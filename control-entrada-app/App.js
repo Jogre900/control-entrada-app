@@ -6,10 +6,13 @@ import { Ionicons } from '@expo/vector-icons';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
+import { MainNavigator } from './navigation/main.navigator'
 import BottomTabNavigator from './navigation/BottomTabNavigator';
 import useLinking from './navigation/useLinking';
 
 const Stack = createStackNavigator();
+
+
 
 export default function App(props) {
   const [isLoadingComplete, setLoadingComplete] = React.useState(false);
@@ -42,19 +45,27 @@ export default function App(props) {
 
     loadResourcesAndDataAsync();
   }, []);
+  
 
   if (!isLoadingComplete && !props.skipLoadingScreen) {
     return null;
   } else {
     return (
-      <View style={styles.container}>
-        {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
-        <NavigationContainer ref={containerRef} initialState={initialNavigationState}>
-          <Stack.Navigator>
-            <Stack.Screen name="Root" component={BottomTabNavigator} />
-          </Stack.Navigator>
+      <React.Fragment>
+        <NavigationContainer>
+
+        <MainNavigator/>
         </NavigationContainer>
-      </View>
+      </React.Fragment>
+      // <View style={styles.container}>
+      // {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
+      //   <NavigationContainer ref={containerRef} initialState={initialNavigationState}>
+      //     <Stack.Navigator>
+      //       <Stack.Screen name="root" component={mainNavigator} />
+      //     </Stack.Navigator>
+      //   </NavigationContainer>
+        
+      // </View>
     );
   }
 }
