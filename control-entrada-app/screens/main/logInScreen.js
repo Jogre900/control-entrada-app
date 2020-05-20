@@ -23,21 +23,20 @@ const backAction = () => {
 };
 
 export const LogInScreen = (props) => {
-//     const backHandler = useRef(null)
-//     useEffect(() => {
-//     backHandler.current = BackHandler.addEventListener("hardwareBackPress", backAction);
-//     return () => {
-//       backHandler.current.remove()
-//         //BackHandler.removeEventListener("hardwareBackPress", backAction);
-//     };
-//   }, []);
+    const backHandler = useRef(null)
+    useEffect(() => {
+    backHandler.current = BackHandler.addEventListener("hardwareBackPress", backAction);
+    return () => {
+      backHandler.current.remove()
+        //BackHandler.removeEventListener("hardwareBackPress", backAction);
+    };
+  }, []);
 
   return (
     <View style={styles.container}>
       <StatusBar hidden={true}/>
-      <Text>LogIn Screen!</Text>
-      <TextInput placeholder="usuario" />
-      <TextInput placeholder="clave" />
+      <TextInput style={styles.input} textAlign='center' placeholder="usuario" />
+      <TextInput style={styles.input} textAlign='center' placeholder="clave" />
       <Button
         onPress={() => {
           props.navigation.navigate("Home");
@@ -61,4 +60,9 @@ const styles = StyleSheet.create({
     alignContent: "center",
     backgroundColor: "#fff",
   },
+  input: {
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: 'grey',
+  }
 });

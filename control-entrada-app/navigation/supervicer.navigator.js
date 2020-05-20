@@ -1,36 +1,39 @@
-import React from 'react'
-import { createDrawerNavigator } from '@react-navigation/drawer'
-import { 
-    View,
-    Text
- } from 'react-native'
+import React from "react";
+import { createDrawerNavigator } from "@react-navigation/drawer";
+import { createStackNavigator } from "@react-navigation/stack";
+import { View, Text } from "react-native";
 
- //screens
- import { HomeSuperScreen } from '../screens/super/homeSuperScreen'
+//screens
+import { HomeSuperScreen } from "../screens/super/homeSuperScreen";
+import { DetailViewScreen } from "../screens/super/detailViewScreen";
+import { HistorialScreen } from "../screens/super/historialScreen";
 
-const drawer = createDrawerNavigator()
-
-function HomeScreen() {
-    return (
-        <View>
-            <Text>HomeScreen!!</Text>
-        </View>
-    )
-}
+const drawer = createDrawerNavigator();
+const Stack = createStackNavigator();
 
 function PerfilScreen() {
-    return (
-        <View>
-            <Text>PerfilScreen!!</Text>
-        </View>
-    )
+  return (
+    <View>
+      <Text>PerfilScreen!!</Text>
+    </View>
+  );
+}
+
+function SupervicerNav() {
+  return (
+    <Stack.Navigator headerMode="none">
+      <Stack.Screen name="supervicer-home" component={HomeSuperScreen} />
+      <Stack.Screen name="detail-view" component={DetailViewScreen} />
+    </Stack.Navigator>
+  );
 }
 
 export const SuperNavigator = () => {
-    return (
-        <drawer.Navigator>
-            <drawer.Screen name='home' component={HomeSuperScreen}/>
-            <drawer.Screen name='perfil' component={PerfilScreen}/>
-        </drawer.Navigator>
-    )
-}
+  return (
+    <drawer.Navigator>
+      <drawer.Screen name="home" component={SupervicerNav} />
+      <drawer.Screen name="perfil" component={PerfilScreen} />
+      <drawer.Screen name="historial" component={HistorialScreen} />
+    </drawer.Navigator>
+  );
+};
