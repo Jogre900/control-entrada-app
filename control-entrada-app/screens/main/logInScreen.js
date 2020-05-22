@@ -11,6 +11,9 @@ import {
   TouchableOpacity,
 } from "react-native";
 
+//components
+import { MainButton } from "../../components/mainButton.component";
+
 const backAction = () => {
   Alert.alert("", "Cerrar App?", [
     {
@@ -32,6 +35,19 @@ export const LogInScreen = (props) => {
   //       //BackHandler.removeEventListener("hardwareBackPress", backAction);
   //   };
   // }, []);
+  const paramsHome = {
+    props: props,
+    title: "Iniciar Sesion",
+    route: "Home",
+    navigate: true
+  };
+
+  const paramsSuper = {
+    props: props,
+    title: "Supervisor",
+    route: "super",
+    navigate: true
+  };
 
   return (
     <View style={styles.container}>
@@ -47,22 +63,8 @@ export const LogInScreen = (props) => {
           textAlign="center"
           placeholder="clave"
         />
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => {
-            props.navigation.navigate("Home");
-          }}
-        >
-          <Text>Iniciar Sesion</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => {
-            props.navigation.navigate("super");
-          }}
-        >
-          <Text>Supervisor</Text>
-        </TouchableOpacity>
+        <MainButton {...paramsHome} />
+        <MainButton {...paramsSuper} />
       </View>
     </View>
   );
@@ -74,7 +76,6 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
     alignItems: "center",
     backgroundColor: "white",
-    paddingHorizontal: 20,
   },
   buttonBox: {
     marginBottom: "10%",
@@ -86,15 +87,5 @@ const styles = StyleSheet.create({
     borderColor: "grey",
     marginBottom: 10,
     height: 40,
-  },
-  button: {
-    borderRadius: 20,
-    backgroundColor: "#cccc",
-    borderColor: "#cccc",
-    borderWidth: 1,
-    marginBottom: 10,
-    height: 40,
-    justifyContent: "center",
-    alignItems: "center"
   },
 });

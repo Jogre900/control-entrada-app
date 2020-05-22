@@ -6,11 +6,38 @@ import {
     Button
 } from 'react-native'
 
+//components
+import { TopNavigation } from '../../components/TopNavigation.component'
+import { MainButton } from '../../components/mainButton.component'
+
 export const HomeScreen = (props) => {
+    const params = {
+        id: false,
+        props: props,
+        title: 'Control de Visitas'
+    }
+    const entrada = {
+        props: props,
+        title: 'Entrada',
+        route: 'entrada',
+        navigate: true
+    }
+    const salida = {
+        props: props,
+        title: 'Salida',
+        route: 'salida',
+        navigate: true
+    }
+
     return (
         <View style={styles.container}>
-            <Button title='entrada' onPress={() => {props.navigation.navigate('entrada')}}/>
-            <Button title='salida' onPress={()=> {props.navigation.navigate('salida')}}/>
+            <TopNavigation {...params}/>
+            <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+                <View style={styles.actionContainer}>
+                <MainButton {...entrada}/>
+                <MainButton {...salida}/>
+                </View>
+            </View>
         </View>
     )
 }
@@ -18,7 +45,11 @@ export const HomeScreen = (props) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: 'center',
-        alignContent: 'center'
+        
+    },
+    actionContainer: {
+        
+        width: "75%",
+        
     }
 })

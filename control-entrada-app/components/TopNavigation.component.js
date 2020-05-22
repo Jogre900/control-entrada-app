@@ -16,12 +16,12 @@ function Notification() {
 }
 
 function NormalNav() {
-  return <View></View>;
+  return <View>
+    <Ionicons name='ios-notifications' size={32} color='#eee'/>
+  </View>;
 }
 
 export const TopNavigation = (params) => {
-  //const { props, title } = params
-  //console.log('pops', params)
   return (
     <View style={styles.container}>
       <StatusBar hidden={true} />
@@ -52,6 +52,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     padding: 10,
+    backgroundColor: '#eee'
   },
   title: {
     fontSize: 17,

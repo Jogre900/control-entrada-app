@@ -9,7 +9,7 @@ const Stack = createStackNavigator()
 
 export const WatchNavigator = () => {
     return (
-        <Stack.Navigator initialRouteName={HomeScreen}>
+        <Stack.Navigator headerMode='none' initialRouteName={HomeScreen}>
             <Stack.Screen name='watch-home' component={HomeScreen}/>
             <Stack.Screen name='entrada' component={EntradaScreen}/>
             <Stack.Screen name='salida' component={SalidaScreen}/>
