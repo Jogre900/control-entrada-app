@@ -8,6 +8,7 @@ const data = [
   {
     cedula: "19222907",
     nombre: "jose",
+    destino: 'apt 104',
     entrada: "15:30",
     salida: "19:00",
   },
@@ -19,6 +20,7 @@ export const HomeSuperScreen = (props) => {
     props: props,
     title: "Entradas del dia",
   };
+  console.log('data-array', data[1])
   return (
     <View>
       <TopNavigation {...params} />
