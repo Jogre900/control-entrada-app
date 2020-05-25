@@ -9,6 +9,7 @@ import { HomeSuperScreen } from "../screens/super/homeSuperScreen";
 import { DetailViewScreen } from "../screens/super/detailViewScreen";
 import { HistorialScreen } from "../screens/super/historialScreen";
 import { PerfilScreen } from '../screens/super/perfilScreen'
+import { NotificationScreen } from '../screens/super/notificationScreen'
 
 const drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
@@ -19,6 +20,7 @@ function SupervicerNav() {
     <Stack.Navigator headerMode="none">
       <Stack.Screen name="supervicer-home" component={HomeSuperScreen} />
       <Stack.Screen name="detail-view" component={DetailViewScreen} />
+      <Stack.Screen name='notification' component={NotificationScreen}/>
     </Stack.Navigator>
   );
 }

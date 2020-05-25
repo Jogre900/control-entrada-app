@@ -5,6 +5,7 @@ import { Ionicons } from "@expo/vector-icons";
 //components
 import { TopNavigation } from "../../components/TopNavigation.component";
 
+
 const data = [
   {
     cedula: "19222907",
@@ -48,7 +49,7 @@ export const HomeSuperScreen = (props) => {
     return (
       <RectButton
         onPress={() => {
-          props.navigation.navigate("noti");
+          props.navigation.navigate("notification");
         }}
       >
         <Ionicons name="md-notifications" size={32} color="grey" />
