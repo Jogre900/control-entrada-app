@@ -1,21 +1,33 @@
 import React from "react";
-import { View, Text, StyleSheet, TextInput, Button, Alert } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  Button,
+  Alert,
+  Image,
+} from "react-native";
+import { RectButton } from "react-native-gesture-handler";
 import { Ionicons } from "@expo/vector-icons";
+
 //components
 import { TopNavigation } from "../../components/TopNavigation.component";
 import { MainButton } from "../../components/mainButton.component";
+
 export const EntradaScreen = (props) => {
-  const nav = {
-    id: false,
-    title: "Registrar Entrada",
-    props: props,
+  const goBackAction = () => {
+    return (
+      <RectButton
+        onPress={() => {
+          props.navigation.goBack();
+        }}
+      >
+        <Ionicons name="ios-arrow-back" size={32} color="grey" />
+      </RectButton>
+    );
   };
-  const registrar = {
-    props: props,
-    title: "Registrar",
-    route: "",
-    navigate: false,
-  };
+
   const inputProps = {
     placeholderTextColor: "black",
     style: {
@@ -24,10 +36,11 @@ export const EntradaScreen = (props) => {
       height: 40,
     },
   };
-  
+
   return (
     <View style={styles.container}>
-      <TopNavigation {...nav} />
+      <TopNavigation title="Registrar Entrada" leftControl={goBackAction()} />
+      <View style={{paddingHorizontal: 5}}>
       <View style={styles.detailCardContainer}>
         <View style={styles.detailCard}>
           <View style={styles.cardContainer1}>
@@ -35,7 +48,11 @@ export const EntradaScreen = (props) => {
               <TextInput placeholder="Cedula" {...inputProps} />
             </View>
             <View>
-              <TextInput placeholder="Nombre" textContentType="password" {...inputProps} />
+              <TextInput
+                placeholder="Nombre"
+                textContentType="password"
+                {...inputProps}
+              />
             </View>
             <View>
               <TextInput placeholder="Apellido" {...inputProps} />
@@ -45,23 +62,23 @@ export const EntradaScreen = (props) => {
             </View>
           </View>
           <View style={styles.cardContainer2}>
-            <Ionicons name="md-camera" size={64} color="grey" />
+            <View
+              style={styles.pictureBox}
+            >
+              <Ionicons name="md-camera" size={32} color="grey" />
+            </View>
           </View>
         </View>
       </View>
-      {/* <View>
-                <TextInput placeholder='cedula'/>
-                <TextInput placeholder='nombre'/>
-                <TextInput placeholder='apellido'/>
-                <TextInput placeholder='destino'/>
-                <View>
-                    <Text>
-                        Foto
-                    </Text>
-                </View>
-                
-            </View> */}
-            <MainButton {...registrar}/>
+      </View>
+      
+
+      <MainButton
+        title="Registrar"
+        onPress={() => {
+          Alert.alert("Registro exitoso!");
+        }}
+      />
     </View>
   );
 };
@@ -75,6 +92,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#cccccc",
     borderRadius: 5,
     padding: 5,
+    //height: '40%'
   },
   detailCard: {
     flexDirection: "row",
@@ -84,15 +102,28 @@ const styles = StyleSheet.create({
   cardContainer1: {
     maxWidth: "60%",
     width: "100%",
+    //height: '100%',
     justifyContent: "space-around",
     backgroundColor: "#cccc",
   },
   cardContainer2: {
     maxWidth: "40%",
     width: "100%",
+
     justifyContent: "space-around",
     alignItems: "center",
     backgroundColor: "#cccc",
+  },
+  pictureBox: {
+      borderWidth: 1,
+      borderColor: 'grey',
+      borderStyle: 'dashed',
+      borderRadius: 5,
+      width: 120,
+      height: 120,
+      justifyContent: "center",
+      alignItems: "center",
+    
   },
   cardTitleContainer: {
     justifyContent: "center",

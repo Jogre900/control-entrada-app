@@ -1,15 +1,14 @@
 import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
 
-export const MainButton = (params) => {
+export const MainButton = (props) => {
+  const { title, onPress } = props
   return (
     <TouchableOpacity
       style={styles.button}
-      onPress={() => {(params.navigate)?
-        params.props.navigation.navigate(params.route):Alert.alert('Algo paso!');
-      }}
+      onPress={onPress}
     >
-      <Text>{params.title}</Text>
+      <Text>{title}</Text>
     </TouchableOpacity>
   );
 };

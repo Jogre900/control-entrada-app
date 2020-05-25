@@ -1,13 +1,14 @@
 import React from "react";
-import { View, Text, StyleSheet, Dimensions } from "react-native";
+import { View, Text, StyleSheet, Image, Dimensions } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 const DEVICE_WIDTH = Dimensions.get("window").width;
 const watchData = [
   {
     cedula: "19222907",
-    nombre: "pepito",
+    nombre: "jose del corral",
     idCode: "987654",
+    picture: require("../assets/images/male.jpg"),
   },
 ];
 
@@ -36,7 +37,12 @@ function WatchCard() {
                 </View>
               </View>
               <View style={styles.cardContainer2}>
-                <Ionicons name="md-camera" size={64} color="grey" />
+                <View>
+                  <Image
+                    style={{ width: 160, height: 160 }}
+                    source={watch.picture}
+                  />
+                </View>
               </View>
             </View>
           </View>
@@ -52,44 +58,42 @@ export const DetailCard = (data) => {
   const info = data.data;
   return (
     <View style={{ padding: 4 }}>
-      {info.map((index) => {
-        return (
-          <View
-            style={styles.detailCardContainer}
-          >
-            <View style={styles.cardTitleContainer}>
-              <Text style={styles.cardTitle}>Visitante</Text>
+      <View style={styles.detailCardContainer}>
+        <View style={styles.cardTitleContainer}>
+          <Text style={styles.cardTitle}>Visitante</Text>
+        </View>
+        <View style={styles.detailCard}>
+          <View style={styles.cardContainer1}>
+            <View>
+              <Text style={styles.cardText}>Nombre:</Text>
+              <Text style={styles.dataText}>{info.nombre}</Text>
             </View>
-            <View style={styles.detailCard}>
-              <View style={styles.cardContainer1}>
-                <View>
-                  <Text style={styles.cardText}>Nombre:</Text>
-                  <Text style={styles.dataText}>{index.nombre}</Text>
-                </View>
-                <View>
-                  <Text style={styles.cardText}>DNI:</Text>
-                  <Text style={styles.dataText}>{index.cedula}</Text>
-                </View>
-                <View>
-                  <Text style={styles.cardText}>Destino:</Text>
-                  <Text style={styles.dataText}>{index.destino}</Text>
-                </View>
-              </View>
-              <View style={styles.cardContainer2}>
-                <Ionicons name="md-camera" size={64} color="white" />
-                <View>
-                  <Text style={styles.cardText}>
-                    Hora de Entrada:{index.entrada}
-                  </Text>
-                  <Text style={styles.cardText}>
-                    Hora de Salida: {index.salida}
-                  </Text>
-                </View>
-              </View>
+            <View>
+              <Text style={styles.cardText}>DNI:</Text>
+              <Text style={styles.dataText}>{info.cedula}</Text>
+            </View>
+            <View>
+              <Text style={styles.cardText}>Destino:</Text>
+              <Text style={styles.dataText}>{info.destino}</Text>
             </View>
           </View>
-        );
-      })}
+          <View style={styles.cardContainer2}>
+            <View>
+              <Image
+                style={{ width: 160, height: 160 }}
+                source={info.picture}
+              />
+            </View>
+            <View style={styles.timeBox}>
+              <Text style={styles.cardText}>Hora de Entrada:</Text>
+              <Text style={styles.dataText}>{info.entrada} am</Text>
+              <Text style={styles.cardText}>Hora de Salida:</Text>
+              <Text style={styles.dataText}>{info.salida} pm</Text>
+            </View>
+          </View>
+        </View>
+      </View>
+
       <WatchCard />
     </View>
   );
@@ -100,7 +104,8 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     backgroundColor: "#cccccc",
     borderRadius: 5,
-    padding: 5,
+    paddingHorizontal: 5,
+    paddingVertical: 10,
   },
   detailCard: {
     flexDirection: "row",
@@ -109,28 +114,25 @@ const styles = StyleSheet.create({
   },
   cardContainer1: {
     maxWidth: "60%",
-    width: "100%",
+
     justifyContent: "space-around",
-    backgroundColor: "#cccc",
   },
-  cardContainer2: {
-    maxWidth: "40%",
-    width: "100%",
-    justifyContent: "space-around",
-    alignItems: "center",
-    backgroundColor: "#cccc",
-  },
+  cardContainer2: {},
   cardTitleContainer: {
     justifyContent: "center",
     alignItems: "center",
+    marginBottom: 15,
+    borderBottomWidth: 0.5,
   },
+  timeBox: {},
   cardTitle: {
-    fontSize: 17,
+    fontSize: 20,
+    lineHeight: 35,
   },
   cardText: {
-    fontSize: 14,
+    fontSize: 13,
   },
   dataText: {
-    fontSize: 20,
+    fontSize: 19,
   },
 });

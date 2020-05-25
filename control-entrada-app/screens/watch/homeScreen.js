@@ -1,55 +1,53 @@
-import React from 'react'
-import {
-    View,
-    Text,
-    StyleSheet,
-    Button
-} from 'react-native'
+import React from "react";
+import { View, Text, StyleSheet, Button, Alert } from "react-native";
+import { RectButton } from "react-native-gesture-handler";
+import { Ionicons } from "@expo/vector-icons";
 
 //components
-import { TopNavigation } from '../../components/TopNavigation.component'
-import { MainButton } from '../../components/mainButton.component'
+import { TopNavigation } from "../../components/TopNavigation.component";
+import { MainButton } from "../../components/mainButton.component";
 
 export const HomeScreen = (props) => {
-    const params = {
-        id: false,
-        props: props,
-        title: 'Control de Visitas'
-    }
-    const entrada = {
-        props: props,
-        title: 'Entrada',
-        route: 'entrada',
-        navigate: true
-    }
-    const salida = {
-        props: props,
-        title: 'Salida',
-        route: 'salida',
-        navigate: true
-    }
-
+  const goBackAction = () => {
     return (
-        <View style={styles.container}>
-            <TopNavigation {...params}/>
-            <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-                <View style={styles.actionContainer}>
-                <MainButton {...entrada}/>
-                <MainButton {...salida}/>
-                </View>
-            </View>
+      <RectButton
+        onPress={() => {
+          props.navigation.goBack();
+        }}
+      >
+        <Ionicons name="ios-arrow-back" size={32} color="grey" />
+      </RectButton>
+    );
+  };
+
+  return (
+    <View style={styles.container}>
+      <TopNavigation title="Control de visitas" leftControl={goBackAction()} />
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <View style={styles.actionContainer}>
+          <MainButton
+            title="Entrada"
+            onPress={() => {
+              props.navigation.navigate("entrada");
+            }}
+          />
+          <MainButton
+            title="Salida"
+            onPress={() => {
+              props.navigation.navigate("salida");
+            }}
+          />
         </View>
-    )
-}
+      </View>
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        
-    },
-    actionContainer: {
-        
-        width: "75%",
-        
-    }
-})
+  container: {
+    flex: 1,
+  },
+  actionContainer: {
+    width: "75%",
+  },
+});

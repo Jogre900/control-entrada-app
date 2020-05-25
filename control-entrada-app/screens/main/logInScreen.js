@@ -63,8 +63,8 @@ export const LogInScreen = (props) => {
           textAlign="center"
           placeholder="clave"
         />
-        <MainButton {...paramsHome} />
-        <MainButton {...paramsSuper} />
+        <MainButton title='Iniciar Sesion' onPress={()=>{props.navigation.navigate('Home')}}/>
+        <MainButton title='Supervsor' onPress={()=>{props.navigation.navigate('super')}}/>
       </View>
     </View>
   );
