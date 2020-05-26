@@ -14,6 +14,7 @@ import { Ionicons } from "@expo/vector-icons";
 //components
 import { TopNavigation } from "../../components/TopNavigation.component";
 import { MainButton } from "../../components/mainButton.component";
+import { Input } from "../../components/input.component";
 
 const busquedaData = {
   nombre: "Jose Del Corral",
@@ -58,22 +59,26 @@ export const SalidaScreen = (props) => {
     <View style={styles.container}>
       <TopNavigation title="Registrar Salida" leftControl={goBackAction()} />
       <View style={styles.searchBox}>
-        <TextInput
-          placeholder="DNI"
-          onChangeText={(valor) => setBuscar(valor)}
-          value={buscar}
-        />
-        <RectButton 
+        <View style={{ width: "70%" }}>
+          <Input
+            title="Buscar por DNI"
+            shape="round"
+            alignText="center"
+            
+            onChangeText={(valor) => setBuscar(valor)}
+            value={buscar}
+          />
+        </View>
+        <RectButton
           title="Buscar"
           onPress={() => {
             buscar === "19222907" ? setEncontrado(true) : setEncontrado(false);
           }}
         >
-          <Ionicons name='ios-search' size={28} color='grey'/>
+          <Ionicons name="ios-search" size={28} color="grey" />
         </RectButton>
       </View>
       {encontrado ? (
-        
         <View style={styles.detailCardContainer}>
           <View style={styles.detailCard}>
             <View style={styles.cardContainer1}>
@@ -120,17 +125,18 @@ export const SalidaScreen = (props) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 5,
   },
   searchBox: {
-    flexDirection: 'row',
-    justifyContent: 'space-between'
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 5
   },
   detailCard: {
     flexDirection: "row",
     justifyContent: "space-between",
     //minWidth: DEVICE_WIDTH,
-    backgroundColor: '#cccc',
+    backgroundColor: "#cccc",
     marginBottom: 10,
     marginBottom: 20,
     borderRadius: 5,

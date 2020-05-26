@@ -14,6 +14,7 @@ import { Ionicons } from "@expo/vector-icons";
 //components
 import { TopNavigation } from "../../components/TopNavigation.component";
 import { MainButton } from "../../components/mainButton.component";
+import { Input } from "../../components/input.component";
 
 export const EntradaScreen = (props) => {
   const goBackAction = () => {
@@ -40,38 +41,51 @@ export const EntradaScreen = (props) => {
   return (
     <View style={styles.container}>
       <TopNavigation title="Registrar Entrada" leftControl={goBackAction()} />
-      <View style={{paddingHorizontal: 5}}>
-      <View style={styles.detailCardContainer}>
-        <View style={styles.detailCard}>
-          <View style={styles.cardContainer1}>
-            <View>
-              <TextInput placeholder="Cedula" {...inputProps} />
+      <View style={{ paddingHorizontal: 5 }}>
+        <View style={styles.detailCardContainer}>
+          <View style={styles.detailCard}>
+            <View style={styles.cardContainer1}>
+              <View>
+                <Input
+                  title="DNI"
+                  shape="round"
+                  textColor="black"
+                  alignText="center"
+                />
+              </View>
+              <View>
+                <Input
+                  title="Nombre"
+                  shape="round"
+                  textColor="black"
+                  alignText="center"
+                />
+              </View>
+              <View>
+                <Input
+                  title="Apellido"
+                  shape="round"
+                  textColor="black"
+                  alignText="center"
+                />
+              </View>
+              <View>
+                <Input
+                  title="Destino"
+                  shape="round"
+                  textColor="black"
+                  alignText="center"
+                />
+              </View>
             </View>
-            <View>
-              <TextInput
-                placeholder="Nombre"
-                textContentType="password"
-                {...inputProps}
-              />
-            </View>
-            <View>
-              <TextInput placeholder="Apellido" {...inputProps} />
-            </View>
-            <View>
-              <TextInput placeholder="Destino" {...inputProps} />
-            </View>
-          </View>
-          <View style={styles.cardContainer2}>
-            <View
-              style={styles.pictureBox}
-            >
-              <Ionicons name="md-camera" size={32} color="grey" />
+            <View style={styles.cardContainer2}>
+              <View style={styles.pictureBox}>
+                <Ionicons name="md-camera" size={32} color="grey" />
+              </View>
             </View>
           </View>
         </View>
       </View>
-      </View>
-      
 
       <MainButton
         title="Registrar"
@@ -89,53 +103,35 @@ const styles = StyleSheet.create({
   },
   detailCardContainer: {
     marginBottom: 20,
-    backgroundColor: "#cccccc",
+    backgroundColor: "#eee",
     borderRadius: 5,
-    padding: 5,
-    //height: '40%'
+    padding: 10,
+    borderWidth: 0.5,
+    borderColor: "grey",
   },
   detailCard: {
     flexDirection: "row",
     justifyContent: "space-between",
-    //minWidth: DEVICE_WIDTH,
   },
   cardContainer1: {
     maxWidth: "60%",
-    width: "100%",
-    //height: '100%',
+    width: "55%",
     justifyContent: "space-around",
-    backgroundColor: "#cccc",
   },
   cardContainer2: {
     maxWidth: "40%",
     width: "100%",
-
     justifyContent: "space-around",
     alignItems: "center",
-    backgroundColor: "#cccc",
   },
   pictureBox: {
-      borderWidth: 1,
-      borderColor: 'grey',
-      borderStyle: 'dashed',
-      borderRadius: 5,
-      width: 120,
-      height: 120,
-      justifyContent: "center",
-      alignItems: "center",
-    
-  },
-  cardTitleContainer: {
+    borderWidth: 1,
+    borderColor: "grey",
+    borderStyle: "dashed",
+    borderRadius: 5,
+    width: 120,
+    height: 150,
     justifyContent: "center",
     alignItems: "center",
-  },
-  cardTitle: {
-    fontSize: 17,
-  },
-  cardText: {
-    fontSize: 14,
-  },
-  dataText: {
-    fontSize: 20,
   },
 });
