@@ -24,11 +24,11 @@ const styles = StyleSheet.create({
     borderWidth: .5,
     marginBottom: 10,
     height: 40,
+    
   },
   squareShape: {
     borderRadius: 3,
     borderWidth: .5,
-    borderColor: "grey",
     marginBottom: 10,
     height: 40,
   },

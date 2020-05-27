@@ -76,14 +76,16 @@ export const LogInScreen = (props) => {
           />
           <View style={styles.buttonBox}>
             <Input
-              style={{ borderColor: "#ff7e00" }}
+              style={{ borderColor: "#ff7e00", color: "white" }}
               title="Usuario"
+              textColor="white"
               shape="round"
               alignText="center"
             />
             <Input
-              style={{ borderColor: "#ff7e00" }}
+              style={{ borderColor: "#ff7e00", color: "white" }}
               title="Clave"
+              textColor="white"
               shape="round"
               alignText="center"
             />
