@@ -15,7 +15,7 @@ export const HomeScreen = (props) => {
           props.navigation.goBack();
         }}
       >
-        <Ionicons name="ios-arrow-back" size={32} color="grey" />
+        <Ionicons name="ios-arrow-back" size={28} color="white" />
       </RectButton>
     );
   };
@@ -23,7 +23,7 @@ export const HomeScreen = (props) => {
   return (
     <View style={styles.container}>
       <TopNavigation title="Control de visitas" leftControl={goBackAction()} />
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+      <View style={styles.contentContainer}>
         <View style={styles.actionContainer}>
           <MainButton
             title="Entrada"
@@ -46,6 +46,11 @@ export const HomeScreen = (props) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  contentContainer: {
+    flex: 1,
+    justifyContent: "center", 
+    alignItems: "center" 
   },
   actionContainer: {
     width: "75%",

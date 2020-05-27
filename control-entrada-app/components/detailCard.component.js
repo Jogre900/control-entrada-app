@@ -102,7 +102,7 @@ export const DetailCard = (data) => {
 const styles = StyleSheet.create({
   detailCardContainer: {
     marginBottom: 20,
-    backgroundColor: "#cccccc",
+    backgroundColor: "white",
     borderRadius: 5,
     paddingHorizontal: 5,
     paddingVertical: 10,

@@ -16,7 +16,7 @@ export const DetailViewScreen = (props) => {
           props.navigation.goBack();
         }}
       >
-        <Ionicons name="ios-arrow-back" size={32} color="grey" />
+        <Ionicons name="ios-arrow-back" size={28} color="white" />
       </RectButton>
     );
   };

@@ -24,7 +24,7 @@ export const EntradaScreen = (props) => {
           props.navigation.goBack();
         }}
       >
-        <Ionicons name="ios-arrow-back" size={32} color="grey" />
+        <Ionicons name="ios-arrow-back" size={28} color="white" />
       </RectButton>
     );
   };
@@ -41,42 +41,37 @@ export const EntradaScreen = (props) => {
   return (
     <View style={styles.container}>
       <TopNavigation title="Registrar Entrada" leftControl={goBackAction()} />
-      <View style={{ paddingHorizontal: 5 }}>
+      <View style={styles.contentContainer}>
         <View style={styles.detailCardContainer}>
           <View style={styles.detailCard}>
             <View style={styles.cardContainer1}>
-              <View>
-                <Input
-                  title="DNI"
-                  shape="round"
-                  textColor="black"
-                  alignText="center"
-                />
-              </View>
-              <View>
-                <Input
-                  title="Nombre"
-                  shape="round"
-                  textColor="black"
-                  alignText="center"
-                />
-              </View>
-              <View>
-                <Input
-                  title="Apellido"
-                  shape="round"
-                  textColor="black"
-                  alignText="center"
-                />
-              </View>
-              <View>
-                <Input
-                  title="Destino"
-                  shape="round"
-                  textColor="black"
-                  alignText="center"
-                />
-              </View>
+              <Input
+                title="DNI"
+                shape="round"
+                textColor="black"
+                alignText="center"
+              />
+
+              <Input
+                title="Nombre"
+                shape="round"
+                textColor="black"
+                alignText="center"
+              />
+
+              <Input
+                title="Apellido"
+                shape="round"
+                textColor="black"
+                alignText="center"
+              />
+
+              <Input
+                title="Destino"
+                shape="round"
+                textColor="black"
+                alignText="center"
+              />
             </View>
             <View style={styles.cardContainer2}>
               <View style={styles.pictureBox}>
@@ -85,14 +80,15 @@ export const EntradaScreen = (props) => {
             </View>
           </View>
         </View>
+        <View style={styles.buttonBox}>
+          <MainButton
+            title="Registrar"
+            onPress={() => {
+              Alert.alert("Registro exitoso!");
+            }}
+          />
+        </View>
       </View>
-
-      <MainButton
-        title="Registrar"
-        onPress={() => {
-          Alert.alert("Registro exitoso!");
-        }}
-      />
     </View>
   );
 };
@@ -100,28 +96,30 @@ export const EntradaScreen = (props) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "white",
+  },
+  contentContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 5,
   },
   detailCardContainer: {
-    marginBottom: 20,
-    backgroundColor: "#eee",
-    borderRadius: 5,
+    width: "100%",
     padding: 10,
     borderWidth: 0.5,
     borderColor: "grey",
+    borderRadius: 5,
   },
   detailCard: {
     flexDirection: "row",
     justifyContent: "space-between",
+    alignItems: "center",
   },
   cardContainer1: {
-    maxWidth: "60%",
     width: "55%",
     justifyContent: "space-around",
   },
   cardContainer2: {
-    maxWidth: "40%",
-    width: "100%",
-    justifyContent: "space-around",
     alignItems: "center",
   },
   pictureBox: {
@@ -133,5 +131,9 @@ const styles = StyleSheet.create({
     height: 150,
     justifyContent: "center",
     alignItems: "center",
+  },
+  buttonBox: {
+    width: "76%",
+    marginTop: 20,
   },
 });

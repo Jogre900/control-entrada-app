@@ -30,7 +30,7 @@ export const SalidaScreen = (props) => {
           props.navigation.goBack();
         }}
       >
-        <Ionicons name="ios-arrow-back" size={32} color="grey" />
+        <Ionicons name="ios-arrow-back" size={28} color="white" />
       </RectButton>
     );
   };
@@ -38,12 +38,8 @@ export const SalidaScreen = (props) => {
   const [buscar, setBuscar] = useState();
   const [horaSalida, setHoraSalida] = useState();
   const [encontrado, setEncontrado] = useState();
-  const [nombre, setNombre] = useState("");
-  const [dni, setDni] = useState("");
-  const [destino, setDestino] = useState("");
 
   const getHour = () => {
-    const date = new Date().getDate();
     const hour = new Date().getHours();
     const minute = new Date().getMinutes();
     let Hour = "";
@@ -58,66 +54,72 @@ export const SalidaScreen = (props) => {
   return (
     <View style={styles.container}>
       <TopNavigation title="Registrar Salida" leftControl={goBackAction()} />
-      <View style={styles.searchBox}>
-        <View style={{ width: "70%" }}>
-          <Input
-            title="Buscar por DNI"
-            shape="round"
-            alignText="center"
-            
-            onChangeText={(valor) => setBuscar(valor)}
-            value={buscar}
-          />
+      <View style={styles.contentContainer}>
+        <View style={styles.searchBox}>
+          <View style={{ width: "70%" }}>
+            <Input
+              title="Buscar por DNI"
+              shape="round"
+              alignText="center"
+              onChangeText={(valor) => setBuscar(valor)}
+              value={buscar}
+            />
+          </View>
+          <RectButton
+            title="Buscar"
+            onPress={() => {
+              buscar === "19222907"
+                ? setEncontrado(true)
+                : setEncontrado(false);
+            }}
+          >
+            <Ionicons name="ios-search" size={28} color="grey" />
+          </RectButton>
         </View>
-        <RectButton
-          title="Buscar"
-          onPress={() => {
-            buscar === "19222907" ? setEncontrado(true) : setEncontrado(false);
-          }}
-        >
-          <Ionicons name="ios-search" size={28} color="grey" />
-        </RectButton>
-      </View>
-      {encontrado ? (
-        <View style={styles.detailCardContainer}>
-          <View style={styles.detailCard}>
-            <View style={styles.cardContainer1}>
-              <View>
-                <Text style={styles.cardText}>Nombre:</Text>
-                <Text style={styles.dataText}>Jose</Text>
+        {encontrado ? (
+          <View style={styles.detailCardContainer}>
+            <View style={styles.detailCard}>
+              <View style={styles.cardContainer1}>
+                <View>
+                  <Text style={styles.cardText}>Nombre:</Text>
+                  <Text style={styles.dataText}>Jose Del Corral</Text>
+                </View>
+                <View>
+                  <Text style={styles.cardText}>DNI:</Text>
+                  <Text style={styles.dataText}>19222907</Text>
+                </View>
+                <View>
+                  <Text style={styles.cardText}>Destino:</Text>
+                  <Text style={styles.dataText}>Apt 104</Text>
+                </View>
               </View>
-              <View>
-                <Text style={styles.cardText}>DNI:</Text>
-                <Text style={styles.dataText}>19222907</Text>
-              </View>
-              <View>
-                <Text style={styles.cardText}>Destino:</Text>
-                <Text style={styles.dataText}>Apt 104</Text>
+              <View style={styles.cardContainer2}>
+                <View>
+                  <Image
+                    style={{ width: 160, height: 160 }}
+                    source={require("../../assets/images/female.jpg")}
+                  />
+                </View>
+                <View>
+                  <Text style={styles.cardText}>Hora de Entrada:</Text>
+                  <Text style={styles.dataText}>8:30 am</Text>
+                  <Text style={styles.cardText}>Hora de Salida:</Text>
+                  <Text style={styles.dataText}>{horaSalida}</Text>
+                </View>
               </View>
             </View>
-            <View style={styles.cardContainer2}>
-              <View>
-                <Image
-                  style={{ width: 160, height: 160 }}
-                  source={require("../../assets/images/female.jpg")}
-                />
-              </View>
-              <View>
-                <Text style={styles.cardText}>Hora de Entrada:</Text>
-                <Text style={styles.dataText}>8:30 am</Text>
-                <Text style={styles.cardText}>Hora de Salida:</Text>
-                <Text style={styles.dataText}>{horaSalida}</Text>
-              </View>
+            <View style={styles.buttonBox}>
+              <MainButton
+                style={{ paddingHorizontal: 79 }}
+                title="Marcar salida"
+                onPress={() => {
+                  getHour();
+                }}
+              />
             </View>
           </View>
-          <MainButton
-            title="Marcar salida"
-            onPress={() => {
-              getHour();
-            }}
-          />
-        </View>
-      ) : null}
+        ) : null}
+      </View>
     </View>
   );
 };
@@ -125,32 +127,36 @@ export const SalidaScreen = (props) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "white",
+  },
+  contentContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 5,
   },
   searchBox: {
+    width: "100%",
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingHorizontal: 5
+  },
+  detailCardContainer: {
+    width: "100%",
   },
   detailCard: {
     flexDirection: "row",
     justifyContent: "space-between",
-    //minWidth: DEVICE_WIDTH,
-    backgroundColor: "#cccc",
-    marginBottom: 10,
-    marginBottom: 20,
+    borderWidth: 0.5,
+    borderColor: "grey",
     borderRadius: 5,
-    padding: 5,
+    padding: 10,
   },
   cardContainer1: {
-    maxWidth: "60%",
     justifyContent: "space-around",
-    //backgroundColor: "#cccc",
   },
   cardContainer2: {
     justifyContent: "space-around",
     alignItems: "flex-start",
-    //backgroundColor: "#cccc",
   },
   cardTitleContainer: {
     justifyContent: "center",
@@ -164,5 +170,9 @@ const styles = StyleSheet.create({
   },
   dataText: {
     fontSize: 19,
+  },
+  buttonBox: {
+    alignItems: "center",
+    marginTop: 20,
   },
 });

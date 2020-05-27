@@ -22,7 +22,6 @@ const styles = StyleSheet.create({
   roundedShape: {
     borderRadius: 20,
     borderWidth: .5,
-    borderColor: "grey",
     marginBottom: 10,
     height: 40,
   },

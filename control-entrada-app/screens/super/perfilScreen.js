@@ -6,9 +6,10 @@ import { RectButton } from "react-native-gesture-handler";
 //components
 import { TopNavigation } from "../../components/TopNavigation.component";
 import { MainButton } from "../../components/mainButton.component";
+import { Input } from '../../components/input.component'
 export const PerfilScreen = (props) => {
   
-  const [textChange, setTextChange] = React.useState(false)
+  const [textChange, setTextChange] = React.useState("")
     const goBackAction = () => {
     return (
       <RectButton
@@ -16,7 +17,7 @@ export const PerfilScreen = (props) => {
           props.navigation.goBack();
         }}
       >
-        <Ionicons name="ios-arrow-back" size={32} color="grey" />
+        <Ionicons name="ios-arrow-back" size={28} color="white" />
       </RectButton>
     );
   };
@@ -32,14 +33,14 @@ export const PerfilScreen = (props) => {
         <Text>Security. All Right Reserved</Text>
         <View style={styles.editBox}>
           <Text>Cambio de Contraseña</Text>
-          <TextInput onChangeText={()=>{setTextChange(true)}} placeholder="pass" style={styles.input} />
-          {(setTextChange)?Alert.alert('algo'):Alert.alert('algo 2')}
-          {/* {(setTextChange)? <MainButton
-            title="Guardar Cambios"
-            onPress={() => {
-              Alert.alert("Perfil Actualizado");
-            }}
-          />: null} */}
+          <Input 
+          title='Clave'
+          alignText='center'
+          shape='round'
+          onChangeText={(text) => {setTextChange(text)}}
+          value={textChange}
+          />
+          {(textChange != "")?<MainButton title='Guardar Cambios'/>:null}
           
         </View>
       </View>
@@ -50,13 +51,16 @@ export const PerfilScreen = (props) => {
 const styles = StyleSheet.create({
   perfilContainer: {
     alignItems: "center",
+    justifyContent: 'center'
   },
   perfilLogo: {
     width: 120,
     height: 120,
   },
   editBox: {
-      marginTop: 30
+      marginTop: 30,
+      width: '75%',
+  
   },
   input: {
     borderBottomWidth: 1,

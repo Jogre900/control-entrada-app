@@ -9,6 +9,7 @@ import {
   Image,
   Dimensions,
   Animated,
+  ImageBackground,
 } from "react-native";
 
 //components
@@ -44,31 +45,22 @@ export const LogInScreen = (props) => {
           toValue: 1,
           duration: 1000,
         }),
-      ]),
+      ])
     ).start();
     // backHandler.current = BackHandler.addEventListener("hardwareBackPress", backAction);
     // return () => {
     //   backHandler.current.remove()
     //BackHandler.removeEventListener("hardwareBackPress", backAction);
   }, []);
-  const paramsHome = {
-    props: props,
-    title: "Iniciar Sesion",
-    route: "Home",
-    navigate: true,
-  };
-
-  const paramsSuper = {
-    props: props,
-    title: "Supervisor",
-    route: "super",
-    navigate: true,
-  };
 
   return (
     <View style={styles.container}>
-      <StatusBar hidden={true} />
-      <Animated.Image
+      <ImageBackground
+        source={require("../../assets/images/background.jpg")}
+        style={styles.image}
+      >
+        <StatusBar hidden={true} />
+        {/* <Animated.Image
         style={[
           styles.image,
           {
@@ -76,23 +68,40 @@ export const LogInScreen = (props) => {
           },
         ]}
         source={require("../../assets/images/female-3.jpg")}
-      />
-      <View style={styles.buttonBox}>
-        <Input title="Usuario" shape="round" alignText="center" />
-        <Input title="Clave" shape="round" alignText="center" />
-        <MainButton
-          title="Iniciar Sesion"
-          onPress={() => {
-            props.navigation.navigate("Home");
-          }}
-        />
-        <MainButton
-          title="Supervsor"
-          onPress={() => {
-            props.navigation.navigate("super");
-          }}
-        />
-      </View>
+      /> */}
+        <View style={styles.backCover}>
+          <Image
+            style={styles.logo}
+            source={require("../../assets/images/security-logo.png")}
+          />
+          <View style={styles.buttonBox}>
+            <Input
+              style={{ borderColor: "#ff7e00" }}
+              title="Usuario"
+              shape="round"
+              alignText="center"
+            />
+            <Input
+              style={{ borderColor: "#ff7e00" }}
+              title="Clave"
+              shape="round"
+              alignText="center"
+            />
+            <MainButton
+              title="Iniciar Sesion"
+              onPress={() => {
+                props.navigation.navigate("Home");
+              }}
+            />
+            <MainButton
+              title="Supervsor"
+              onPress={() => {
+                props.navigation.navigate("super");
+              }}
+            />
+          </View>
+        </View>
+      </ImageBackground>
     </View>
   );
 };
@@ -100,25 +109,28 @@ export const LogInScreen = (props) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "flex-end",
-    alignItems: "center",
-    backgroundColor: "white",
   },
   buttonBox: {
     marginBottom: "10%",
     width: "75%",
     //position: "absolute",
   },
-  input: {
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: "grey",
-    marginBottom: 10,
-    height: 40,
-  },
   image: {
     resizeMode: "cover",
-    width: 120,
-    height: 120,
+    flex: 1,
+  },
+  backCover: {
+    backgroundColor: "black",
+    flex: 1,
+    width: width,
+    height: height,
+    opacity: 0.8,
+    justifyContent: "flex-end",
+    alignItems: "center",
+  },
+  logo: {
+    width: 200,
+    height: 200,
+    bottom: "25%",
   },
 });

@@ -41,7 +41,7 @@ export const HomeSuperScreen = (props) => {
           props.navigation.toggleDrawer();
         }}
       >
-        <Ionicons name="md-menu" size={32} color="grey" />
+        <Ionicons name="md-menu" size={28} color="white" />
       </RectButton>
     );
   };
@@ -52,11 +52,11 @@ export const HomeSuperScreen = (props) => {
           props.navigation.navigate("notification");
         }}
       >
-        <Ionicons name="md-notifications" size={32} color="grey" />
+        <Ionicons name="md-notifications" size={28} color="white" />
       </RectButton>
     );
   };
-  console.log("data-array", data[1]);
+  
   return (
     <View>
       <TopNavigation
@@ -92,9 +92,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems:'center',
-    paddingVertical: 5,
-    borderBottomWidth: .5,
+    paddingVertical: 10,
+    paddingHorizontal: 10,
+    borderWidth: .5,
     borderColor: 'grey',
-    marginVertical: 5
+    marginVertical: 5,
+    borderRadius: 20
   }
 })

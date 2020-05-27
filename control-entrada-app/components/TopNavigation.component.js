@@ -6,7 +6,7 @@ import { Ionicons } from "@expo/vector-icons";
 function NormalNav() {
   return (
     <View>
-      <Ionicons name="ios-notifications" size={32} color="#eee" />
+      <Ionicons name="ios-notifications" size={32} color="#ff7e00" />
     </View>
   );
 }
@@ -32,10 +32,12 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     padding: 10,
-    backgroundColor: "#eee",
-    marginBottom: 5
+    backgroundColor: "#ff7e00",
+    paddingTop:20,
+    marginBottom: 10
   },
   title: {
     fontSize: 17,
+    color: 'white'
   },
 });
