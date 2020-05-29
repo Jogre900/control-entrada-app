@@ -13,9 +13,6 @@ export const SplashScreen = (props) => {
   });
 
   const activatedSplash = () => {
-    setTimeout(() => {
-      navigation.navigate("logIn");
-    }, 3000);
     Animated.loop(
       Animated.sequence([
         Animated.timing(scaleUp, {

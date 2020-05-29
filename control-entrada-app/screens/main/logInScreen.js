@@ -1,27 +1,13 @@
-import React, { useEffect, useRef } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  StatusBar,
-  BackHandler,
-  Alert,
-  Image,
-  Dimensions,
-  Animated,
-  ImageBackground,
-  KeyboardAvoidingView,
-  TouchableWithoutFeedback,
-  Keyboard,
-  TextInput,
-} from "react-native";
+import React, { useEffect, useRef, useState } from "react";
+import { View, Text, StyleSheet, StatusBar, BackHandler, Alert, Image, Dimensions, Animated, ImageBackground, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard, TextInput } from "react-native";
 
 //components
 import { MainButton } from "../../components/mainButton.component";
 import { Input } from "../../components/input.component";
+import { SplashScreen } from "../../components/splashScreen.component";
 
 //constants
-import { mainColor } from '../../constants/Colors'
+import { mainColor } from "../../constants/Colors";
 
 const { width, height } = Dimensions.get("window");
 
@@ -38,33 +24,40 @@ const backAction = () => {
 };
 
 export const LogInScreen = (props) => {
+  const { navigation } = props;
+
+  const [isSplash, setIsSplash] = useState(true);
+
   const backHandler = useRef(null);
   const translate = new Animated.Value(1);
-  const nextInput = useRef(null)
+  const nextInput = useRef(null);
+
+  const activeSplash = () => {
+    setTimeout(() => {
+      setIsSplash(false);
+    }, 3000);
+  };
+
   useEffect(() => {
+    activeSplash();
     // backHandler.current = BackHandler.addEventListener("hardwareBackPress", backAction);
     // return () => {
     //   backHandler.current.remove()
     //BackHandler.removeEventListener("hardwareBackPress", backAction);
   }, []);
 
+  if (isSplash) {
+    return <SplashScreen />;
+  }
+
   return (
     <View style={styles.container}>
-      <ImageBackground
-        source={require("../../assets/images/background.jpg")}
-        style={styles.imageBackground}
-      >
+      <ImageBackground source={require("../../assets/images/background.jpg")} style={styles.imageBackground}>
         <StatusBar hidden={true} />
 
-        <TouchableWithoutFeedback
-          style={styles.backCover}
-          onPress={() => Keyboard.dismiss()}
-        >
+        <TouchableWithoutFeedback style={styles.backCover} onPress={() => Keyboard.dismiss()}>
           <KeyboardAvoidingView style={styles.backCover} behavior="padding">
-            <Image
-              style={styles.logo}
-              source={require("../../assets/images/security-logo.png")}
-            />
+            <Image style={styles.logo} source={require("../../assets/images/security-logo.png")} />
             <View style={styles.buttonBox}>
               <Input
                 style={{ borderColor: mainColor, color: "white" }}
@@ -76,16 +69,7 @@ export const LogInScreen = (props) => {
                 returnKeyType="next"
                 onSubmitEditing={() => nextInput.focus()}
               />
-              <Input
-                style={{ borderColor: mainColor, color: "white" }}
-                title="Clave"
-                textColor="white"
-                shape="round"
-                alignText="center"
-                returnKeyType="go"
-                secureTextEntry={true}
-                ref={nextInput}
-              />
+              <Input style={{ borderColor: mainColor, color: "white" }} title="Clave" textColor="white" shape="round" alignText="center" returnKeyType="go" secureTextEntry={true} ref={nextInput} />
               <MainButton
                 title="Iniciar Sesion"
                 onPress={() => {
