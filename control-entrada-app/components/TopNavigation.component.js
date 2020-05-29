@@ -4,7 +4,7 @@ import { RectButton } from "react-native-gesture-handler";
 import { Ionicons } from "@expo/vector-icons";
 
 //constants
-import { mainColor } from '../../constants/Colors'
+import { mainColor } from "../constants/Colors";
 
 function NormalNav() {
   return (
@@ -36,11 +36,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 10,
     backgroundColor: mainColor,
-    paddingTop:20,
-    marginBottom: 10
+    paddingTop: 20,
+    marginBottom: 10,
   },
   title: {
     fontSize: 17,
-    color: 'white'
+    color: "white",
   },
 });

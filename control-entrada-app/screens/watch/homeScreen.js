@@ -1,5 +1,5 @@
 import React from "react";
-import { View, StyleSheet, ImageBackground } from "react-native";
+import { View, StyleSheet, ImageBackground, Dimensions } from "react-native";
 import { RectButton } from "react-native-gesture-handler";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -8,9 +8,11 @@ import { TopNavigation } from "../../components/TopNavigation.component";
 import { MainButton } from "../../components/mainButton.component";
 
 //constants
-import { mainColor } from '../../constants/Colors'
+import { mainColor } from "../../constants/Colors";
 
 const cover = require("../../assets/images/background.jpg");
+
+const { width, height } = Dimensions.get("window");
 
 export const HomeScreen = (props) => {
   const goBackAction = () => {
