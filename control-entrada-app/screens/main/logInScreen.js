@@ -60,7 +60,7 @@ export const LogInScreen = (props) => {
             <Image style={styles.logo} source={require("../../assets/images/security-logo.png")} />
             <View style={styles.buttonBox}>
               <Input
-                style={{ borderColor: mainColor, color: "white" }}
+                style={{ borderColor: '#ff7e00', color: "white" }}
                 title="Correo"
                 textColor="white"
                 shape="round"
@@ -69,7 +69,7 @@ export const LogInScreen = (props) => {
                 returnKeyType="next"
                 onSubmitEditing={() => nextInput.focus()}
               />
-              <Input style={{ borderColor: mainColor, color: "white" }} title="Clave" textColor="white" shape="round" alignText="center" returnKeyType="go" secureTextEntry={true} ref={nextInput} />
+              <Input style={{ borderColor: '#ff7e00', color: "white" }} title="Clave" textColor="white" shape="round" alignText="center" returnKeyType="go" secureTextEntry={true} ref={nextInput} />
               <MainButton
                 title="Iniciar Sesion"
                 onPress={() => {

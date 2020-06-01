@@ -4,12 +4,13 @@ import { RectButton } from "react-native-gesture-handler";
 import { Ionicons } from "@expo/vector-icons";
 
 //constants
-import { mainColor } from "../constants/Colors";
+import {tintColor} from "../constants/Colors";
 
 function NormalNav() {
+  console.log(tintColor)
   return (
     <View>
-      <Ionicons name="ios-notifications" size={32} color={mainColor} />
+      <Ionicons name="ios-notifications" size={32} color='#ff7e00' />
     </View>
   );
 }
@@ -35,9 +36,9 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     padding: 10,
-    backgroundColor: mainColor,
+    backgroundColor: '#ff7e00',
     paddingTop: 20,
-    marginBottom: 10,
+    marginBottom: 0,
   },
   title: {
     fontSize: 17,

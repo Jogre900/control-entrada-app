@@ -80,8 +80,9 @@ const styles = StyleSheet.create({
   },
   actionContainer: {
     width: "75%",
+    marginBottom: '10%'
   },
   button: {
-    borderColor: mainColor,
+    borderColor: '#ff7e00',
   },
 });
