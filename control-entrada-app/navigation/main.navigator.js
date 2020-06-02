@@ -1,24 +1,21 @@
-import React from 'react'
-import { createStackNavigator } from '@react-navigation/stack'
+import React from "react";
+import { createStackNavigator } from "@react-navigation/stack";
 
 //screens
-import { SplashScreen } from '../components/splashScreen.component'
-import { LogInScreen } from '../screens/main/logInScreen'
-import { WatchNavigator } from './watch.navigator'
-import { SuperNavigator } from './supervicer.navigator'
+import { SplashScreen } from "../components/splashScreen.component";
+import { LogInScreen } from "../screens/main/logInScreen";
+import { WatchNavigator } from "./watch.navigator";
+import { SuperNavigator } from "./supervicer.navigator";
 
-
-const stack = createStackNavigator()
+const stack = createStackNavigator();
 
 export const MainNavigator = () => {
-    
-    return (
-        <stack.Navigator headerMode='none'>
-            {/* <stack.Screen name='splash' component={SplashScreen}/> */}
-            <stack.Screen name='logIn' component={LogInScreen}/>
-            <stack.Screen name='Home' component={WatchNavigator}/>
-            <stack.Screen name='super' component={SuperNavigator}/> 
-        </stack.Navigator>
-    )
-}
-
+  return (
+    <stack.Navigator headerMode="none">
+      {/* <stack.Screen name="splash" component={SplashScreen} /> */}
+      <stack.Screen name="logIn" component={LogInScreen} />
+      <stack.Screen name="Home" component={WatchNavigator} />
+      <stack.Screen name="super" component={SuperNavigator} />
+    </stack.Navigator>
+  );
+};

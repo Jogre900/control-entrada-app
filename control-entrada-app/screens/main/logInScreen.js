@@ -1,20 +1,13 @@
-import React, { useEffect, useRef } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  StatusBar,
-  BackHandler,
-  Alert,
-  Image,
-  Dimensions,
-  Animated,
-  ImageBackground,
-} from "react-native";
+import React, { useEffect, useRef, useState } from "react";
+import { View, Text, StyleSheet, StatusBar, BackHandler, Alert, Image, Dimensions, Animated, ImageBackground, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard, TextInput } from "react-native";
 
 //components
 import { MainButton } from "../../components/mainButton.component";
 import { Input } from "../../components/input.component";
+import { SplashScreen } from "../../components/splashScreen.component";
+
+//constants
+import { mainColor } from "../../constants/Colors";
 
 const { width, height } = Dimensions.get("window");
 
@@ -31,78 +24,67 @@ const backAction = () => {
 };
 
 export const LogInScreen = (props) => {
+  const { navigation } = props;
+
+  const [isSplash, setIsSplash] = useState(true);
+
   const backHandler = useRef(null);
   const translate = new Animated.Value(1);
+  const nextInput = useRef(null);
+
+  const activeSplash = () => {
+    setTimeout(() => {
+      setIsSplash(false);
+    }, 3000);
+  };
 
   useEffect(() => {
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(translate, {
-          toValue: 1.1,
-          duration: 1000,
-        }),
-        Animated.timing(translate, {
-          toValue: 1,
-          duration: 1000,
-        }),
-      ])
-    ).start();
+    activeSplash();
     // backHandler.current = BackHandler.addEventListener("hardwareBackPress", backAction);
     // return () => {
     //   backHandler.current.remove()
     //BackHandler.removeEventListener("hardwareBackPress", backAction);
   }, []);
 
+  if (isSplash) {
+    return <SplashScreen />;
+  }
+
   return (
     <View style={styles.container}>
-      <ImageBackground
-        source={require("../../assets/images/background.jpg")}
-        style={styles.image}
-      >
+      <ImageBackground source={require("../../assets/images/background.jpg")} style={styles.imageBackground}>
         <StatusBar hidden={true} />
-        {/* <Animated.Image
-        style={[
-          styles.image,
-          {
-            transform: [{ scale: translate }],
-          },
-        ]}
-        source={require("../../assets/images/female-3.jpg")}
-      /> */}
-        <View style={styles.backCover}>
-          <Image
-            style={styles.logo}
-            source={require("../../assets/images/security-logo.png")}
-          />
-          <View style={styles.buttonBox}>
-            <Input
-              style={{ borderColor: "#ff7e00", color: "white" }}
-              title="Usuario"
-              textColor="white"
-              shape="round"
-              alignText="center"
-            />
-            <Input
-              style={{ borderColor: "#ff7e00", color: "white" }}
-              title="Clave"
-              textColor="white"
-              shape="round"
-              alignText="center"
-            />
-            <MainButton
-              title="Iniciar Sesion"
-              onPress={() => {
-                props.navigation.navigate("Home");
-              }}
-            />
-            <MainButton
-              title="Supervsor"
-              onPress={() => {
-                props.navigation.navigate("super");
-              }}
-            />
-          </View>
-        </View>
+
+        <TouchableWithoutFeedback style={styles.backCover} onPress={() => Keyboard.dismiss()}>
+          <KeyboardAvoidingView style={styles.backCover} behavior="padding">
+            <Image style={styles.logo} source={require("../../assets/images/security-logo.png")} />
+            <View style={styles.buttonBox}>
+              <Input
+                style={{ borderColor: '#ff7e00', color: "white" }}
+                title="Correo"
+                textColor="white"
+                shape="round"
+                alignText="center"
+                keyboardType="email-address"
+                returnKeyType="next"
+                onSubmitEditing={() => nextInput.focus()}
+              />
+              <Input style={{ borderColor: '#ff7e00', color: "white" }} title="Clave" textColor="white" shape="round" alignText="center" returnKeyType="go" secureTextEntry={true} ref={nextInput} />
+              <MainButton
+                title="Iniciar Sesion"
+                onPress={() => {
+                  props.navigation.navigate("Home");
+                }}
+              />
+              <MainButton
+                title="Supervisor"
+                onPress={() => {
+                  props.navigation.navigate("super");
+                }}
+              />
+            </View>
+          </KeyboardAvoidingView>
+        </TouchableWithoutFeedback>
       </ImageBackground>
     </View>
   );
@@ -117,7 +99,7 @@ const styles = StyleSheet.create({
     width: "75%",
     //position: "absolute",
   },
-  image: {
+  imageBackground: {
     resizeMode: "cover",
     flex: 1,
   },

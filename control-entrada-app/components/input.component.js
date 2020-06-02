@@ -2,7 +2,21 @@ import React from "react";
 import { View, TextInput, StyleSheet } from "react-native";
 
 export const Input = (props) => {
-  const { title, textColor, onChangeText, value, shape, alignText, style } = props;
+  const { 
+    title, 
+    textColor, 
+    onChangeText, 
+    value, 
+    shape, 
+    alignText, 
+    style,
+    keyboardType,
+    returnKeyType,
+    secureTextEntry,
+    autoCorrect,
+    ref,
+    onSubmitEditing
+  } = props;
   
   return (
     <View>
@@ -10,9 +24,15 @@ export const Input = (props) => {
         style={[style, (shape=='round')?styles.roundedShape:styles.squareShape]}
         placeholder={title}
         textAlign={alignText}
+        keyboardType={keyboardType}
+        returnKeyType={returnKeyType}
+        secureTextEntry={secureTextEntry}
         placeholderTextColor={textColor}
+        autoCorrect={autoCorrect}
         onChangeText={onChangeText}
         value={value}
+        onSubmitEditing={onSubmitEditing}
+        ref={ref}
       />
     </View>
   );

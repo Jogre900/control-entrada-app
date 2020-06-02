@@ -1,24 +1,35 @@
 import React from "react";
-import { View, Text, StyleSheet, Image, TextInput, Alert } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TextInput,
+  Alert,
+  TouchableHighlight,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { RectButton } from "react-native-gesture-handler";
 
 //components
 import { TopNavigation } from "../../components/TopNavigation.component";
 import { MainButton } from "../../components/mainButton.component";
-import { Input } from '../../components/input.component'
+import { Input } from "../../components/input.component";
+
 export const PerfilScreen = (props) => {
-  
-  const [textChange, setTextChange] = React.useState("")
-    const goBackAction = () => {
+  const [textChange, setTextChange] = React.useState("");
+  const [repeatPass, setRepeatPass] = React.useState("");
+  const goBackAction = () => {
     return (
-      <RectButton
-        onPress={() => {
-          props.navigation.goBack();
-        }}
-      >
-        <Ionicons name="ios-arrow-back" size={28} color="white" />
-      </RectButton>
+      <View>
+        <TouchableHighlight
+          onPress={() => {
+            props.navigation.goBack();
+          }}
+        >
+          <Ionicons name="ios-arrow-back" size={28} color="white" />
+        </TouchableHighlight>
+      </View>
     );
   };
 
@@ -33,15 +44,31 @@ export const PerfilScreen = (props) => {
         <Text>Security. All Right Reserved</Text>
         <View style={styles.editBox}>
           <Text>Cambio de Contraseña</Text>
-          <Input 
-          title='Clave'
-          alignText='center'
-          shape='round'
-          onChangeText={(text) => {setTextChange(text)}}
-          value={textChange}
+          <Input
+            style={styles.input}
+            title="Clave"
+            alignText="center"
+            shape="round"
+            secureTextEntry={true}
+            onChangeText={(text) => {
+              setTextChange(text);
+            }}
+            value={textChange}
           />
-          {(textChange != "")?<MainButton title='Guardar Cambios'/>:null}
-          
+          {textChange != "" ? (
+            <Input
+              
+              title="Repetir Clave"
+              alignText="center"
+              secureTextEntry={true}
+              shape="round"
+              onChangeText={(text) => {
+                setRepeatPass(text);
+              }}
+              value={repeatPass}
+            />
+          ) : null}
+          {repeatPass != "" ? <MainButton style={{width: '100%'}}title="Guardar Cambios" /> : null}
         </View>
       </View>
     </View>
@@ -51,19 +78,19 @@ export const PerfilScreen = (props) => {
 const styles = StyleSheet.create({
   perfilContainer: {
     alignItems: "center",
-    justifyContent: 'center'
+    justifyContent: "center",
   },
   perfilLogo: {
     width: 120,
     height: 120,
   },
   editBox: {
-      marginTop: 30,
-      width: '75%',
-  
+    marginTop: 30,
+    justifyContent: "center",
+    alignItems: "center",
+    width: '75%'
   },
   input: {
-    borderBottomWidth: 1,
-    borderColor: "grey",
+    marginTop: 10
   },
 });

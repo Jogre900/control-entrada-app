@@ -7,6 +7,7 @@ import {
   Button,
   Alert,
   Image,
+  TouchableHighlight
 } from "react-native";
 import { RectButton } from "react-native-gesture-handler";
 import { Ionicons } from "@expo/vector-icons";
@@ -25,13 +26,15 @@ const busquedaData = {
 export const SalidaScreen = (props) => {
   const goBackAction = () => {
     return (
-      <RectButton
-        onPress={() => {
-          props.navigation.goBack();
-        }}
-      >
-        <Ionicons name="ios-arrow-back" size={28} color="white" />
-      </RectButton>
+      <View>
+        <TouchableHighlight
+          onPress={() => {
+            props.navigation.goBack();
+          }}
+        >
+          <Ionicons name="ios-arrow-back" size={28} color="white" />
+        </TouchableHighlight>
+      </View>
     );
   };
 

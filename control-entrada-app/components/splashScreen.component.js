@@ -4,14 +4,15 @@ import { View, StyleSheet, Image, Dimensions, Animated, StatusBar } from "react-
 const { width, height } = Dimensions.get("window");
 const logo = require("../assets/images/security-logo.png");
 
-export const SplashScreen = () => {
+export const SplashScreen = (props) => {
+  const { navigation } = props;
   const scaleUp = new Animated.Value(1);
   const opacityInterpolate = scaleUp.interpolate({
     inputRange: [1, 1.1],
     outputRange: [0.1, 1],
   });
 
-  useEffect(() => {
+  const activatedSplash = () => {
     Animated.loop(
       Animated.sequence([
         Animated.timing(scaleUp, {
@@ -24,11 +25,15 @@ export const SplashScreen = () => {
         }),
       ])
     ).start();
+  };
+
+  useEffect(() => {
+    activatedSplash();
   }, []);
 
   return (
     <View style={styles.container}>
-        <StatusBar hidden={true}/>
+      <StatusBar hidden={true} />
       <Animated.Image
         source={logo}
         style={[
