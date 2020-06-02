@@ -1,5 +1,13 @@
 import React from "react";
-import { View, Text, StyleSheet, Image, TextInput, Alert, TouchableHighlight } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TextInput,
+  Alert,
+  TouchableHighlight,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { RectButton } from "react-native-gesture-handler";
 
@@ -37,6 +45,7 @@ export const PerfilScreen = (props) => {
         <View style={styles.editBox}>
           <Text>Cambio de Contraseña</Text>
           <Input
+            style={styles.input}
             title="Clave"
             alignText="center"
             shape="round"
@@ -46,8 +55,9 @@ export const PerfilScreen = (props) => {
             }}
             value={textChange}
           />
-          {(textChange != "") ? 
+          {textChange != "" ? (
             <Input
+              
               title="Repetir Clave"
               alignText="center"
               secureTextEntry={true}
@@ -57,8 +67,8 @@ export const PerfilScreen = (props) => {
               }}
               value={repeatPass}
             />
-           : null}
-          {(repeatPass != "") ? <MainButton title="Guardar Cambios" /> : null}
+          ) : null}
+          {repeatPass != "" ? <MainButton style={{width: '100%'}}title="Guardar Cambios" /> : null}
         </View>
       </View>
     </View>
@@ -76,10 +86,11 @@ const styles = StyleSheet.create({
   },
   editBox: {
     marginTop: 30,
-    width: "75%",
+    justifyContent: "center",
+    alignItems: "center",
+    width: '75%'
   },
   input: {
-    borderBottomWidth: 1,
-    borderColor: "grey",
+    marginTop: 10
   },
 });
