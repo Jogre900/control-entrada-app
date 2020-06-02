@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, Text, StyleSheet, TextInput, Button } from 'react-native'
+import { View, Text, StyleSheet, TextInput, Button, TouchableHighlight } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { RectButton } from 'react-native-gesture-handler'
 
@@ -10,11 +10,17 @@ import { TopNavigation } from '../../components/TopNavigation.component'
 export const HistorialScreen = (props) => {
     const goBackAction = () => {
         return (
-            <RectButton onPress={() => {props.navigation.goBack()}}>
-                <Ionicons name='ios-arrow-back' size={28} color='white'/>
-            </RectButton>
-        )
-    } 
+          <View>
+            <TouchableHighlight
+              onPress={() => {
+                props.navigation.goBack();
+              }}
+            >
+              <Ionicons name="ios-arrow-back" size={28} color="white" />
+            </TouchableHighlight>
+          </View>
+        );
+      };
 
     return (
         <View>

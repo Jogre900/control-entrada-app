@@ -1,6 +1,6 @@
 import React from "react";
 import { View, StyleSheet, ImageBackground, Dimensions } from "react-native";
-import { RectButton } from "react-native-gesture-handler";
+import { RectButton, TouchableHighlight } from "react-native-gesture-handler";
 import { Ionicons } from "@expo/vector-icons";
 
 //components
@@ -17,13 +17,15 @@ const { width, height } = Dimensions.get("window");
 export const HomeScreen = (props) => {
   const goBackAction = () => {
     return (
-      <RectButton
-        onPress={() => {
-          props.navigation.goBack();
-        }}
-      >
-        <Ionicons name="ios-arrow-back" size={28} color="white" />
-      </RectButton>
+      <View>
+        <TouchableHighlight
+          onPress={() => {
+            props.navigation.goBack();
+          }}
+        >
+          <Ionicons name="ios-arrow-back" size={28} color="white" />
+        </TouchableHighlight>
+      </View>
     );
   };
 
@@ -80,9 +82,9 @@ const styles = StyleSheet.create({
   },
   actionContainer: {
     width: "75%",
-    marginBottom: '10%'
+    marginBottom: "10%",
   },
   button: {
-    borderColor: '#ff7e00',
+    borderColor: "#ff7e00",
   },
 });

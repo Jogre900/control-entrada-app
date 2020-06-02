@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, Image, TextInput, Alert } from "react-native";
+import { View, Text, StyleSheet, Image, TextInput, Alert, TouchableHighlight } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { RectButton } from "react-native-gesture-handler";
 
@@ -10,16 +10,18 @@ import { Input } from "../../components/input.component";
 
 export const PerfilScreen = (props) => {
   const [textChange, setTextChange] = React.useState("");
-  const [repeatPass, setRepeatPass] = useState("");
+  const [repeatPass, setRepeatPass] = React.useState("");
   const goBackAction = () => {
     return (
-      <RectButton
-        onPress={() => {
-          props.navigation.goBack();
-        }}
-      >
-        <Ionicons name="ios-arrow-back" size={28} color="white" />
-      </RectButton>
+      <View>
+        <TouchableHighlight
+          onPress={() => {
+            props.navigation.goBack();
+          }}
+        >
+          <Ionicons name="ios-arrow-back" size={28} color="white" />
+        </TouchableHighlight>
+      </View>
     );
   };
 

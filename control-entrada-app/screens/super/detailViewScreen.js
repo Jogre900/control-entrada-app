@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, Button } from "react-native";
+import { View, Text, StyleSheet, Button, TouchableHighlight } from "react-native";
 import { RectButton } from "react-native-gesture-handler";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -11,16 +11,17 @@ export const DetailViewScreen = (props) => {
   const data = props.route.params;
   const goBackAction = () => {
     return (
-      <RectButton
-        onPress={() => {
-          props.navigation.goBack();
-        }}
-      >
-        <Ionicons name="ios-arrow-back" size={28} color="white" />
-      </RectButton>
+      <View>
+        <TouchableHighlight
+          onPress={() => {
+            props.navigation.goBack();
+          }}
+        >
+          <Ionicons name="ios-arrow-back" size={28} color="white" />
+        </TouchableHighlight>
+      </View>
     );
   };
-
   return (
     <View>
       <TopNavigation title="Vista Detallada" leftControl={goBackAction()} />

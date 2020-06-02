@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, Alert, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, Alert, TouchableOpacity, TouchableHighlight } from "react-native";
 import { RectButton } from "react-native-gesture-handler";
 import { Ionicons } from "@expo/vector-icons";
 //components
@@ -36,24 +36,28 @@ const data = [
 export const HomeSuperScreen = (props) => {
   const drawerAction = () => {
     return (
-      <RectButton
-        onPress={() => {
-          props.navigation.toggleDrawer();
-        }}
-      >
-        <Ionicons name="md-menu" size={28} color="white" />
-      </RectButton>
+      <View>
+        <TouchableHighlight
+          onPress={() => {
+            props.navigation.toggleDrawer();
+          }}
+        >
+          <Ionicons name="md-menu" size={28} color="white" />
+        </TouchableHighlight>
+      </View>
     );
   };
   const openNotifications = () => {
     return (
-      <RectButton
-        onPress={() => {
-          props.navigation.navigate("notification");
-        }}
-      >
-        <Ionicons name="md-notifications" size={28} color="white" />
-      </RectButton>
+      <View>
+        <TouchableHighlight
+          onPress={() => {
+            props.navigation.navigate('notification');
+          }}
+        >
+          <Ionicons name="md-notifications" size={28} color="white" />
+        </TouchableHighlight>
+      </View>
     );
   };
   
