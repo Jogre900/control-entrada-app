@@ -13,7 +13,7 @@ const stack = createStackNavigator();
 export const MainNavigator = () => {
   return (
     <stack.Navigator headerMode="none">
-      <stack.Screen name="splash" component={ProfileComponent} />
+      {/* <stack.Screen name="splash" component={ProfileComponent} /> */}
       <stack.Screen name="logIn" component={LogInScreen} />
       <stack.Screen name="Home" component={WatchNavigator} />
       <stack.Screen name="super" component={SuperNavigator} />

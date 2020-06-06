@@ -9,6 +9,7 @@ import {
   ScrollView,
   ImageBackground,
   Image,
+  KeyboardAvoidingView,
 } from "react-native";
 import { Input } from "./input.component";
 import { MainButton } from "./mainButton.component";
@@ -38,7 +39,20 @@ const element1 = () => {
   );
 };
 
-
+const formContent = () => {
+  return (
+    <View style={{ marginTop: 10, paddingHorizontal: '12%'}}>
+      
+      <Input title="Nombre" shape="round" />
+      <Input title="Apellido" shape="round" />
+      <Input title="DNI" shape="round" />
+      <Input title="Destino" shape="round" />
+      <View>
+        <MainButton title="Registrar Entrada" />
+      </View>
+    </View>
+  );
+};
 
 const { width } = Dimensions.get("window");
 const cover = require("../assets/images/background.jpg");
@@ -51,7 +65,7 @@ export const ProfileComponent = () => {
   const [xTabOne, setXTabOne] = React.useState();
   const [xTabTwo, setXTabTwo] = React.useState();
   const [hightContent1, setHightContent1] = React.useState(-5000);
-  const [saveImg, setSaveImg] = React.useState()
+  const [saveImg, setSaveImg] = React.useState();
   const translateTab = new Animated.Value(0);
   const translateContent1 = new Animated.Value(0);
   const translateContent2 = new Animated.Value(width);
@@ -129,7 +143,7 @@ export const ProfileComponent = () => {
             style={{ width: 140, height: 140, borderRadius: 70 }}
           />
           <Image
-            source={{uri: saveImg}}
+            source={{ uri: saveImg }}
             style={{ width: 120, height: 120, borderRadius: 70 }}
           />
         </View>
@@ -139,28 +153,29 @@ export const ProfileComponent = () => {
 
   const pickImage = async () => {
     let result = await ImagePicker.launchCameraAsync();
-
     console.log(result);
-
     setSaveImg(result.uri);
   };
 
   return (
     <View style={{ flex: 1 }}>
+      <KeyboardAvoidingView style={{flex:1}} behavior='padding'>
       <ImageBackground source={cover} style={styles.imgBackground}>
         <View style={styles.cover}>
           <View style={{ justifyContent: "center", alignItems: "center" }}>
             {/* <Ionicons name="ios-person" size={120} color="#fff" /> */}
             <View style={{ position: "relative", marginBottom: 10 }}>
               <Image source={profilePic} style={styles.profilePic} />
-              <TouchableOpacity
-                onPress={() => pickImage(res => {
-                  console.log(res)
-                })}
+              {/* <TouchableOpacity
+                onPress={() =>
+                  pickImage((res) => {
+                    console.log(res);
+                  })
+                }
                 style={styles.cameraIcon}
               >
                 <Ionicons name="ios-camera" size={38} color="orange" />
-              </TouchableOpacity>
+              </TouchableOpacity> */}
             </View>
             <View style={styles.nameBox}>
               <Text style={styles.nameText}>Jose Del Corral</Text>
@@ -218,6 +233,7 @@ export const ProfileComponent = () => {
             </TouchableOpacity>
           </View>
           <View>
+            
             <Animated.View
               onLayout={(event) => {
                 setHightContent1(event.nativeEvent.layout.height);
@@ -249,6 +265,7 @@ export const ProfileComponent = () => {
           </View>
         </View>
       </View>
+      </KeyboardAvoidingView>
     </View>
   );
 };
@@ -278,7 +295,7 @@ const styles = StyleSheet.create({
   },
   nameBox: {
     height: 40,
-    backgroundColor: "orange",
+    //backgroundColor: "orange",
     paddingHorizontal: 10,
     borderRadius: 20,
     top: "10%",
@@ -286,7 +303,7 @@ const styles = StyleSheet.create({
   },
   nameText: {
     textAlign: "center",
-    fontSize: 17,
+    fontSize: 32,
     color: "#fff",
   },
   tabBar: {
@@ -311,12 +328,18 @@ const styles = StyleSheet.create({
   //elemento 1
   dataBox: {
     marginVertical: 10,
+    flexDirection: 'row',
+    alignItems:'center',
+    //justifyContent:'space-between'
   },
   labelText: {
     fontSize: 14,
+    color:'grey'
   },
   dataText: {
     fontSize: 17,
+    //fontWeight:'200',
+    paddingLeft:20
   },
   //emento 2
 });

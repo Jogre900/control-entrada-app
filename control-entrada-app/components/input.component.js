@@ -1,5 +1,6 @@
 import React from "react";
 import { View, TextInput, StyleSheet } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 
 export const Input = (props) => {
   const { 
@@ -7,7 +8,8 @@ export const Input = (props) => {
     textColor, 
     onChangeText, 
     value, 
-    shape, 
+    shape,
+    icon, 
     alignText, 
     style,
     keyboardType,
@@ -19,9 +21,13 @@ export const Input = (props) => {
   } = props;
   
   return (
-    <View>
+    <View style={{flexDirection:'row', alignItems:'center',  borderBottomWidth: .5}}>
+      <View style={{alignItems:'center', justifyContent:'center'}}>
+        <Ionicons name={icon} size={28} color='grey'style={{marginRight: 5}}/>
+      </View>
       <TextInput
-        style={[style, (shape=='round')?styles.roundedShape:styles.squareShape]}
+        style={[style, (shape=='round')?styles.roundedShape:
+        (shape=='square') ? styles.squareShape : styles.flatShape]}
         placeholder={title}
         textAlign={alignText}
         keyboardType={keyboardType}
@@ -52,4 +58,10 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     height: 40,
   },
+  flatShape: {
+    //borderRadius: 3,
+    //borderBottomWidth: .5,
+    //marginBottom: 10,
+    //height: 40,
+  }
 });
