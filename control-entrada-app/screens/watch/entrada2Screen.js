@@ -61,13 +61,12 @@ const watchPic = require("../../assets/images/male-2.jpg");
 //         </View>
 
 export const Entrada2Screen = (props) => {
-  
   const [saveImg, setSaveImg] = React.useState(null);
   const [changeImg, setChangeImg] = React.useState(false);
-  
+
   const pickImage = async () => {
     let result = await ImagePicker.launchCameraAsync();
-    console.log(' result----',result);
+    console.log(" result----", result);
     setSaveImg(result.uri);
     result.cancelled ? setChangeImg(false) : setChangeImg(true);
   };
@@ -83,56 +82,78 @@ export const Entrada2Screen = (props) => {
   };
 
   return (
-    <TouchableWithoutFeedback style={{flex:1}} onPress={() => Keyboard.dismiss()}>
-    <KeyboardAvoidingView style={styles.containerKeyboard} behavior="padding">
-      <TopNavigation title="Entrada" leftControl={goBackAction()} />
-      <ImageBackground source={cover} style={styles.imgBackground}>
-        <View style={styles.cover}>
-          <View style={{ position: "relative", marginBottom: 10 }}>
-            {saveImg ? (
-              <Image source={{ uri: saveImg }} style={styles.profilePic} />
-            ) : (
-              <View style={styles.profilePicBox}>
-                <Image source={profilePic} style={styles.profilePic} />
-                {/* <Ionicons name="ios-person" size={120} color="grey" /> */}
-              </View>
-            )}
-            <TouchableOpacity
-              onPress={() =>
-                pickImage((res) => {
-                  console.log(res);
-                })
-              }
-              style={styles.cameraIcon}
-            >
-              {changeImg ? (
-                <Ionicons name="ios-close" size={42} color="#ff7e00" />
+    <TouchableWithoutFeedback
+      style={{ flex: 1 }}
+      onPress={() => Keyboard.dismiss()}
+    >
+      <KeyboardAvoidingView style={styles.containerKeyboard} behavior="padding">
+        <TopNavigation title="Entrada" leftControl={goBackAction()} />
+        <ImageBackground source={cover} style={styles.imgBackground}>
+          <View style={styles.cover}>
+            <View style={{ position: "relative", marginBottom: 10 }}>
+              {saveImg ? (
+                <Image source={{ uri: saveImg }} style={styles.profilePic} />
               ) : (
-                <Ionicons name="ios-camera" size={42} color="#ff7e00" />
+                <View style={styles.profilePicBox}>
+                  <Image source={profilePic} style={styles.profilePic} />
+                  {/* <Ionicons name="ios-person" size={120} color="grey" /> */}
+                </View>
               )}
-            </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() =>
+                  pickImage((res) => {
+                    console.log(res);
+                  })
+                }
+                style={styles.cameraIcon}
+              >
+                {changeImg ? (
+                  <Ionicons name="ios-close" size={42} color="#ff7e00" />
+                ) : (
+                  <Ionicons name="ios-camera" size={42} color="#ff7e00" />
+                )}
+              </TouchableOpacity>
+            </View>
+          </View>
+        </ImageBackground>
+        <View style={{ flex: 1, alignItems: "center" }}>
+          <View
+            style={{
+              marginTop: 20,
+              width: "75%",
+            }}
+          >
+            <Input
+              title="Nombre"
+              shape="flat"
+              icon="ios-person"
+              style={styles.input}
+            />
+            <Input
+              title="Apellido"
+              shape="flat"
+              icon="ios-person"
+              style={styles.input}
+            />
+            <Input
+              title="DNI"
+              shape="flat"
+              icon="ios-card"
+              style={styles.input}
+            />
+            <Input
+              title="Destino"
+              shape="flat"
+              icon="ios-pin"
+              style={styles.input}
+            />
+
+            <View>
+              <MainButton title="Registrar Entrada" style={{ marginTop: 10 }} />
+            </View>
           </View>
         </View>
-      </ImageBackground>
-      <View style={{ flex: 1,  
-        alignItems: "center" }}>
-        <View
-          style={{
-            marginTop: 20,
-            width: "75%",
-          }}
-        >
-          <Input title="Nombre" shape="flat" icon="ios-person" />
-          <Input title="Apellido" shape="flat" icon="ios-person" />
-          <Input title="DNI" shape="flat" icon="ios-card" />
-          <Input title="Destino" shape="flat" icon="ios-pin" />
-          
-          <View>
-            <MainButton title="Registrar Entrada" style={{marginTop:10}}/>
-          </View>
-        </View>
-      </View>
-    </KeyboardAvoidingView>
+      </KeyboardAvoidingView>
     </TouchableWithoutFeedback>
   );
 };
@@ -172,18 +193,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     right: 5,
   },
-  nameBox: {
-    height: 40,
-    //backgroundColor: "orange",
-    paddingHorizontal: 10,
-    borderRadius: 20,
-    top: "10%",
-    justifyContent: "center",
+  input: {
+    marginBottom: 10,
   },
-  nameText: {
-    textAlign: "center",
-    fontSize: 32,
-    color: "#fff",
-  },
-  
 });

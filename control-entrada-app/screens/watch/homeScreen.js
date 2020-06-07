@@ -1,6 +1,6 @@
 import React from "react";
-import { View, StyleSheet, ImageBackground, Dimensions } from "react-native";
-import { RectButton, TouchableHighlight } from "react-native-gesture-handler";
+import { View, StyleSheet, ImageBackground, Dimensions, TouchableOpacity } from "react-native";
+
 import { Ionicons } from "@expo/vector-icons";
 
 //components
@@ -18,13 +18,13 @@ export const HomeScreen = (props) => {
   const goBackAction = () => {
     return (
       <View>
-        <TouchableHighlight
+        <TouchableOpacity
           onPress={() => {
             props.navigation.goBack();
           }}
         >
           <Ionicons name="ios-arrow-back" size={28} color="white" />
-        </TouchableHighlight>
+        </TouchableOpacity>
       </View>
     );
   };

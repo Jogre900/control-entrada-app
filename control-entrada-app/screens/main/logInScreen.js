@@ -84,7 +84,7 @@ export const LogInScreen = (props) => {
             />
             <View style={styles.buttonBox}>
               <Input
-                style={{ borderColor: "#ff7e00", color: "white" }}
+                style={{ borderColor: "#ff7e00", color: "white", marginBottom: 10 }}
                 title="Correo"
                 textColor="white"
                 shape="round"
@@ -95,7 +95,7 @@ export const LogInScreen = (props) => {
                 onSubmitEditing={() => nextInput.focus()}
               />
               <Input
-                style={{ borderColor: "#ff7e00", color: "white" }}
+                style={{ borderColor: "#ff7e00", color: "white",  marginBottom: 10 }}
                 title="Clave"
                 textColor="white"
                 shape="round"

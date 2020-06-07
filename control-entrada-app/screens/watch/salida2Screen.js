@@ -10,6 +10,7 @@ import {
   ImageBackground,
   Image,
   KeyboardAvoidingView,
+  Keyboard,
 } from "react-native";
 import { RectButton } from "react-native-gesture-handler";
 import { TopNavigation } from "../../components/TopNavigation.component";
@@ -49,41 +50,15 @@ export const Salida2Screen = (props) => {
             props.navigation.goBack();
           }}
         >
-          <Ionicons name="ios-arrow-back" size={28} color="orange" />
+          <Ionicons name="ios-arrow-back" size={28} color="white" />
         </TouchableOpacity>
       </View>
     );
   };
 
-  const element1 = () => {
-    return (
-      <View style={{ marginTop: 10, paddingHorizontal: 5 }}>
-        <View style={styles.dataBox}>
-          <Text style={styles.labelText}>DNI:</Text>
-          <Text style={styles.dataText}>19222907</Text>
-        </View>
-        <View style={styles.dataBox}>
-          <Text style={styles.labelText}>Destino:</Text>
-          <Text style={styles.dataText}>Apt 104</Text>
-        </View>
-        <View style={styles.dataBox}>
-          <Text style={styles.labelText}>Hora de Entrada:</Text>
-          <Text style={styles.dataText}>10:00 am</Text>
-        </View>
-        <View style={styles.dataBox}>
-          <Text style={styles.labelText}>Hora de Salida:</Text>
-          <Text style={styles.dataText}>{horaSalida}</Text>
-        </View>
-        <View>
-          <MainButton
-            title="Marcar salida"
-            onPress={() => {
-              getHour();
-            }}
-          />
-        </View>
-      </View>
-    );
+  const buscarProfile = (id) => {
+    id === "19222907" ? setEncontrado(true) : setEncontrado(false);
+    Keyboard.dismiss();
   };
 
   return (
@@ -95,21 +70,17 @@ export const Salida2Screen = (props) => {
             title="Buscar por DNI"
             shape="round"
             alignText="center"
+            style={{backgroundColor:'white'}}
             onChangeText={(valor) => setBuscar(valor)}
             value={buscar}
           />
         </View>
-        <RectButton
-          title="Buscar"
-          onPress={() => {
-            buscar === "19222907" ? setEncontrado(true) : setEncontrado(false);
-          }}
-        >
-          <Ionicons name="ios-search" size={28} color="grey" />
+        <RectButton title="Buscar" onPress={() => buscarProfile(buscar)}>
+          <Ionicons name="ios-search" size={28} color="white" />
         </RectButton>
       </View>
       {encontrado ? (
-        <View style={{flex:1}}>
+        <View style={{ flex: 1 }}>
           <ImageBackground source={cover} style={styles.imgBackground}>
             <View style={styles.cover}>
               <View style={{ justifyContent: "center", alignItems: "center" }}>
@@ -123,8 +94,33 @@ export const Salida2Screen = (props) => {
               </View>
             </View>
           </ImageBackground>
-          <View style={{ flex: 1 }}>
-            <View style={{ paddingHorizontal: 5 }}>{element1()}</View>
+          <View style={{ flex: 1, alignItems: "center" }}>
+            <View style={{ width: "75%" }}>
+              <View style={styles.dataBox}>
+                <Text style={styles.labelText}>DNI:</Text>
+                <Text style={styles.dataText}>19222907</Text>
+              </View>
+              <View style={styles.dataBox}>
+                <Text style={styles.labelText}>Destino:</Text>
+                <Text style={styles.dataText}>Apt 104</Text>
+              </View>
+              <View style={styles.dataBox}>
+                <Text style={styles.labelText}>Hora de Entrada:</Text>
+                <Text style={styles.dataText}>10:00 am</Text>
+              </View>
+              <View style={styles.dataBox}>
+                <Text style={styles.labelText}>Hora de Salida:</Text>
+                <Text style={styles.dataText}>{horaSalida}</Text>
+              </View>
+              <View>
+                <MainButton
+                  title="Marcar salida"
+                  onPress={() => {
+                    getHour();
+                  }}
+                />
+              </View>
+            </View>
           </View>
         </View>
       ) : null}
@@ -142,8 +138,10 @@ const styles = StyleSheet.create({
     width: "100%",
     flexDirection: "row",
     justifyContent: "space-between",
+    paddingHorizontal: 5,
+    paddingBottom: 5,
     alignItems: "center",
-    backgroundColor: '#ff7e00'
+    backgroundColor: "#ff7e00",
   },
   cover: {
     backgroundColor: "black",
@@ -175,30 +173,13 @@ const styles = StyleSheet.create({
     fontSize: 32,
     color: "#fff",
   },
-  tabBar: {
-    flexDirection: "row",
-    height: 50,
-    position: "relative",
-  },
-  tab1: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    //borderBottomWidth: 1,
-    borderColor: "grey",
-  },
-  tab2: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    //borderBottomWidth: 1,
-    borderColor: "grey",
-  },
+
   //elemento 1
   dataBox: {
     marginVertical: 10,
     flexDirection: "row",
     alignItems: "center",
+    //width:'75%'
     //justifyContent:'space-between'
   },
   labelText: {

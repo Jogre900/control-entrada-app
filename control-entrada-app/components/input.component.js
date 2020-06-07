@@ -23,7 +23,7 @@ export const Input = (props) => {
 
   const inputFlat = () => {
     return (
-      <TouchableWithoutFeedback style={styles.flatShape}>
+      <TouchableWithoutFeedback style={[style, styles.flatShape]}>
         <View style={{ alignItems: "center", justifyContent: "center" }}>
           <Ionicons
             name={icon}
@@ -33,7 +33,7 @@ export const Input = (props) => {
           />
         </View>
         <TextInput
-          style={style}
+          
           placeholder={title}
           textAlign={alignText}
           keyboardType={keyboardType}
@@ -78,13 +78,13 @@ const styles = StyleSheet.create({
   roundedShape: {
     borderRadius: 20,
     borderWidth: 0.5,
-    marginBottom: 10,
+
     height: 40,
   },
   squareShape: {
     borderRadius: 3,
     borderWidth: 0.5,
-    marginBottom: 10,
+    
     height: 40,
     //width: '100%'
   },
@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     //alignItems: "center",
     borderBottomWidth: 0.5,
-    marginBottom: 5,
+   
     height: 40
   },
 });

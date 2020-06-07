@@ -16,39 +16,24 @@ import { MainButton } from "./mainButton.component";
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 
-const element1 = () => {
+const element1 = (info) => {
   return (
     <View style={{ marginTop: 10, paddingHorizontal: 5 }}>
       <View style={styles.dataBox}>
         <Text style={styles.labelText}>DNI:</Text>
-        <Text style={styles.dataText}>19222907</Text>
+        <Text style={styles.dataText}>{info.cedula}</Text>
       </View>
       <View style={styles.dataBox}>
         <Text style={styles.labelText}>Destino:</Text>
-        <Text style={styles.dataText}>Apt 104</Text>
+        <Text style={styles.dataText}>{info.destino}</Text>
       </View>
       <View style={styles.dataBox}>
         <Text style={styles.labelText}>Hora de Entrada:</Text>
-        <Text style={styles.dataText}>10:00 am</Text>
+        <Text style={styles.dataText}>{info.entrada} am</Text>
       </View>
       <View style={styles.dataBox}>
         <Text style={styles.labelText}>Hora de Salida:</Text>
-        <Text style={styles.dataText}>10:00 pm</Text>
-      </View>
-    </View>
-  );
-};
-
-const formContent = () => {
-  return (
-    <View style={{ marginTop: 10, paddingHorizontal: '12%'}}>
-      
-      <Input title="Nombre" shape="round" />
-      <Input title="Apellido" shape="round" />
-      <Input title="DNI" shape="round" />
-      <Input title="Destino" shape="round" />
-      <View>
-        <MainButton title="Registrar Entrada" />
+        <Text style={styles.dataText}>{info.salida} pm</Text>
       </View>
     </View>
   );
@@ -59,7 +44,9 @@ const cover = require("../assets/images/background.jpg");
 const profilePic = require("../assets/images/female-2.jpg");
 const watchPic = require("../assets/images/male-2.jpg");
 
-export const ProfileComponent = () => {
+export const ProfileComponent = (data) => {
+  const info = data.data;
+
   const [activeTab, setActiveTab] = React.useState("0");
 
   const [xTabOne, setXTabOne] = React.useState();
@@ -151,43 +138,28 @@ export const ProfileComponent = () => {
     );
   };
 
-  const pickImage = async () => {
-    let result = await ImagePicker.launchCameraAsync();
-    console.log(result);
-    setSaveImg(result.uri);
-  };
-
   return (
-    <View style={{ flex: 1 }}>
-      <KeyboardAvoidingView style={{flex:1}} behavior='padding'>
+    <View style={{ marginTop: 5, }}>
       <ImageBackground source={cover} style={styles.imgBackground}>
         <View style={styles.cover}>
-          <View style={{ justifyContent: "center", alignItems: "center" }}>
-            {/* <Ionicons name="ios-person" size={120} color="#fff" /> */}
-            <View style={{ position: "relative", marginBottom: 10 }}>
+          <View
+            style={{
+              //justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <View style={{ marginBottom: 10 }}>
               <Image source={profilePic} style={styles.profilePic} />
-              {/* <TouchableOpacity
-                onPress={() =>
-                  pickImage((res) => {
-                    console.log(res);
-                  })
-                }
-                style={styles.cameraIcon}
-              >
-                <Ionicons name="ios-camera" size={38} color="orange" />
-              </TouchableOpacity> */}
             </View>
-            <View style={styles.nameBox}>
-              <Text style={styles.nameText}>Jose Del Corral</Text>
-            </View>
+            <Text style={styles.nameText}>{info.nombre}</Text>
           </View>
         </View>
       </ImageBackground>
-      <View style={{ flex: 1 }}>
-        <View style={{ paddingHorizontal: 5 }}>
-          {/* //------CODE FROM TABBAR------// */}
-          {/* ///----------------------------//////// */}
-          <View style={styles.tabBar}>
+       <View style={{backgroundColor:'pink'}}>
+         <View style={{ paddingHorizontal: 5 }}>
+           {/* //------CODE FROM TABBAR------// */}
+           {/* ///----------------------------//////// */}
+           <View style={styles.tabBar}>
             <Animated.View
               style={{
                 //backgroundColor: "blue",
@@ -233,7 +205,6 @@ export const ProfileComponent = () => {
             </TouchableOpacity>
           </View>
           <View>
-            
             <Animated.View
               onLayout={(event) => {
                 setHightContent1(event.nativeEvent.layout.height);
@@ -246,7 +217,7 @@ export const ProfileComponent = () => {
                 ],
               }}
             >
-              {element1()}
+              {element1(info)}
             </Animated.View>
             <Animated.View
               style={{
@@ -264,24 +235,23 @@ export const ProfileComponent = () => {
             </Animated.View>
           </View>
         </View>
-      </View>
-      </KeyboardAvoidingView>
+        </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   imgBackground: {
-    flex: 1,
+    //flex: 1,
     resizeMode: "cover",
-    justifyContent: "center",
+    //justifyContent: "center",
   },
   cover: {
     backgroundColor: "black",
-    flex: 1,
-    alignItems: "center",
+    //flex: 1,
+    //alignItems: "center",
     opacity: 0.8,
-    justifyContent: "center",
+    //justifyContent: "center",
   },
   profilePic: {
     width: 140,
@@ -294,12 +264,12 @@ const styles = StyleSheet.create({
     right: 5,
   },
   nameBox: {
-    height: 40,
+    //height: 40,
     //backgroundColor: "orange",
-    paddingHorizontal: 10,
-    borderRadius: 20,
-    top: "10%",
-    justifyContent: "center",
+    //paddingHorizontal: 10,
+    //borderRadius: 20,
+    //top: "10%",
+    //justifyContent: "center",
   },
   nameText: {
     textAlign: "center",
@@ -328,18 +298,18 @@ const styles = StyleSheet.create({
   //elemento 1
   dataBox: {
     marginVertical: 10,
-    flexDirection: 'row',
-    alignItems:'center',
+    flexDirection: "row",
+    alignItems: "center",
     //justifyContent:'space-between'
   },
   labelText: {
     fontSize: 14,
-    color:'grey'
+    color: "grey",
   },
   dataText: {
     fontSize: 17,
     //fontWeight:'200',
-    paddingLeft:20
+    paddingLeft: 20,
   },
   //emento 2
 });
