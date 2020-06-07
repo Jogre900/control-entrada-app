@@ -1,5 +1,20 @@
 import React, { useEffect, useRef, useState } from "react";
-import { View, Text, StyleSheet, StatusBar, BackHandler, Alert, Image, Dimensions, Animated, ImageBackground, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard, TextInput } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  StatusBar,
+  BackHandler,
+  Alert,
+  Image,
+  Dimensions,
+  Animated,
+  ImageBackground,
+  KeyboardAvoidingView,
+  TouchableWithoutFeedback,
+  Keyboard,
+  TextInput,
+} from "react-native";
 
 //components
 import { MainButton } from "../../components/mainButton.component";
@@ -52,24 +67,43 @@ export const LogInScreen = (props) => {
 
   return (
     <View style={styles.container}>
-      <ImageBackground source={require("../../assets/images/background.jpg")} style={styles.imageBackground}>
+      <ImageBackground
+        source={require("../../assets/images/background.jpg")}
+        style={styles.imageBackground}
+      >
         <StatusBar hidden={true} />
 
-        <TouchableWithoutFeedback style={styles.backCover} onPress={() => Keyboard.dismiss()}>
+        <TouchableWithoutFeedback
+          style={styles.backCover}
+          onPress={() => Keyboard.dismiss()}
+        >
           <KeyboardAvoidingView style={styles.backCover} behavior="padding">
-            <Image style={styles.logo} source={require("../../assets/images/security-logo.png")} />
+            <Image
+              style={styles.logo}
+              source={require("../../assets/images/security-logo.png")}
+            />
             <View style={styles.buttonBox}>
               <Input
-                style={{ borderColor: '#ff7e00', color: "white" }}
+                style={{ borderColor: "#ff7e00", color: "white" }}
                 title="Correo"
                 textColor="white"
                 shape="round"
+                //icon='ios-close'
                 alignText="center"
                 keyboardType="email-address"
                 returnKeyType="next"
                 onSubmitEditing={() => nextInput.focus()}
               />
-              <Input style={{ borderColor: '#ff7e00', color: "white" }} title="Clave" textColor="white" shape="round" alignText="center" returnKeyType="go" secureTextEntry={true} ref={nextInput} />
+              <Input
+                style={{ borderColor: "#ff7e00", color: "white" }}
+                title="Clave"
+                textColor="white"
+                shape="round"
+                alignText="center"
+                returnKeyType="go"
+                secureTextEntry={true}
+                ref={nextInput}
+              />
               <MainButton
                 title="Iniciar Sesion"
                 onPress={() => {

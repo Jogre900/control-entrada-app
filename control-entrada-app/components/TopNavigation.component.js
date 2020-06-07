@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
     height: "100%",
   },
   title: {
-    fontSize: 17,
+    fontSize: 20,
     color: "white",
     textAlign: "center",
   },

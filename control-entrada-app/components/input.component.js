@@ -1,67 +1,98 @@
 import React from "react";
 import { View, TextInput, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { TouchableWithoutFeedback } from "react-native-gesture-handler";
 
 export const Input = (props) => {
-  const { 
-    title, 
-    textColor, 
-    onChangeText, 
-    value, 
+  const {
+    title,
+    textColor,
+    onChangeText,
+    value,
     shape,
-    icon, 
-    alignText, 
+    icon,
+    alignText,
     style,
     keyboardType,
     returnKeyType,
     secureTextEntry,
     autoCorrect,
-    ref,
-    onSubmitEditing
+    onSubmitEditing,
+    ref
   } = props;
-  
-  return (
-    <View style={{flexDirection:'row', alignItems:'center',  borderBottomWidth: .5}}>
-      <View style={{alignItems:'center', justifyContent:'center'}}>
-        <Ionicons name={icon} size={28} color='grey'style={{marginRight: 5}}/>
+
+  const inputFlat = () => {
+    return (
+      <TouchableWithoutFeedback style={styles.flatShape}>
+        <View style={{ alignItems: "center", justifyContent: "center" }}>
+          <Ionicons
+            name={icon}
+            size={28}
+            color="grey"
+            style={{ marginRight: 5 }}
+          />
+        </View>
+        <TextInput
+          style={style}
+          placeholder={title}
+          textAlign={alignText}
+          keyboardType={keyboardType}
+          returnKeyType={returnKeyType}
+          secureTextEntry={secureTextEntry}
+          placeholderTextColor={textColor}
+          autoCorrect={autoCorrect}
+          onChangeText={onChangeText}
+          value={value}
+          onSubmitEditing={onSubmitEditing}
+             
+        />
+      </TouchableWithoutFeedback>
+    );
+  };
+
+  const inputRound = () => {
+    return (
+      <View>
+        <TextInput
+          style={[style, styles.roundedShape]}
+          placeholder={title}
+          textAlign={alignText}
+          keyboardType={keyboardType}
+          returnKeyType={returnKeyType}
+          secureTextEntry={secureTextEntry}
+          placeholderTextColor={textColor}
+          autoCorrect={autoCorrect}
+          onChangeText={onChangeText}
+          value={value}
+          onSubmitEditing={onSubmitEditing}
+          ref={ref}
+        />
       </View>
-      <TextInput
-        style={[style, (shape=='round')?styles.roundedShape:
-        (shape=='square') ? styles.squareShape : styles.flatShape]}
-        placeholder={title}
-        textAlign={alignText}
-        keyboardType={keyboardType}
-        returnKeyType={returnKeyType}
-        secureTextEntry={secureTextEntry}
-        placeholderTextColor={textColor}
-        autoCorrect={autoCorrect}
-        onChangeText={onChangeText}
-        value={value}
-        onSubmitEditing={onSubmitEditing}
-        ref={ref}
-      />
-    </View>
-  );
+    );
+  };
+
+  return shape === "round" ? inputRound() : inputFlat();
 };
 
 const styles = StyleSheet.create({
   roundedShape: {
     borderRadius: 20,
-    borderWidth: .5,
+    borderWidth: 0.5,
     marginBottom: 10,
     height: 40,
-    
   },
   squareShape: {
     borderRadius: 3,
-    borderWidth: .5,
+    borderWidth: 0.5,
     marginBottom: 10,
     height: 40,
+    //width: '100%'
   },
   flatShape: {
-    //borderRadius: 3,
-    //borderBottomWidth: .5,
-    //marginBottom: 10,
-    //height: 40,
-  }
+    flexDirection: "row",
+    //alignItems: "center",
+    borderBottomWidth: 0.5,
+    marginBottom: 5,
+    height: 40
+  },
 });
