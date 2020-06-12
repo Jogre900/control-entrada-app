@@ -17,8 +17,10 @@ import { MainButton } from "../../components/mainButton.component";
 import { Input } from "../../components/input.component";
 
 export const PerfilScreen = (props) => {
-  const [textChange, setTextChange] = React.useState("");
+  const [passChange, setPassChange] = React.useState("");
+  
   const [repeatPass, setRepeatPass] = React.useState("");
+  
   const goBackAction = () => {
     return (
       <View>
@@ -47,28 +49,32 @@ export const PerfilScreen = (props) => {
           <Input
             style={styles.input}
             title="Clave"
-            alignText="center"
-            shape="round"
+            icon="ios-eye-off"
+            //alignText="center"
+            shape="flat"
             secureTextEntry={true}
             onChangeText={(text) => {
-              setTextChange(text);
+              setPassChange(text);
             }}
-            value={textChange}
+            value={passChange}
           />
-          {textChange != "" ? (
+          {passChange != "" ? (
             <Input
-              
+              style={styles.input}
+              icon="ios-eye-off"
               title="Repetir Clave"
-              alignText="center"
+              //alignText="center"
               secureTextEntry={true}
-              shape="round"
+              shape="flat"
               onChangeText={(text) => {
                 setRepeatPass(text);
               }}
               value={repeatPass}
             />
           ) : null}
-          {repeatPass != "" ? <MainButton style={{width: '100%'}}title="Guardar Cambios" /> : null}
+          {passChange === repeatPass ? (
+            <MainButton style={{ width: "100%" }} title="Guardar Cambios" />
+          ) : null}
         </View>
       </View>
     </View>
@@ -79,6 +85,7 @@ const styles = StyleSheet.create({
   perfilContainer: {
     alignItems: "center",
     justifyContent: "center",
+    marginTop: 10,
   },
   perfilLogo: {
     width: 120,
@@ -86,11 +93,11 @@ const styles = StyleSheet.create({
   },
   editBox: {
     marginTop: 30,
-    justifyContent: "center",
-    alignItems: "center",
-    width: '75%'
+    //justifyContent: "center",
+    //alignItems: "center",
+    width: "75%",
   },
   input: {
-    marginTop: 10
+    marginBottom: 10,
   },
 });

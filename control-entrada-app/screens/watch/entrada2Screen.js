@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect} from "react";
 import {
   View,
   Text,
@@ -12,6 +12,7 @@ import {
   KeyboardAvoidingView,
   TouchableWithoutFeedback,
   Keyboard,
+  Alert
 } from "react-native";
 
 //components
@@ -20,6 +21,9 @@ import { Input } from "../../components/input.component";
 import { MainButton } from "../../components/mainButton.component";
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
+import  firebase from '../../lib/firebase'
+
+import FireMethods from "../../lib/methods.firebase";
 
 const formContent = () => {
   return (
@@ -63,6 +67,25 @@ const watchPic = require("../../assets/images/male-2.jpg");
 export const Entrada2Screen = (props) => {
   const [saveImg, setSaveImg] = React.useState(null);
   const [changeImg, setChangeImg] = React.useState(false);
+  const [userId, setUserId] = React.useState();
+  const [name, setName] = React.useState("");
+  const [lastName, setLastName] = React.useState("");
+  const [dni, setDni] = React.useState("");
+  const [destiny, setDestiny] = React.useState("");
+
+
+  const getUserId = () => {
+    try {
+      let userid = firebase.auth().currentUser
+      setUserId(userid);
+      console.log("user-Id:---",userid)
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  useEffect(() => {
+    getUserId()
+  }, []);
 
   const pickImage = async () => {
     let result = await ImagePicker.launchCameraAsync();
@@ -79,6 +102,23 @@ export const Entrada2Screen = (props) => {
         </TouchableWithoutFeedback>
       </View>
     );
+  };
+
+  const saveEntrance = () => {
+    if (name === "" || lastName === "" || dni === "" || destiny === "") {
+      Alert.alert("Completa todos los Campos!");
+    } else {
+      try {
+        FireMethods.saveName(userId, name);
+        FireMethods.saveLastName(userId, lastName);
+        FireMethods.saveDni(userId, dni);
+        FireMethods.saveDestiny(userId, destiny);
+        Alert.alert("Registro Exitoso")
+        console.log("Registro Exitoso")
+      } catch (error) {
+        console.log(error);
+      }
+    }
   };
 
   return (
@@ -125,31 +165,47 @@ export const Entrada2Screen = (props) => {
           >
             <Input
               title="Nombre"
+              secureTextEntry={false}
               shape="flat"
               icon="ios-person"
               style={styles.input}
+              onChangeText={(name) => setName(name)}
+              value={name}
             />
             <Input
               title="Apellido"
+              secureTextEntry={false}
               shape="flat"
               icon="ios-person"
               style={styles.input}
+              onChangeText={(lastname) => setLastName(lastname)}
+              value={lastName}
             />
             <Input
               title="DNI"
+              secureTextEntry={false}
               shape="flat"
               icon="ios-card"
               style={styles.input}
+              onChangeText={(dni) => setDni(dni)}
+              value={dni}
             />
             <Input
               title="Destino"
+              secureTextEntry={false}
               shape="flat"
               icon="ios-pin"
               style={styles.input}
+              onChangeText={(destiny) => setDestiny(destiny)}
+              value={destiny}
             />
 
             <View>
-              <MainButton title="Registrar Entrada" style={{ marginTop: 10 }} />
+              <MainButton
+                title="Registrar Entrada"
+                style={{ marginTop: 10 }}
+                onPress={() => saveEntrance()}
+              />
             </View>
           </View>
         </View>
