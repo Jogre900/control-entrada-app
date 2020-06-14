@@ -9,6 +9,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { MainNavigator } from './navigation/main.navigator'
 import BottomTabNavigator from './navigation/BottomTabNavigator';
 import useLinking from './navigation/useLinking';
+import firebase from './lib/firebase'
 
 const Stack = createStackNavigator();
 
@@ -21,6 +22,7 @@ export default function App(props) {
   const { getInitialState } = useLinking(containerRef);
 
   // Load any resources or data that we need prior to rendering the app
+  
   React.useEffect(() => {
     async function loadResourcesAndDataAsync() {
       try {
