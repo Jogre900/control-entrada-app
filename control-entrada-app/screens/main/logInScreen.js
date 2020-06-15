@@ -13,12 +13,12 @@ import {
   KeyboardAvoidingView,
   TouchableWithoutFeedback,
   Keyboard,
-  TextInput,
 } from "react-native";
 
 //components
 import { MainButton } from "../../components/mainButton.component";
-import { Input } from "../../components/input.component";
+import Input from "../../components/input.component";
+import Input2 from '../../components/input2'
 import { SplashScreen } from "../../components/splashScreen.component";
 
 //constants
@@ -50,11 +50,12 @@ export const LogInScreen = (props) => {
   const activeSplash = () => {
     setTimeout(() => {
       setIsSplash(false);
-    }, 3000);
+    }, 500);
   };
 
   useEffect(() => {
     activeSplash();
+    console.log('ref: ',nextInput.current)
     // backHandler.current = BackHandler.addEventListener("hardwareBackPress", backAction);
     // return () => {
     //   backHandler.current.remove()
@@ -88,11 +89,10 @@ export const LogInScreen = (props) => {
                 title="Correo"
                 textColor="white"
                 shape="round"
-                //icon='ios-close'
                 alignText="center"
                 keyboardType="email-address"
                 returnKeyType="next"
-                onSubmitEditing={() => nextInput.focus()}
+                onSubmitEditing={() => nextInput.current.focus()}
               />
               <Input
                 style={{ borderColor: "#ff7e00", color: "white",  marginBottom: 10 }}

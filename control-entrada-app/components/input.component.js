@@ -7,7 +7,9 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
-export const Input = (props) => {
+const Input = (props, ref) => {
+  // ----LA REF NO ME LLEGA POR PROPS----!!!
+  
   const {
     title,
     textColor,
@@ -22,9 +24,8 @@ export const Input = (props) => {
     secureTextEntry,
     autoCorrect,
     onSubmitEditing,
-    ref,
   } = props;
-
+//console.log('input ref: ', props.ref)
   const [eyeIcon, setEyeIcon] = React.useState(false);
 
   const showPass = () => {
@@ -55,6 +56,8 @@ export const Input = (props) => {
           onChangeText={onChangeText}
           value={value}
           onSubmitEditing={onSubmitEditing}
+          ref={ref}
+
         />
       </View>
     ) : (
@@ -78,6 +81,7 @@ export const Input = (props) => {
           onChangeText={onChangeText}
           value={value}
           onSubmitEditing={onSubmitEditing}
+          ref={ref}
         />
       </View>
     );
@@ -106,6 +110,10 @@ export const Input = (props) => {
 
   return shape === "round" ? inputRound() : inputFlat();
 };
+
+const forwardRefInput = React.forwardRef(Input)
+
+export default forwardRefInput;
 
 const styles = StyleSheet.create({
   roundedShape: {

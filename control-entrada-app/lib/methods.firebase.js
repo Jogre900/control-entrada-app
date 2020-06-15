@@ -17,6 +17,16 @@ const FireMethods = {
     saveDestiny(userId, destiny){
         let entranceDestiny = `/users/${userId}/entrance/destiny`
         return firebase.database().ref(entranceDestiny).push(destiny)
+    },
+    saveEntrance(name, lastName, dni, destiny, hora_entrada, foto){
+        return firebase.database().ref('/entradas').push({
+            nombre: name,
+            apellido: lastName,
+            cedula: dni,
+            destino: destiny,
+            hora_entrada: hora_entrada,
+            foto: foto
+        })
     } 
 }
 

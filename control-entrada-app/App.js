@@ -9,7 +9,6 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { MainNavigator } from './navigation/main.navigator'
 import BottomTabNavigator from './navigation/BottomTabNavigator';
 import useLinking from './navigation/useLinking';
-import firebase from './lib/firebase'
 
 const Stack = createStackNavigator();
 

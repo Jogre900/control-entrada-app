@@ -1,4 +1,4 @@
-import React, {useEffect} from "react";
+import React, { useEffect } from "react";
 import {
   View,
   Text,
@@ -12,57 +12,69 @@ import {
   KeyboardAvoidingView,
   TouchableWithoutFeedback,
   Keyboard,
-  Alert
+  Alert,
 } from "react-native";
 
 //components
 import { TopNavigation } from "../../components/TopNavigation.component";
-import { Input } from "../../components/input.component";
+import Input from "../../components/input.component";
 import { MainButton } from "../../components/mainButton.component";
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
-import  firebase from '../../lib/firebase'
-
+import firebase from "../../lib/firebase";
+//import { RNFetchBlob } from 'react-native-fetch-blob'
 import FireMethods from "../../lib/methods.firebase";
 
-const formContent = () => {
-  return (
-    <View style={{ marginTop: 10, paddingHorizontal: "12%" }}>
-      <Input title="Nombre" shape="round" />
-      <Input title="Apellido" shape="round" />
-      <Input title="DNI" shape="round" />
-      <Input title="Destino" shape="round" />
-      <View>
-        <MainButton title="Registrar Entrada" />
-      </View>
-    </View>
-  );
+// const Blob = RNFetchBlob.polyfill.Blob
+// const fs = RNFetchBlob.fs
+
+// window.XMLHttpRequest = RNFetchBlob.polyfill.XMLHttpRequest
+// window.Blob = Blob
+
+// const upLoadImage = (uri, imageName, mime='/image.jpg') => {
+//   return new Promise((resolve, reject) => {
+//     let uploadBlob = null
+//     const imageRef = firebase.storage().ref('images').child(imageName)
+//     fs.readFile(uri, 'base64')
+//     .then((data) => {
+//       return Blob.build(data, {type: `${mime};BASE64`})
+//     })
+//     .then((blob) => {
+//       uploadBlob = blob
+//       return imageRef.put(blob, {contentType: mime})
+//     })
+//     .then(() => {
+//       uploadBlob.close()
+//       return imageRef.getDownloadURL()
+//     })
+//     .then((url) => {
+//       resolve(url)
+//     })
+//     .catch((error) => {
+//       reject(error)
+//     })
+//   })
+// }
+
+const upLoadImage = (uri) => {
+  return new Promise((resolve, reject) => {
+    let xhr = new XMLHttpRequest();
+    xhr.onerror = reject;
+    xhr.onreadystatechange = () => {
+      if (xhr.readyState === 4) {
+        resolve(xhr.response);
+      }
+    };
+    xhr.open("GET", uri);
+    xhr.responseType = "blob";
+    xhr.send();
+  });
 };
 
 const { width } = Dimensions.get("window");
 const cover = require("../../assets/images/background.jpg");
 const profilePic = require("../../assets/images/profile-picture.png");
 const watchPic = require("../../assets/images/male-2.jpg");
-
-// FORM dataBox
-// <View style={{ flex: 1 }}>
-//           <View style={{ paddingHorizontal: 5 }}>
-//             {/* //------CODE FROM TABBAR------// */}
-//             {/* ///----------------------------//////// */}
-//             <View style={{ marginTop: 20, paddingHorizontal: "12%" }}>
-//               <Input title="Nombre" shape="flat" icon='md-camera'/>
-//               <Input title="Nombre" shape="flat" icon='md-camera'/>
-//               <Input title="Nombre" shape="flat" icon='md-camera'/>
-//               <Input title="Nombre" shape="flat" icon='md-camera'/>
-//               {/* <Input title="Apellido" shape="round" />
-//               <Input title="DNI" shape="round" />
-//               <Input title="Destino" shape="round" /> */}
-//               <View>
-//                 <MainButton title="Registrar Entrada" />
-//               </View>
-//             </View>
-//           </View>
-//         </View>
 
 export const Entrada2Screen = (props) => {
   const [saveImg, setSaveImg] = React.useState(null);
@@ -72,19 +84,19 @@ export const Entrada2Screen = (props) => {
   const [lastName, setLastName] = React.useState("");
   const [dni, setDni] = React.useState("");
   const [destiny, setDestiny] = React.useState("");
-
+  const [imgUrl, setImgUrl] = React.useState("");
 
   const getUserId = () => {
     try {
-      let userid = firebase.auth().currentUser
+      let userid = firebase.auth().currentUser;
       setUserId(userid);
-      console.log("user-Id:---",userid)
+      //console.log("user-Id:---",userid)
     } catch (error) {
       console.log(error);
     }
-  }
+  };
   useEffect(() => {
-    getUserId()
+    getUserId();
   }, []);
 
   const pickImage = async () => {
@@ -105,20 +117,31 @@ export const Entrada2Screen = (props) => {
   };
 
   const saveEntrance = () => {
-    if (name === "" || lastName === "" || dni === "" || destiny === "") {
-      Alert.alert("Completa todos los Campos!");
-    } else {
-      try {
-        FireMethods.saveName(userId, name);
-        FireMethods.saveLastName(userId, lastName);
-        FireMethods.saveDni(userId, dni);
-        FireMethods.saveDestiny(userId, destiny);
-        Alert.alert("Registro Exitoso")
-        console.log("Registro Exitoso")
-      } catch (error) {
-        console.log(error);
-      }
-    }
+    upLoadImage(saveImg).then((response) => {
+      const data = response;
+      firebase.storage().ref("imag").child(`${name}`).put(data);
+      firebase.storage()
+        .ref("imag")
+        .child(`${name}`)
+        .getDownloadURL()
+        .then((url) => {
+          console.log("url image: ", url);
+          setImgUrl(url);
+        })
+        FireMethods.saveEntrance(name, lastName, dni, destiny, "", imgUrl);
+        
+    });
+    // if (name === "" || lastName === "" || dni === "" || destiny === "") {
+    //   Alert.alert("Completa todos los Campos!");
+    // } else {
+    //   try {
+
+    //     Alert.alert("Registro Exitoso")
+    //     console.log("Registro Exitoso")
+    //   } catch (error) {
+    //     console.log(error);
+    //   }
+    // }
   };
 
   return (
