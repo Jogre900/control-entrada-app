@@ -1,12 +1,5 @@
-import React, { useEffect } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TextInput,
-  Button,
-  TouchableHighlight,
-} from "react-native";
+import React, { useEffect, useState } from "react";
+import { View, Text, StyleSheet, TextInput, Button, TouchableHighlight } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { RectButton } from "react-native-gesture-handler";
 
@@ -19,7 +12,7 @@ import firebase from "../../lib/firebase";
 import FireMethods from "../../lib/methods.firebase";
 
 export const HistorialScreen = (props) => {
-  const [object, setObject] = React.useState();
+  const [object, setObject] = useState({});
   var datos = [];
   const goBackAction = () => {
     return (
@@ -35,15 +28,16 @@ export const HistorialScreen = (props) => {
     );
   };
 
-  useEffect(() => {
-    FireMethods.getEntrance((object) => {
-      setObject(object);
-      //console.log("useEffect:   ", object);
-      console.log("nombre:", object.nombre);
-      console.log("apellido:", object.apellido);
-      console.log("cedula:", object.cedula);
-      console.log("destino:", object.destino);
+  const getEntrada = async () => {
+    let data = new Object();
+    await FireMethods.getEntrance((object) => {
+      data = object;
     });
+    setObject(data);
+  };
+
+  useEffect(() => {
+    getEntrada();
   }, []);
 
   return (
@@ -51,26 +45,21 @@ export const HistorialScreen = (props) => {
       <TopNavigation title="Historial" leftControl={goBackAction()} />
       <View style={styles.historialContainer}>
         <View style={styles.inputBox}>
-          <Input
-            style={styles.input}
-            alignText="center"
-            shape="round"
-            title="Desde"
-          />
-          <Input
-            style={styles.input}
-            alignText="center"
-            shape="round"
-            title="Hasta"
-          />
-          <Input
-            style={styles.input}
-            alignText="center"
-            shape="round"
-            title="DNI"
-          />
+          <Input style={styles.input} alignText="center" shape="round" title="Desde" />
+          <Input style={styles.input} alignText="center" shape="round" title="Hasta" />
+          <Input style={styles.input} alignText="center" shape="round" title="DNI" />
         </View>
         <View style={{ backgroundColor: "red" }}>
+          {Object.keys(object).map((item) => {
+            return (
+              <View key={item}>
+                <Text>{object[item].apellido}</Text>
+                <Text>{object[item].cedula}</Text>
+                <Text>ALGO</Text>
+                <Text>ALGO</Text>
+              </View>
+            );
+          })}
         </View>
         <View style={styles.buttonBox}>
           <MainButton style={{ width: "75%" }} title="Buscar" />

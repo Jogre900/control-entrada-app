@@ -1,26 +1,18 @@
 import React from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  TextInput,
-  Alert,
-  TouchableHighlight,
-} from "react-native";
+import { View, Text, StyleSheet, Image, TextInput, Alert, TouchableHighlight } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { RectButton } from "react-native-gesture-handler";
 
 //components
 import { TopNavigation } from "../../components/TopNavigation.component";
 import { MainButton } from "../../components/mainButton.component";
-import { Input } from "../../components/input.component";
+import Input from "../../components/input.component";
 
 export const PerfilScreen = (props) => {
   const [passChange, setPassChange] = React.useState("");
-  
+
   const [repeatPass, setRepeatPass] = React.useState("");
-  
+
   const goBackAction = () => {
     return (
       <View>
@@ -39,12 +31,10 @@ export const PerfilScreen = (props) => {
     <View>
       <TopNavigation title="Perfil" leftControl={goBackAction()} />
       <View style={styles.perfilContainer}>
-        <Image
-          style={styles.perfilLogo}
-          source={require("../../assets/images/security-logo.png")}
-        />
+        <Image style={styles.perfilLogo} source={require("../../assets/images/security-logo.png")} />
         <Text>Security. All Right Reserved</Text>
         <View style={styles.editBox}>
+          <Input title="Nombre" secureTextEntry={false} shape="flat" icon="ios-person" style={styles.input} />
           <Text>Cambio de Contraseña</Text>
           <Input
             style={styles.input}
@@ -72,9 +62,7 @@ export const PerfilScreen = (props) => {
               value={repeatPass}
             />
           ) : null}
-          {passChange === repeatPass ? (
-            <MainButton style={{ width: "100%" }} title="Guardar Cambios" />
-          ) : null}
+          {passChange === repeatPass ? <MainButton style={{ width: "100%" }} title="Guardar Cambios" /> : null}
         </View>
       </View>
     </View>

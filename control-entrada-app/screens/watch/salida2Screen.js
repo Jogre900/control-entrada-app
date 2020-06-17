@@ -1,20 +1,8 @@
 import React from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  Animated,
-  Dimensions,
-  TouchableOpacity,
-  ScrollView,
-  ImageBackground,
-  Image,
-  KeyboardAvoidingView,
-  Keyboard,
-} from "react-native";
+import { View, Text, StyleSheet, Animated, Dimensions, TouchableOpacity, ScrollView, ImageBackground, Image, KeyboardAvoidingView, Keyboard } from "react-native";
 import { RectButton } from "react-native-gesture-handler";
 import { TopNavigation } from "../../components/TopNavigation.component";
-import  Input  from "../../components/input.component";
+import Input from "../../components/input.component";
 import { MainButton } from "../../components/mainButton.component";
 import { Ionicons } from "@expo/vector-icons";
 import FireMethods from "../../lib/methods.firebase";
@@ -29,6 +17,7 @@ export const Salida2Screen = (props) => {
   const [activeTab, setActiveTab] = React.useState("0");
   const [buscar, setBuscar] = React.useState("");
   const [encontrado, setEncontrado] = React.useState(false);
+  const [person, setPerson] = React.useState({});
   const [horaSalida, setHoraSalida] = React.useState();
 
   const getHour = () => {
@@ -41,6 +30,7 @@ export const Salida2Screen = (props) => {
       Hour = `${hour}:${minute} pm`;
     }
     setHoraSalida(Hour);
+    update();
   };
 
   const goBackAction = () => {
@@ -57,10 +47,18 @@ export const Salida2Screen = (props) => {
     );
   };
 
-  const buscarProfile = (id) => {
-    FireMethods.getDuplicateDni(id)
+  const buscarProfile = async (id) => {
+    setEncontrado(false);
+    let resp = await FireMethods.getDuplicateDni(id);
+    console.log("BUYSCAR:", resp);
+    await setPerson(resp);
+    setEncontrado(true);
     //id === "19222907" ? setEncontrado(true) : setEncontrado(false);
     Keyboard.dismiss();
+  };
+
+  const update = () => {
+    FireMethods.updateEntrance(person.timeStamp, "algo2");
   };
 
   return (
@@ -68,14 +66,7 @@ export const Salida2Screen = (props) => {
       <TopNavigation title="Salida" leftControl={goBackAction()} />
       <View style={styles.searchBox}>
         <View style={{ width: "70%" }}>
-          <Input
-            title="Buscar por DNI"
-            shape="round"
-            alignText="center"
-            style={{backgroundColor:'white'}}
-            onChangeText={(valor) => setBuscar(valor)}
-            value={buscar}
-          />
+          <Input title="Buscar por DNI" shape="round" alignText="center" style={{ backgroundColor: "white" }} onChangeText={(valor) => setBuscar(valor)} value={buscar} />
         </View>
         <RectButton title="Buscar" onPress={() => buscarProfile(buscar)}>
           <Ionicons name="ios-search" size={28} color="white" />
