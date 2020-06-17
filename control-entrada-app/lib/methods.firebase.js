@@ -1,33 +1,57 @@
 //import * as firebase from 'firebase'
-import firebase from './firebase'
+import firebase from "./firebase";
 
 const FireMethods = {
-    saveName(userId, name) {
-        let entranceName = `/users/${userId}/entrance/name`
-        return firebase.database().ref(entranceName).push(name)
-    },
-    saveLastName(userId, lastName){
-        let entranceLastName = `/users/${userId}/entrance/lastName`
-        return firebase.database().ref(entranceLastName).push(lastName)
-    },
-    saveDni(userId, dni){
-        let entranceDni = `/users/${userId}/entrance/dni`
-        return firebase.database().ref(entranceDni).push(dni)
-    },
-    saveDestiny(userId, destiny){
-        let entranceDestiny = `/users/${userId}/entrance/destiny`
-        return firebase.database().ref(entranceDestiny).push(destiny)
-    },
-    saveEntrance(name, lastName, dni, destiny, hora_entrada, foto){
-        return firebase.database().ref('/entradas').push({
-            nombre: name,
-            apellido: lastName,
-            cedula: dni,
-            destino: destiny,
-            hora_entrada: hora_entrada,
-            foto: foto
-        })
-    } 
-}
+  saveEntrance(name, lastName, dni, destiny, hora_entrada, foto) {
+    return firebase.database().ref("/entradas").push(
+      {
+      nombre: name,
+      apellido: lastName,
+      cedula: dni,
+      destino: destiny,
+      hora_entrada: hora_entrada,
+      foto: foto,
+    }
+    );
+  },
 
-module.exports = FireMethods
+  getEntrance(callback) {
+    var usersRef = firebase.database().ref("entradas");
+
+    firebase
+      .database()
+      .ref(usersRef)
+      .on("child_added", (snapshot) => {
+        //console.log("snapshot-val", snapshot.val());
+        let datos = "";
+        if (snapshot.val()) {
+          datos = snapshot.val();
+        }
+        callback(datos);
+      });
+  },
+  getEntranceById() {
+    let ref = firebase.database().ref("entradas");
+    firebase
+      .database()
+      .ref(ref)
+      .on("child_added", (snapshot) => {
+        let usuarios = snapshot.val();
+        console.log("dni:---", usuarios.cedula);
+      });
+  },
+  getDuplicateDni(dni) {
+    let ref = firebase.database().ref("entradas");
+    console.log(dni)
+    firebase
+      .database()
+      .ref(ref)
+      .equalTo(dni)
+      .on("child_added", (snapshot) => {
+        
+          console.log(snapshot.val())
+      });
+  },
+};
+
+module.exports = FireMethods;

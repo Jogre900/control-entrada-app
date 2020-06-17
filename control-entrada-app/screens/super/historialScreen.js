@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   View,
   Text,
@@ -12,10 +12,15 @@ import { RectButton } from "react-native-gesture-handler";
 
 //components
 import { MainButton } from "../../components/mainButton.component";
-import { Input } from "../../components/input.component";
+import Input from "../../components/input.component";
 import { TopNavigation } from "../../components/TopNavigation.component";
 
+import firebase from "../../lib/firebase";
+import FireMethods from "../../lib/methods.firebase";
+
 export const HistorialScreen = (props) => {
+  const [object, setObject] = React.useState();
+  var datos = [];
   const goBackAction = () => {
     return (
       <View>
@@ -29,6 +34,17 @@ export const HistorialScreen = (props) => {
       </View>
     );
   };
+
+  useEffect(() => {
+    FireMethods.getEntrance((object) => {
+      setObject(object);
+      //console.log("useEffect:   ", object);
+      console.log("nombre:", object.nombre);
+      console.log("apellido:", object.apellido);
+      console.log("cedula:", object.cedula);
+      console.log("destino:", object.destino);
+    });
+  }, []);
 
   return (
     <View>
@@ -53,6 +69,8 @@ export const HistorialScreen = (props) => {
             shape="round"
             title="DNI"
           />
+        </View>
+        <View style={{ backgroundColor: "red" }}>
         </View>
         <View style={styles.buttonBox}>
           <MainButton style={{ width: "75%" }} title="Buscar" />

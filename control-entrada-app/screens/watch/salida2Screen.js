@@ -14,9 +14,10 @@ import {
 } from "react-native";
 import { RectButton } from "react-native-gesture-handler";
 import { TopNavigation } from "../../components/TopNavigation.component";
-import { Input } from "../../components/input.component";
+import  Input  from "../../components/input.component";
 import { MainButton } from "../../components/mainButton.component";
 import { Ionicons } from "@expo/vector-icons";
+import FireMethods from "../../lib/methods.firebase";
 import * as ImagePicker from "expo-image-picker";
 
 const { width } = Dimensions.get("window");
@@ -57,7 +58,8 @@ export const Salida2Screen = (props) => {
   };
 
   const buscarProfile = (id) => {
-    id === "19222907" ? setEncontrado(true) : setEncontrado(false);
+    FireMethods.getDuplicateDni(id)
+    //id === "19222907" ? setEncontrado(true) : setEncontrado(false);
     Keyboard.dismiss();
   };
 
