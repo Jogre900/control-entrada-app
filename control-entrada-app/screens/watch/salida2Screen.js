@@ -7,7 +7,7 @@ import { MainButton } from "../../components/mainButton.component";
 import { Ionicons } from "@expo/vector-icons";
 import FireMethods from "../../lib/methods.firebase";
 import * as ImagePicker from "expo-image-picker";
-
+import moment from 'moment'
 const { width } = Dimensions.get("window");
 const cover = require("../../assets/images/background.jpg");
 const profilePic = require("../../assets/images/female-2.jpg");
@@ -21,15 +21,8 @@ export const Salida2Screen = (props) => {
   const [horaSalida, setHoraSalida] = React.useState();
 
   const getHour = () => {
-    const hour = new Date().getHours();
-    const minute = new Date().getMinutes();
-    let Hour = "";
-    if (hour <= 12) {
-      Hour = `${hour}:${minute} am`;
-    } else {
-      Hour = `${hour}:${minute} pm`;
-    }
-    setHoraSalida(Hour);
+    let hour = moment().format("MMM Do YY, h:mm a")
+    setHoraSalida(hour);
     update();
   };
 
@@ -58,7 +51,8 @@ export const Salida2Screen = (props) => {
   };
 
   const update = () => {
-    FireMethods.updateEntrance(person.timeStamp, "algo2");
+    console.log("person:  ",person)
+    FireMethods.updateEntrance(person.timeStamp, "algo3");
   };
 
   return (
@@ -79,10 +73,10 @@ export const Salida2Screen = (props) => {
               <View style={{ justifyContent: "center", alignItems: "center" }}>
                 {/* <Ionicons name="ios-person" size={120} color="#fff" /> */}
                 <View style={{ position: "relative", marginBottom: 10 }}>
-                  <Image source={profilePic} style={styles.profilePic} />
+                  <Image source={{uri: person.foto}} style={styles.profilePic} />
                 </View>
                 <View style={styles.nameBox}>
-                  <Text style={styles.nameText}>Jose Del Corral</Text>
+      <Text style={styles.nameText}>{person.nombre}{person.apellido}</Text>
                 </View>
               </View>
             </View>
@@ -91,15 +85,15 @@ export const Salida2Screen = (props) => {
             <View style={{ width: "75%" }}>
               <View style={styles.dataBox}>
                 <Text style={styles.labelText}>DNI:</Text>
-                <Text style={styles.dataText}>19222907</Text>
+      <Text style={styles.dataText}>{person.cedula}</Text>
               </View>
               <View style={styles.dataBox}>
                 <Text style={styles.labelText}>Destino:</Text>
-                <Text style={styles.dataText}>Apt 104</Text>
+      <Text style={styles.dataText}>{person.destino}</Text>
               </View>
               <View style={styles.dataBox}>
                 <Text style={styles.labelText}>Hora de Entrada:</Text>
-                <Text style={styles.dataText}>10:00 am</Text>
+                <Text style={styles.dataText}>{person.hora_entrada}</Text>
               </View>
               <View style={styles.dataBox}>
                 <Text style={styles.labelText}>Hora de Salida:</Text>

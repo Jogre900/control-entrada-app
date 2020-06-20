@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useState, useEffect} from "react";
 import { View, Text, StyleSheet, Alert, TouchableOpacity, TouchableHighlight } from "react-native";
 import { RectButton } from "react-native-gesture-handler";
 import { Ionicons } from "@expo/vector-icons";
 //components
 import { TopNavigation } from "../../components/TopNavigation.component";
+import FireMethods from '../../lib/methods.firebase'
 
 
 const data = [
@@ -34,6 +35,7 @@ const data = [
 ];
 
 export const HomeSuperScreen = (props) => {
+  const [object, setObject] = useState({})
   const drawerAction = () => {
     return (
       <View>
@@ -60,6 +62,19 @@ export const HomeSuperScreen = (props) => {
       </View>
     );
   };
+
+  const getEntrada = async () => {
+    let data = new Object();
+    await FireMethods.getEntrance((object) => {
+      data = object;
+    });
+    setObject(data);
+    console.log("object:  ",object)
+  };
+
+  useEffect(() => {
+    getEntrada();
+  }, []);
   
   return (
     <View>
@@ -69,17 +84,17 @@ export const HomeSuperScreen = (props) => {
         rightControl={openNotifications()}
       />
         <View style={styles.listEntry}>
-      {data.map((element, index) => {
+      {Object.keys(object).map((element) => {
         return (
 
           <TouchableOpacity style={styles.entryBox}
-          key={index}  
-          onPress={() => props.navigation.navigate("detail-view", element)}
+          key={element}  
+          onPress={() => props.navigation.navigate("detail-view", object[element])}
           >
-            <Text>{element.cedula}</Text>
-            <Text>{element.nombre}</Text>
-            <Text>{element.entrada}</Text>
-            <Text>{element.salida}</Text>
+            <Text>{object[element].cedula}</Text>
+            <Text>{object[element].nombre}</Text>
+            <Text>{object[element].apellido}</Text>
+            <Text>{object[element].hora_entrada}</Text>
           </TouchableOpacity>
         );
       })}

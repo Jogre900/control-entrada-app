@@ -15,7 +15,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { tintColor } from "../constants/Colors";
 
 function NormalNav() {
-  console.log(tintColor);
+  
   return (
     <View style={styles.rightControlBox}>
       <Ionicons name="ios-notifications" size={28} color="#ff7e00" />
@@ -25,7 +25,7 @@ function NormalNav() {
 
 export const TopNavigation = (props) => {
   const { title, leftControl, rightControl } = props;
-  console.log("leftcontrol------", leftControl.props.children.props.onPress);
+  
 
   return (
     <View style={styles.container}>

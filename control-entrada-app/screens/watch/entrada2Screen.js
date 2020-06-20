@@ -22,39 +22,8 @@ import { MainButton } from "../../components/mainButton.component";
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import firebase from "../../lib/firebase";
-//import { RNFetchBlob } from 'react-native-fetch-blob'
 import FireMethods from "../../lib/methods.firebase";
-
-// const Blob = RNFetchBlob.polyfill.Blob
-// const fs = RNFetchBlob.fs
-
-// window.XMLHttpRequest = RNFetchBlob.polyfill.XMLHttpRequest
-// window.Blob = Blob
-
-// const upLoadImage = (uri, imageName, mime='/image.jpg') => {
-//   return new Promise((resolve, reject) => {
-//     let uploadBlob = null
-//     const imageRef = firebase.storage().ref('images').child(imageName)
-//     fs.readFile(uri, 'base64')
-//     .then((data) => {
-//       return Blob.build(data, {type: `${mime};BASE64`})
-//     })
-//     .then((blob) => {
-//       uploadBlob = blob
-//       return imageRef.put(blob, {contentType: mime})
-//     })
-//     .then(() => {
-//       uploadBlob.close()
-//       return imageRef.getDownloadURL()
-//     })
-//     .then((url) => {
-//       resolve(url)
-//     })
-//     .catch((error) => {
-//       reject(error)
-//     })
-//   })
-// }
+import moment from "moment";
 
 const upLoadImage = (uri) => {
   return new Promise((resolve, reject) => {
@@ -69,6 +38,11 @@ const upLoadImage = (uri) => {
     xhr.responseType = "blob";
     xhr.send();
   });
+};
+
+const getDate = () => {
+  let date = moment().format("MMM Do YY, h:mm a");
+  return date;
 };
 
 const { width } = Dimensions.get("window");
@@ -116,32 +90,57 @@ export const Entrada2Screen = (props) => {
     );
   };
 
-  const saveEntrance = () => {
-    upLoadImage(saveImg).then((response) => {
-      const data = response;
-      firebase.storage().ref("imag").child(`${name}`).put(data);
-      firebase.storage()
-        .ref("imag")
-        .child(`${name}`)
-        .getDownloadURL()
-        .then((url) => {
-          console.log("url image: ", url);
-          setImgUrl(url);
-        })
-        FireMethods.saveEntrance(name, lastName, dni, destiny, "", imgUrl);
-        
-    });
-    // if (name === "" || lastName === "" || dni === "" || destiny === "") {
-    //   Alert.alert("Completa todos los Campos!");
-    // } else {
-    //   try {
+  const saveEntrance = async () => {
+    console.log(dni)
+    await FireMethods.getEntranceById(dni, (resp) => {
+      if(resp){
+        console.log("usuario encontrado:", resp)
+        alert("Usuario ya Registrado!")
+      }else{
+        upLoadImage(saveImg).then((response) => {
+          let data = response;
+          firebase.storage().ref("imag").child(`${dni}`).put(data);
+          firebase
+            .storage()
+            .ref("imag")
+            .child(`${dni}`)
+            .getDownloadURL()
+            .then((url) => {
+              console.log("url image: ", url);
+              setImgUrl(url);
+            });
+          FireMethods.saveEntrance(
+            name,
+            lastName,
+            dni,
+            destiny,
+            getDate(),
+            "",
+            imgUrl
+          );
+        });
 
-    //     Alert.alert("Registro Exitoso")
-    //     console.log("Registro Exitoso")
-    //   } catch (error) {
-    //     console.log(error);
-    //   }
-    // }
+
+
+
+        // upLoadImage(saveImg)
+        // .then(response => {
+        //   firebase.storage().ref("imag").child(dni).put(response)
+        //   firebase.storage().ref("imag").child(dni).getDownloadURL()
+        //   .then(url => {
+        //     setImgUrl(url)
+        //     console.log("url",imgUrl)
+        //     FireMethods.saveEntrance(name, lastName, dni, destiny, getDate(), "", imgUrl)
+        //   })
+        // })
+      }
+    })
+    
+    
+    
+    
+      
+    
   };
 
   return (

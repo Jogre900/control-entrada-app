@@ -34,6 +34,7 @@ export const HistorialScreen = (props) => {
       data = object;
     });
     setObject(data);
+    console.log("object:  ",object)
   };
 
   useEffect(() => {

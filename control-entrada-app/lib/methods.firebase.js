@@ -3,19 +3,21 @@
 import firebase from "./firebase";
 
 const FireMethods = {
-  saveEntrance(name, lastName, dni, destiny, hora_entrada, foto) {
-    return firebase.database().ref("/entradas").push({
+  async saveEntrance(name, lastName, dni, destiny, hora_entrada, hora_salida ,foto) {
+    return await firebase.database().ref("/entradas").push({
       nombre: name,
       apellido: lastName,
       cedula: dni,
       destino: destiny,
       hora_entrada: hora_entrada,
+      hora_salida: hora_salida,
       foto: foto,
     });
     //id: uuid4();
   },
-  updateEntrance(id, hora_salida) {
-    return firebase.database().ref("/entradas").child(id).update({
+ async updateEntrance(id, hora_salida) {
+  console.log("id ipdate: ",id)   
+  return await firebase.database().ref("/entradas").child(id).update({
       hora_salida,
     });
     //id: uuid4();
@@ -36,14 +38,17 @@ const FireMethods = {
         callback(datos);
       });
   },
-  getEntranceById() {
-    let ref = firebase.database().ref("entradas");
-    firebase
+  async getEntranceById(dni, callback) {
+    
+    let ref = firebase.database().ref("/entradas");
+    await firebase
       .database()
       .ref(ref)
-      .on("child_added", (snapshot) => {
-        let usuarios = snapshot.val();
-        console.log("dni:---", usuarios.cedula);
+      .orderByChild("cedula")
+      .equalTo(dni)
+      .on("value", (snapshot) => {
+        let usuario = snapshot.val();
+        callback(usuario)
       });
   },
   async getDuplicateDni(dni) {
