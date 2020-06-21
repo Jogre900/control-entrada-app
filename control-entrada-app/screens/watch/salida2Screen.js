@@ -23,7 +23,7 @@ export const Salida2Screen = (props) => {
   const getHour = () => {
     let hour = moment().format("MMM Do YY, h:mm a")
     setHoraSalida(hour);
-    update();
+    return hour
   };
 
   const goBackAction = () => {
@@ -43,16 +43,14 @@ export const Salida2Screen = (props) => {
   const buscarProfile = async (id) => {
     setEncontrado(false);
     let resp = await FireMethods.getDuplicateDni(id);
-    console.log("BUYSCAR:", resp);
-    await setPerson(resp);
+    setPerson(await resp);
     setEncontrado(true);
-    //id === "19222907" ? setEncontrado(true) : setEncontrado(false);
     Keyboard.dismiss();
   };
 
   const update = () => {
     console.log("person:  ",person)
-    FireMethods.updateEntrance(person.timeStamp, "algo3");
+    FireMethods.updateEntrance(person.timeStamp, getHour());
   };
 
   return (
@@ -76,7 +74,7 @@ export const Salida2Screen = (props) => {
                   <Image source={{uri: person.foto}} style={styles.profilePic} />
                 </View>
                 <View style={styles.nameBox}>
-      <Text style={styles.nameText}>{person.nombre}{person.apellido}</Text>
+      <Text style={styles.nameText}>{person.nombre} {person.apellido}</Text>
                 </View>
               </View>
             </View>
@@ -103,7 +101,7 @@ export const Salida2Screen = (props) => {
                 <MainButton
                   title="Marcar salida"
                   onPress={() => {
-                    getHour();
+                    update();
                   }}
                 />
               </View>

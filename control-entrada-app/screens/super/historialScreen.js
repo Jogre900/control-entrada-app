@@ -37,9 +37,9 @@ export const HistorialScreen = (props) => {
     console.log("object:  ",object)
   };
 
-  useEffect(() => {
-    getEntrada();
-  }, []);
+  // useEffect(() => {
+  //   getEntrada();
+  // }, []);
 
   return (
     <View>

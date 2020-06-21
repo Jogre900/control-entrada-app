@@ -17,7 +17,7 @@ const FireMethods = {
   },
  async updateEntrance(id, hora_salida) {
   console.log("id ipdate: ",id)   
-  return await firebase.database().ref("/entradas").child(id).update({
+  return await firebase.database().ref("entradas").child(id).update({
       hora_salida,
     });
     //id: uuid4();
@@ -26,10 +26,10 @@ const FireMethods = {
   async getEntrance(callback) {
     var usersRef = firebase.database().ref("entradas");
 
-    firebase
+    await firebase
       .database()
       .ref(usersRef)
-      .on("value", (snapshot) => {
+      .once("value", (snapshot) => {
         //console.log("snapshot-val", snapshot.val());
         let datos = "";
         if (snapshot.val()) {

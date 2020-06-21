@@ -33,9 +33,9 @@ export const DetailViewScreen = (props) => {
   const translateContent1 = new Animated.Value(0);
   const translateContent2 = new Animated.Value(width);
 
-  const animatedOverlay = (tabCoor, tabActive) => {
-    //setActiveTab(tabActive)
-    Animated.spring(translateTab, {
+  const animatedOverlay = async (tabCoor, tabActive) => {
+    setActiveTab(tabActive)
+    await Animated.spring(translateTab, {
       toValue: tabCoor,
       duration: 500,
       speed: 12,
@@ -216,7 +216,7 @@ export const DetailViewScreen = (props) => {
               animatedOverlay(xTabOne, 0);
             }}
           >
-            <Text style={{ color: activeTab === "0" ? "orange" : "grey" }}>
+            <Text style={{ color: activeTab === 0 ? "#ff7e00" : "grey" }}>
               Datos
             </Text>
           </TouchableOpacity>
@@ -229,7 +229,7 @@ export const DetailViewScreen = (props) => {
               animatedOverlay(xTabTwo, 1);
             }}
           >
-            <Text style={{ color: activeTab === "1" ? "orange" : "grey" }}>
+            <Text style={{ color: activeTab === 1 ? "#ff7e00" : "grey" }}>
               Seguridad
             </Text>
           </TouchableOpacity>
@@ -299,6 +299,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     //borderBottomWidth: 1,
     borderColor: "grey",
+    
   },
   tab2: {
     flex: 1,

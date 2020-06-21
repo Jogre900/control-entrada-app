@@ -25,21 +25,6 @@ import firebase from "../../lib/firebase";
 import FireMethods from "../../lib/methods.firebase";
 import moment from "moment";
 
-const upLoadImage = (uri) => {
-  return new Promise((resolve, reject) => {
-    let xhr = new XMLHttpRequest();
-    xhr.onerror = reject;
-    xhr.onreadystatechange = () => {
-      if (xhr.readyState === 4) {
-        resolve(xhr.response);
-      }
-    };
-    xhr.open("GET", uri);
-    xhr.responseType = "blob";
-    xhr.send();
-  });
-};
-
 const getDate = () => {
   let date = moment().format("MMM Do YY, h:mm a");
   return date;
@@ -58,7 +43,7 @@ export const Entrada2Screen = (props) => {
   const [lastName, setLastName] = React.useState("");
   const [dni, setDni] = React.useState("");
   const [destiny, setDestiny] = React.useState("");
-  const [imgUrl, setImgUrl] = React.useState("");
+  const [imgUrl, setImgUrl] = React.useState();
 
   const getUserId = () => {
     try {
@@ -76,7 +61,7 @@ export const Entrada2Screen = (props) => {
   const pickImage = async () => {
     let result = await ImagePicker.launchCameraAsync();
     console.log(" result----", result);
-    setSaveImg(result.uri);
+    setSaveImg(await result.uri);
     result.cancelled ? setChangeImg(false) : setChangeImg(true);
   };
 
@@ -90,57 +75,50 @@ export const Entrada2Screen = (props) => {
     );
   };
 
+  const upLoadImage = async (uri) => {
+    return new Promise((resolve, reject) => {
+      let xhr = new XMLHttpRequest();
+      xhr.onerror = reject;
+      xhr.onreadystatechange = () => {
+        if (xhr.readyState === 4) {
+          resolve(xhr.response);
+        }
+      };
+      xhr.open("GET", uri);
+      xhr.responseType = "blob";
+      xhr.send();
+    }).then(async (response) => {
+      let data = response;
+      await firebase.storage().ref("imag").child(`${dni}`).put(data);
+      setImgUrl(
+        await firebase.storage().ref("imag").child(`${dni}`).getDownloadURL()
+      );
+    });
+  };
+
   const saveEntrance = async () => {
-    console.log(dni)
-    await FireMethods.getEntranceById(dni, (resp) => {
-      if(resp){
-        console.log("usuario encontrado:", resp)
-        alert("Usuario ya Registrado!")
-      }else{
-        upLoadImage(saveImg).then((response) => {
-          let data = response;
-          firebase.storage().ref("imag").child(`${dni}`).put(data);
-          firebase
-            .storage()
-            .ref("imag")
-            .child(`${dni}`)
-            .getDownloadURL()
-            .then((url) => {
-              console.log("url image: ", url);
-              setImgUrl(url);
-            });
-          FireMethods.saveEntrance(
-            name,
-            lastName,
-            dni,
-            destiny,
-            getDate(),
-            "",
-            imgUrl
-          );
-        });
+    await upLoadImage(saveImg);
+    console.log("uri:   ",imgUrl)
+    await FireMethods.saveEntrance(
+      name,
+      lastName,
+      dni,
+      destiny,
+      getDate(),
+      "",
+      imgUrl
+    );
 
-
-
-
-        // upLoadImage(saveImg)
-        // .then(response => {
-        //   firebase.storage().ref("imag").child(dni).put(response)
-        //   firebase.storage().ref("imag").child(dni).getDownloadURL()
-        //   .then(url => {
-        //     setImgUrl(url)
-        //     console.log("url",imgUrl)
-        //     FireMethods.saveEntrance(name, lastName, dni, destiny, getDate(), "", imgUrl)
-        //   })
-        // })
-      }
-    })
-    
-    
-    
-    
-      
-    
+    // upLoadImage(saveImg)
+    // .then(response => {
+    //   firebase.storage().ref("imag").child(dni).put(response)
+    //   firebase.storage().ref("imag").child(dni).getDownloadURL()
+    //   .then(url => {
+    //     setImgUrl(url)
+    //     console.log("url",imgUrl)
+    //     FireMethods.saveEntrance(name, lastName, dni, destiny, getDate(), "", imgUrl)
+    //   })
+    // })
   };
 
   return (
