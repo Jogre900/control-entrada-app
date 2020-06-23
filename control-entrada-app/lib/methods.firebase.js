@@ -3,7 +3,7 @@
 import firebase from "./firebase";
 
 const FireMethods = {
-  async saveEntrance(name, lastName, dni, destiny, hora_entrada, hora_salida ,foto) {
+  async saveEntrance(name, lastName, dni, destiny, hora_entrada, hora_salida, foto) {
     return await firebase.database().ref("/entradas").push({
       nombre: name,
       apellido: lastName,
@@ -15,9 +15,9 @@ const FireMethods = {
     });
     //id: uuid4();
   },
- async updateEntrance(id, hora_salida) {
-  console.log("id ipdate: ",id)   
-  return await firebase.database().ref("entradas").child(id).update({
+  async updateEntrance(id, hora_salida) {
+    console.log("id ipdate: ", id);
+    return await firebase.database().ref("entradas").child(id).update({
       hora_salida,
     });
     //id: uuid4();
@@ -39,7 +39,6 @@ const FireMethods = {
       });
   },
   async getEntranceById(dni, callback) {
-    
     let ref = firebase.database().ref("/entradas");
     await firebase
       .database()
@@ -48,29 +47,39 @@ const FireMethods = {
       .equalTo(dni)
       .on("value", (snapshot) => {
         let usuario = snapshot.val();
-        callback(usuario)
+        callback(usuario);
       });
   },
+
   async getDuplicateDni(dni, callback) {
     let ref = firebase.database().ref("/entradas");
     let search = {};
-    let response = {};
-    await firebase
-      .database()
-      .ref(ref)
+    let response = {
+      data: null,
+      msg: "",
+    };
+    await ref
       .orderByChild("cedula")
       .equalTo(dni)
       .on("value", (snapshot) => {
-        console.log(snapshot.val())
+        console.log(snapshot.val());
         search = snapshot.val();
       });
 
-    await Object.keys(search).map((item) => {
-      if (search[item].hora_salida == "") {
-        response = search[item];
-        response.timeStamp = item;
+    if (search && Object.entries(search).length > 0) {
+      await Object.keys(search).map((item) => {
+        if (search[item].hora_salida == "") {
+          response.data = search[item];
+          response.data.timeStamp = item;
+        }
+      });
+      if (response.data == null) {
+        response.msg = "No Posee Entrada Registrada.";
       }
-    });
+    } else {
+      console.log("paso por aqui");
+      response.msg = "La Cedula Ingresada Nunca ha Sido Registrada.";
+    }
     callback(response);
   },
 };

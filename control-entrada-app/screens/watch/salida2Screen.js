@@ -7,7 +7,7 @@ import { MainButton } from "../../components/mainButton.component";
 import { Ionicons } from "@expo/vector-icons";
 import FireMethods from "../../lib/methods.firebase";
 import * as ImagePicker from "expo-image-picker";
-import moment from 'moment'
+import moment from "moment";
 const { width } = Dimensions.get("window");
 const cover = require("../../assets/images/background.jpg");
 const profilePic = require("../../assets/images/female-2.jpg");
@@ -16,14 +16,14 @@ const watchPic = require("../../assets/images/male-2.jpg");
 export const Salida2Screen = (props) => {
   const [activeTab, setActiveTab] = React.useState("0");
   const [buscar, setBuscar] = React.useState("");
-  const [encontrado, setEncontrado] = React.useState(false);
-  const [person, setPerson] = React.useState({});
+  const [messageText, setMessageText] = React.useState("");
+  const [person, setPerson] = React.useState(null);
   const [horaSalida, setHoraSalida] = React.useState();
 
   const getHour = () => {
-    let hour = moment().format("MMM Do YY, h:mm a")
+    let hour = moment().format("MMM Do YY, h:mm a");
     setHoraSalida(hour);
-    return hour
+    return hour;
   };
 
   const goBackAction = () => {
@@ -41,25 +41,33 @@ export const Salida2Screen = (props) => {
   };
 
   const buscarProfile = async (id) => {
-    setEncontrado(false);
-    let resp  
-    await FireMethods.getDuplicateDni(id, data => {
-      resp = data
+    setMessageText("");
+    setPerson(null);
+    let resp;
+    await FireMethods.getDuplicateDni(id, (data) => {
+      resp = data;
     });
-    console.log("resp",resp)
-    if(!resp){
-      alert("encontrado")
-    }else{
-      alert("usuario ya marco salida")
+    console.log("resp", resp);
+
+    if (resp.data != null) {
+      setPerson(resp.data);
+    } else {
+      setMessageText(resp.msg);
     }
-    setPerson(await resp);
-    setEncontrado(true);
     Keyboard.dismiss();
   };
 
   const update = () => {
-    console.log("person:  ",person)
+    console.log("person:  ", person);
     FireMethods.updateEntrance(person.timeStamp, getHour());
+  };
+
+  const MessageView = (props) => {
+    return (
+      <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+        <Text>{props.message}</Text>
+      </View>
+    );
   };
 
   return (
@@ -73,17 +81,19 @@ export const Salida2Screen = (props) => {
           <Ionicons name="ios-search" size={28} color="white" />
         </RectButton>
       </View>
-      {encontrado ? (
+      {person != null ? (
         <View style={{ flex: 1 }}>
           <ImageBackground source={cover} style={styles.imgBackground}>
             <View style={styles.cover}>
               <View style={{ justifyContent: "center", alignItems: "center" }}>
                 {/* <Ionicons name="ios-person" size={120} color="#fff" /> */}
                 <View style={{ position: "relative", marginBottom: 10 }}>
-                  <Image source={{uri: person.foto}} style={styles.profilePic} />
+                  <Image source={{ uri: person.foto }} style={styles.profilePic} />
                 </View>
                 <View style={styles.nameBox}>
-      <Text style={styles.nameText}>{person.nombre} {person.apellido}</Text>
+                  <Text style={styles.nameText}>
+                    {person.nombre} {person.apellido}
+                  </Text>
                 </View>
               </View>
             </View>
@@ -92,11 +102,11 @@ export const Salida2Screen = (props) => {
             <View style={{ width: "75%" }}>
               <View style={styles.dataBox}>
                 <Text style={styles.labelText}>DNI:</Text>
-      <Text style={styles.dataText}>{person.cedula}</Text>
+                <Text style={styles.dataText}>{person.cedula}</Text>
               </View>
               <View style={styles.dataBox}>
                 <Text style={styles.labelText}>Destino:</Text>
-      <Text style={styles.dataText}>{person.destino}</Text>
+                <Text style={styles.dataText}>{person.destino}</Text>
               </View>
               <View style={styles.dataBox}>
                 <Text style={styles.labelText}>Hora de Entrada:</Text>
@@ -117,7 +127,9 @@ export const Salida2Screen = (props) => {
             </View>
           </View>
         </View>
-      ) : null}
+      ) : (
+        <MessageView message={messageText} />
+      )}
     </View>
   );
 };
