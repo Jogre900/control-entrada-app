@@ -51,8 +51,8 @@ const FireMethods = {
         callback(usuario)
       });
   },
-  async getDuplicateDni(dni) {
-    let ref = firebase.database().ref("entradas");
+  async getDuplicateDni(dni, callback) {
+    let ref = firebase.database().ref("/entradas");
     let search = {};
     let response = {};
     await firebase
@@ -61,6 +61,7 @@ const FireMethods = {
       .orderByChild("cedula")
       .equalTo(dni)
       .on("value", (snapshot) => {
+        console.log(snapshot.val())
         search = snapshot.val();
       });
 
@@ -70,7 +71,7 @@ const FireMethods = {
         response.timeStamp = item;
       }
     });
-    return response;
+    callback(response);
   },
 };
 

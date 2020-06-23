@@ -43,7 +43,7 @@ const data = [
 
 export const HomeSuperScreen = (props) => {
   const [object, setObject] = useState({});
-  const [loading, setLoading] = useState();
+  const [loading, setLoading] = useState(true);
   const drawerAction = () => {
     return (
       <View>
@@ -70,15 +70,15 @@ export const HomeSuperScreen = (props) => {
       </View>
     );
   };
-  const loading = () => {
+  const splash = () => {
     return (
       <View>
-        <Text style={{ textAlign: "center", fontSize: "19" }}>Loading...</Text>
+        <Text style={{ textAlign: "center", fontSize: 19 }}>Loading...</Text>
       </View>
     );
   };
   const getEntrada = async () => {
-    setLoading(true);
+    
     let data = new Object();
     await FireMethods.getEntrance((object) => {
       data = object;
@@ -100,7 +100,7 @@ export const HomeSuperScreen = (props) => {
         rightControl={openNotifications()}
       />
       {loading ? (
-        loading()
+        splash()
       ) : (
         <View style={styles.listEntry}>
           {Object.keys(object).map((element) => {

@@ -98,7 +98,7 @@ export const DetailViewScreen = (props) => {
           marginTop: 10,
         }}
       >
-        <View style={{ width: "75%" }}>
+        <View style={{ width: "90%" }}>
           <View style={styles.dataBox}>
             <Text style={styles.labelText}>DNI:</Text>
             <Text style={styles.dataText}>{data.cedula}</Text>
@@ -188,7 +188,7 @@ export const DetailViewScreen = (props) => {
       </View>
 
       {/* -------------TAB BAR----------- */}
-      <View style={{ flex: 1 }}>
+      <View style={{ flex: 1, paddingHorizontal: 5 }}>
         <View style={styles.tabBar}>
           <Animated.View
             style={{

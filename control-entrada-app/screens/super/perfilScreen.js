@@ -34,7 +34,6 @@ export const PerfilScreen = (props) => {
         <Image style={styles.perfilLogo} source={require("../../assets/images/security-logo.png")} />
         <Text>Security. All Right Reserved</Text>
         <View style={styles.editBox}>
-          <Input title="Nombre" secureTextEntry={false} shape="flat" icon="ios-person" style={styles.input} />
           <Text>Cambio de Contraseña</Text>
           <Input
             style={styles.input}

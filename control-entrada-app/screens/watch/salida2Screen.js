@@ -42,7 +42,16 @@ export const Salida2Screen = (props) => {
 
   const buscarProfile = async (id) => {
     setEncontrado(false);
-    let resp = await FireMethods.getDuplicateDni(id);
+    let resp  
+    await FireMethods.getDuplicateDni(id, data => {
+      resp = data
+    });
+    console.log("resp",resp)
+    if(!resp){
+      alert("encontrado")
+    }else{
+      alert("usuario ya marco salida")
+    }
     setPerson(await resp);
     setEncontrado(true);
     Keyboard.dismiss();
