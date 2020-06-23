@@ -61,7 +61,7 @@ export const PerfilScreen = (props) => {
               value={repeatPass}
             />
           ) : null}
-          {passChange === repeatPass ? <MainButton style={{ width: "100%" }} title="Guardar Cambios" /> : null}
+          {passChange === repeatPass && repeatPass? <MainButton style={{ width: "100%" }} title="Guardar Cambios" /> : null}
         </View>
       </View>
     </View>

@@ -6,40 +6,13 @@ import {
   Alert,
   TouchableOpacity,
   TouchableHighlight,
+  ActivityIndicator,
 } from "react-native";
-import { RectButton } from "react-native-gesture-handler";
 import { Ionicons } from "@expo/vector-icons";
 //components
 import { TopNavigation } from "../../components/TopNavigation.component";
 import FireMethods from "../../lib/methods.firebase";
-import { set } from "react-native-reanimated";
-
-const data = [
-  {
-    cedula: "19222907",
-    nombre: "Ana de Armas",
-    destino: "apt 104",
-    entrada: "15:30",
-    salida: "19:00",
-    picture: require("../../assets/images/female.jpg"),
-  },
-  {
-    cedula: "19222907",
-    nombre: "Amy RedHead",
-    destino: "apt 104",
-    entrada: "15:30",
-    salida: "19:00",
-    picture: require("../../assets/images/female-2.jpg"),
-  },
-  {
-    cedula: "19222907",
-    nombre: "Ryan Reynolds",
-    destino: "apt 104",
-    entrada: "15:30",
-    salida: "19:00",
-    picture: require("../../assets/images/male-2.jpg"),
-  },
-];
+import moment from "moment";
 
 export const HomeSuperScreen = (props) => {
   const [object, setObject] = useState({});
@@ -73,12 +46,14 @@ export const HomeSuperScreen = (props) => {
   const splash = () => {
     return (
       <View>
-        <Text style={{ textAlign: "center", fontSize: 19 }}>Loading...</Text>
+        <ActivityIndicator size="large" color="#0000ff" />
+        <ActivityIndicator size="small" color="#00ff00" />
+        <ActivityIndicator size="large" color="#0000ff" />
+        <ActivityIndicator size="small" color="#00ff00" />
       </View>
     );
   };
   const getEntrada = async () => {
-    
     let data = new Object();
     await FireMethods.getEntrance((object) => {
       data = object;
@@ -86,6 +61,11 @@ export const HomeSuperScreen = (props) => {
     setObject(data);
     setLoading(false);
     console.log("object:  ", object);
+  };
+
+  const getDate = () => {
+    let date = moment().format("MMM D h:mm");
+    return date;
   };
 
   useEffect(() => {
@@ -133,6 +113,11 @@ export const HomeSuperScreen = (props) => {
           })}
         </View>
       )}
+      <View>
+        <Text>
+        {getDate()}
+        </Text>
+      </View>
     </View>
   );
 };

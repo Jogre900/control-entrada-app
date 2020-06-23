@@ -13,6 +13,7 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   Alert,
+  ActivityIndicator
 } from "react-native";
 
 //components
@@ -25,10 +26,6 @@ import firebase from "../../lib/firebase";
 import FireMethods from "../../lib/methods.firebase";
 import moment from "moment";
 
-const getDate = () => {
-  let date = moment().format("MMM Do YY, h:mm a");
-  return date;
-};
 
 const { width } = Dimensions.get("window");
 const cover = require("../../assets/images/background.jpg");
@@ -44,7 +41,13 @@ export const Entrada2Screen = (props) => {
   const [dni, setDni] = React.useState("");
   const [destiny, setDestiny] = React.useState("");
   const [imgUrl, setImgUrl] = React.useState();
-
+  const [saving, setSaving] = React.useState()
+  
+  const getDate = () => {
+    let date = moment().format("MMM D, h:mm");
+    return date;
+  };
+  
   const getUserId = () => {
     try {
       let userid = firebase.auth().currentUser;
@@ -75,6 +78,15 @@ export const Entrada2Screen = (props) => {
     );
   };
 
+  const splash = () => {
+    return (
+      <View>
+        <ActivityIndicator size="large" color="#ff7e00"/>
+        <ActivityIndicator size="small" color="#ff7e00"/>
+      </View>
+    )
+  }
+
   const upLoadImage = async (uri) => {
     return new Promise((resolve, reject) => {
       let xhr = new XMLHttpRequest();
@@ -97,6 +109,7 @@ export const Entrada2Screen = (props) => {
   };
 
   const saveEntrance = async () => {
+    setSaving(true)
     await upLoadImage(saveImg);
     console.log("uri:   ",imgUrl)
     await FireMethods.saveEntrance(
@@ -108,7 +121,7 @@ export const Entrada2Screen = (props) => {
       "",
       imgUrl
     );
-
+      setSaving(false)
     // upLoadImage(saveImg)
     // .then(response => {
     //   firebase.storage().ref("imag").child(dni).put(response)
@@ -187,6 +200,7 @@ export const Entrada2Screen = (props) => {
               shape="flat"
               icon="ios-card"
               style={styles.input}
+              keyBoradType="numeric"
               onChangeText={(dni) => setDni(dni)}
               value={dni}
             />
@@ -207,6 +221,7 @@ export const Entrada2Screen = (props) => {
                 onPress={() => saveEntrance()}
               />
             </View>
+            {saving ? splash() : null}
           </View>
         </View>
       </KeyboardAvoidingView>
