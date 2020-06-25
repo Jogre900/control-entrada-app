@@ -3,6 +3,7 @@ import { createDrawerNavigator, DrawerItem } from "@react-navigation/drawer";
 import { createStackNavigator } from "@react-navigation/stack";
 import { View, Text, Image, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import firebase from '../lib/firebase'
 
 //screens
 import { HomeSuperScreen } from "../screens/super/homeSuperScreen";
@@ -52,7 +53,13 @@ function DrawerBody(props) {
       <DrawerItem
         label="Cerrar Sesion"
         onPress={() => {
-          Alert.alert('Adios');
+          firebase.auth().signOut()
+          .then(() => {
+            props.navigation.popToTop()
+          })
+          .catch(error => {
+            console.log(error)
+          })
         }}
       />
     </View>

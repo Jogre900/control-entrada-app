@@ -1,6 +1,12 @@
 import React from "react";
-import { View, StyleSheet, ImageBackground, Dimensions, TouchableOpacity } from "react-native";
-
+import {
+  View,
+  StyleSheet,
+  ImageBackground,
+  Dimensions,
+  TouchableOpacity,
+} from "react-native";
+import firebase from '../../lib/firebase'
 import { Ionicons } from "@expo/vector-icons";
 
 //components
@@ -15,6 +21,17 @@ const cover = require("../../assets/images/background.jpg");
 const { width, height } = Dimensions.get("window");
 
 export const HomeScreen = (props) => {
+  const signOut = () => {
+    firebase
+      .auth()
+      .signOut()
+      .then(() => {
+        props.navigation.popToTop();
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
   const goBackAction = () => {
     return (
       <View>
@@ -29,9 +46,23 @@ export const HomeScreen = (props) => {
     );
   };
 
+  const rightControls = () => {
+    return (
+      <View>
+        <TouchableOpacity onPress={() => signOut()}>
+          <Ionicons name="ios-log-out" size={28} color="white" />
+        </TouchableOpacity>
+      </View>
+    );
+  };
+
   return (
     <View style={styles.container}>
-      <TopNavigation title="Control de visitas" leftControl={goBackAction()} />
+      <TopNavigation
+        title="Control de visitas"
+        leftControl={goBackAction()}
+        rightControl={rightControls()}
+      />
       <View style={styles.contentContainer}>
         <ImageBackground source={cover} style={styles.imageBackground}>
           <View style={styles.backcover}>
