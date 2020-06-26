@@ -34,7 +34,7 @@ export const DetailViewScreen = (props) => {
   const translateContent2 = new Animated.Value(width);
 
   const animatedOverlay = async (tabCoor, tabActive) => {
-    setActiveTab(tabActive)
+    //setActiveTab(tabActive)
     await Animated.spring(translateTab, {
       toValue: tabCoor,
       duration: 500,
@@ -98,7 +98,7 @@ export const DetailViewScreen = (props) => {
           marginTop: 10,
         }}
       >
-        <View style={{ width: "90%" }}>
+        <View style={{ width: "95%" }}>
           <View style={styles.dataBox}>
             <Text style={styles.labelText}>DNI:</Text>
             <Text style={styles.dataText}>{data.cedula}</Text>
@@ -124,15 +124,16 @@ export const DetailViewScreen = (props) => {
     return (
       <View
         style={{
+          justifyContent: "center",
           alignItems: "center",
           marginTop: 10,
         }}
       >
         <View
           style={{
-            width: "75%",
+            width: "90%",
             flexDirection: "row",
-            justifyContent: "center",
+            justifyContent:'space-between',
           }}
         >
           <View>

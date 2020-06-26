@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -13,7 +13,7 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   Alert,
-  ActivityIndicator
+  ActivityIndicator,
 } from "react-native";
 
 //components
@@ -26,28 +26,32 @@ import firebase from "../../lib/firebase";
 import FireMethods from "../../lib/methods.firebase";
 import moment from "moment";
 
-
 const { width } = Dimensions.get("window");
 const cover = require("../../assets/images/background.jpg");
 const profilePic = require("../../assets/images/profile-picture.png");
 const watchPic = require("../../assets/images/male-2.jpg");
 
 export const Entrada2Screen = (props) => {
-  const [saveImg, setSaveImg] = React.useState(null);
-  const [changeImg, setChangeImg] = React.useState(false);
-  const [userId, setUserId] = React.useState();
-  const [name, setName] = React.useState("");
-  const [lastName, setLastName] = React.useState("");
-  const [dni, setDni] = React.useState("");
-  const [destiny, setDestiny] = React.useState("");
-  const [imgUrl, setImgUrl] = React.useState();
-  const [saving, setSaving] = React.useState()
-  
+  const [saveImg, setSaveImg] = useState();
+  const [changeImg, setChangeImg] = useState(false);
+  const [userId, setUserId] = useState();
+  const [name, setName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [dni, setDni] = useState("");
+  const [destiny, setDestiny] = useState("");
+  const [imgUrl, setImgUrl] = useState();
+  const [saving, setSaving] = useState();
+  const [saveSuccess, setSaveSuccess] = useState(false);
+
+  const nameRef = useRef();
+  const lastNameRef = useRef();
+  const dniRef = useRef();
+  const destinyRef = useRef();
   const getDate = () => {
     let date = moment().format("MMM D, h:mm");
     return date;
   };
-  
+
   const getUserId = () => {
     try {
       let userid = firebase.auth().currentUser;
@@ -81,11 +85,11 @@ export const Entrada2Screen = (props) => {
   const splash = () => {
     return (
       <View>
-        <ActivityIndicator size="large" color="#ff7e00"/>
-        <ActivityIndicator size="small" color="#ff7e00"/>
+        <ActivityIndicator size="large" color="#ff7e00" />
+        <ActivityIndicator size="small" color="#ff7e00" />
       </View>
-    )
-  }
+    );
+  };
 
   const upLoadImage = async (uri) => {
     return new Promise((resolve, reject) => {
@@ -109,29 +113,44 @@ export const Entrada2Screen = (props) => {
   };
 
   const saveEntrance = async () => {
-    setSaving(true)
-    await upLoadImage(saveImg);
-    console.log("uri:   ",imgUrl)
-    await FireMethods.saveEntrance(
-      name,
-      lastName,
-      dni,
-      destiny,
-      getDate(),
-      "",
-      imgUrl
-    );
-      setSaving(false)
-    // upLoadImage(saveImg)
-    // .then(response => {
-    //   firebase.storage().ref("imag").child(dni).put(response)
-    //   firebase.storage().ref("imag").child(dni).getDownloadURL()
-    //   .then(url => {
-    //     setImgUrl(url)
-    //     console.log("url",imgUrl)
-    //     FireMethods.saveEntrance(name, lastName, dni, destiny, getDate(), "", imgUrl)
-    //   })
-    // })
+    if (name == "" || lastName == "" || dni == "" || destiny == "") {
+      alert("debe completar los campos");
+      
+    } else {
+      setSaving(true);
+      try {
+        await upLoadImage(saveImg);
+        console.log("uri:   ", imgUrl);
+        await FireMethods.saveEntrance(
+          name,
+          lastName,
+          dni,
+          destiny,
+          getDate(),
+          "",
+          imgUrl
+        );
+
+        setSaving(false);
+        setSaveSuccess(true);
+        clearInputs();
+      } catch (error) {
+        console.log(error);
+        setSaving(false);
+      }
+    }
+  };
+
+  const clearInputs = () => {
+    setName("");
+    setLastName("");
+    setDni("");
+    setDestiny("");
+    setSaveImg("")
+  };
+
+  const savedSuccess = () => {
+    return <Text style={{textAlign:'center', color:"green"}}>Guardado exitoso</Text>;
   };
 
   return (
@@ -182,8 +201,11 @@ export const Entrada2Screen = (props) => {
               shape="flat"
               icon="ios-person"
               style={styles.input}
+              returnKeyType="next"
+              onSubmitEditing={() => lastNameRef.current.focus()}
               onChangeText={(name) => setName(name)}
               value={name}
+              ref={nameRef}
             />
             <Input
               title="Apellido"
@@ -191,8 +213,11 @@ export const Entrada2Screen = (props) => {
               shape="flat"
               icon="ios-person"
               style={styles.input}
+              returnKeyType="next"
+              onSubmitEditing={() => dniRef.current.focus()}
               onChangeText={(lastname) => setLastName(lastname)}
               value={lastName}
+              ref={lastNameRef}
             />
             <Input
               title="DNI"
@@ -201,8 +226,11 @@ export const Entrada2Screen = (props) => {
               icon="ios-card"
               style={styles.input}
               keyBoradType="numeric"
+              returnKeyType="next"
+              onSubmitEditing={() => destinyRef.current.focus()}
               onChangeText={(dni) => setDni(dni)}
               value={dni}
+              ref={dniRef}
             />
             <Input
               title="Destino"
@@ -210,8 +238,11 @@ export const Entrada2Screen = (props) => {
               shape="flat"
               icon="ios-pin"
               style={styles.input}
+              returnKeyType="go"
+              onSubmitEditing={() => saveEntrance()}
               onChangeText={(destiny) => setDestiny(destiny)}
               value={destiny}
+              ref={destinyRef}
             />
 
             <View>
@@ -222,6 +253,7 @@ export const Entrada2Screen = (props) => {
               />
             </View>
             {saving ? splash() : null}
+            {saveSuccess ? savedSuccess() : null}
           </View>
         </View>
       </KeyboardAvoidingView>

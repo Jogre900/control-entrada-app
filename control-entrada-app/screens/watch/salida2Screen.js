@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState, useRef} from "react";
 import { View, Text, StyleSheet, Animated, Dimensions, TouchableOpacity, ScrollView, ImageBackground, Image, KeyboardAvoidingView, Keyboard } from "react-native";
 import { RectButton } from "react-native-gesture-handler";
 import { TopNavigation } from "../../components/TopNavigation.component";
@@ -8,20 +8,23 @@ import { Ionicons } from "@expo/vector-icons";
 import FireMethods from "../../lib/methods.firebase";
 import * as ImagePicker from "expo-image-picker";
 import moment from "moment";
+
 const { width } = Dimensions.get("window");
 const cover = require("../../assets/images/background.jpg");
 const profilePic = require("../../assets/images/female-2.jpg");
 const watchPic = require("../../assets/images/male-2.jpg");
 
 export const Salida2Screen = (props) => {
-  const [activeTab, setActiveTab] = React.useState("0");
-  const [buscar, setBuscar] = React.useState("");
-  const [messageText, setMessageText] = React.useState("");
-  const [person, setPerson] = React.useState(null);
-  const [horaSalida, setHoraSalida] = React.useState();
+  const [activeTab, setActiveTab] = useState("0");
+  const [buscar, setBuscar] = useState("");
+  const [messageText, setMessageText] = useState("");
+  const [person, setPerson] = useState(null);
+  const [horaSalida, setHoraSalida] = useState();
+
+  const searchRef = useRef()
 
   const getHour = () => {
-    let hour = moment().format("MMM Do YY, h:mm a");
+    let hour = moment().format("MMM D, h:mm");
     setHoraSalida(hour);
     return hour;
   };
@@ -51,6 +54,7 @@ export const Salida2Screen = (props) => {
 
     if (resp.data != null) {
       setPerson(resp.data);
+
     } else {
       setMessageText(resp.msg);
     }
@@ -75,11 +79,19 @@ export const Salida2Screen = (props) => {
       <TopNavigation title="Salida" leftControl={goBackAction()} />
       <View style={styles.searchBox}>
         <View style={{ width: "70%" }}>
-          <Input title="Buscar por DNI" shape="round" alignText="center" style={{ backgroundColor: "white" }} onChangeText={(valor) => setBuscar(valor)} value={buscar} />
+          <Input 
+          title="Buscar por DNI" 
+          shape="round" 
+          alignText="center" 
+          style={{ backgroundColor: "white" }} 
+          retrunKeyType="search"
+          onSubmitEditing={() => buscarProfile()}
+          onChangeText={(valor) => setBuscar(valor)} 
+          value={buscar} />
         </View>
-        <RectButton title="Buscar" onPress={() => buscarProfile(buscar)}>
+        <TouchableOpacity onPress={() => buscarProfile(buscar)}>
           <Ionicons name="ios-search" size={28} color="white" />
-        </RectButton>
+        </TouchableOpacity>
       </View>
       {person != null ? (
         <View style={{ flex: 1 }}>

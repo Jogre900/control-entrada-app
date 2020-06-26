@@ -46,10 +46,8 @@ export const HomeSuperScreen = (props) => {
   const splash = () => {
     return (
       <View>
-        <ActivityIndicator size="large" color="#0000ff" />
-        <ActivityIndicator size="small" color="#00ff00" />
-        <ActivityIndicator size="large" color="#0000ff" />
-        <ActivityIndicator size="small" color="#00ff00" />
+        <ActivityIndicator size="large" color="#ff7e00" />
+        
       </View>
     );
   };
@@ -113,11 +111,6 @@ export const HomeSuperScreen = (props) => {
           })}
         </View>
       )}
-      <View>
-        <Text>
-        {getDate()}
-        </Text>
-      </View>
     </View>
   );
 };
@@ -131,8 +124,8 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     paddingVertical: 10,
-    paddingHorizontal: 10,
-    borderWidth: 0.5,
+    paddingHorizontal: 5,
+    borderBottomWidth: 0.5,
     borderColor: "grey",
     marginVertical: 5,
     borderRadius: 20,
@@ -140,6 +133,8 @@ const styles = StyleSheet.create({
   dataContainerView: {
     justifyContent: "center",
     alignItems: "center",
+    width:"33%",
+    maxWidth: "33%"
   },
   dataText: {
     fontSize: 15,

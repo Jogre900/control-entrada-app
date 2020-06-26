@@ -58,7 +58,7 @@ const FireMethods = {
       data: null,
       msg: "",
     };
-    await ref
+    await firebase.database().ref(ref)
       .orderByChild("cedula")
       .equalTo(dni)
       .on("value", (snapshot) => {

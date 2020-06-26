@@ -154,12 +154,12 @@ export const LogInScreen = (props) => {
                   signIn();
                 }}
               />
-              <MainButton
+              {/* <MainButton
                 title="Supervisor"
                 onPress={() => {
                   props.navigation.navigate("super");
                 }}
-              />
+              /> */}
             </View>
           </KeyboardAvoidingView>
         </TouchableWithoutFeedback>
