@@ -1,0 +1,37 @@
+// Dependencies
+import Sequelize from "sequelize";
+
+// Configuration
+import { $db } from "@config";
+
+// Db Connection
+const { database, username, password, dialect } = $db();
+
+//ENV CONST
+const DB = process.env.DB_DATABASE;
+//console.log("ENV DATABASE: ", DB);
+
+const sequelize = new Sequelize(database, username, password, {
+  dialect,
+  define: {
+    underscored: true
+  }
+});
+
+// Models
+const models = {
+  User: sequelize.import("./User"),
+  //SIN EDITAR O REVISAR
+  Notification: sequelize.import("./Notification"),
+  NotificationRead: sequelize.import("./NotificationRead")
+};
+
+Object.keys(models).forEach(modelName => {
+  if ("associate" in models[modelName]) {
+    models[modelName].associate(models);
+  }
+});
+
+models.sequelize = sequelize;
+
+export default models;

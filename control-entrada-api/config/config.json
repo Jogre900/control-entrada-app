@@ -1,0 +1,14 @@
+{
+  "serverPort": 3000,
+  "db": {
+    "host": "localhost",
+    "dialect": "postgres",
+    "database": "control_entrada",
+    "username": "control_user",
+    "password": "develop"
+  },
+  "security": {
+    "secretKey": ")]3;N*|m:z+R%<Nk}5Bc",
+    "expiresIn": "7d"
+  }
+}

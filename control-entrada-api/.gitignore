@@ -1,0 +1,16 @@
+# macOS
+.DS_Store
+
+# General
+/node_modules
+*/node_modules
+*.log*
+.env
+/public/imgs/*.png
+/public/imgs/*.jpeg
+/public/imgs/*.jpg
+
+#VS Code
+.vscode
+*.code-workspace
+node_modules
