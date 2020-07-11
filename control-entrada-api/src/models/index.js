@@ -14,8 +14,8 @@ const DB = process.env.DB_DATABASE;
 const sequelize = new Sequelize(database, username, password, {
   dialect,
   define: {
-    underscored: true
-  }
+    underscored: true,
+  },
 });
 
 // Models
@@ -23,10 +23,18 @@ const models = {
   User: sequelize.import("./User"),
   //SIN EDITAR O REVISAR
   Notification: sequelize.import("./Notification"),
-  NotificationRead: sequelize.import("./NotificationRead")
+  NotificationRead: sequelize.import("./NotificationRead"),
+  Company: sequelize.import("./company.js"),
+  Employee: sequelize.import("./employee.js"),
+  Zone: sequelize.import("./zone.js"),
+  Destination: sequelize.import("./destination.js"),
+  UserZone: sequelize.import("./userZone.js"),
+  Citizen: sequelize.import("./citizen.js"),
+  Visits: sequelize.import("./visits.js"),
+  Picture: sequelize.import("./picture.js"),
 };
 
-Object.keys(models).forEach(modelName => {
+Object.keys(models).forEach((modelName) => {
   if ("associate" in models[modelName]) {
     models[modelName].associate(models);
   }

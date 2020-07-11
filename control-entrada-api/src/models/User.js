@@ -75,6 +75,15 @@ export default (sequelize, { BOOLEAN, STRING, UUID, UUIDV4, ENUM }) => {
       onDelete: "CASCADE",
       onUpdate: "CASCADE"
     });
+    User.hasMany(models.userZone, {
+      foreignKey: {
+        name: 'UserId',
+        field: 'user_id'
+      },
+      as: 'userZone',
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE'
+    })
   };
 
   return User;

@@ -1,0 +1,17 @@
+{
+  "name": "api-control-entrada",
+  "version": "1.0.0",
+  "description": "control-entrada",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "start": "nodemon ./index.js"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.4"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "sequelize": "^6.3.0"
+  }
+}
