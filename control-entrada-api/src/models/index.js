@@ -24,14 +24,14 @@ const models = {
   //SIN EDITAR O REVISAR
   Notification: sequelize.import("./Notification"),
   NotificationRead: sequelize.import("./NotificationRead"),
-  Company: sequelize.import("./company.js"),
-  Employee: sequelize.import("./employee.js"),
-  Zone: sequelize.import("./zone.js"),
-  Destination: sequelize.import("./destination.js"),
-  UserZone: sequelize.import("./userZone.js"),
-  Citizen: sequelize.import("./citizen.js"),
-  Visits: sequelize.import("./visits.js"),
-  Picture: sequelize.import("./picture.js"),
+  company: sequelize.import("./company.js"),
+  employee: sequelize.import("./employee.js"),
+  zone: sequelize.import("./zone.js"),
+  destination: sequelize.import("./destination.js"),
+  userZone: sequelize.import("./userZone.js"),
+  citizen: sequelize.import("./citizen.js"),
+  visits: sequelize.import("./visits.js"),
+  picture: sequelize.import("./picture.js"),
 };
 
 Object.keys(models).forEach((modelName) => {

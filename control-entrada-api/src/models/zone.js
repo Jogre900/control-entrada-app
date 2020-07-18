@@ -38,7 +38,7 @@ export default (sequelize, { UUID, UUIDV4, STRING, DATE }) => {
       onDelete: "CASCADE",
       onUpdate: "CASCADE",
     });
-    Zone.hasMany(models.userZone {
+    Zone.hasMany(models.userZone, {
         foreignKey: {
             name: 'ZoneId',
             field: 'zone_id'

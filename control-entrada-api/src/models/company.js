@@ -3,8 +3,8 @@ export default (sequelize, { UUID, UUIDV4, STRING }) => {
     id: {
       primaryKey: true,
       allowNull: false,
-      Type: UUID,
-      defaultValue: UUIDV4(),
+      type: UUID,
+      defaultValue: UUIDV4()
     },
     name: {
       type: STRING,
@@ -34,13 +34,13 @@ export default (sequelize, { UUID, UUIDV4, STRING }) => {
         name: "companyId",
         field: "company_id",
       },
-      as: "company_employee",
+      as: "companyEmployee",
       onDelete: "CASCADE",
       onUpdate: "CASCADE",
     });
     Company.hasMany(models.zone, {
       foreignKey: {
-        name: "CompanyId",
+        name: "companyId",
         field: "company_id",
       },
       as: "compnayZone",
