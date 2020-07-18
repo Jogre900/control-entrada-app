@@ -1,12 +1,3 @@
-/**
- * id
- * clientId
- * productId
- * changeCode
- * expirationDate
- * status
- */
-
 export default (sequelize, { UUID, UUIDV4, BOOLEAN }) => {
   const NotificationRead = sequelize.define("NotificationRead", {
     id: {

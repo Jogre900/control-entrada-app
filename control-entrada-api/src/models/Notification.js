@@ -1,12 +1,3 @@
-/**
- * id
- * clientId
- * productId
- * changeCode
- * expirationDate
- * status
- */
-
 export default (sequelize, { UUID, UUIDV4, STRING }) => {
   const Notification = sequelize.define("Notification", {
     id: {
