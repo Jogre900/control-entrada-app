@@ -9,15 +9,19 @@ import session from "express-session";
 import multer from "multer";
 import { v4 as uuidv4 } from "uuid";
 
+//routes
+import router from "@routes";
+
 //Configurtion
 import { $security, $serverPort } from "@config";
 import { sendMail } from "@utils/sendMail";
 import { encrypt } from "@utils/security";
 
 //CONST CONFIG
+const routes = router;
 const DEV = process.env.NODE_ENV !== "production";
 const PORT = process.env.PORT || $serverPort();
-const SECRETKEY = process.env.SECURITY_SECRETKEY || $security.secretKey;
+const SECRETKEY = process.env.SECRETKEY || $security().secretKey;
 
 //Middlewares
 
@@ -89,6 +93,7 @@ app.use(cors({ credentials: true, origin: true }));
   });*/
 
 //Routes
+app.use("/api", routes);
 app.post("/api/uploadImg", uploadImg.single("file"), (req, res, next) => {
   const file = req.file;
   if (!file) {
@@ -98,25 +103,6 @@ app.post("/api/uploadImg", uploadImg.single("file"), (req, res, next) => {
   }
   //retornar el nombre del archivo para guardar en la base de datos
   res.send(file);
-});
-
-app.get("/api/ping", (req, res) => {
-  // random endpoint so that the client can call something
-  res.json({ msg: "pong..." });
-});
-
-app.get("/api/allUser", async (req, res) => {
-  // random endpoint so that the client can call something
-  let user = await models.User.findAll({
-    include: [
-      {
-        model: models.NotificationRead,
-        as: "notificationUsers",
-        include: { model: models.Notification, as: "notification" }
-      }
-    ]
-  });
-  res.json({ msg: user });
 });
 
 app.post("/api/login", async (req, res) => {
@@ -136,66 +122,6 @@ app.post("/api/login", async (req, res) => {
     response.msg = "Usuario Invalido!";
   }
   res.json(response);
-});
-
-app.post("/api/createUser", async (req, res) => {
-  let user = await models.User.create({
-    email: req.body.email,
-    password: req.body.password
-  });
-  if (user) {
-    let mailOptions = {
-      from: 'Segovia Develop 👻" <segoviadevelop@gmail.com>',
-      to: req.body.email,
-      subject: "Sending Email using Node.js - Control Entrada",
-      text: "That was easy!",
-      html:
-        "<h1>Hello " +
-        user.email +
-        "</h1><br />Your Pin: " +
-        user.pin +
-        " and token validate " +
-        user.tokenActivation
-    };
-    sendMail(mailOptions);
-  }
-  res.json({ msg: user });
-});
-
-app.post("/api/createNotification", async (req, res) => {
-  //CREATE NOTIFICATION
-  let user = await models.User.findByPk(req.body.id);
-
-  let notificationInput = {
-    notificationType: "Give",
-    notification:
-      "#title: Oh! parece que alguien te hizo un obsequio. #body: Que afortunado eres " +
-      user.email +
-      ", te acaba de obsequiar una oferta. Podrás acceder a tu regalo luego de haber aceptado. #action: ",
-    notificationRead: [
-      {
-        userId: user.id
-      }
-    ]
-  };
-
-  let notification = await models.Notification.create(
-    {
-      ...notificationInput
-    },
-    {
-      include: [
-        {
-          model: models.NotificationRead,
-          as: "notificationRead"
-        }
-      ]
-    }
-  );
-
-  res.json({
-    msg: notification
-  });
 });
 
 app.get("/salir", (req, res) => {

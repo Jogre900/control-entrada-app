@@ -9,7 +9,9 @@
           "@config": "./config",
           "@public": "./public",
           "@utils": "./src/utils",
-          "@models": "./src/models"
+          "@models": "./src/models",
+          "@methods": "./src/methods",
+          "@routes": "./src/routes"
         }
       }
     ]
