@@ -10,6 +10,19 @@ export default (sequelize, { BOOLEAN, STRING, UUID, UUIDV4, ENUM }) => {
         type: UUID,
         defaultValue: UUIDV4()
       },
+      name: {
+        type: STRING,
+        allowNull: false
+      },
+      lastName: {
+        type: STRING,
+        allowNull: false
+      },
+      dni: {
+        type: STRING,
+        allowNull: false,
+        unique: true
+      },
       email: {
         type: STRING,
         allowNull: false,

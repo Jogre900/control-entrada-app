@@ -9,6 +9,9 @@ const Methods = {
   },
   createUser: async function(req, res) {
     let user = await models.User.create({
+      name: req.body.name,
+      lastName: req.body.lastName,
+      dni: req.body.dni,
       email: req.body.email,
       password: req.body.password
     });
