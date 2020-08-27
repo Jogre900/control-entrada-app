@@ -5,7 +5,8 @@
     "dialect": "postgres",
     "database": "control_entrada",
     "username": "control_user",
-    "password": "develop"
+    "password": "develop",
+    "logging": false
   },
   "security": {
     "secretKey": ")]3;N*|m:z+R%<Nk}5Bc",

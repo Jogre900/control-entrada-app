@@ -6,7 +6,7 @@ export default (sequelize, { UUID, UUIDV4, STRING, DATE }) => {
       type: UUID,
       defaultValue: UUIDV4(),
     },
-    name: {
+    zone: {
       type: STRING,
       allowNull: false,
       unique: true,
@@ -34,7 +34,7 @@ export default (sequelize, { UUID, UUIDV4, STRING, DATE }) => {
         name: "zoneId",
         field: "zone_id",
       },
-      as: "ZoneId",
+      as: "zona",
       onDelete: "CASCADE",
       onUpdate: "CASCADE",
     });
@@ -43,8 +43,9 @@ export default (sequelize, { UUID, UUIDV4, STRING, DATE }) => {
             name: 'ZoneId',
             field: 'zone_id'
         },
-        as: 'zoneId'
+        as: 'encargado_zona'
     })
+    Zone.belongsTo(models.company)
   };
   return Zone;
 };

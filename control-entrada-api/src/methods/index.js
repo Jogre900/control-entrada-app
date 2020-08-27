@@ -7,7 +7,61 @@ const Methods = {
   test: function(req, res) {
     res.status(200).send(`<h2>Hola desde Node</h2>`);
   },
+  createCompany: async function(req, res) {
+    const { name, email, dni, zone } = req.body;
+    let company = await models.company.create(
+      {
+        name,
+        email,
+        dni,
+        // companyZone: {
+        //   zone
+        // }
+      },
+      // {
+      //   include: [{ model: models.zone, as: "companyZone" }]
+      // }
+    );
+    res.json({ msg: company });
+  },
+  createZone: async function(req, res) {
+    const { zone } = req.body
+    const { id } = req.params
+    console.log("company id--------------------",id)
+    let zoneC = await models.zone.create({
+      zone,
+      companyId : id
+    },
+    )
+    res.json({ msg: zoneC})
+  },
+  findZones: async function(req, res) {
+    let zones = await models.zone.findAll({
+      include: [{model: models.company}]
+    })
+    res.json({msg: zones})
+  },
+  createDestiny: async function(req, res) {
+    const {name} = req.body
+    const {id} = req.params
+    let destiny = await models.destination.create({
+      name,
+      zoneId: id
+    })
+    res.json({msg: destiny})
+  },
+  findDestinyByZone: async function(req, res){
+    const {id} = req.params
+    console.log("zoneID---", id)
+    let zones = await models.destination.findAll({
+      where: {
+        zoneId: id
+      }
+    })
+    res.json({msg: zones})
+  },
   createUser: async function(req, res) {
+    console.log(req.body);
     let user = await models.User.create({
       name: req.body.name,
       lastName: req.body.lastName,
@@ -31,6 +85,8 @@ const Methods = {
     //     };
     //     sendMail(mailOptions);
     //   }
+
+    console.log(user);
     res.json({ msg: user });
   },
   findUsers: async function(req, res) {

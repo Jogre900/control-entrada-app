@@ -5,7 +5,7 @@ import Sequelize from "sequelize";
 import { $db } from "@config";
 
 // Db Connection
-const { database, username, password, dialect } = $db();
+const { database, username, password, dialect, logging } = $db();
 
 //ENV CONST
 const DB = process.env.DB_DATABASE;
@@ -16,6 +16,7 @@ const sequelize = new Sequelize(database, username, password, {
   define: {
     underscored: true,
   },
+  
 });
 
 // Models

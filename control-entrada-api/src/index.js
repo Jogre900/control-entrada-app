@@ -137,7 +137,7 @@ console.log("port: ", PORT);
 const alter = false;
 const force = false;
 
-models.sequelize.sync({ alter, force }).then(() => {
+models.sequelize.sync({ alter, force}).then(() => {
   app.listen(PORT, function() {
     console.log("Running!!! Port: ", PORT);
   });

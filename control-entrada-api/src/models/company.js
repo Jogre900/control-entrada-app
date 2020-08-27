@@ -43,7 +43,7 @@ export default (sequelize, { UUID, UUIDV4, STRING }) => {
         name: "companyId",
         field: "company_id",
       },
-      as: "compnayZone",
+      as: "companyZone",
       onDelete: "CASCADE",
       onUpdate: "CASCADE",
     });
