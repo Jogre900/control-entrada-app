@@ -11,4 +11,6 @@ const router = Router()
     router.get("/findZones", Methods.findZones)
     router.post("/createDestiny/:id", Methods.createDestiny)
     router.get("/findDestiny/:id", Methods.findDestinyByZone)
+    router.post("/createEmployee", Methods.createEmployee)
+    router.get("/findEmployees", Methods.findEmployees)
 module.exports = router

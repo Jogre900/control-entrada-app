@@ -34,7 +34,7 @@ export default (sequelize, { UUID, UUIDV4, STRING, DATE }) => {
         name: "zoneId",
         field: "zone_id",
       },
-      as: "zona",
+      as: "Destinos",
       onDelete: "CASCADE",
       onUpdate: "CASCADE",
     });

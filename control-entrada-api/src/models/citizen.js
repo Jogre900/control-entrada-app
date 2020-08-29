@@ -30,7 +30,7 @@ export default (sequelize, { UUID, UUIDV4, STRING }) => {
         name: "citizenId",
         field: "citizen_id"
       },
-      as: "citizenId",
+      as: "Visitas",
       onDelete: "CASCADE",
       onUpdate: "CASCADE"
     });

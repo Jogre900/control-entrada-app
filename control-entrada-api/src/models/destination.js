@@ -17,10 +17,8 @@ export default (sequelize, { UUID, UUIDV4, STRING }) => {
         name: "destinationId",
         field: "destination_id"
       }
-    })
-    Destination.associate = (models) => {
-      Destination.belongsTo(models.zone)
-    }
+    });
+    Destination.belongsTo(models.zone);
   };
   return Destination;
 };

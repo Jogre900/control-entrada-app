@@ -15,5 +15,9 @@ export default ( sequelize, {UUID, UUIDV4, DATE}) => {
             allowNull: false
         }
     })
+    UserZone.associate = models => {
+        UserZone.belongsTo(models.employee)
+        UserZone.belongsTo(models.zone)
+    }
     return UserZone
 }

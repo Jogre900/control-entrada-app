@@ -34,7 +34,7 @@ export default (sequelize, { UUID, UUIDV4, STRING }) => {
         name: "companyId",
         field: "company_id",
       },
-      as: "companyEmployee",
+      as: "Empleado",
       onDelete: "CASCADE",
       onUpdate: "CASCADE",
     });

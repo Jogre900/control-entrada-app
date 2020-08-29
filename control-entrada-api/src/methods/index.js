@@ -13,11 +13,11 @@ const Methods = {
       {
         name,
         email,
-        dni,
+        dni
         // companyZone: {
         //   zone
         // }
-      },
+      }
       // {
       //   include: [{ model: models.zone, as: "companyZone" }]
       // }
@@ -25,40 +25,83 @@ const Methods = {
     res.json({ msg: company });
   },
   createZone: async function(req, res) {
-    const { zone } = req.body
-    const { id } = req.params
-    console.log("company id--------------------",id)
+    const { zone } = req.body;
+    const { id } = req.params;
+    console.log("company id--------------------", id);
     let zoneC = await models.zone.create({
       zone,
-      companyId : id
-    },
-    )
-    res.json({ msg: zoneC})
+      companyId: id
+    });
+    res.json({ msg: zoneC });
   },
   findZones: async function(req, res) {
     let zones = await models.zone.findAll({
-      include: [{model: models.company}]
-    })
-    res.json({msg: zones})
+      include: [
+        { model: models.company },
+        { model: models.destination, as: "Destinos" },
+        {model: models.userZone, as: "encargado_zona"}
+      ]
+    });
+    res.json({ msg: zones });
   },
   createDestiny: async function(req, res) {
-    const {name} = req.body
-    const {id} = req.params
+    const { name } = req.body;
+    const { id } = req.params;
     let destiny = await models.destination.create({
       name,
       zoneId: id
-    })
-    res.json({msg: destiny})
+    });
+    res.json({ msg: destiny });
   },
-  findDestinyByZone: async function(req, res){
-    const {id} = req.params
-    console.log("zoneID---", id)
+  findDestinyByZone: async function(req, res) {
+    const { id } = req.params;
     let zones = await models.destination.findAll({
       where: {
         zoneId: id
-      }
+      },
+      include: [{ model: models.zone, as: "Zone" }]
+    });
+    res.json({ msg: zones });
+  },
+  createEmployee: async function(req, res) {
+    console.log("empleado----",req.body)
+    const {
+      name,
+      lasName,
+      dni,
+      picture,
+      status,
+      assignationDate,
+      changeTurnDate,
+      zoneId,
+      companyId,
+      userId
+    } = req.body;
+    let employee = await models.employee.create({
+      name,
+      lasName,
+      dni,
+      picture,
+      status,
+      companyId,
+      Horario: {
+        assignationDate,
+        changeTurnDate,
+        zoneId,
+        userId
+      },
+      
+      include: [
+        { model: models.userZone, as: "Horario" }, 
+      ]
     })
-    res.json({msg: zones})
+    res.json({msg: employee})
+  },
+  findEmployees: async function(req, res){
+    let employees = await models.employee.findAll({
+      include: [{model: models.userZone, as: 'alog'}]
+    })
+    res.json({msg: employees})
   },
   createUser: async function(req, res) {
     console.log(req.body);

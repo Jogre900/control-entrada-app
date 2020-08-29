@@ -28,6 +28,17 @@ export default (sequelize, { UUID, UUIDV4, STRING }) => {
       allowNull: false,
     },
   });
-
+  Employee.associate = models =>{
+    Employee.hasMany(models.userZone, {
+      ForeignKey: {
+        name: 'employeeId',
+        field: 'employee_id'
+      },
+      as: 'Horario',
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE'
+    })
+    Employee.belongsTo(models.company)
+  }
   return Employee;
 };

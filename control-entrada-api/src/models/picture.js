@@ -14,6 +14,9 @@ export default (sequelize, { UUID, UUIDV4, STRING }) => {
       type: STRING,
       allowNull: false,
     },
-  });
+  })
+  Picture.associate = models => {
+    Picture.belongsTo(models.visits)
+  }
   return Picture;
 };
