@@ -15,7 +15,7 @@ export default (sequelize, { UUID, UUIDV4, STRING }) => {
       type: STRING,
       allowNull: false,
     },
-    lasName: {
+    lastName: {
       type: STRING,
       allowNull: false,
     },

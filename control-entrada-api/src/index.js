@@ -95,6 +95,7 @@ app.use(cors({ credentials: true, origin: true }));
 //Routes
 app.use("/api", routes);
 app.post("/api/uploadImg", uploadImg.single("file"), (req, res, next) => {
+  console.log(req.body)
   const file = req.file;
   if (!file) {
     const error = new Error("Please upload a file");
@@ -102,32 +103,35 @@ app.post("/api/uploadImg", uploadImg.single("file"), (req, res, next) => {
     return next(error);
   }
   //retornar el nombre del archivo para guardar en la base de datos
-  res.send(file);
+  res.send(file.filename);
 });
+app.get("/api/showImage", (req, res) => {
+  
+})
 
-app.post("/api/login", async (req, res) => {
-  let response = { value: "", error: false, msg: "" };
-  // random endpoint so that the client can call something
-  let user = await models.User.findOne({
-    where: {
-      email: req.body.email,
-      password: encrypt(req.body.password)
-    }
-  });
+// app.post("/api/login", async (req, res) => {
+//   let response = { value: "", error: false, msg: "" };
+//   // random endpoint so that the client can call something
+//   let user = await models.User.findOne({
+//     where: {
+//       email: req.body.email,
+//       password: encrypt(req.body.password)
+//     }
+//   });
 
-  if (user) {
-    response.value = user;
-  } else {
-    response.error = true;
-    response.msg = "Usuario Invalido!";
-  }
-  res.json(response);
-});
+//   if (user) {
+//     response.value = user;
+//   } else {
+//     response.error = true;
+//     response.msg = "Usuario Invalido!";
+//   }
+//   res.json(response);
+// });
 
-app.get("/salir", (req, res) => {
-  res.clearCookie("at");
-  res.redirect("/login");
-});
+// app.get("/salir", (req, res) => {
+//   res.clearCookie("at");
+//   res.redirect("/login");
+// });
 
 //TODO ruta creacion providers
 

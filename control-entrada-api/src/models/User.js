@@ -60,13 +60,13 @@ export default (sequelize, { BOOLEAN, STRING, UUID, UUIDV4, ENUM }) => {
         defaultValue: makeid(6)
       }
     },
-    {
-      hooks: {
-        beforeCreate: user => {
-          user.password = encrypt(user.password);
-        }
-      }
-    }
+    // {
+    //   hooks: {
+    //     beforeCreate: user => {
+    //       user.password = encrypt(user.password);
+    //     }
+    //   }
+    // }
   );
 
   User.associate = models => {

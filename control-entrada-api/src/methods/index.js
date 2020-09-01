@@ -1,27 +1,18 @@
 import models from "@models";
-import multer from "multer";
 import { encrypt } from "@utils/security";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import { $security, $serverPort } from "@config";
+const SECRETKEY = process.env.SECRETKEY || $security().secretKey;
 
 const Methods = {
-  //test
-  test: function(req, res) {
-    res.status(200).send(`<h2>Hola desde Node</h2>`);
-  },
   createCompany: async function(req, res) {
     const { name, email, dni, zone } = req.body;
-    let company = await models.company.create(
-      {
-        name,
-        email,
-        dni
-        // companyZone: {
-        //   zone
-        // }
-      }
-      // {
-      //   include: [{ model: models.zone, as: "companyZone" }]
-      // }
-    );
+    let company = await models.company.create({
+      name,
+      email,
+      dni
+    });
     res.json({ msg: company });
   },
   createZone: async function(req, res) {
@@ -39,7 +30,7 @@ const Methods = {
       include: [
         { model: models.company },
         { model: models.destination, as: "Destinos" },
-        {model: models.userZone, as: "encargado_zona"}
+        { model: models.userZone, as: "encargado_zona" }
       ]
     });
     res.json({ msg: zones });
@@ -64,7 +55,7 @@ const Methods = {
     res.json({ msg: zones });
   },
   createEmployee: async function(req, res) {
-    console.log("empleado----",req.body)
+    console.log("empleado----", req.body);
     const {
       name,
       lasName,
@@ -73,45 +64,110 @@ const Methods = {
       status,
       assignationDate,
       changeTurnDate,
-      zoneId,
+      ZoneId,
       companyId,
       userId
     } = req.body;
-    let employee = await models.employee.create({
+    let employeeData = {
       name,
       lasName,
       dni,
       picture,
       status,
-      companyId,
-      Horario: {
-        assignationDate,
-        changeTurnDate,
-        zoneId,
-        userId
+      companyId
+    };
+    let userZoneData = {
+      assignationDate,
+      changeTurnDate,
+      ZoneId
+    };
+    let employee = await models.employee.create(
+      {
+        ...employeeData,
+        Horario: {
+          ...userZoneData
+        }
       },
-      
-      include: [
-        { model: models.userZone, as: "Horario" }, 
-      ]
-    })
-    res.json({msg: employee})
+      { include: [{ model: models.userZone, as: "Horario" }] }
+    );
+    res.json({ msg: employee });
   },
-  findEmployees: async function(req, res){
+  createUserZone: async function(req, res) {
+    const { assignationDate, changeTurnDate, ZoneId, EmployeeId } = req.body;
+    console.log("userZone", req.body);
+    let userZone = await models.userZone.create({
+      assignationDate,
+      changeTurnDate,
+      ZoneId,
+      EmployeeId
+    });
+    res.json({ msg: userZone });
+  },
+  findEmployees: async function(req, res) {
     let employees = await models.employee.findAll({
-      include: [{model: models.userZone, as: 'alog'}]
-    })
-    res.json({msg: employees})
+      include: [{ model: models.userZone, as: "alog" }]
+    });
+    res.json({ msg: employees });
+  },
+  uploadImage: async function(req, res, next) {
+    console.log(req.body);
+    const file = req.file;
+    console.log(file);
+    const { entry } = req.body;
+    if (!file) {
+      const error = new Error("Please upload a file");
+      error.httpStatusCode = 400;
+      return next(error);
+    }
+    let data = await models.picture.create({
+      picture: file.filename,
+      entry
+    });
+    //retornar el nombre del archivo para guardar en la base de datos
+    res.send({ msg: data });
+    //res.send(file.filename);
+  },
+  displayPicture: async function(req, res) {
+    let data = await models.picture.findAll();
+    res.send({ msg: data });
   },
   createUser: async function(req, res) {
     console.log(req.body);
-    let user = await models.User.create({
-      name: req.body.name,
-      lastName: req.body.lastName,
-      dni: req.body.dni,
-      email: req.body.email,
-      password: req.body.password
+    let { name, lastName, dni, email, password } = req.body;
+    let user = await models.User.findOne({
+      where: {
+        email: req.body.email
+      }
     });
+    if (!user) {
+      let hash = await bcrypt.hash(password, 10);
+      console.log("hash:---", hash);
+      password = hash;
+      console.log("password:-----", password);
+      let userR = await models.User.create({
+        name,
+        lastName,
+        dni,
+        email,
+        password
+      });
+
+      let token = jwt.sign(userR.dataValues, SECRETKEY, { expiresIn: 1440 });
+      res.json({
+        msg: "Registro exitoso",
+        tkn: token
+      });
+    } else {
+      res.json({ msg: "usuario ya registrado" });
+    }
+
+    // let user = await models.User.create({
+    //   name: req.body.name,
+    //   lastName: req.body.lastName,
+    //   dni: req.body.dni,
+    //   email: req.body.email,
+    //   password: req.body.password
+    // });
     //   if (user) {
     //     let mailOptions = {
     //       from: 'Segovia Develop 👻" <segoviadevelop@gmail.com>',
@@ -129,8 +185,44 @@ const Methods = {
     //     sendMail(mailOptions);
     //   }
 
-    console.log(user);
-    res.json({ msg: user });
+    // console.log(user);
+    // res.json({ msg: user });
+  },
+  login: async function(req, res) {
+    const { email, password } = req.body;
+    console.log(req.body);
+    let user = await models.User.findOne({
+      where: {
+        email
+      }
+    });
+    if (user) {
+      console.log("user:----", user);
+      console.log("password:----", password);
+      console.log("user.password:----", user.password);
+      if (bcrypt.compareSync(password, user.password)) {
+        console.log("si paso!!!");
+        let token = jwt.sign(user.dataValues, SECRETKEY, { expiresIn: 1440 });
+        res.json({
+          msg: "Inicio Exitoso",
+          tokn: token
+        });
+      } else {
+        res.json({ msg: "Usuario no Registrado" });
+      }
+    }else {
+      res.json({ msg: "Correo no registrado" });
+    }
+  },
+  getProfile: async function(req, res){
+    let decode = jwt.verify(req.header['authorization'], SECRETKEY)
+    console.log("decode",decode)
+    let profile = await models.User.findOne({
+      where: {
+        id: decode.id
+      }
+    })
+    if(profile) res.json({profile: user})
   },
   findUsers: async function(req, res) {
     let user = await models.User.findAll({
