@@ -215,14 +215,15 @@ const Methods = {
     }
   },
   getProfile: async function(req, res){
-    let decode = jwt.verify(req.header['authorization'], SECRETKEY)
+    let token = req.headers['authorization'].split(' ')[1]
+    let decode = jwt.verify(req.headers['authorization'], SECRETKEY)
     console.log("decode",decode)
     let profile = await models.User.findOne({
       where: {
         id: decode.id
       }
     })
-    if(profile) res.json({profile: user})
+    if(profile) res.json({msg: profile})
   },
   findUsers: async function(req, res) {
     let user = await models.User.findAll({
