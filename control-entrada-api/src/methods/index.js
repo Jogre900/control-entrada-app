@@ -7,55 +7,130 @@ const SECRETKEY = process.env.SECRETKEY || $security().secretKey;
 
 const Methods = {
   createCompany: async function(req, res) {
-    const { name, email, dni, zone } = req.body;
-    let company = await models.company.create({
-      name,
-      email,
-      dni
-    });
-    res.json({ msg: company });
+    let RESPONSE = {
+      error: true,
+      msg: "",
+      data: null,
+      token: null
+    };
+    const { name, email, dni } = req.body;
+    try {
+      let company = await models.company.create({
+        name,
+        email,
+        dni
+      });
+      RESPONSE.error = false;
+      RESPONSE.msg = "Creacion de Empresa Exitoso!";
+      RESPONSE.data = company;
+      res.json(RESPONSE);
+    } catch (error) {
+      RESPONSE.msg = error;
+      res.json(RESPONSE);
+    }
   },
   createZone: async function(req, res) {
+   let RESPONSE = {
+      error: true,
+      msg: "",
+      data: null,
+      token: null
+    };
     const { zone } = req.body;
     const { id } = req.params;
-    console.log("company id--------------------", id);
-    let zoneC = await models.zone.create({
-      zone,
-      companyId: id
-    });
-    res.json({ msg: zoneC });
+    try {
+      let zoneC = await models.zone.create({
+        zone,
+        companyId: id
+      });
+      RESPONSE.error = false
+      RESPONSE.msg = 'Creacion de Zona Exitasa!'
+      RESPONSE.data = zoneC
+      res.json(RESPONSE);  
+    } catch (error) {
+      RESPONSE.msg = error
+    }
+    
   },
   findZones: async function(req, res) {
-    let zones = await models.zone.findAll({
-      include: [
-        { model: models.company },
-        { model: models.destination, as: "Destinos" },
-        { model: models.userZone, as: "encargado_zona" }
-      ]
-    });
-    res.json({ msg: zones });
+    let RESPONSE = {
+      error: true,
+      msg: "",
+      data: null,
+      token: null
+    };
+    try {
+      let zones = await models.zone.findAll({
+        include: [
+          { model: models.company, as: 'companyZone' },
+          { model: models.destination, as: "Destinos" },
+          { model: models.userZone, as: "encargado_zona" }
+        ]
+      });
+      RESPONSE.error = false
+      RESPONSE.msg = 'Busqueda Exitosa!'
+      RESPONSE.data = zones
+      res.json(RESPONSE);  
+    } catch (error) {
+      RESPONSE.error = error
+      res.json(RESPONSE)
+    }
+    
   },
   createDestiny: async function(req, res) {
+    let RESPONSE = {
+      error: true,
+      msg: "",
+      data: null,
+      token: null
+    };
     const { name } = req.body;
     const { id } = req.params;
-    let destiny = await models.destination.create({
-      name,
-      zoneId: id
-    });
-    res.json({ msg: destiny });
+    try {
+      let destiny = await models.destination.create({
+        name,
+        zoneId: id
+      });
+      RESPONSE.error = false
+      RESPONSE.msg = 'Creacion de Destino Exitosa!'
+      RESPONSE.data = destiny
+      res.json(RESPONSE);  
+    } catch (error) {
+      RESPONSE.msg = error
+      res.json(RESPONSE)
+    }
+    
   },
   findDestinyByZone: async function(req, res) {
+    let RESPONSE = {
+      error: true,
+      msg: "",
+      data: null,
+      token: null
+    };
     const { id } = req.params;
-    let zones = await models.destination.findAll({
-      where: {
-        zoneId: id
-      },
-      include: [{ model: models.zone, as: "Zone" }]
-    });
-    res.json({ msg: zones });
+    try {
+      let destinys = await models.destination.findAll({
+        where: {
+          zoneId: id
+        },
+        include: [{ model: models.zone, as: "Zone" }]
+      });
+      RESPONSE.error = false
+      RESPONSE.msg = 'Busqueda Exitosa!'
+      RESPONSE.data = destinys
+      res.json(RESPONSE);  
+    } catch (error) {
+      RESPONSE.msg = error
+    }
   },
   createEmployee: async function(req, res) {
-    console.log("empleado----", req.body);
+    let RESPONSE = {
+      error: true,
+      msg: '',
+      data: null,
+      token: null
+    }
     const {
       name,
       lasName,
@@ -81,33 +156,72 @@ const Methods = {
       changeTurnDate,
       ZoneId
     };
-    let employee = await models.employee.create(
-      {
-        ...employeeData,
-        Horario: {
-          ...userZoneData
-        }
-      },
-      { include: [{ model: models.userZone, as: "Horario" }] }
-    );
-    res.json({ msg: employee });
+    try {
+      let employee = await models.employee.create(
+        {
+          ...employeeData,
+          Horario: {
+            ...userZoneData
+          }
+        },
+        { include: [{ model: models.userZone, as: "Horario" }] }
+      );
+      RESPONSE.error = false
+      RESPONSE.msg = 'Creacion de Empleado Exitosa!'
+      RESPONSE.data = employee
+      res.json(RESPONSE);  
+    } catch (error) {
+      RESPONSE.msg = error
+      res.json(RESPONSE)
+    }
+    
   },
   createUserZone: async function(req, res) {
-    const { assignationDate, changeTurnDate, ZoneId, EmployeeId } = req.body;
-    console.log("userZone", req.body);
-    let userZone = await models.userZone.create({
-      assignationDate,
-      changeTurnDate,
-      ZoneId,
-      EmployeeId
-    });
-    res.json({ msg: userZone });
+    let RESPONSE = {
+      error: true,
+      msg: '',
+      data: null,
+      token: null
+    }
+    const { assignationDate, changeTurnDate, ZoneId } = req.body;
+    const { id } = req.params
+    try {
+      let userZone = await models.userZone.create({
+        assignationDate,
+        changeTurnDate,
+        ZoneId,
+        EmployeeId: id
+      });
+      RESPONSE.error = false
+      RESPONSE.msg = 'Creacion de UserZone Exitosa!'
+      RESPONSE.data = userZone
+      res.json({ msg: userZone });  
+    } catch (error) {
+      RESPONSE.msg = error
+      res.json(RESPONSE)
+    }
+    
   },
   findEmployees: async function(req, res) {
-    let employees = await models.employee.findAll({
-      include: [{ model: models.userZone, as: "alog" }]
-    });
-    res.json({ msg: employees });
+    let RESPONSE = {
+      error: true,
+      msg: '',
+      data: null,
+      token: null
+    }
+    try {
+      let employees = await models.employee.findAll({
+        include: [{ model: models.userZone, as: "Horario" }]
+      });
+      RESPONSE.error = false
+      RESPONSE.msg = 'Busqueda Exitosa!'
+      RESPONSE.data = employees
+      res.json(RESPONSE);  
+    } catch (error) {
+       RESPONSE.msg = error 
+       res.json(RESPONSE)
+    }
+    
   },
   uploadImage: async function(req, res, next) {
     console.log(req.body);
@@ -119,47 +233,60 @@ const Methods = {
       error.httpStatusCode = 400;
       return next(error);
     }
-    let data = await models.picture.create({
-      picture: file.filename,
-      entry
-    });
+    // let data = await models.picture.create({
+    //   picture: file.filename,
+    //   entry
+    // });
     //retornar el nombre del archivo para guardar en la base de datos
-    res.send({ msg: data });
+    //res.send({ msg: data });
     //res.send(file.filename);
+    return file;
   },
   displayPicture: async function(req, res) {
     let data = await models.picture.findAll();
     res.send({ msg: data });
   },
   createUser: async function(req, res) {
-    console.log(req.body);
-    let { name, lastName, dni, email, password } = req.body;
-    let user = await models.User.findOne({
-      where: {
-        email: req.body.email
-      }
-    });
-    if (!user) {
-      let hash = await bcrypt.hash(password, 10);
-      console.log("hash:---", hash);
-      password = hash;
-      console.log("password:-----", password);
-      let userR = await models.User.create({
-        name,
-        lastName,
-        dni,
-        email,
-        password
-      });
-
-      let token = jwt.sign(userR.dataValues, SECRETKEY, { expiresIn: 1440 });
-      res.json({
-        msg: "Registro exitoso",
-        tkn: token
-      });
-    } else {
-      res.json({ msg: "usuario ya registrado" });
+    let RESPONSE = {
+      error: true,
+      msg: '',
+      data: null,
+      token: null
     }
+    let { name, lastName, dni, email, password } = req.body;
+    try {
+      let user = await models.User.findOne({
+        where: {
+          email: req.body.email
+        }
+      });
+      if (!user) {
+        let hash = await bcrypt.hash(password, 10);
+        password = hash;
+        let userR = await models.User.create({
+          name,
+          lastName,
+          dni,
+          email,
+          password
+        });
+  
+        let token = jwt.sign(userR.dataValues, SECRETKEY, { expiresIn: 1440 });
+        RESPONSE.error = false
+        RESPONSE.msg = 'Registro Exitoso!'
+        RESPONSE.data = userR
+        RESPONSE.token = token
+        res.json(RESPONSE);
+      } else {
+        RESPONSE.msg = 'Usuario ya Registrado'
+        RESPONSE.data = user
+        res.json(RESPONSE);
+      }  
+    } catch (error) {
+      RESPONSE.msg = error
+      res.json(RESPONSE)
+    }
+    
 
     // let user = await models.User.create({
     //   name: req.body.name,
@@ -193,68 +320,157 @@ const Methods = {
       error: true,
       msg: "",
       data: null,
-      tokn: null
+      token: null
     };
     const { email, password } = req.body;
-    console.log(req.body);
-    let user = await models.User.findOne({
-      where: {
-        email
-      }
-    });
-    if (user) {
-      console.log("user:----", user);
-      console.log("password:----", password);
-      console.log("user.password:----", user.password);
-      if (bcrypt.compareSync(password, user.password)) {
-        console.log("si paso!!!");
-        let token = jwt.sign(user.dataValues, SECRETKEY, { expiresIn: 1440 });
-        RESPONSE.error = false;
-        RESPONSE.msg = "Inicio Exitoso";
-        RESPONSE.tokn = token;
+    try {
+      let user = await models.User.findOne({
+        where: {
+          email
+        }
+      });
+      if (user) {
+        
+        if (bcrypt.compareSync(password, user.password)) {
+          
+          let token = jwt.sign(user.dataValues, SECRETKEY, { expiresIn: 1440 });
+          RESPONSE.error = false;
+          RESPONSE.msg = "Inicio Exitoso";
+          RESPONSE.token = token;
+        } else {
+          RESPONSE.msg = "Usuario no Registrado";
+        }
       } else {
-        RESPONSE.msg = "Usuario no Registrado";
+        RESPONSE.msg = "Correo no registrado";
       }
-    } else {
-      RESPONSE.msg = "Correo no registrado";
+      res.json(RESPONSE);  
+    } catch (error) {
+      RESPONSE.msg = error
+      res.json(RESPONSE)
     }
-    res.json(RESPONSE);
   },
   getProfile: async function(req, res) {
     let RESPONSE = {
       error: true,
       msg: "",
       data: null,
-      tokn: null
+      token: null
     };
-    console.log("llego: ", req.headers.authorization);
     let decode = jwt.verify(req.headers.authorization, SECRETKEY);
-    console.log("decode", decode);
-    let profile = await models.User.findOne({
-      where: {
-        id: decode.id
+    try {
+      let profile = await models.User.findOne({
+        where: {
+          id: decode.id
+        }
+      });
+      if (profile) {
+        RESPONSE.error = false;
+        RESPONSE.data = profile;
+      } else {
+        RESPONSE.msg = "Token no valido";
       }
-    });
-    if (profile) {
-      RESPONSE.error = false;
-      RESPONSE.data = profile;
-    } else {
-      RESPONSE.msg = "Token no valido";
-    }
 
-    res.json(RESPONSE);
+      res.json(RESPONSE);
+    } catch (error) {
+      RESPONSE.error = error;
+      res.json(RESPONSE);
+    }
   },
   findUsers: async function(req, res) {
-    let user = await models.User.findAll({
-      include: [
+    let RESPONSE = {
+      error: true,
+      msg: "",
+      data: null,
+      token: null
+    };
+    try {
+      let user = await models.User.findAll({
+        include: [
+          {
+            model: models.NotificationRead,
+            as: "notificationUsers",
+            include: { model: models.Notification, as: "notification" }
+          }
+        ]
+      });
+      (RESPONSE.error = false), (RESPONSE.msg = "Busqueda Exitosa");
+      RESPONSE.data = user;
+      res.json(RESPONSE);
+    } catch (error) {
+      RESPONSE.msg = error;
+      res.json(RESPONSE);
+    }
+  },
+  createVisits: async function(req, res) {
+    let RESPONSE = {
+      error: true,
+      msg: "",
+      data: null,
+      tokn: null
+    };
+    let picture = req.file.filename;
+
+    const {
+      dni,
+      name,
+      lastName,
+      entryDate,
+      descriptionEntry,
+      departureDate,
+      descriptionDeparture
+    } = req.body;
+    try {
+      let visits = await models.citizen.create(
         {
-          model: models.NotificationRead,
-          as: "notificationUsers",
-          include: { model: models.Notification, as: "notification" }
+          dni,
+          name,
+          lastName,
+          picture,
+          Visitas: {
+            entryDate,
+            descriptionEntry,
+            departureDate,
+            descriptionDeparture
+          }
+        },
+        {
+          include: [
+            {
+              model: models.visits,
+              as: "Visitas"
+            }
+          ]
         }
-      ]
-    });
-    res.json({ msg: user });
+      );
+      (RESPONSE.error = false), (RESPONSE.msg = "Registro Exitoso");
+      RESPONSE.data = visits;
+      res.json(RESPONSE);
+    } catch (error) {
+      RESPONSE.msg = error;
+      res.json(RESPONSE);
+    }
+  },
+  findVisit: async function(req, res) {
+    let RESPONSE = {
+      error: true,
+      msg: "",
+      data: null,
+      tokn: null
+    };
+    const { id } = req.params;
+    try {
+      let visit = await models.citizen.findOne({
+        where: { id },
+        include: [{ model: models.visits, as: "Visitas" }]
+      });
+      RESPONSE.error = false;
+      RESPONSE.msg = "Consulta Exitosa";
+      RESPONSE.data = visit;
+
+      res.json(RESPONSE);
+    } catch (error) {
+      RESPONSE.msg = error;
+    }
   },
   createNoti: async function(req, res) {
     let user = await models.User.findByPk(req.body.id);
