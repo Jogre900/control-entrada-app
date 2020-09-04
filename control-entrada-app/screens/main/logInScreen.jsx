@@ -13,14 +13,14 @@ import {
   KeyboardAvoidingView,
   TouchableWithoutFeedback,
   Keyboard,
-  TextInput,
 } from "react-native";
 
 //components
 import { MainButton } from "../../components/mainButton.component";
-import { Input } from "../../components/input.component";
+import Input from "../../components/input.component";
+import Input2 from "../../components/input2";
 import { SplashScreen } from "../../components/splashScreen.component";
-
+import firebase from "../../lib/firebase";
 //constants
 import { mainColor } from "../../constants/Colors";
 
@@ -40,6 +40,8 @@ const backAction = () => {
 
 export const LogInScreen = (props) => {
   const { navigation } = props;
+  const [email, setEmail] = useState();
+  const [pass, setPass] = useState();
 
   const [isSplash, setIsSplash] = useState(true);
 
@@ -50,7 +52,36 @@ export const LogInScreen = (props) => {
   const activeSplash = () => {
     setTimeout(() => {
       setIsSplash(false);
-    }, 3000);
+    }, 500);
+  };
+
+  const signIn = () => {
+    console.log("email", email);
+    firebase
+      .auth()
+      .signInWithEmailAndPassword(email, pass)
+      .catch((error) => {
+        console.log("error code: ", error.code);
+        console.log("error message: ", error.message);
+      });
+  };
+
+  const signInStatus = () => {
+    firebase.auth().onAuthStateChanged((currentUser) => {
+      console.log("user: ", currentUser);
+      if (currentUser) {
+        switch (currentUser.email) {
+          case "supervisor@security.com":
+            props.navigation.navigate("super");
+            break;
+          case "entrancekeeper@security.com":
+            props.navigation.navigate("Home");
+            break;
+          default:
+            break;
+        }
+      }
+    });
   };
 
   useEffect(() => {
@@ -59,6 +90,10 @@ export const LogInScreen = (props) => {
     // return () => {
     //   backHandler.current.remove()
     //BackHandler.removeEventListener("hardwareBackPress", backAction);
+  }, []);
+
+  useEffect(() => {
+    signInStatus();
   }, []);
 
   if (isSplash) {
@@ -84,38 +119,47 @@ export const LogInScreen = (props) => {
             />
             <View style={styles.buttonBox}>
               <Input
-                style={{ borderColor: "#ff7e00", color: "white", marginBottom: 10 }}
+                style={{ borderColor: "#ff7e00", marginBottom: 10 }}
+                styleInput={{ color: "white" }}
                 title="Correo"
                 textColor="white"
                 shape="round"
-                //icon='ios-close'
                 alignText="center"
                 keyboardType="email-address"
                 returnKeyType="next"
-                onSubmitEditing={() => nextInput.focus()}
+                onSubmitEditing={() => nextInput.current.focus()}
+                onChangeText={(correo) => {
+                  setEmail(correo);
+                }}
+                value={email}
               />
               <Input
-                style={{ borderColor: "#ff7e00", color: "white",  marginBottom: 10 }}
+                style={{ borderColor: "#ff7e00", marginBottom: 10 }}
+                styleInput={{ color: "white" }}
                 title="Clave"
                 textColor="white"
                 shape="round"
                 alignText="center"
                 returnKeyType="go"
                 secureTextEntry={true}
+                onChangeText={(pass) => {
+                  setPass(pass);
+                }}
+                value={pass}
                 ref={nextInput}
               />
               <MainButton
                 title="Iniciar Sesion"
                 onPress={() => {
-                  props.navigation.navigate("Home");
+                  signIn();
                 }}
               />
-              <MainButton
+              {/* <MainButton
                 title="Supervisor"
                 onPress={() => {
                   props.navigation.navigate("super");
                 }}
-              />
+              /> */}
             </View>
           </KeyboardAvoidingView>
         </TouchableWithoutFeedback>

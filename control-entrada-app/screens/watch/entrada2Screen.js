@@ -1,4 +1,4 @@
-import React, {useEffect} from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -12,85 +12,63 @@ import {
   KeyboardAvoidingView,
   TouchableWithoutFeedback,
   Keyboard,
-  Alert
+  Alert,
+  ActivityIndicator,
 } from "react-native";
 
 //components
 import { TopNavigation } from "../../components/TopNavigation.component";
-import { Input } from "../../components/input.component";
+import Input from "../../components/input.component";
 import { MainButton } from "../../components/mainButton.component";
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
-import  firebase from '../../lib/firebase'
-
+import firebase from "../../lib/firebase";
 import FireMethods from "../../lib/methods.firebase";
-
-const formContent = () => {
-  return (
-    <View style={{ marginTop: 10, paddingHorizontal: "12%" }}>
-      <Input title="Nombre" shape="round" />
-      <Input title="Apellido" shape="round" />
-      <Input title="DNI" shape="round" />
-      <Input title="Destino" shape="round" />
-      <View>
-        <MainButton title="Registrar Entrada" />
-      </View>
-    </View>
-  );
-};
+import moment from "moment";
 
 const { width } = Dimensions.get("window");
 const cover = require("../../assets/images/background.jpg");
 const profilePic = require("../../assets/images/profile-picture.png");
 const watchPic = require("../../assets/images/male-2.jpg");
 
-// FORM dataBox
-// <View style={{ flex: 1 }}>
-//           <View style={{ paddingHorizontal: 5 }}>
-//             {/* //------CODE FROM TABBAR------// */}
-//             {/* ///----------------------------//////// */}
-//             <View style={{ marginTop: 20, paddingHorizontal: "12%" }}>
-//               <Input title="Nombre" shape="flat" icon='md-camera'/>
-//               <Input title="Nombre" shape="flat" icon='md-camera'/>
-//               <Input title="Nombre" shape="flat" icon='md-camera'/>
-//               <Input title="Nombre" shape="flat" icon='md-camera'/>
-//               {/* <Input title="Apellido" shape="round" />
-//               <Input title="DNI" shape="round" />
-//               <Input title="Destino" shape="round" /> */}
-//               <View>
-//                 <MainButton title="Registrar Entrada" />
-//               </View>
-//             </View>
-//           </View>
-//         </View>
-
 export const Entrada2Screen = (props) => {
-  const [saveImg, setSaveImg] = React.useState(null);
-  const [changeImg, setChangeImg] = React.useState(false);
-  const [userId, setUserId] = React.useState();
-  const [name, setName] = React.useState("");
-  const [lastName, setLastName] = React.useState("");
-  const [dni, setDni] = React.useState("");
-  const [destiny, setDestiny] = React.useState("");
+  const [saveImg, setSaveImg] = useState();
+  const [changeImg, setChangeImg] = useState(false);
+  const [userId, setUserId] = useState();
+  const [name, setName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [dni, setDni] = useState("");
+  const [destiny, setDestiny] = useState("");
+  const [imgUrl, setImgUrl] = useState();
+  const [saving, setSaving] = useState();
+  const [saveSuccess, setSaveSuccess] = useState(false);
 
+  const nameRef = useRef();
+  const lastNameRef = useRef();
+  const dniRef = useRef();
+  const destinyRef = useRef();
+  const getDate = () => {
+    let date = moment().format("MMM D, h:mm");
+    return date;
+  };
 
   const getUserId = () => {
     try {
-      let userid = firebase.auth().currentUser
+      let userid = firebase.auth().currentUser;
       setUserId(userid);
-      console.log("user-Id:---",userid)
+      //console.log("user-Id:---",userid)
     } catch (error) {
       console.log(error);
     }
-  }
+  };
   useEffect(() => {
-    getUserId()
+    getUserId();
   }, []);
 
   const pickImage = async () => {
     let result = await ImagePicker.launchCameraAsync();
     console.log(" result----", result);
-    setSaveImg(result.uri);
+    setSaveImg(await result.uri);
     result.cancelled ? setChangeImg(false) : setChangeImg(true);
   };
 
@@ -104,21 +82,75 @@ export const Entrada2Screen = (props) => {
     );
   };
 
-  const saveEntrance = () => {
-    if (name === "" || lastName === "" || dni === "" || destiny === "") {
-      Alert.alert("Completa todos los Campos!");
+  const splash = () => {
+    return (
+      <View>
+        <ActivityIndicator size="large" color="#ff7e00" />
+        <ActivityIndicator size="small" color="#ff7e00" />
+      </View>
+    );
+  };
+
+  const upLoadImage = async (uri) => {
+    return new Promise((resolve, reject) => {
+      let xhr = new XMLHttpRequest();
+      xhr.onerror = reject;
+      xhr.onreadystatechange = () => {
+        if (xhr.readyState === 4) {
+          resolve(xhr.response);
+        }
+      };
+      xhr.open("GET", uri);
+      xhr.responseType = "blob";
+      xhr.send();
+    }).then(async (response) => {
+      let data = response;
+      await firebase.storage().ref("imag").child(`${dni}`).put(data);
+      setImgUrl(
+        await firebase.storage().ref("imag").child(`${dni}`).getDownloadURL()
+      );
+    });
+  };
+
+  const saveEntrance = async () => {
+    if (name == "" || lastName == "" || dni == "" || destiny == "") {
+      alert("debe completar los campos");
+      
     } else {
+      setSaving(true);
       try {
-        FireMethods.saveName(userId, name);
-        FireMethods.saveLastName(userId, lastName);
-        FireMethods.saveDni(userId, dni);
-        FireMethods.saveDestiny(userId, destiny);
-        Alert.alert("Registro Exitoso")
-        console.log("Registro Exitoso")
+        await upLoadImage(saveImg);
+        console.log("uri:   ", imgUrl);
+        await FireMethods.saveEntrance(
+          name,
+          lastName,
+          dni,
+          destiny,
+          getDate(),
+          "",
+          imgUrl
+        );
+
+        setSaving(false);
+        setSaveSuccess(true);
+        clearInputs();
       } catch (error) {
         console.log(error);
+        setSaving(false);
       }
     }
+  };
+
+  const clearInputs = () => {
+    setName("");
+    setLastName("");
+    setDni("");
+    setDestiny("");
+    setSaveImg("")
+  };
+
+  const savedSuccess = () => {
+    return <Text style={{textAlign:'center', color:"green"}}>Guardado exitoso</Text>;
   };
 
   return (
@@ -169,8 +201,11 @@ export const Entrada2Screen = (props) => {
               shape="flat"
               icon="ios-person"
               style={styles.input}
+              returnKeyType="next"
+              onSubmitEditing={() => lastNameRef.current.focus()}
               onChangeText={(name) => setName(name)}
               value={name}
+              ref={nameRef}
             />
             <Input
               title="Apellido"
@@ -178,8 +213,11 @@ export const Entrada2Screen = (props) => {
               shape="flat"
               icon="ios-person"
               style={styles.input}
+              returnKeyType="next"
+              onSubmitEditing={() => dniRef.current.focus()}
               onChangeText={(lastname) => setLastName(lastname)}
               value={lastName}
+              ref={lastNameRef}
             />
             <Input
               title="DNI"
@@ -187,8 +225,12 @@ export const Entrada2Screen = (props) => {
               shape="flat"
               icon="ios-card"
               style={styles.input}
+              keyBoradType="numeric"
+              returnKeyType="next"
+              onSubmitEditing={() => destinyRef.current.focus()}
               onChangeText={(dni) => setDni(dni)}
               value={dni}
+              ref={dniRef}
             />
             <Input
               title="Destino"
@@ -196,8 +238,11 @@ export const Entrada2Screen = (props) => {
               shape="flat"
               icon="ios-pin"
               style={styles.input}
+              returnKeyType="go"
+              onSubmitEditing={() => saveEntrance()}
               onChangeText={(destiny) => setDestiny(destiny)}
               value={destiny}
+              ref={destinyRef}
             />
 
             <View>
@@ -207,6 +252,8 @@ export const Entrada2Screen = (props) => {
                 onPress={() => saveEntrance()}
               />
             </View>
+            {saving ? splash() : null}
+            {saveSuccess ? savedSuccess() : null}
           </View>
         </View>
       </KeyboardAvoidingView>

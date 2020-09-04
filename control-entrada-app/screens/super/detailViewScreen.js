@@ -19,7 +19,6 @@ import { ProfileComponent } from "../../components/profile.component";
 
 const { width } = Dimensions.get("window");
 const cover = require("../../assets/images/background.jpg");
-const profilePic = require("../../assets/images/female-2.jpg");
 const watchPic = require("../../assets/images/male-2.jpg");
 
 export const DetailViewScreen = (props) => {
@@ -34,9 +33,9 @@ export const DetailViewScreen = (props) => {
   const translateContent1 = new Animated.Value(0);
   const translateContent2 = new Animated.Value(width);
 
-  const animatedOverlay = (tabCoor, tabActive) => {
+  const animatedOverlay = async (tabCoor, tabActive) => {
     //setActiveTab(tabActive)
-    Animated.spring(translateTab, {
+    await Animated.spring(translateTab, {
       toValue: tabCoor,
       duration: 500,
       speed: 12,
@@ -68,7 +67,6 @@ export const DetailViewScreen = (props) => {
           toValue: 0,
           duration: 500,
           speed: 12,
-
           bounciness: 5,
         }).start(),
       ]);
@@ -93,8 +91,14 @@ export const DetailViewScreen = (props) => {
 
   const element1 = (data) => {
     return (
-      <View style={{ justifyContent: "center", alignItems: "center", marginTop:10 }}>
-        <View style={{ width: "75%" }}>
+      <View
+        style={{
+          justifyContent: "center",
+          alignItems: "center",
+          marginTop: 10,
+        }}
+      >
+        <View style={{ width: "95%" }}>
           <View style={styles.dataBox}>
             <Text style={styles.labelText}>DNI:</Text>
             <Text style={styles.dataText}>{data.cedula}</Text>
@@ -105,11 +109,11 @@ export const DetailViewScreen = (props) => {
           </View>
           <View style={styles.dataBox}>
             <Text style={styles.labelText}>Hora de Entrada:</Text>
-            <Text style={styles.dataText}>{data.entrada} am</Text>
+            <Text style={styles.dataText}>{data.hora_entrada}</Text>
           </View>
           <View style={styles.dataBox}>
             <Text style={styles.labelText}>Hora de Salida:</Text>
-            <Text style={styles.dataText}>{data.salida} pm</Text>
+            <Text style={styles.dataText}>{data.hora_salida}</Text>
           </View>
         </View>
       </View>
@@ -120,15 +124,16 @@ export const DetailViewScreen = (props) => {
     return (
       <View
         style={{
+          justifyContent: "center",
           alignItems: "center",
-          marginTop:10
+          marginTop: 10,
         }}
       >
         <View
           style={{
-            width: "75%",
+            width: "90%",
             flexDirection: "row",
-            justifyContent: "center",
+            justifyContent:'space-between',
           }}
         >
           <View>
@@ -173,16 +178,18 @@ export const DetailViewScreen = (props) => {
               }}
             >
               <View style={{ marginBottom: 10 }}>
-                <Image source={data.picture} style={styles.profilePic} />
+                <Image source={{ uri: data.foto }} style={styles.profilePic} />
               </View>
-              <Text style={styles.nameText}>{data.nombre}</Text>
+              <Text style={styles.nameText}>
+                {data.nombre} {data.apellido}
+              </Text>
             </View>
           </View>
         </ImageBackground>
       </View>
 
       {/* -------------TAB BAR----------- */}
-      <View style={{ flex: 1 }}>
+      <View style={{ flex: 1, paddingHorizontal: 5 }}>
         <View style={styles.tabBar}>
           <Animated.View
             style={{
@@ -192,7 +199,7 @@ export const DetailViewScreen = (props) => {
               position: "absolute",
               top: 0,
               left: 0,
-              borderColor: "orange",
+              borderColor: "#ff7e00",
               borderBottomWidth: 2,
               transform: [
                 {
@@ -210,7 +217,7 @@ export const DetailViewScreen = (props) => {
               animatedOverlay(xTabOne, 0);
             }}
           >
-            <Text style={{ color: activeTab === "0" ? "orange" : "grey" }}>
+            <Text style={{ color: activeTab === 0 ? "#ff7e00" : "grey" }}>
               Datos
             </Text>
           </TouchableOpacity>
@@ -223,7 +230,7 @@ export const DetailViewScreen = (props) => {
               animatedOverlay(xTabTwo, 1);
             }}
           >
-            <Text style={{ color: activeTab === "1" ? "orange" : "grey" }}>
+            <Text style={{ color: activeTab === 1 ? "#ff7e00" : "grey" }}>
               Seguridad
             </Text>
           </TouchableOpacity>
@@ -293,6 +300,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     //borderBottomWidth: 1,
     borderColor: "grey",
+    
   },
   tab2: {
     flex: 1,

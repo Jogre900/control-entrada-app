@@ -1,5 +1,6 @@
 Arguments: 
   C:\Program Files\nodejs\node.exe C:\Program Files\Yarn\bin\yarn.js add seqquelize
+  C:\Program Files\nodejs\node.exe C:\Program Files\Yarn\bin\yarn.js add react-native-fetch-blob
 
 PATH: 
   C:\Program Files\Git\mingw32\bin;C:\Program Files\Git\usr\bin;C:\Users\Jose del Corral\bin;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0;C:\WINDOWS\System32\OpenSSH;C:\Go\bin;C:\Program Files\Git\cmd;C:\Program Files\Yarn\bin;C:\Program Files\nodejs;C:\Program Files\TortoiseGit\bin;C:\Users\Jose del Corral\AppData\Local\Microsoft\WindowsApps;C:\Users\Jose del Corral\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\Jose del Corral\go\bin;C:\Users\Jose del Corral\AppData\Local\Yarn\bin;C:\Users\Jose del Corral\AppData\Roaming\npm
@@ -25,6 +26,7 @@ Trace:
       at IncomingMessage.emit (events.js:215:7)
       at endReadableNT (_stream_readable.js:1184:12)
       at processTicksAndRejections (internal/process/task_queues.js:80:21)
+  Error: EPERM: operation not permitted, unlink 'C:\Users\Jose del Corral\Desktop\control-entrada-app\control-entrada-app\node_modules\@babel\compat-data\node_modules\.bin'
 
 npm manifest: 
   {

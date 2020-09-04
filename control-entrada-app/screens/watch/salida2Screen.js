@@ -1,23 +1,13 @@
-import React from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  Animated,
-  Dimensions,
-  TouchableOpacity,
-  ScrollView,
-  ImageBackground,
-  Image,
-  KeyboardAvoidingView,
-  Keyboard,
-} from "react-native";
+import React, {useState, useRef} from "react";
+import { View, Text, StyleSheet, Animated, Dimensions, TouchableOpacity, ScrollView, ImageBackground, Image, KeyboardAvoidingView, Keyboard } from "react-native";
 import { RectButton } from "react-native-gesture-handler";
 import { TopNavigation } from "../../components/TopNavigation.component";
-import { Input } from "../../components/input.component";
+import Input from "../../components/input.component";
 import { MainButton } from "../../components/mainButton.component";
 import { Ionicons } from "@expo/vector-icons";
+import FireMethods from "../../lib/methods.firebase";
 import * as ImagePicker from "expo-image-picker";
+import moment from "moment";
 
 const { width } = Dimensions.get("window");
 const cover = require("../../assets/images/background.jpg");
@@ -25,21 +15,18 @@ const profilePic = require("../../assets/images/female-2.jpg");
 const watchPic = require("../../assets/images/male-2.jpg");
 
 export const Salida2Screen = (props) => {
-  const [activeTab, setActiveTab] = React.useState("0");
-  const [buscar, setBuscar] = React.useState("");
-  const [encontrado, setEncontrado] = React.useState(false);
-  const [horaSalida, setHoraSalida] = React.useState();
+  const [activeTab, setActiveTab] = useState("0");
+  const [buscar, setBuscar] = useState("");
+  const [messageText, setMessageText] = useState("");
+  const [person, setPerson] = useState(null);
+  const [horaSalida, setHoraSalida] = useState();
+
+  const searchRef = useRef()
 
   const getHour = () => {
-    const hour = new Date().getHours();
-    const minute = new Date().getMinutes();
-    let Hour = "";
-    if (hour <= 12) {
-      Hour = `${hour}:${minute} am`;
-    } else {
-      Hour = `${hour}:${minute} pm`;
-    }
-    setHoraSalida(Hour);
+    let hour = moment().format("MMM D, h:mm");
+    setHoraSalida(hour);
+    return hour;
   };
 
   const goBackAction = () => {
@@ -56,9 +43,35 @@ export const Salida2Screen = (props) => {
     );
   };
 
-  const buscarProfile = (id) => {
-    id === "19222907" ? setEncontrado(true) : setEncontrado(false);
+  const buscarProfile = async (id) => {
+    setMessageText("");
+    setPerson(null);
+    let resp;
+    await FireMethods.getDuplicateDni(id, (data) => {
+      resp = data;
+    });
+    console.log("resp", resp);
+
+    if (resp.data != null) {
+      setPerson(resp.data);
+
+    } else {
+      setMessageText(resp.msg);
+    }
     Keyboard.dismiss();
+  };
+
+  const update = () => {
+    console.log("person:  ", person);
+    FireMethods.updateEntrance(person.timeStamp, getHour());
+  };
+
+  const MessageView = (props) => {
+    return (
+      <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+        <Text>{props.message}</Text>
+      </View>
+    );
   };
 
   return (
@@ -66,30 +79,33 @@ export const Salida2Screen = (props) => {
       <TopNavigation title="Salida" leftControl={goBackAction()} />
       <View style={styles.searchBox}>
         <View style={{ width: "70%" }}>
-          <Input
-            title="Buscar por DNI"
-            shape="round"
-            alignText="center"
-            style={{backgroundColor:'white'}}
-            onChangeText={(valor) => setBuscar(valor)}
-            value={buscar}
-          />
+          <Input 
+          title="Buscar por DNI" 
+          shape="round" 
+          alignText="center" 
+          style={{ backgroundColor: "white" }} 
+          retrunKeyType="search"
+          onSubmitEditing={() => buscarProfile()}
+          onChangeText={(valor) => setBuscar(valor)} 
+          value={buscar} />
         </View>
-        <RectButton title="Buscar" onPress={() => buscarProfile(buscar)}>
+        <TouchableOpacity onPress={() => buscarProfile(buscar)}>
           <Ionicons name="ios-search" size={28} color="white" />
-        </RectButton>
+        </TouchableOpacity>
       </View>
-      {encontrado ? (
+      {person != null ? (
         <View style={{ flex: 1 }}>
           <ImageBackground source={cover} style={styles.imgBackground}>
             <View style={styles.cover}>
               <View style={{ justifyContent: "center", alignItems: "center" }}>
                 {/* <Ionicons name="ios-person" size={120} color="#fff" /> */}
                 <View style={{ position: "relative", marginBottom: 10 }}>
-                  <Image source={profilePic} style={styles.profilePic} />
+                  <Image source={{ uri: person.foto }} style={styles.profilePic} />
                 </View>
                 <View style={styles.nameBox}>
-                  <Text style={styles.nameText}>Jose Del Corral</Text>
+                  <Text style={styles.nameText}>
+                    {person.nombre} {person.apellido}
+                  </Text>
                 </View>
               </View>
             </View>
@@ -98,15 +114,15 @@ export const Salida2Screen = (props) => {
             <View style={{ width: "75%" }}>
               <View style={styles.dataBox}>
                 <Text style={styles.labelText}>DNI:</Text>
-                <Text style={styles.dataText}>19222907</Text>
+                <Text style={styles.dataText}>{person.cedula}</Text>
               </View>
               <View style={styles.dataBox}>
                 <Text style={styles.labelText}>Destino:</Text>
-                <Text style={styles.dataText}>Apt 104</Text>
+                <Text style={styles.dataText}>{person.destino}</Text>
               </View>
               <View style={styles.dataBox}>
                 <Text style={styles.labelText}>Hora de Entrada:</Text>
-                <Text style={styles.dataText}>10:00 am</Text>
+                <Text style={styles.dataText}>{person.hora_entrada}</Text>
               </View>
               <View style={styles.dataBox}>
                 <Text style={styles.labelText}>Hora de Salida:</Text>
@@ -116,14 +132,16 @@ export const Salida2Screen = (props) => {
                 <MainButton
                   title="Marcar salida"
                   onPress={() => {
-                    getHour();
+                    update();
                   }}
                 />
               </View>
             </View>
           </View>
         </View>
-      ) : null}
+      ) : (
+        <MessageView message={messageText} />
+      )}
     </View>
   );
 };
