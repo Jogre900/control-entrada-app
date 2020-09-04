@@ -189,6 +189,12 @@ const Methods = {
     // res.json({ msg: user });
   },
   login: async function(req, res) {
+    let RESPONSE = {
+      error: true,
+      msg: "",
+      data: null,
+      tokn: null
+    };
     const { email, password } = req.body;
     console.log(req.body);
     let user = await models.User.findOne({
@@ -203,26 +209,40 @@ const Methods = {
       if (bcrypt.compareSync(password, user.password)) {
         console.log("si paso!!!");
         let token = jwt.sign(user.dataValues, SECRETKEY, { expiresIn: 1440 });
-        res.json({
-          msg: "Inicio Exitoso",
-          tokn: token
-        });
+        RESPONSE.error = false;
+        RESPONSE.msg = "Inicio Exitoso";
+        RESPONSE.tokn = token;
       } else {
-        res.json({ msg: "Usuario no Registrado" });
+        RESPONSE.msg = "Usuario no Registrado";
       }
-    }else {
-      res.json({ msg: "Correo no registrado" });
+    } else {
+      RESPONSE.msg = "Correo no registrado";
     }
+    res.json(RESPONSE);
   },
-  getProfile: async function(req, res){
-    let decode = jwt.verify(req.header['authorization'], SECRETKEY)
-    console.log("decode",decode)
+  getProfile: async function(req, res) {
+    let RESPONSE = {
+      error: true,
+      msg: "",
+      data: null,
+      tokn: null
+    };
+    console.log("llego: ", req.headers.authorization);
+    let decode = jwt.verify(req.headers.authorization, SECRETKEY);
+    console.log("decode", decode);
     let profile = await models.User.findOne({
       where: {
         id: decode.id
       }
-    })
-    if(profile) res.json({profile: user})
+    });
+    if (profile) {
+      RESPONSE.error = false;
+      RESPONSE.data = profile;
+    } else {
+      RESPONSE.msg = "Token no valido";
+    }
+
+    res.json(RESPONSE);
   },
   findUsers: async function(req, res) {
     let user = await models.User.findAll({
