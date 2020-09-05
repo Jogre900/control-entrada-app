@@ -29,8 +29,26 @@ const Methods = {
       res.json(RESPONSE);
     }
   },
+  findCompany: async function(req, res) {
+    let RESPONSE = {
+      error: true,
+      msg: "",
+      data: null,
+      token: null
+    };
+    try {
+      let company = await models.company.findAll();
+      RESPONSE.error = false;
+      RESPONSE.msg = "Busqueda Exitosa";
+      RESPONSE.data = company;
+      res.json(RESPONSE);
+    } catch (error) {
+      RESPONSE.msg = error;
+      res.json(RESPONSE);
+    }
+  },
   createZone: async function(req, res) {
-   let RESPONSE = {
+    let RESPONSE = {
       error: true,
       msg: "",
       data: null,
@@ -43,14 +61,13 @@ const Methods = {
         zone,
         companyId: id
       });
-      RESPONSE.error = false
-      RESPONSE.msg = 'Creacion de Zona Exitasa!'
-      RESPONSE.data = zoneC
-      res.json(RESPONSE);  
+      RESPONSE.error = false;
+      RESPONSE.msg = "Creacion de Zona Exitasa!";
+      RESPONSE.data = zoneC;
+      res.json(RESPONSE);
     } catch (error) {
-      RESPONSE.msg = error
+      RESPONSE.msg = error;
     }
-    
   },
   findZones: async function(req, res) {
     let RESPONSE = {
@@ -62,20 +79,19 @@ const Methods = {
     try {
       let zones = await models.zone.findAll({
         include: [
-          { model: models.company, as: 'companyZone' },
+          { model: models.company, as: "companyZone" },
           { model: models.destination, as: "Destinos" },
           { model: models.userZone, as: "encargado_zona" }
         ]
       });
-      RESPONSE.error = false
-      RESPONSE.msg = 'Busqueda Exitosa!'
-      RESPONSE.data = zones
-      res.json(RESPONSE);  
+      RESPONSE.error = false;
+      RESPONSE.msg = "Busqueda Exitosa!";
+      RESPONSE.data = zones;
+      res.json(RESPONSE);
     } catch (error) {
-      RESPONSE.error = error
-      res.json(RESPONSE)
+      RESPONSE.error = error;
+      res.json(RESPONSE);
     }
-    
   },
   createDestiny: async function(req, res) {
     let RESPONSE = {
@@ -91,15 +107,14 @@ const Methods = {
         name,
         zoneId: id
       });
-      RESPONSE.error = false
-      RESPONSE.msg = 'Creacion de Destino Exitosa!'
-      RESPONSE.data = destiny
-      res.json(RESPONSE);  
+      RESPONSE.error = false;
+      RESPONSE.msg = "Creacion de Destino Exitosa!";
+      RESPONSE.data = destiny;
+      res.json(RESPONSE);
     } catch (error) {
-      RESPONSE.msg = error
-      res.json(RESPONSE)
+      RESPONSE.msg = error;
+      res.json(RESPONSE);
     }
-    
   },
   findDestinyByZone: async function(req, res) {
     let RESPONSE = {
@@ -116,21 +131,21 @@ const Methods = {
         },
         include: [{ model: models.zone, as: "Zone" }]
       });
-      RESPONSE.error = false
-      RESPONSE.msg = 'Busqueda Exitosa!'
-      RESPONSE.data = destinys
-      res.json(RESPONSE);  
+      RESPONSE.error = false;
+      RESPONSE.msg = "Busqueda Exitosa!";
+      RESPONSE.data = destinys;
+      res.json(RESPONSE);
     } catch (error) {
-      RESPONSE.msg = error
+      RESPONSE.msg = error;
     }
   },
   createEmployee: async function(req, res) {
     let RESPONSE = {
       error: true,
-      msg: '',
+      msg: "",
       data: null,
       token: null
-    }
+    };
     const {
       name,
       lasName,
@@ -166,25 +181,24 @@ const Methods = {
         },
         { include: [{ model: models.userZone, as: "Horario" }] }
       );
-      RESPONSE.error = false
-      RESPONSE.msg = 'Creacion de Empleado Exitosa!'
-      RESPONSE.data = employee
-      res.json(RESPONSE);  
+      RESPONSE.error = false;
+      RESPONSE.msg = "Creacion de Empleado Exitosa!";
+      RESPONSE.data = employee;
+      res.json(RESPONSE);
     } catch (error) {
-      RESPONSE.msg = error
-      res.json(RESPONSE)
+      RESPONSE.msg = error;
+      res.json(RESPONSE);
     }
-    
   },
   createUserZone: async function(req, res) {
     let RESPONSE = {
       error: true,
-      msg: '',
+      msg: "",
       data: null,
       token: null
-    }
+    };
     const { assignationDate, changeTurnDate, ZoneId } = req.body;
-    const { id } = req.params
+    const { id } = req.params;
     try {
       let userZone = await models.userZone.create({
         assignationDate,
@@ -192,36 +206,34 @@ const Methods = {
         ZoneId,
         EmployeeId: id
       });
-      RESPONSE.error = false
-      RESPONSE.msg = 'Creacion de UserZone Exitosa!'
-      RESPONSE.data = userZone
-      res.json({ msg: userZone });  
+      RESPONSE.error = false;
+      RESPONSE.msg = "Creacion de UserZone Exitosa!";
+      RESPONSE.data = userZone;
+      res.json({ msg: userZone });
     } catch (error) {
-      RESPONSE.msg = error
-      res.json(RESPONSE)
+      RESPONSE.msg = error;
+      res.json(RESPONSE);
     }
-    
   },
   findEmployees: async function(req, res) {
     let RESPONSE = {
       error: true,
-      msg: '',
+      msg: "",
       data: null,
       token: null
-    }
+    };
     try {
       let employees = await models.employee.findAll({
         include: [{ model: models.userZone, as: "Horario" }]
       });
-      RESPONSE.error = false
-      RESPONSE.msg = 'Busqueda Exitosa!'
-      RESPONSE.data = employees
-      res.json(RESPONSE);  
+      RESPONSE.error = false;
+      RESPONSE.msg = "Busqueda Exitosa!";
+      RESPONSE.data = employees;
+      res.json(RESPONSE);
     } catch (error) {
-       RESPONSE.msg = error 
-       res.json(RESPONSE)
+      RESPONSE.msg = error;
+      res.json(RESPONSE);
     }
-    
   },
   uploadImage: async function(req, res, next) {
     console.log(req.body);
@@ -249,10 +261,10 @@ const Methods = {
   createUser: async function(req, res) {
     let RESPONSE = {
       error: true,
-      msg: '',
+      msg: "",
       data: null,
       token: null
-    }
+    };
     let { name, lastName, dni, email, password } = req.body;
     try {
       let user = await models.User.findOne({
@@ -270,23 +282,22 @@ const Methods = {
           email,
           password
         });
-  
+
         let token = jwt.sign(userR.dataValues, SECRETKEY, { expiresIn: 1440 });
-        RESPONSE.error = false
-        RESPONSE.msg = 'Registro Exitoso!'
-        RESPONSE.data = userR
-        RESPONSE.token = token
+        RESPONSE.error = false;
+        RESPONSE.msg = "Registro Exitoso!";
+        RESPONSE.data = userR;
+        RESPONSE.token = token;
         res.json(RESPONSE);
       } else {
-        RESPONSE.msg = 'Usuario ya Registrado'
-        RESPONSE.data = user
+        RESPONSE.msg = "Usuario ya Registrado";
+        RESPONSE.data = user;
         res.json(RESPONSE);
-      }  
+      }
     } catch (error) {
-      RESPONSE.msg = error
-      res.json(RESPONSE)
+      RESPONSE.msg = error;
+      res.json(RESPONSE);
     }
-    
 
     // let user = await models.User.create({
     //   name: req.body.name,
@@ -330,12 +341,11 @@ const Methods = {
         }
       });
       if (user) {
-        
         if (bcrypt.compareSync(password, user.password)) {
-          
           let token = jwt.sign(user.dataValues, SECRETKEY, { expiresIn: 1440 });
           RESPONSE.error = false;
           RESPONSE.msg = "Inicio Exitoso";
+          RESPONSE.data = user;
           RESPONSE.token = token;
         } else {
           RESPONSE.msg = "Usuario no Registrado";
@@ -343,10 +353,10 @@ const Methods = {
       } else {
         RESPONSE.msg = "Correo no registrado";
       }
-      res.json(RESPONSE);  
+      res.json(RESPONSE);
     } catch (error) {
-      RESPONSE.msg = error
-      res.json(RESPONSE)
+      RESPONSE.msg = error;
+      res.json(RESPONSE);
     }
   },
   getProfile: async function(req, res) {

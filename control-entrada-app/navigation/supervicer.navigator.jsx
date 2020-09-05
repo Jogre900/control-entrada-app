@@ -8,6 +8,7 @@ import firebase from '../lib/firebase'
 //screens
 import { HomeSuperScreen } from "../screens/super/homeSuperScreen";
 import { DetailViewScreen } from "../screens/super/detailViewScreen";
+import {ZonasScreen} from '../screens/super/zonasScreen'
 import { HistorialScreen } from "../screens/super/historialScreen";
 import { PerfilScreen } from '../screens/super/perfilScreen'
 import { NotificationScreen } from '../screens/super/notificationScreen'
@@ -50,6 +51,10 @@ function DrawerBody(props) {
           props.navigation.navigate("historial");
         }}
       />
+      <DrawerItem 
+      label="Zonas"
+      onPress={() => props.navigation.navigate("zonas")}
+      />
       <DrawerItem
         label="Cerrar Sesion"
         onPress={() => {
@@ -87,6 +92,7 @@ export const SuperNavigator = () => {
       <drawer.Screen name="home" component={SupervicerNav} />
       <drawer.Screen name="perfil" component={PerfilScreen} />
       <drawer.Screen name="historial" component={HistorialScreen} />
+      <drawer.Screen name="zonas" component={ZonasScreen}/>
     </drawer.Navigator>
   );
 };

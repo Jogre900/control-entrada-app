@@ -14,16 +14,18 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
 } from "react-native";
+import axios from 'axios'
+import asynStorage from '@react-native-community/async-storage'
 
 //components
 import { MainButton } from "../../components/mainButton.component";
 import Input from "../../components/input.component";
-import Input2 from "../../components/input2";
 import { SplashScreen } from "../../components/splashScreen.component";
 import firebase from "../../lib/firebase";
 //constants
 import { mainColor } from "../../constants/Colors";
 
+const API_PORT = 'http://192.168.10.107:8000'
 const { width, height } = Dimensions.get("window");
 
 const backAction = () => {
@@ -55,15 +57,21 @@ export const LogInScreen = (props) => {
     }, 500);
   };
 
-  const signIn = () => {
-    console.log("email", email);
-    firebase
-      .auth()
-      .signInWithEmailAndPassword(email, pass)
-      .catch((error) => {
-        console.log("error code: ", error.code);
-        console.log("error message: ", error.message);
-      });
+  const storeData = async (value) => {
+    try {
+      await AsyncStorage.setItem('userToken', value)
+    } catch (e) {
+      console.log("Error al Guardar", e)
+    }
+  }
+  const signIn = async () => {
+    // console.log(email, pass) 
+    // let data = await axios.post(`${API_PORT}/api/login`, {email: email, password: pass})
+    // console.log('algo',data.data)
+    // if(data.data.data.privilege === 'Admin') props.navigation.navigate("super")
+    // storeData(data.data.token)
+    props.navigation.navigate("super")
+
   };
 
   const signInStatus = () => {
@@ -92,9 +100,7 @@ export const LogInScreen = (props) => {
     //BackHandler.removeEventListener("hardwareBackPress", backAction);
   }, []);
 
-  useEffect(() => {
-    signInStatus();
-  }, []);
+  
 
   if (isSplash) {
     return <SplashScreen />;
