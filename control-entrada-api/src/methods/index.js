@@ -77,13 +77,15 @@ const Methods = {
       token: null
     };
     try {
-      let zones = await models.zone.findAll({
+       let zones = await models.zone.findAll(
+         {
         include: [
-          { model: models.company, as: "companyZone" },
+          //{ model: models.company, as: "companyZone" },
           { model: models.destination, as: "Destinos" },
           { model: models.userZone, as: "encargado_zona" }
         ]
-      });
+      }
+      );
       RESPONSE.error = false;
       RESPONSE.msg = "Busqueda Exitosa!";
       RESPONSE.data = zones;
