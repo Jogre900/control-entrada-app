@@ -8,12 +8,14 @@ import firebase from '../lib/firebase'
 //screens
 import { HomeSuperScreen } from "../screens/super/homeSuperScreen";
 import { DetailViewScreen } from "../screens/super/detailViewScreen";
-import {ZonasScreen} from '../screens/super/zonasScreen'
+import {ZonasScreen} from '../screens/super/zonesScreen'
+import { ZoneDetailScreen } from '../screens/super/zoneDetailScreen'
 import { DestinyScreen } from '../screens/super/destinyScreen'
 import { HistorialScreen } from "../screens/super/historialScreen";
 import { PerfilScreen } from '../screens/super/perfilScreen'
 import { NotificationScreen } from '../screens/super/notificationScreen'
-
+import { EmployeeScreen } from '../screens/super/employeeScreen'
+import { CreateEmployeScreen } from '../screens/super/createEmployeeScreen'
 const drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
 
@@ -24,6 +26,7 @@ function SupervicerNav() {
       <Stack.Screen name="supervicer-home" component={HomeSuperScreen} />
       <Stack.Screen name="detail-view" component={DetailViewScreen} />
       <Stack.Screen name='notification' component={NotificationScreen}/>
+      <Stack.Screen name='zone_detail' component={ZoneDetailScreen}/>
     </Stack.Navigator>
   );
 }
@@ -50,6 +53,18 @@ function DrawerBody(props) {
         label="Historal"
         onPress={() => {
           props.navigation.navigate("historial");
+        }}
+      />
+      <DrawerItem
+        label="Empleados"
+        onPress={() => {
+          props.navigation.navigate("empleados");
+        }}
+      />
+      <DrawerItem
+        label="Crear Empleado"
+        onPress={() => {
+          props.navigation.navigate("crear_empleado");
         }}
       />
       <DrawerItem 
@@ -97,6 +112,8 @@ export const SuperNavigator = () => {
       <drawer.Screen name="home" component={SupervicerNav} />
       <drawer.Screen name="perfil" component={PerfilScreen} />
       <drawer.Screen name="historial" component={HistorialScreen} />
+      <drawer.Screen name="crear_empleado" component={CreateEmployeScreen}/>
+      <drawer.Screen name="empleados" component={EmployeeScreen}/>
       <drawer.Screen name="zonas" component={ZonasScreen}/>
       <drawer.Screen name="destinos" component={DestinyScreen}/>
     </drawer.Navigator>

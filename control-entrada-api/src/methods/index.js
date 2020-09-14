@@ -150,7 +150,7 @@ const Methods = {
     };
     const {
       name,
-      lasName,
+      lastName,
       dni,
       picture,
       status,
@@ -162,7 +162,7 @@ const Methods = {
     } = req.body;
     let employeeData = {
       name,
-      lasName,
+      lastName,
       dni,
       picture,
       status,

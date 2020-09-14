@@ -8,63 +8,65 @@ import {
   Dimensions,
 } from "react-native";
 import { Picker } from "@react-native-community/picker";
-//import RNPickerSelect from 'react-native-picker-select'
 
 import axios from "axios";
-import {API_PORT} from "../../config/index.js";
+import { API_PORT } from "../../config/index.js";
 import Input from "../../components/input.component";
-import {TopNavigation} from "../../components/TopNavigation.component";
+import { TopNavigation } from "../../components/TopNavigation.component";
 import { MainButton } from "../../components/mainButton.component";
 import { Ionicons } from "@expo/vector-icons";
 
-const DEVICE_WIDTH = Dimensions.get("screen").width;
+const DEVICE_WIDTH = Dimensions.get("window").width;
 
-const goBackAction = () => {
-  return (
-    <View>
-      <TouchableHighlight
-        onPress={() => {
-          props.navigation.goBack();
-        }}
-      >
-        <Ionicons name="ios-arrow-back" size={28} color="white" />
-      </TouchableHighlight>
-    </View>
-  );
-};
-
-export const DestinyScreen = () => {
+export const DestinyScreen = (props) => {
   const [zones, setZones] = useState([]);
   const [zoneId, setZoneId] = useState("");
   const [create, setCreate] = useState(false);
   const [destinys, setDestinys] = useState([]);
   const [destinyName, setDestinyName] = useState();
 
+  const goBackAction = () => {
+    return (
+      <View>
+        <TouchableHighlight
+          onPress={() => {
+            props.navigation.goBack();
+          }}
+        >
+          <Ionicons name="ios-arrow-back" size={28} color="white" />
+        </TouchableHighlight>
+      </View>
+    );
+  };
+
   const requestZone = async () => {
     let res = await axios.get(`${API_PORT()}/api/findZones`);
+    //console.log("zones: ", res.data.data)
     setZones(res.data.data);
   };
   const requestDestiny = async () => {
-    let res = await axios.get(`${API_PORT()}/api/findDestiny/`);
+    let res = await axios.get(`${API_PORT()}/api/findDestiny/${zoneId}`);
     setDestinys(res.data.data);
   };
 
-  const renderItem = ({ item }) => (
-    <View style={styles.destiny}>
-      <Text>{item.name}</Text>
-      <Ionicons name="md-pin" size={28} color="grey" />
-    </View>
-  );
+  const renderItem = ({ item }) => {
+    
+    return (
+      <View style={styles.destiny}>
+        <Text>{item.name}</Text>
+        <Ionicons name="md-pin" size={28} color="grey" />
+      </View>
+    );
+  };
 
   const createDestiny = async () => {
     setCreate(false);
     try {
-      let res = axios.post(`${API_PORT()}/api/createDestiny/${zoneId}`, {
+      let res = await axios.post(`${API_PORT()}/api/createDestiny/${zoneId}`, {
         name: destinyName,
       });
       if (res) {
         setCreate(true);
-        console.log(res.data);
       }
     } catch (error) {
       console.log("error: ", error);
@@ -75,38 +77,36 @@ export const DestinyScreen = () => {
   }, []);
   useEffect(() => {
     requestDestiny();
-  }, [create]);
+  }, [zoneId, create]);
 
   return (
     <View>
       <TopNavigation title="Destinos" leftControl={goBackAction()} />
       <View>
-      {/* <RNPickerSelect
-            onValueChange={(value) => console.log(value)}
-            items={[
-                { label: 'Football', value: 'football' },
-                { label: 'Baseball', value: 'baseball' },
-                { label: 'Hockey', value: 'hockey' },
-            ]}
-        /> */}
+       <Text>Selecione la Zona:</Text>
         {zones && (
           <Picker
-            //mode="dropdown"
-            //selectedValue={zoneId}
+            mode="dropdown"
+            selectedValue={zoneId}
             onValueChange={(value) => {
               setZoneId(value);
             }}
           >
             {zones.map((item, index) => {
-              return (
-                <Picker.Item label={item.name} value={item.id} key={index} />
-              );
+              return <Picker.Item label={item.zone} value={item.id} key={index}/>;
             })}
           </Picker>
         )}
       </View>
       <View>
-        <FlatList data={destinys} RenderItem={renderItem} numColumns={3} />
+        <Text>Destinos</Text>
+        {destinys && (
+          <FlatList
+            data={destinys}
+            renderItem={renderItem}
+            numColumns={3}
+          />
+        )}
       </View>
       <View>
         <Text>Crear Destino</Text>

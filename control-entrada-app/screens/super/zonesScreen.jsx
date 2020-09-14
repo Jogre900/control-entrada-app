@@ -11,13 +11,14 @@ import {
 //import  {Picker} from '@react-native-community/picker'
 import axios from "axios";
 import { Ionicons } from "@expo/vector-icons";
+import { Picker } from "@react-native-community/picker";
 //import SelectBox from 'react-native-multi-selectbox'
 //import RNPickerSelect from 'react-native-picker-select';
 
 //componentes
 import { API_PORT } from "../../config/index.js";
-import { TopNavigation } from "../../components/TopNavigation.component.js";
-import Input from "../../components/input.component.js";
+import { TopNavigation } from "../../components/TopNavigation.component.jsx";
+import Input from "../../components/input.component.jsx";
 import { MainButton } from "../../components/mainButton.component";
 
 const DEVICE_WIDTH = Dimensions.get("window").width;
@@ -29,7 +30,7 @@ export const ZonasScreen = (props) => {
   const [horaSalida, setHoraSalida] = useState(null);
   const [create, setCreate] = useState(false);
   const [company, setCompany] = useState([]);
-  const [id, setid] = useState("27c4c838-1d59-4125-8459-c62a0a28e634");
+  const [companyId, setCompanyId] = useState(null);
 
   const goBackAction = () => {
     return (
@@ -46,18 +47,18 @@ export const ZonasScreen = (props) => {
   };
 
   const requestCompany = async () => {
-    let res = await axios.get(`${API_PORT()}/api/findCompany`);
-    let company = res.data.data;
-    let result = company.map((el, i) => {
-      return [el.id, el.name];
-    });
-    //console.log(result);
+    try {
+      let res = await axios.get(`${API_PORT()}/api/findCompany`);
+      if (res) setCompany(res.data.data);
+    } catch (error) {
+      console.log("error: ", error);
+    }
   };
 
   const createZone = async () => {
     setCreate(false);
     if (zoneName) {
-      let res = await axios.post(`${API_PORT()}/api/createZone/${id}`, {
+      let res = await axios.post(`${API_PORT()}/api/createZone/${companyId}`, {
         zone: zoneName,
       });
       if (res) setCreate(true);
@@ -74,10 +75,13 @@ export const ZonasScreen = (props) => {
 
   const renderItem = ({ item }) => {
     return (
-      <View style={styles.zones}>
+      <TouchableHighlight onPress={() => props.navigation.navigate("zone_detail", {id: item.id, zone: item.zone})} 
+      style={styles.zones}>
+        <View>
         <Text>{item.zone}</Text>
         <Ionicons name="md-pin" size={28} color="grey" />
-      </View>
+        </View>
+      </TouchableHighlight>
     );
   };
   useEffect(() => {
@@ -90,19 +94,31 @@ export const ZonasScreen = (props) => {
     <View>
       <TopNavigation title="Zonas" leftControl={goBackAction()} />
       <View>
-        <View style={{ flexDirection: "row", maxWidth: 360 }}>
+        <View>
+          {/* //company box */}
+          <Text>Selecione Empresa:</Text>
           {
-            
-            zone && (
-              <FlatList
-                //style={{backgroundColor: 'blue'}}
-                data={zone}
-                renderItem={renderItem}
-                numColumns={3}
-              />
-            )
-            
+            company &&
+            <Picker
+            mode="dropdown"
+            selectedValue={companyId}
+            onValueChange={(id) => setCompanyId(id)}
+            >
+            {company.map((item) => (
+              <Picker.Item label={item.name} value={item.value} key={item.id}/>
+            ))}
+            </Picker>
           }
+        </View>
+        <View>
+        <Text>Zonas:</Text>
+          {zone && (
+            <FlatList
+              data={zone}
+              renderItem={renderItem}
+              numColumns={3}
+            />
+          )}
         </View>
         <Text>Crear Zona</Text>
 
@@ -165,6 +181,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     margin: 0.5,
     padding: 10,
-    minWidth: Math.floor(DEVICE_WIDTH / 3)
+    minWidth: Math.floor(DEVICE_WIDTH / 3),
   },
 });
