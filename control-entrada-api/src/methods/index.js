@@ -267,14 +267,21 @@ const Methods = {
       data: null,
       token: null
     };
-    let { name, lastName, dni, email, password } = req.body;
+    console.log(req.body)
+    console.log(req.params)
+    let { name, lastName, dni, email, password, picture, privilege, assignationDate, changeTurnDate } = req.body;
+    const { id } = req.params
     try {
       let user = await models.User.findOne({
         where: {
-          email: req.body.email
+          email
         }
       });
-      if (!user) {
+      console.log("user",user)
+      if (user == null) {
+        try {
+          //console.log("es null")
+          //console.log(password)
         let hash = await bcrypt.hash(password, 10);
         password = hash;
         let userR = await models.User.create({
@@ -282,16 +289,30 @@ const Methods = {
           lastName,
           dni,
           email,
-          password
+          password,
+          picture, 
+          privilege,
+          userZone: {
+            assignationDate, 
+            changeTurnDate,
+            ZoneId: id
+          }
+        }, {
+          include: [{model: models.userZone, as: 'userZone'}]
         });
+        //console.log(userR)
 
-        let token = jwt.sign(userR.dataValues, SECRETKEY, { expiresIn: 1440 });
+        //let token = jwt.sign(userR.dataValues, SECRETKEY, { expiresIn: 1440 });
         RESPONSE.error = false;
         RESPONSE.msg = "Registro Exitoso!";
         RESPONSE.data = userR;
-        RESPONSE.token = token;
+        //RESPONSE.token = token;
         res.json(RESPONSE);
+        } catch (error) {
+          console.log(error)
+        }
       } else {
+        RESPONSE.error = true
         RESPONSE.msg = "Usuario ya Registrado";
         RESPONSE.data = user;
         res.json(RESPONSE);

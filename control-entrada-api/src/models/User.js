@@ -43,11 +43,15 @@ export default (sequelize, { BOOLEAN, STRING, UUID, UUIDV4, ENUM }) => {
         allowNull: false,
         defaultValue: makeid(4)
       },
+      picture: {
+        type: STRING,
+        allowNull: false
+      },
       privilege: {
-        type: ENUM,
+        type: STRING,
         allowNull: false,
-        values: ["Admin", "Supervisor", "Watchmen"],
-        defaultValue: "Admin"
+        // values: ["Admin", "Supervisor", "Watchmen"],
+        // defaultValue: "Admin"
       },
       active: {
         type: BOOLEAN,

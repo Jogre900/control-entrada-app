@@ -30,7 +30,7 @@ export const ZonasScreen = (props) => {
   const [horaSalida, setHoraSalida] = useState(null);
   const [create, setCreate] = useState(false);
   const [company, setCompany] = useState([]);
-  const [companyId, setCompanyId] = useState(null);
+  const [companyId, setCompanyId] = useState("");
 
   const goBackAction = () => {
     return (
@@ -49,6 +49,7 @@ export const ZonasScreen = (props) => {
   const requestCompany = async () => {
     try {
       let res = await axios.get(`${API_PORT()}/api/findCompany`);
+      console.log("res.data: ", res.data)
       if (res) setCompany(res.data.data);
     } catch (error) {
       console.log("error: ", error);
@@ -57,6 +58,7 @@ export const ZonasScreen = (props) => {
 
   const createZone = async () => {
     setCreate(false);
+    
     if (zoneName) {
       let res = await axios.post(`${API_PORT()}/api/createZone/${companyId}`, {
         zone: zoneName,
@@ -67,9 +69,7 @@ export const ZonasScreen = (props) => {
   };
 
   const requestZone = async () => {
-    let res = await axios.get(`${API_PORT()}/api/findZones`, null);
-    //console.log("find Zone:", res.data.data)
-    console.log(DEVICE_WIDTH);
+    let res = await axios.get(`${API_PORT()}/api/findZones`);
     setZone(res.data.data);
   };
 
@@ -105,7 +105,7 @@ export const ZonasScreen = (props) => {
             onValueChange={(id) => setCompanyId(id)}
             >
             {company.map((item) => (
-              <Picker.Item label={item.name} value={item.value} key={item.id}/>
+              <Picker.Item label={item.name} value={item.id} key={item.id}/>
             ))}
             </Picker>
           }

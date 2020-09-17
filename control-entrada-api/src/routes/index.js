@@ -29,7 +29,7 @@ const storage = multer.diskStorage({
 const router = Router()
 
     
-    router.post("/createUser", Methods.createUser)
+    router.post("/createUser/:id?", Methods.createUser)
     router.post("/login", Methods.login)
     router.get("/findUsers", Methods.findUsers)
     router.post("/createCompany", Methods.createCompany)
