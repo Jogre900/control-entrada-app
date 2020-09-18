@@ -271,6 +271,7 @@ const Methods = {
     console.log(req.params)
     let { name, lastName, dni, email, password, picture, privilege, assignationDate, changeTurnDate } = req.body;
     const { id } = req.params
+    console.log(req.file)
     try {
       let user = await models.User.findOne({
         where: {

@@ -574,3 +574,19 @@
 [0917/112311.057:ERROR:crash_report_database_win.cc(469)] failed to stat report
 [0917/112311.057:ERROR:crash_report_database_win.cc(469)] failed to stat report
 [0917/112311.057:ERROR:crash_report_database_win.cc(469)] failed to stat report
+[0917/113300.670:ERROR:process_reader_win.cc(123)] NtOpenThread: {Acceso denegado} Un proceso ha solicitado acceso a un objeto, pero no se le han concedido esos derechos de acceso. (0xc0000022)
+[0917/113300.698:ERROR:exception_snapshot_win.cc(99)] thread ID 6780 not found in process
+[0918/024055.125:ERROR:crash_report_database_win.cc(469)] failed to stat report
+[0918/024055.135:ERROR:crash_report_database_win.cc(469)] failed to stat report
+[0918/024055.135:ERROR:crash_report_database_win.cc(469)] failed to stat report
+[0918/024055.135:ERROR:crash_report_database_win.cc(469)] failed to stat report
+[0918/024055.135:ERROR:crash_report_database_win.cc(469)] failed to stat report
+[0918/024055.135:ERROR:crash_report_database_win.cc(469)] failed to stat report
+[0918/024055.135:ERROR:crash_report_database_win.cc(469)] failed to stat report
+[0918/024055.135:ERROR:crash_report_database_win.cc(469)] failed to stat report
+[0918/024055.136:ERROR:crash_report_database_win.cc(469)] failed to stat report
+[0918/024055.136:ERROR:crash_report_database_win.cc(469)] failed to stat report
+[0918/024055.136:ERROR:crash_report_database_win.cc(469)] failed to stat report
+[0918/024055.136:ERROR:crash_report_database_win.cc(469)] failed to stat report
+[0918/024055.136:ERROR:crash_report_database_win.cc(469)] failed to stat report
+[0918/024055.136:ERROR:crash_report_database_win.cc(469)] failed to stat report
