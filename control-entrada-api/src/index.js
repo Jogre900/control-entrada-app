@@ -54,7 +54,8 @@ import models from "@models";
 const app = express();
 
 //Public static
-app.use(express.static(path.join(__dirname, "../public")));
+//app.use(express.static(path.join(__dirname, "../public")));
+app.use(express.static("../public/imgs"));
 
 //Middlewares
 app.use(

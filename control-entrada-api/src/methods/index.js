@@ -77,15 +77,13 @@ const Methods = {
       token: null
     };
     try {
-       let zones = await models.zone.findAll(
-         {
+      let zones = await models.zone.findAll({
         include: [
           //{ model: models.company, as: "companyZone" },
           { model: models.destination, as: "Destinos" },
           { model: models.userZone, as: "encargado_zona" }
         ]
-      }
-      );
+      });
       RESPONSE.error = false;
       RESPONSE.msg = "Busqueda Exitosa!";
       RESPONSE.data = zones;
@@ -267,53 +265,66 @@ const Methods = {
       data: null,
       token: null
     };
-    console.log(req.body)
-    console.log(req.params)
-    let { name, lastName, dni, email, password, picture, privilege, assignationDate, changeTurnDate } = req.body;
-    const { id } = req.params
-    console.log(req.file)
+    console.log(req.body);
+    console.log(req.params);
+    let {
+      name,
+      lastName,
+      dni,
+      email,
+      password,
+      picture,
+      privilege,
+      assignationDate,
+      changeTurnDate
+    } = req.body;
+    const { id } = req.params;
+    console.log(req.file);
     try {
       let user = await models.User.findOne({
         where: {
           email
         }
       });
-      console.log("user",user)
+      console.log("user", user);
       if (user == null) {
         try {
           //console.log("es null")
           //console.log(password)
-        let hash = await bcrypt.hash(password, 10);
-        password = hash;
-        let userR = await models.User.create({
-          name,
-          lastName,
-          dni,
-          email,
-          password,
-          picture, 
-          privilege,
-          userZone: {
-            assignationDate, 
-            changeTurnDate,
-            ZoneId: id
-          }
-        }, {
-          include: [{model: models.userZone, as: 'userZone'}]
-        });
-        //console.log(userR)
+          let hash = await bcrypt.hash(password, 10);
+          password = hash;
+          let userR = await models.User.create(
+            {
+              name,
+              lastName,
+              dni,
+              email,
+              password,
+              picture,
+              privilege,
+              userZone: {
+                assignationDate,
+                changeTurnDate,
+                ZoneId: id
+              }
+            },
+            {
+              include: [{ model: models.userZone, as: "userZone" }]
+            }
+          );
+          //console.log(userR)
 
-        //let token = jwt.sign(userR.dataValues, SECRETKEY, { expiresIn: 1440 });
-        RESPONSE.error = false;
-        RESPONSE.msg = "Registro Exitoso!";
-        RESPONSE.data = userR;
-        //RESPONSE.token = token;
-        res.json(RESPONSE);
+          //let token = jwt.sign(userR.dataValues, SECRETKEY, { expiresIn: 1440 });
+          RESPONSE.error = false;
+          RESPONSE.msg = "Registro Exitoso!";
+          RESPONSE.data = userR;
+          //RESPONSE.token = token;
+          res.json(RESPONSE);
         } catch (error) {
-          console.log(error)
+          console.log(error);
         }
       } else {
-        RESPONSE.error = true
+        RESPONSE.error = true;
         RESPONSE.msg = "Usuario ya Registrado";
         RESPONSE.data = user;
         res.json(RESPONSE);

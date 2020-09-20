@@ -195,10 +195,7 @@ export const CreateEmployeScreen = (props) => {
     }
   };
 
-  const uploadImage = async (picture) => {
-    let data = await fetch(picture);
-    console.log("Test", JSON.stringify(data.headers));
-  };
+  
 
   useEffect(() => {
     requestZone();
@@ -278,7 +275,7 @@ export const CreateEmployeScreen = (props) => {
             onValueChange={(value) => setPrivilege(value)}
           >
             {rol.map((item, i) => (
-              <Picker.Item label={item.rol} value={item.rol} />
+              <Picker.Item label={item.rol} value={item.rol} key={i}/>
             ))}
           </Picker>
           {

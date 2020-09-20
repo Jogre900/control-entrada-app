@@ -5,6 +5,10 @@ import {
   StyleSheet,
   TouchableHighlight,
   FlatList,
+  Image,
+  RefreshControl,
+  ScrollView,
+  Alert
 } from "react-native";
 
 import axios from "axios";
@@ -13,9 +17,25 @@ import Input from "../../components/input.component";
 import { TopNavigation } from "../../components/TopNavigation.component";
 import { MainButton } from "../../components/mainButton.component";
 import { Ionicons } from "@expo/vector-icons";
+import Constants from "expo-constants";
 
 export const EmployeeScreen = (props) => {
   const [employee, setEmployee] = useState([]);
+  const [refreshing, setRefreshing] = React.useState(false);
+
+  const wait = (timeout) => {
+    return new Promise((resolve) => {
+      setTimeout(resolve, timeout);
+    });
+  };
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+
+    wait(3000)
+      .then(() => setRefreshing(false));
+  }, []);
+
   const goBackAction = () => {
     return (
       <View>
@@ -31,17 +51,29 @@ export const EmployeeScreen = (props) => {
   };
   const requestEmployee = async () => {
     try {
-      let res = await axios.get(`${API_PORT()}/api/findEmployee`);
+      let res = await axios.get(`${API_PORT()}/api/findUsers`);
       if (res) setEmployee(res.data.data);
     } catch (error) {
       console.log("error: ", error);
     }
   };
-  const renderEmplyee = ({item}) => (
+  const renderEmplyee = ({ item }) => {
+    console.log(item);
+    return (
       <View>
-          <Text>{item.name}</Text>
+        <Text>Nombre: {item.name}</Text>
+        <Text>Apellido: {item.lastName}</Text>
+        <Text>DNI: {item.dni}</Text>
+        <Text>Correo: {item.email}</Text>
+        <Text>Fecha: {item.assignationDate}</Text>
+        <Text>Foto: {item.picture}</Text>
+        <Image
+          source={API_PORT() + "/public/imgs/" + item.picture}
+          style={{ width: "100%", height: 120 }}
+        />
       </View>
-  )
+    );
+  };
 
   useEffect(() => {
     requestEmployee();
@@ -49,13 +81,32 @@ export const EmployeeScreen = (props) => {
   return (
     <View>
       <TopNavigation title="Empleados" leftControl={goBackAction()} />
+      <ScrollView
+        contentContainerStyle={styles.scrollView}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['red', 'blue', 'green']}/>
+        }
+      >
+
         <Text>Lista de Empleados:</Text>
         <FlatList
             data={employee}
             renderItem={renderEmplyee}
         />
+      </ScrollView>
     </View>
   );
 };
 
-const styles = StyleSheet.create();
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    marginTop: Constants.statusBarHeight,
+  },
+  scrollView: {
+    flex: 1,
+    backgroundColor: "pink",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+});
