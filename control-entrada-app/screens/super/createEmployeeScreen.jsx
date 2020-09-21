@@ -91,11 +91,11 @@ export const CreateEmployeScreen = (props) => {
     data.append("file", { uri: image, name: fileName, type: fileType });
     data.append("name", name);
     data.append("lastName", lastName);
-    data.append("dni",dni);
-    data.append("email",email);
-    data.append("picture", fileName)
-    data.append("password", "12345" );
-    data.append("privilege",privilege);
+    data.append("dni", dni);
+    data.append("email", email);
+    data.append("picture", fileName);
+    data.append("password", "12345");
+    data.append("privilege", privilege);
     data.append("assignationDate", date.toString());
     data.append("changeTurnDate", changeTurn.toString());
     // let data = {
@@ -110,7 +110,7 @@ export const CreateEmployeScreen = (props) => {
     //   changeTurnDate: changeTurn,
     // };
     console.log("zine Id:", zoneId);
-    console.log(data)
+    console.log(data);
     try {
       let res = await axios.post(
         `${API_PORT()}/api/createUser/${zoneId}`,
@@ -142,66 +142,50 @@ export const CreateEmployeScreen = (props) => {
     }
   };
 
-  const galeryImage = async () => {
-    try {
-      let result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.All,
-        allowsEditing: false,
-        aspect: [4, 3],
-        quality: 1,
-      });
-      if (!result.cancelled) {
-        setImage(result.uri);
-        let filename = result.uri.split("/").pop();
-        setFileName(filename);
-        // Infer the type of the image
-        let match = /\.(\w+)$/.exec(filename);
-        let type = match ? `image/${match[1]}` : `image`;
-        setFileType(type);
-        console.log("fileName: ", fileName);
-        console.log("file type: ", fileType);
-
-        //uploadImage(result.uri)
+  const getImage = async (type) => {
+    const options = {
+      allowsEditing: false,
+      aspect: [4, 3],
+      quality: 1,
+    };
+    if (type === "galery") {
+      try {
+        var result = await ImagePicker.launchImageLibraryAsync({
+          mediaTypes: ImagePicker.MediaTypeOptions.All,
+          ...options,
+        });
+      } catch (error) {
+        console.log(error);
       }
-      //console.log(result);
-    } catch (E) {
-      console.log(E);
+    } else {
+      try {
+        var result = await ImagePicker.launchCameraAsync({
+          mediaTypes: ImagePicker.MediaTypeOptions.Images,
+          ...options,
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    }
+
+    if (!result.cancelled) {
+      setImage(result.uri);
+      let filename = result.uri.split("/").pop();
+      setFileName(filename);
+      // Infer the type of the image
+      let match = /\.(\w+)$/.exec(filename);
+      let type = match ? `image/${match[1]}` : `image`;
+      setFileType(type);
+      console.log("fileName: ", fileName);
+      console.log("file type: ", fileType);
     }
   };
-
-  const cameraImage = async () => {
-    try {
-      let result = await ImagePicker.launchCameraAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: false,
-        aspect: [4, 3],
-        quality: 1,
-      });
-      if (!result.cancelled) {
-        setImage(result.uri);
-        let filename = result.uri.split("/").pop();
-
-        // Infer the type of the image
-        let match = /\.(\w+)$/.exec(filename);
-        let type = match ? `image/${match[1]}` : `image`;
-        console.log("fileName: ", filename);
-        console.log("file type: ", type);
-        console.log("fileName: ", filename);
-        //uploadImage(result.uri)
-      }
-      console.log(result);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  
 
   useEffect(() => {
     requestZone();
   }, []);
   return (
-    <View style={{flex:1}}>
+    <View style={{ flex: 1 }}>
       <TopNavigation title="Crear Empleado" leftControl={goBackAction()} />
       <ScrollView>
         <View>
@@ -266,8 +250,8 @@ export const CreateEmployeScreen = (props) => {
                 />
               </View>
             )}
-            <Button title="Galeria" onPress={() => galeryImage()} />
-            <Button title="Camara" onPress={() => cameraImage()} />
+            <Button title="Galeria" onPress={() => getImage("galery")} />
+            <Button title="Camara" onPress={() => getImage("camera")} />
           </View>
           <Picker
             mode="dropdown"
@@ -275,7 +259,7 @@ export const CreateEmployeScreen = (props) => {
             onValueChange={(value) => setPrivilege(value)}
           >
             {rol.map((item, i) => (
-              <Picker.Item label={item.rol} value={item.rol} key={i}/>
+              <Picker.Item label={item.rol} value={item.rol} key={i} />
             ))}
           </Picker>
           {

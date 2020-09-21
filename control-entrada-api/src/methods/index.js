@@ -81,7 +81,11 @@ const Methods = {
         include: [
           //{ model: models.company, as: "companyZone" },
           { model: models.destination, as: "Destinos" },
-          { model: models.userZone, as: "encargado_zona" }
+          {
+            model: models.userZone,
+            as: "encargado_zona",
+            include: [models.User]
+          }
         ]
       });
       RESPONSE.error = false;
@@ -435,7 +439,8 @@ const Methods = {
             model: models.NotificationRead,
             as: "notificationUsers",
             include: { model: models.Notification, as: "notification" }
-          }
+          },
+          { model: models.userZone, as: "userZone" }
         ]
       });
       (RESPONSE.error = false), (RESPONSE.msg = "Busqueda Exitosa");

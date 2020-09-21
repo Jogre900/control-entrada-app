@@ -6,6 +6,8 @@ import {
   FlatList,
   TouchableHighlight,
   Dimensions,
+  ActivityIndicator,
+  Alert,
 } from "react-native";
 import { Picker } from "@react-native-community/picker";
 
@@ -20,10 +22,14 @@ const DEVICE_WIDTH = Dimensions.get("window").width;
 
 export const DestinyScreen = (props) => {
   const [zones, setZones] = useState([]);
-  const [zoneId, setZoneId] = useState("");
+  const [zoneId, setZoneId] = useState();
   const [create, setCreate] = useState(false);
   const [destinys, setDestinys] = useState([]);
+  const [notFound, setNotFound] = useState(false);
   const [destinyName, setDestinyName] = useState();
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [succes, setSuccess] = useState(false);
 
   const goBackAction = () => {
     return (
@@ -39,18 +45,50 @@ export const DestinyScreen = (props) => {
     );
   };
 
+  //LOADING
+  const Splash = () => {
+    return (
+      <View>
+        <ActivityIndicator size="large" color="#ff7e00" />
+      </View>
+    );
+  };
+
+  //REGISTRO
+  const saveSuccess = () => {
+    Alert.alert("Registro Exitoso!");
+    setSuccess(false);
+  };
+
   const requestZone = async () => {
-    let res = await axios.get(`${API_PORT()}/api/findZones`);
-    //console.log("zones: ", res.data.data)
-    setZones(res.data.data);
+    setLoading(true);
+    setNotFound(false)
+    try {
+      let res = await axios.get(`${API_PORT()}/api/findZones`);
+      if (res) {
+        setZones(res.data.data);
+        setLoading(false);
+      }
+    } catch (error) {
+      console.log("error: ", error);
+    }
   };
   const requestDestiny = async () => {
-    let res = await axios.get(`${API_PORT()}/api/findDestiny/${zoneId}`);
-    setDestinys(res.data.data);
+    try {
+      let res = await axios.get(`${API_PORT()}/api/findDestiny/${zoneId}`);
+      if (res.data.data.length >= 1) {
+        setDestinys(res.data.data);
+        setNotFound(false);
+      } else {
+        setNotFound(true);
+        setDestinys([]);
+      }
+    } catch (error) {
+      console.log("error: ", error);
+    }
   };
 
   const renderItem = ({ item }) => {
-    
     return (
       <View style={styles.destiny}>
         <Text>{item.name}</Text>
@@ -60,13 +98,18 @@ export const DestinyScreen = (props) => {
   };
 
   const createDestiny = async () => {
+    setSaving(true);
     setCreate(false);
+    setSuccess(false);
     try {
       let res = await axios.post(`${API_PORT()}/api/createDestiny/${zoneId}`, {
         name: destinyName,
       });
       if (res) {
         setCreate(true);
+        setDestinyName("");
+        setSaving(false);
+        setSuccess(true);
       }
     } catch (error) {
       console.log("error: ", error);
@@ -83,30 +126,41 @@ export const DestinyScreen = (props) => {
     <View>
       <TopNavigation title="Destinos" leftControl={goBackAction()} />
       <View>
-       <Text>Selecione la Zona:</Text>
-        {zones && (
-          <Picker
-            mode="dropdown"
-            selectedValue={zoneId}
-            onValueChange={(value) => {
-              setZoneId(value);
-            }}
-          >
-            {zones.map((item, index) => {
-              return <Picker.Item label={item.zone} value={item.id} key={index}/>;
-            })}
-          </Picker>
+        <Text>Selecione la Zona:</Text>
+        {loading ? (
+          <Splash />
+        ) : (
+          zones && (
+            <Picker
+              mode="dropdown"
+              selectedValue={zoneId}
+              onValueChange={(value) => {
+                setZoneId(value);
+              }}
+            >
+              {zones.map((item, index) => {
+                return (
+                  <Picker.Item label={item.zone} value={item.id} key={index} />
+                );
+              })}
+            </Picker>
+          )
         )}
       </View>
       <View>
+            <Text>zone id: {zoneId}</Text>
         <Text>Destinos</Text>
         {destinys && (
-          <FlatList
-            data={destinys}
-            renderItem={renderItem}
-            numColumns={3}
-          />
-        )}
+          <FlatList data={destinys} renderItem={renderItem} numColumns={3} />
+        )  
+          
+        }
+        {
+          notFound &&
+          <View>
+            <Text>No hay Destinos disponibles</Text>
+          </View>
+        }
       </View>
       <View>
         <Text>Crear Destino</Text>
@@ -130,6 +184,10 @@ export const DestinyScreen = (props) => {
             createDestiny();
           }}
         />
+        <View>
+          {saving ? <Splash /> : null}
+          {succes && saveSuccess()}
+        </View>
       </View>
     </View>
   );

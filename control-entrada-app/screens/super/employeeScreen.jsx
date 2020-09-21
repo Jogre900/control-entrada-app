@@ -8,7 +8,8 @@ import {
   Image,
   RefreshControl,
   ScrollView,
-  Alert
+  Alert,
+  ActivityIndicator,
 } from "react-native";
 
 import axios from "axios";
@@ -21,8 +22,10 @@ import Constants from "expo-constants";
 
 export const EmployeeScreen = (props) => {
   const [employee, setEmployee] = useState([]);
-  const [refreshing, setRefreshing] = React.useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const [loading, setLoading] = useState(false);
 
+  //REFRESH CONTROL
   const wait = (timeout) => {
     return new Promise((resolve) => {
       setTimeout(resolve, timeout);
@@ -32,10 +35,17 @@ export const EmployeeScreen = (props) => {
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
 
-    wait(3000)
-      .then(() => setRefreshing(false));
+    wait(3000).then(() => setRefreshing(false));
   }, []);
 
+  //LOADING
+  const splash = () => {
+    return (
+      <View>
+        <ActivityIndicator size="large" color="#ff7e00" />
+      </View>
+    );
+  };
   const goBackAction = () => {
     return (
       <View>
@@ -50,9 +60,13 @@ export const EmployeeScreen = (props) => {
     );
   };
   const requestEmployee = async () => {
+    setLoading(true);
     try {
       let res = await axios.get(`${API_PORT()}/api/findUsers`);
-      if (res) setEmployee(res.data.data);
+      if (res) {
+        setEmployee(res.data.data);
+        setLoading(false);
+      }
     } catch (error) {
       console.log("error: ", error);
     }
@@ -84,15 +98,21 @@ export const EmployeeScreen = (props) => {
       <ScrollView
         contentContainerStyle={styles.scrollView}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['red', 'blue', 'green']}/>
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={["red", "blue", "green"]}
+          />
         }
       >
-
-        <Text>Lista de Empleados:</Text>
-        <FlatList
-            data={employee}
-            renderItem={renderEmplyee}
-        />
+        {loading ? (
+          splash()
+        ) : (
+          <View>
+            <Text>Lista de Empleados:</Text>
+            <FlatList data={employee} renderItem={renderEmplyee} />
+          </View>
+        )}
       </ScrollView>
     </View>
   );
@@ -101,11 +121,11 @@ export const EmployeeScreen = (props) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop: Constants.statusBarHeight,
+    //marginTop: Constants.statusBarHeight,
   },
   scrollView: {
     flex: 1,
-    backgroundColor: "pink",
+    //backgroundColor: "pink",
     alignItems: "center",
     justifyContent: "center",
   },

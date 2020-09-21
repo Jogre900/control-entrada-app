@@ -7,13 +7,12 @@ import {
   Dimensions,
   FlatList,
   StyleSheet,
+  ActivityIndicator,
+  Alert,
 } from "react-native";
-//import  {Picker} from '@react-native-community/picker'
 import axios from "axios";
 import { Ionicons } from "@expo/vector-icons";
 import { Picker } from "@react-native-community/picker";
-//import SelectBox from 'react-native-multi-selectbox'
-//import RNPickerSelect from 'react-native-picker-select';
 
 //componentes
 import { API_PORT } from "../../config/index.js";
@@ -30,7 +29,10 @@ export const ZonasScreen = (props) => {
   const [horaSalida, setHoraSalida] = useState(null);
   const [create, setCreate] = useState(false);
   const [company, setCompany] = useState([]);
-  const [companyId, setCompanyId] = useState("");
+  const [companyId, setCompanyId] = useState("algo");
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [success, setSuccess] = useState(false);
 
   const goBackAction = () => {
     return (
@@ -46,40 +48,84 @@ export const ZonasScreen = (props) => {
     );
   };
 
+  //LOADING
+  const Splash = () => {
+    return (
+      <View>
+        <ActivityIndicator size="large" color="#ff7e00" />
+      </View>
+    );
+  };
+
+  //REGISTER
+  const saveSuccess = () => {
+    Alert.alert("Registro Exitoso!");
+    setSuccess(false);
+  };
+
+  //CLEAR INPUTS
+  const clearInputs = () => (
+    setZoneName("")
+  )
+
   const requestCompany = async () => {
+    setLoading(true);
     try {
       let res = await axios.get(`${API_PORT()}/api/findCompany`);
-      console.log("res.data: ", res.data)
-      if (res) setCompany(res.data.data);
+      console.log("res.data: ", res.data);
+      if (res.data.data) {
+        setCompany(res.data.data);
+        setLoading(false);
+      }
     } catch (error) {
       console.log("error: ", error);
     }
   };
 
   const createZone = async () => {
+    console.log("company id:----", companyId);
     setCreate(false);
-    
-    if (zoneName) {
-      let res = await axios.post(`${API_PORT()}/api/createZone/${companyId}`, {
-        zone: zoneName,
-      });
-      if (res) setCreate(true);
-      console.log("crear zona", res.data);
+    setSaving(true);
+    try {
+      let res = await axios.post(
+        `${API_PORT()}/api/createZone/${companyId}`,
+        {
+          zone: zoneName,
+        }
+      );
+      if (res) {
+        console.log(res);
+        setCreate(true);
+        setSaving(false)
+        setSuccess(true)
+      }
+    } catch (error) {
+      console.log(error)
     }
   };
 
   const requestZone = async () => {
     let res = await axios.get(`${API_PORT()}/api/findZones`);
     setZone(res.data.data);
+    console.log("zones:-------",res.data)
   };
 
   const renderItem = ({ item }) => {
     return (
-      <TouchableHighlight onPress={() => props.navigation.navigate("zone_detail", {id: item.id, zone: item.zone})} 
-      style={styles.zones}>
+      <TouchableHighlight
+        onPress={() =>
+          props.navigation.navigate("zone_detail", {
+            id: item.id,
+            zone: item.zone,
+            destinys: item.Destinos,
+            watchmen: item.encargado_zona
+          })
+        }
+        style={styles.zones}
+      >
         <View>
-        <Text>{item.zone}</Text>
-        <Ionicons name="md-pin" size={28} color="grey" />
+          <Text>{item.zone}</Text>
+          <Ionicons name="md-pin" size={28} color="grey" />
         </View>
       </TouchableHighlight>
     );
@@ -97,27 +143,30 @@ export const ZonasScreen = (props) => {
         <View>
           {/* //company box */}
           <Text>Selecione Empresa:</Text>
-          {
-            company &&
+          {loading ? (
+            <Splash />
+          ) : (
             <Picker
-            mode="dropdown"
-            selectedValue={companyId}
-            onValueChange={(id) => setCompanyId(id)}
+              mode="dropdown"
+              selectedValue={companyId}
+              onValueChange={(itemValue, itemIndex) =>
+                setCompanyId(itemValue)}
             >
-            {company.map((item) => (
-              <Picker.Item label={item.name} value={item.id} key={item.id}/>
-            ))}
+              <Picker.Item label="Java" value="java" />
+  <Picker.Item label="JavaScript" value="js" />
+              {/* {company.map((item) => (
+                <Picker.Item label={item.name} value={item.id} key={item.id} />
+              ))} */}
             </Picker>
-          }
+          )}
         </View>
         <View>
-        <Text>Zonas:</Text>
+          <Text>company ID: {companyId}</Text>
+        </View>
+        <View>
+          <Text>Zonas:</Text>
           {zone && (
-            <FlatList
-              data={zone}
-              renderItem={renderItem}
-              numColumns={3}
-            />
+            <FlatList data={zone} renderItem={renderItem} numColumns={3} />
           )}
         </View>
         <Text>Crear Zona</Text>
@@ -168,6 +217,8 @@ export const ZonasScreen = (props) => {
           }}
         />
       </View>
+      {saving ? <Splash /> : null}
+      {success && saveSuccess()}
     </View>
   );
 };
