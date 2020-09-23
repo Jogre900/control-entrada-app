@@ -33,6 +33,7 @@ export default (sequelize, { UUID, UUIDV4, STRING, DATE }) => {
       onDelete: "CASCADE",
       onUpdate: "CASCADE"
     })
+    Visits.belongsTo(models.destination)
     Visits.belongsTo(models.citizen)
   };
   return Visits;

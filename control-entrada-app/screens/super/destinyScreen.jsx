@@ -67,6 +67,7 @@ export const DestinyScreen = (props) => {
       let res = await axios.get(`${API_PORT()}/api/findZones`);
       if (res) {
         setZones(res.data.data);
+        setZoneId(res.data.data[0].id)
         setLoading(false);
       }
     } catch (error) {

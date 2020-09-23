@@ -70,7 +70,7 @@ export const LogInScreen = (props) => {
     // console.log('algo',data.data)
     // if(data.data.data.privilege === 'Admin') props.navigation.navigate("super")
     // storeData(data.data.token)
-    props.navigation.navigate("super")
+    props.navigation.navigate("watch")
 
   };
 
@@ -160,12 +160,12 @@ export const LogInScreen = (props) => {
                   signIn();
                 }}
               />
-              {/* <MainButton
+              <MainButton
                 title="Supervisor"
                 onPress={() => {
                   props.navigation.navigate("super");
                 }}
-              /> */}
+              />
             </View>
           </KeyboardAvoidingView>
         </TouchableWithoutFeedback>

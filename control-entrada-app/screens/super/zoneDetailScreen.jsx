@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -6,7 +6,10 @@ import {
   TouchableHighlight,
   FlatList,
   ScrollView,
+  TouchableOpacity,
+  Alert
 } from "react-native";
+import axios from 'axios'
 
 //componentes
 import { API_PORT } from "../../config/index.js";
@@ -14,12 +17,14 @@ import { TopNavigation } from "../../components/TopNavigation.component.jsx";
 import Input from "../../components/input.component";
 import { MainButton } from "../../components/mainButton.component";
 import { Ionicons } from "@expo/vector-icons";
+import moment from 'moment'
 
 export const ZoneDetailScreen = (props) => {
   //console.log(props)
-  const { zone, destinys, watchmen } = props.route.params;
-  console.log("destinos:----------", destinys);
-  console.log("watchmen:--------", watchmen);
+  const { id, zone, entryTime, departureTime, destinys, watchmen } = props.route.params;
+  console.log(props.route.params)
+  const [destiny, setDestiny] = useState(destinys)
+  
   const goBackAction = () => {
     return (
       <View>
@@ -36,6 +41,9 @@ export const ZoneDetailScreen = (props) => {
   const renderDestiny = ({ item }) => (
     <View>
       <Text>{item.name}</Text>
+      <TouchableOpacity onPress={() => deleteDestiny(item.id)}>
+        <Ionicons name="ios-trash" size={28} color="#ccc"/>
+      </TouchableOpacity>
     </View>
   );
   const renderWatchman = ({ item }) => (
@@ -48,6 +56,33 @@ export const ZoneDetailScreen = (props) => {
       <Text>Cambio de Turno: {item.changeTurnDate}</Text>
     </View>
   );
+
+  // const deleteWarning = (id) => {
+  //   Alert.alert("Seguro que desea borrar este destino?", [
+  //     {
+  //       text: "Cancel",
+  //       style: "cancel"
+  //     },
+  //     {
+  //       text: "OK",
+  //       onPress:() => {
+  //         deleteDestiny(id)
+  //       }
+  //     }
+  // ])
+  // }
+  const deleteDestiny = async (destinyId) => {
+    console.log(destinyId)
+    try {
+      let res = await axios.delete(`${API_PORT()}/api/deleteDestiny/${destinyId}`)
+      if(res){
+      console.log(res)
+      setDestiny(destiny => destiny.filter(elem => elem.id != destinyId))
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
   return (
     <View style={{flex:1}}>
       <TopNavigation title={zone} leftControl={goBackAction()} />
@@ -55,10 +90,12 @@ export const ZoneDetailScreen = (props) => {
         <Text>Zona:</Text>
         <View>
           <Text>{zone}</Text>
+          <Text>{moment(entryTime).format('HH:mm a')}</Text>
+          <Text>{moment(departureTime).format('HH:mm a')}</Text>
         </View>
         <View>
           <Text>Destinos:</Text>
-          <FlatList data={destinys} renderItem={renderDestiny} />
+          <FlatList data={destiny} renderItem={renderDestiny} />
         </View>
         <View>
           <Text>Encargados:</Text>

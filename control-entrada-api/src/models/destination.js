@@ -15,8 +15,9 @@ export default (sequelize, { UUID, UUIDV4, STRING }) => {
     Destination.hasMany(models.visits, {
       foreignKey: {
         name: "destinationId",
-        field: "destination_id"
-      }
+        field: "destination_id",
+      },
+      as: "Destino"
     });
     Destination.belongsTo(models.zone);
   };

@@ -7,6 +7,8 @@ import {
   Button,
   ScrollView,
   Image,
+  ActivityIndicator,
+  Alert
 } from "react-native";
 
 import axios from "axios";
@@ -18,9 +20,9 @@ import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Picker } from "@react-native-community/picker";
 import * as ImagePicker from "expo-image-picker";
-import { ZoneDetailScreen } from "./zoneDetailScreen.jsx";
 
-const rol = [{ rol: "Super" }, { rol: "Vigilante" }];
+
+
 
 export const CreateEmployeScreen = (props) => {
   const [zones, setZones] = useState([]);
@@ -30,7 +32,7 @@ export const CreateEmployeScreen = (props) => {
   const [dni, setDni] = useState("");
   const [email, setEmail] = useState("");
   const [picture, setPicture] = useState("");
-  const [privilege, setPrivilege] = useState("");
+  const [privilege, setPrivilege] = useState("Supervisor");
   const [date, setDate] = useState(new Date());
   const [changeTurn, setChangeTurn] = useState(new Date());
   const [mode, setMode] = useState("date");
@@ -41,6 +43,8 @@ export const CreateEmployeScreen = (props) => {
   const [image, setImage] = useState();
   const [fileName, setFileName] = useState("");
   const [fileType, setFileType] = useState("");
+  const [saving, setSaving] = useState(false)
+  const [success, setSuccess] = useState(false)
   const goBackAction = () => {
     return (
       <View>
@@ -53,6 +57,21 @@ export const CreateEmployeScreen = (props) => {
         </TouchableHighlight>
       </View>
     );
+  };
+
+  //LOADING
+  const Splash = () => {
+    return (
+      <View>
+        <ActivityIndicator size="large" color="#ff7e00" />
+      </View>
+    );
+  };
+
+  //REGISTER
+  const saveSuccess = () => {
+    Alert.alert("Registro Exitoso!");
+    setSuccess(false);
   };
 
   //DATE PICKER CONFIG
@@ -86,6 +105,8 @@ export const CreateEmployeScreen = (props) => {
   };
 
   const createEmploye = async () => {
+    setSaving(true)
+    setSuccess(false)
     setCreate(false);
     let data = new FormData();
     data.append("file", { uri: image, name: fileName, type: fileType });
@@ -127,6 +148,8 @@ export const CreateEmployeScreen = (props) => {
         console.log("turno: ", changeTurn);
         console.log(res.data);
         setCreate(true);
+        setSaving(false)
+        setSuccess(true)
       }
     } catch (error) {
       console.log("error: ", error);
@@ -136,7 +159,12 @@ export const CreateEmployeScreen = (props) => {
   const requestZone = async () => {
     try {
       let res = await axios.get(`${API_PORT()}/api/findZones`);
-      if (res) setZones(res.data.data);
+      if (res){
+        console.log("zones array:-----", res.data.data[0].zone)
+        setZones(res.data.data);
+        setZoneId(res.data.data[0].id)
+      } 
+
     } catch (error) {
       console.log("error: ", error);
     }
@@ -258,9 +286,8 @@ export const CreateEmployeScreen = (props) => {
             selectedValue={privilege}
             onValueChange={(value) => setPrivilege(value)}
           >
-            {rol.map((item, i) => (
-              <Picker.Item label={item.rol} value={item.rol} key={i} />
-            ))}
+            <Picker.Item label={"Supervisor"} value={"Supervisor"}/>
+            <Picker.Item label={"Vigilante"} value={"Vigilante"}/>
           </Picker>
           {
             <View style={{ backgroundColor: "red" }}>
@@ -330,11 +357,13 @@ export const CreateEmployeScreen = (props) => {
               createEmploye();
             }}
           />
-          {create ? (
-            <View>
-              <Text>Creacion Exitosa!</Text>
-            </View>
+          {saving ? (
+            <Splash/>
           ) : null}
+          {
+            success &&
+            saveSuccess()
+          }
         </View>
       </ScrollView>
     </View>

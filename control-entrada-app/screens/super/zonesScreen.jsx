@@ -3,43 +3,49 @@ import {
   View,
   Text,
   TouchableHighlight,
-  TouchableWithoutFeedback,
+  TouchableOpacity,
   Dimensions,
   FlatList,
   StyleSheet,
   ActivityIndicator,
   Alert,
+  ScrollView,
 } from "react-native";
 import axios from "axios";
 import { Ionicons } from "@expo/vector-icons";
 import { Picker } from "@react-native-community/picker";
+import DateTimePicker from "@react-native-community/datetimepicker";
 
 //componentes
 import { API_PORT } from "../../config/index.js";
 import { TopNavigation } from "../../components/TopNavigation.component.jsx";
 import Input from "../../components/input.component.jsx";
 import { MainButton } from "../../components/mainButton.component";
+import moment from "moment";
 
 const DEVICE_WIDTH = Dimensions.get("window").width;
 
 export const ZonasScreen = (props) => {
   const [zone, setZone] = useState([]);
   const [zoneName, setZoneName] = useState("");
-  const [horaEntrada, setHoraEntrada] = useState(null);
-  const [horaSalida, setHoraSalida] = useState(null);
   const [create, setCreate] = useState(false);
+  const [deleteZone, setDeleteZone] = useState(false);
   const [company, setCompany] = useState([]);
-  const [companyId, setCompanyId] = useState("algo");
+  const [companyId, setCompanyId] = useState("");
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [entranceTime, setEntranceTime] = useState(new Date());
+  const [departureTime, setDepartureTime] = useState(new Date());
+  const [show1, setShow1] = useState(false);
+  const [show2, setShow2] = useState(false);
 
   const goBackAction = () => {
     return (
       <View>
         <TouchableHighlight
           onPress={() => {
-            props.navigation.goBack();
+            props.navigation.navigate("supervicer-home");
           }}
         >
           <Ionicons name="ios-arrow-back" size={28} color="white" />
@@ -64,9 +70,38 @@ export const ZonasScreen = (props) => {
   };
 
   //CLEAR INPUTS
-  const clearInputs = () => (
-    setZoneName("")
-  )
+  const clearInputs = () => setZoneName("");
+
+  //TIMEPICKER
+  const displayTimePicker = () => {
+    setShow1(true);
+  };
+
+  const showMode = (currentMode) => {
+    setShow1(true);
+    //setMode(currentMode);
+  };
+
+  const onChange = (event, selectedDate) => {
+    const currentDate = selectedDate || entranceTime;
+    setShow1(false);
+    setEntranceTime(currentDate);
+  };
+
+  const displayTimePicker2 = () => {
+    showMode2("date");
+  };
+
+  const showMode2 = (currentMode) => {
+    setShow2(true);
+    //setMode(currentMode);
+  };
+
+  const onChange2 = (event, selectedDate) => {
+    const currentDate = selectedDate || departureTime;
+    setShow2(Platform.OS === "ios");
+    setDepartureTime(currentDate);
+  };
 
   const requestCompany = async () => {
     setLoading(true);
@@ -75,11 +110,20 @@ export const ZonasScreen = (props) => {
       console.log("res.data: ", res.data);
       if (res.data.data) {
         setCompany(res.data.data);
+        setCompanyId(res.data.data[0].id)
         setLoading(false);
       }
     } catch (error) {
       console.log("error: ", error);
     }
+  };
+
+  //ZONE API
+
+  const requestZone = async () => {
+    let res = await axios.get(`${API_PORT()}/api/findZones`);
+    setZone(res.data.data);
+    console.log("zones:-------", res.data.data);
   };
 
   const createZone = async () => {
@@ -91,43 +135,61 @@ export const ZonasScreen = (props) => {
         `${API_PORT()}/api/createZone/${companyId}`,
         {
           zone: zoneName,
+          firsEntryTime: entranceTime.toString(),
+          firsDepartureTime: departureTime.toString(),
         }
       );
       if (res) {
         console.log(res);
         setCreate(true);
-        setSaving(false)
-        setSuccess(true)
+        setSaving(false);
+        setSuccess(true);
       }
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
   };
 
-  const requestZone = async () => {
-    let res = await axios.get(`${API_PORT()}/api/findZones`);
-    setZone(res.data.data);
-    console.log("zones:-------",res.data)
+  const deleteZones = async (id) => {
+    setDeleteZone(false);
+    try {
+      let res = await axios.delete(`${API_PORT()}/api/deleteZone/${id}`);
+      if (res) setDeleteZone(true);
+    } catch (error) {
+      console.log("error: ", error);
+    }
   };
 
   const renderItem = ({ item }) => {
     return (
-      <TouchableHighlight
-        onPress={() =>
-          props.navigation.navigate("zone_detail", {
-            id: item.id,
-            zone: item.zone,
-            destinys: item.Destinos,
-            watchmen: item.encargado_zona
-          })
-        }
-        style={styles.zones}
-      >
-        <View>
+      <View>
+        <TouchableOpacity
+          onPress={() =>
+            props.navigation.navigate("zone_detail", {
+              id: item.id,
+              zone: item.zone,
+              destinys: item.Destinos,
+              watchmen: item.encargado_zona,
+              entryTime: item.firsEntryTime,
+              departureTime: item.firsDepartureTime,
+            })
+          }
+          style={styles.zones}
+        >
           <Text>{item.zone}</Text>
+          <Text>Entrada: {moment(item.firsEntryTime).format("HH: mm a")}</Text>
+          <Text>
+            Salida: {moment(item.firsDepartureTime).format("HH:mm a")}
+          </Text>
           <Ionicons name="md-pin" size={28} color="grey" />
+        </TouchableOpacity>
+
+        <View>
+          <TouchableOpacity onPress={() => deleteZones(item.id)}>
+            <Ionicons name="ios-trash" size={28} color="#cccc" />
+          </TouchableOpacity>
         </View>
-      </TouchableHighlight>
+      </View>
     );
   };
   useEffect(() => {
@@ -135,90 +197,130 @@ export const ZonasScreen = (props) => {
   }, []);
   useEffect(() => {
     requestZone();
-  }, [create]);
+  }, [create, deleteZone]);
   return (
-    <View>
+    <View style={{ flex: 1 }}>
       <TopNavigation title="Zonas" leftControl={goBackAction()} />
-      <View>
+      <ScrollView>
         <View>
-          {/* //company box */}
-          <Text>Selecione Empresa:</Text>
-          {loading ? (
-            <Splash />
-          ) : (
-            <Picker
-              mode="dropdown"
-              selectedValue={companyId}
-              onValueChange={(itemValue, itemIndex) =>
-                setCompanyId(itemValue)}
-            >
-              <Picker.Item label="Java" value="java" />
-  <Picker.Item label="JavaScript" value="js" />
-              {/* {company.map((item) => (
+          <View>
+            {/* //company box */}
+            <Text>Selecione Empresa:</Text>
+            {loading ? (
+              <Splash />
+            ) : (
+              <Picker
+                mode="dropdown"
+                selectedValue={companyId}
+                onValueChange={(itemValue, itemIndex) =>
+                  setCompanyId(itemValue)
+                }
+              >
+                {company.map((item) => (
                 <Picker.Item label={item.name} value={item.id} key={item.id} />
-              ))} */}
-            </Picker>
-          )}
-        </View>
-        <View>
-          <Text>company ID: {companyId}</Text>
-        </View>
-        <View>
-          <Text>Zonas:</Text>
-          {zone && (
-            <FlatList data={zone} renderItem={renderItem} numColumns={3} />
-          )}
-        </View>
-        <Text>Crear Zona</Text>
+              ))}
+              </Picker>
+            )}
+          </View>
+          <View>
+            <Text>company ID: {companyId}</Text>
+          </View>
+          <View>
+            <Text>Zonas:</Text>
+            {zone &&
+              zone.map((item, i) => (
+                <View key={i}>
+                  <TouchableOpacity
+                    onPress={() =>
+                      props.navigation.navigate("zone_detail", {
+                        id: item.id,
+                        zone: item.zone,
+                        destinys: item.Destinos,
+                        watchmen: item.encargado_zona,
+                        entryTime: item.firsEntryTime,
+                        departureTime: item.firsDepartureTime,
+                      })
+                    }
+                    style={styles.zones}
+                  >
+                    <Text>{item.zone}</Text>
+                    <Text>
+                      Entrada: {moment(item.firsEntryTime).format("HH: mm a")}
+                    </Text>
+                    <Text>
+                      Salida: {moment(item.firsDepartureTime).format("HH:mm a")}
+                    </Text>
+                    <Ionicons name="md-pin" size={28} color="grey" />
+                  </TouchableOpacity>
+                  <View>
+                    <TouchableOpacity onPress={() => deleteZones(item.id)}>
+                      <Ionicons name="ios-trash" size={28} color="#cccc" />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              ))
+              // <FlatList data={zone} renderItem={renderItem} numColumns={3} />
+            }
+          </View>
+          <Text>Crear Zona</Text>
 
-        <Input
-          style={{ borderColor: "black", marginBottom: 10 }}
-          styleInput={{ color: "black" }}
-          title="NombreZona"
-          textColor="black"
-          shape="square"
-          alignText="center"
-          returnKeyType="next"
-          onChangeText={(nombre) => {
-            setZoneName(nombre);
-          }}
-          value={zoneName}
-        />
-        <Input
-          style={{ borderColor: "black", marginBottom: 10 }}
-          styleInput={{ color: "black" }}
-          title="Hora de entrada"
-          textColor="black"
-          shape="square"
-          alignText="center"
-          returnKeyType="next"
-          onChangeText={(entrada) => {
-            setHoraEntrada(entrada);
-          }}
-          value={horaEntrada}
-        />
-        <Input
-          style={{ borderColor: "black", marginBottom: 10 }}
-          styleInput={{ color: "black" }}
-          title="Hora de salida"
-          textColor="black"
-          shape="square"
-          alignText="center"
-          returnKeyType="next"
-          onChangeText={(salida) => {
-            setHoraSalida(salida);
-          }}
-          value={horaSalida}
-        />
-        <MainButton
-          title="Registrar Zona"
-          onPress={() => {
-            createZone();
-          }}
-        />
-      </View>
-      {saving ? <Splash /> : null}
-      {success && saveSuccess()}
+          <Input
+            style={{ borderColor: "black", marginBottom: 10 }}
+            styleInput={{ color: "black" }}
+            title="NombreZona"
+            textColor="black"
+            shape="square"
+            alignText="center"
+            returnKeyType="next"
+            onChangeText={(nombre) => {
+              setZoneName(nombre);
+            }}
+            value={zoneName}
+          />
+          <View>
+            <TouchableOpacity onPress={() => displayTimePicker()}>
+              <Text>Hora de Entrada</Text>
+            </TouchableOpacity>
+            <Text>hora de entrada: {entranceTime.toString()}</Text>
+            {show1 && (
+              <DateTimePicker
+                value={entranceTime}
+                mode={"time"}
+                is24Hour={false}
+                display="default"
+                onChange={onChange}
+              />
+            )}
+          </View>
+          <View>
+            <TouchableOpacity onPress={() => displayTimePicker2()}>
+              <Text>Hora de Salida</Text>
+            </TouchableOpacity>
+            <Text>hora de salida: {departureTime.toString()}</Text>
+            {show2 && (
+              <DateTimePicker
+                value={departureTime}
+                mode={"time"}
+                is24Hour={false}
+                display="default"
+                onChange={onChange2}
+              />
+            )}
+          </View>
+          {entranceTime > departureTime
+            ? console.log("Es mayor!!!")
+            : console.log("Es menor.!!")}
+
+          <MainButton
+            title="Registrar Zona"
+            onPress={() => {
+              createZone();
+            }}
+          />
+        </View>
+        {saving ? <Splash /> : null}
+        {success && saveSuccess()}
+      </ScrollView>
     </View>
   );
 };
@@ -232,6 +334,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     margin: 0.5,
     padding: 10,
-    minWidth: Math.floor(DEVICE_WIDTH / 3),
+    //minWidth: Math.floor(DEVICE_WIDTH / 3),
   },
 });

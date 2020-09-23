@@ -54,11 +54,14 @@ const Methods = {
       data: null,
       token: null
     };
-    const { zone } = req.body;
+    const { zone, firsEntryTime, firsDepartureTime } = req.body;
     const { id } = req.params;
+    console.log(req.body);
     try {
       let zoneC = await models.zone.create({
         zone,
+        firsEntryTime,
+        firsDepartureTime,
         companyId: id
       });
       RESPONSE.error = false;
@@ -94,6 +97,32 @@ const Methods = {
       res.json(RESPONSE);
     } catch (error) {
       RESPONSE.error = error;
+      res.json(RESPONSE);
+    }
+  },
+  deleteZone: async function(req, res) {
+    let RESPONSE = {
+      error: true,
+      msg: "",
+      data: null,
+      token: null
+    };
+    const { id } = req.params;
+    try {
+      let zone = await models.zone.findOne({
+        where: {
+          id
+        }
+      });
+      if (zone) {
+        console.log(zone);
+        zone.destroy();
+        (RESPONSE.error = false), (RESPONSE.msg = "Registro borrado!");
+        RESPONSE.data = zone;
+        res.json(RESPONSE);
+      }
+    } catch (error) {
+      RESPONSE.msg = error;
       res.json(RESPONSE);
     }
   },
@@ -141,6 +170,31 @@ const Methods = {
       res.json(RESPONSE);
     } catch (error) {
       RESPONSE.msg = error;
+    }
+  },
+  deleteDestiny: async function(req, res) {
+    let RESPONSE = {
+      error: true,
+      msg: "",
+      data: null,
+      token: null
+    };
+    const { id } = req.params;
+    try {
+      let destiny = await models.destination.findOne({
+        where: {
+          id
+        }
+      });
+      if (destiny) {
+        destiny.destroy();
+        (RESPONSE.error = false), (RESPONSE.msg = "Registro borrado!");
+        RESPONSE.data = destiny;
+        res.json(RESPONSE);
+      }
+    } catch (error) {
+      RESPONSE.msg = error;
+      res.json(RESPONSE);
     }
   },
   createEmployee: async function(req, res) {
@@ -451,6 +505,31 @@ const Methods = {
       res.json(RESPONSE);
     }
   },
+  deleteUser: async function(req, res) {
+    let RESPONSE = {
+      error: true,
+      msg: "",
+      data: null,
+      token: null
+    };
+    const { id } = req.params;
+    try {
+      let user = await models.User.findOne({
+        where: {
+          id
+        }
+      });
+      if (user) {
+        user.destroy();
+        (RESPONSE.error = false), (RESPONSE.msg = "Registro Borrado!");
+        RESPONSE.data = user;
+        res.json(RESPONSE);
+      }
+    } catch (error) {
+      RESPONSE.msg = error;
+      res.json(RESPONSE);
+    }
+  },
   createVisits: async function(req, res) {
     let RESPONSE = {
       error: true,
@@ -458,17 +537,20 @@ const Methods = {
       data: null,
       tokn: null
     };
-    let picture = req.file.filename;
-
+    console.log(req.body);
+    console.log(req.params);
+    console.log(req.file);
     const {
       dni,
       name,
       lastName,
+      picture,
       entryDate,
       descriptionEntry,
       departureDate,
       descriptionDeparture
     } = req.body;
+    const { id } = req.params;
     try {
       let visits = await models.citizen.create(
         {
@@ -480,7 +562,8 @@ const Methods = {
             entryDate,
             descriptionEntry,
             departureDate,
-            descriptionDeparture
+            descriptionDeparture,
+            destinationId: id
           }
         },
         {

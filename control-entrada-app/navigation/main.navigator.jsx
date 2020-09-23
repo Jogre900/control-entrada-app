@@ -15,7 +15,7 @@ export const MainNavigator = () => {
     <stack.Navigator headerMode="none">
       {/* <stack.Screen name="splash" component={ProfileComponent} /> */}
       <stack.Screen name="logIn" component={LogInScreen} />
-      <stack.Screen name="Home" component={WatchNavigator} />
+      <stack.Screen name="watch" component={WatchNavigator} />
       <stack.Screen name="super" component={SuperNavigator} />
     </stack.Navigator>
   );
