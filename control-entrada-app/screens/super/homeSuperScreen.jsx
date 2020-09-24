@@ -11,12 +11,15 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 //components
 import { TopNavigation } from "../../components/TopNavigation.component";
-import FireMethods from "../../lib/methods.firebase";
+import axios from 'axios'
+import {API_PORT} from '../../config/index'
 import moment from "moment";
+
 
 export const HomeSuperScreen = (props) => {
   const [object, setObject] = useState({});
   const [loading, setLoading] = useState(true);
+  const [visits, setVisits] = useState([])
   const drawerAction = () => {
     return (
       <View>
@@ -25,7 +28,7 @@ export const HomeSuperScreen = (props) => {
             props.navigation.toggleDrawer();
           }}
         >
-          <Ionicons name="md-menu" size={28} color="white" />
+          <Ionicons name="ios-menu" size={28} color="white" />
         </TouchableHighlight>
       </View>
     );
@@ -43,31 +46,31 @@ export const HomeSuperScreen = (props) => {
       </View>
     );
   };
-  const splash = () => {
+  const Splash = () => {
     return (
       <View>
         <ActivityIndicator size="large" color="#ff7e00" />
-        
       </View>
     );
   };
-  const getEntrada = async () => {
-    let data = new Object();
-    await FireMethods.getEntrance((object) => {
-      data = object;
-    });
-    setObject(data);
-    setLoading(false);
-    console.log("object:  ", object);
-  };
 
-  const getDate = () => {
-    let date = moment().format("MMM D h:mm");
-    return date;
-  };
+  //VISITS
+  const requestVisits = async () => {
+    setLoading(true)
+    try {
+      let res = await axios.get(`${API_PORT()}/api/findAllVisits`)
+      if(res){
+        setVisits(res.data.data)
+        setLoading(false)
+      } 
+    } catch (error) {
+      console.log("error:", error)
+    }
+  }
+  
 
   useEffect(() => {
-    getEntrada();
+    requestVisits()
   }, []);
 
   return (
@@ -78,32 +81,32 @@ export const HomeSuperScreen = (props) => {
         rightControl={openNotifications()}
       />
       {loading ? (
-        splash()
+        <Splash/>
       ) : (
         <View style={styles.listEntry}>
-          {Object.keys(object).map((element) => {
+          {visits.map((elem, i) => {
             return (
               <TouchableOpacity
                 style={styles.entryBox}
-                key={element}
+                key={i}
                 onPress={() =>
-                  props.navigation.navigate("detail-view", object[element])
+                  props.navigation.navigate("detail-view", elem)
                 }
               >
                 <View style={styles.dataContainerView}>
                   <Text>DNI</Text>
-                  <Text style={styles.dataText}>{object[element].cedula}</Text>
+                  <Text style={styles.dataText}>{elem.dni}</Text>
                 </View>
                 <View style={styles.dataContainerView}>
                   <Text>Nombre</Text>
                   <Text style={styles.dataText}>
-                    {object[element].nombre} {object[element].apellido}
+                    {elem.name} {elem.lastName}
                   </Text>
                 </View>
                 <View style={styles.dataContainerView}>
                   <Text>Entrada</Text>
                   <Text style={styles.dataText}>
-                    {object[element].hora_entrada}
+                    {moment(elem.Visitas.entryDate).format('HH:mm a')}
                   </Text>
                 </View>
               </TouchableOpacity>

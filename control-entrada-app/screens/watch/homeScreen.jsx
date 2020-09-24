@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   StyleSheet,
@@ -6,8 +6,10 @@ import {
   Dimensions,
   TouchableOpacity,
 } from "react-native";
-import firebase from '../../lib/firebase'
+import axios from 'axios'
+import { API_PORT } from '../../config/index'
 import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from '@react-native-community/async-storage'
 
 //components
 import { TopNavigation } from "../../components/TopNavigation.component";
@@ -21,17 +23,27 @@ const cover = require("../../assets/images/background.jpg");
 const { width, height } = Dimensions.get("window");
 
 export const HomeScreen = (props) => {
-  const signOut = () => {
-    firebase
-      .auth()
-      .signOut()
-      .then(() => {
-        props.navigation.popToTop();
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
+  const [profile, setProfile] = useState()
+  const getProfile = async () => {
+    const token = await AsyncStorage.getItem("watchToken")
+    console.log(token)
+    if(token){
+      try {
+        let res = await axios.get(`${API_PORT()}/api/profile`, {
+          headers: {
+            'Authorization': `bearer ${token}` 
+          }
+        })
+        if(res){
+          console.log("Profile:--", res.data)
+          setProfile(res.data.data)
+        }
+      } catch (error) {
+        console.log("error: ", error) 
+      }
+    }
+    
+  }
   const goBackAction = () => {
     return (
       <View>
@@ -56,6 +68,9 @@ export const HomeScreen = (props) => {
     );
   };
 
+  useEffect(() => {
+    getProfile()
+  }, [])
   return (
     <View style={styles.container}>
       <TopNavigation
@@ -71,7 +86,7 @@ export const HomeScreen = (props) => {
                 title="Entrada"
                 style={styles.button}
                 onPress={() => {
-                  props.navigation.navigate("entrada");
+                  props.navigation.navigate("entrada", profile);
                 }}
               />
               <MainButton

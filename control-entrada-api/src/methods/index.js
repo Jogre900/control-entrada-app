@@ -3,6 +3,7 @@ import { encrypt } from "@utils/security";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { $security, $serverPort } from "@config";
+import options from "dotenv/lib/env-options";
 const SECRETKEY = process.env.SECRETKEY || $security().secretKey;
 
 const Methods = {
@@ -331,7 +332,6 @@ const Methods = {
       dni,
       email,
       password,
-      picture,
       privilege,
       assignationDate,
       changeTurnDate
@@ -358,7 +358,7 @@ const Methods = {
               dni,
               email,
               password,
-              picture,
+              picture: req.file.filename,
               privilege,
               userZone: {
                 assignationDate,
@@ -435,7 +435,7 @@ const Methods = {
       });
       if (user) {
         if (bcrypt.compareSync(password, user.password)) {
-          let token = jwt.sign(user.dataValues, SECRETKEY, { expiresIn: 1440 });
+          let token = jwt.sign(user.dataValues, SECRETKEY, { expiresIn: "1d" });
           RESPONSE.error = false;
           RESPONSE.msg = "Inicio Exitoso";
           RESPONSE.data = user;
@@ -459,7 +459,10 @@ const Methods = {
       data: null,
       token: null
     };
-    let decode = jwt.verify(req.headers.authorization, SECRETKEY);
+
+    const token = req.headers.authorization.split(" ")[1];
+
+    let decode = jwt.verify(token, SECRETKEY);
     try {
       let profile = await models.User.findOne({
         where: {
@@ -469,14 +472,73 @@ const Methods = {
       if (profile) {
         RESPONSE.error = false;
         RESPONSE.data = profile;
+        RESPONSE.msg = "Perfil Encontrado";
+        res.json(RESPONSE);
       } else {
         RESPONSE.msg = "Token no valido";
+        res.json(RESPONSE);
       }
-
-      res.json(RESPONSE);
     } catch (error) {
       RESPONSE.error = error;
       res.json(RESPONSE);
+    }
+  },
+  findUserZone: async function(req, res) {
+    let RESPONSE = {
+      error: true,
+      msg: "",
+      data: null,
+      token: null
+    };
+    const { id } = req.params;
+    try {
+      let userZone = await models.userZone.findOne({
+        where: {
+          UserId: id
+        },
+
+        include: [
+          {
+            model: models.zone,
+            include: {
+              model: models.destination,
+              as: "Destinos"
+            }
+          }
+        ]
+      }
+    );
+      if(userZone){
+        RESPONSE.error = false,
+        RESPONSE.msg = "Busqueda exitosa!",
+        RESPONSE.data = userZone
+        res.json(RESPONSE)
+      }
+    } catch (error) {
+      RESPONSE.msg = error
+      res.json(RESPONSE)
+    }
+  },
+  verifyExpToken: async function(req, res) {
+    let RESPONSE = {
+      error: true,
+      msg: "",
+      data: null,
+      token: null
+    };
+    const token = req.headers.authorization.split(" ")[1];
+    try {
+      let decode = jwt.verify(token, SECRETKEY);
+      if (decode) {
+        if (decode.exp) {
+          RESPONSE.error = false;
+          (RESPONSE.data = decode), (RESPONSE.msg = "token activo");
+          RESPONSE.token = decode;
+          res.json(RESPONSE);
+        }
+      }
+    } catch (error) {
+      RESPONSE.msg = error;
     }
   },
   findUsers: async function(req, res) {
@@ -544,11 +606,11 @@ const Methods = {
       dni,
       name,
       lastName,
-      picture,
       entryDate,
       descriptionEntry,
       departureDate,
-      descriptionDeparture
+      descriptionDeparture,
+      userZoneId
     } = req.body;
     const { id } = req.params;
     try {
@@ -557,13 +619,14 @@ const Methods = {
           dni,
           name,
           lastName,
-          picture,
+          picture: req.file.filename,
           Visitas: {
             entryDate,
             descriptionEntry,
             departureDate,
             descriptionDeparture,
-            destinationId: id
+            destinationId: id,
+            UserZoneId: userZoneId 
           }
         },
         {
@@ -583,6 +646,38 @@ const Methods = {
       res.json(RESPONSE);
     }
   },
+  updateVisit: async function(req, res){
+    let RESPONSE = {
+      error: true,
+      msg: "",
+      data: null,
+      tokn: null
+    };
+    const { departureDate, descriptionDeparture } = req.body
+    const {id} = req.params
+
+    try {
+      let visit = await models.visits.findOne({
+        where: {
+          id
+        }
+      })
+      if(visit){
+        console.log(visit)
+        visit.departureDate = departureDate
+        visit.descriptionDeparture = descriptionDeparture
+        await visit.save()
+        console.log(visit)
+        RESPONSE.error = false
+        RESPONSE.msg = "Actualizacion Existosa"
+        RESPONSE.data = visit
+        res.json(RESPONSE)
+      }
+    } catch (error) {
+      RESPONSE.msg = error
+      res.json(RESPONSE)
+    }
+  },
   findVisit: async function(req, res) {
     let RESPONSE = {
       error: true,
@@ -590,19 +685,88 @@ const Methods = {
       data: null,
       tokn: null
     };
+    
     const { id } = req.params;
+    
     try {
       let visit = await models.citizen.findOne({
-        where: { id },
-        include: [{ model: models.visits, as: "Visitas" }]
+        where: { dni: id },
+        include: [
+          {
+            model: models.visits,
+            as: "Visitas",
+            include: [
+              {model: models.destination},
+              {model: models.userZone,
+              include: [
+                {model: models.zone},
+                {model: models.User}
+              ]}
+            ]
+          }
+        ]
       });
+      if(visit){
+        console.log(visit)
       RESPONSE.error = false;
       RESPONSE.msg = "Consulta Exitosa";
       RESPONSE.data = visit;
 
       res.json(RESPONSE);
+      }
     } catch (error) {
       RESPONSE.msg = error;
+      res.json(RESPONSE);
+    }
+  },
+  findAllVisits: async function(req, res) {
+    let RESPONSE = {
+      error: true,
+      msg: "",
+      data: null,
+      tokn: null
+    };
+    try {
+      let visits = await models.citizen.findAll({
+        include: [
+          {
+            model: models.visits,
+            as: "Visitas",
+            include: {
+              model: models.destination,
+              attributes: ["id", "name"],
+              include: {
+                model: models.zone,
+                attributes: ["id", "zone"],
+                include: {
+                  model: models.userZone,
+                  as: "encargado_zona",
+                  attributes: ["id", "assignationDate", "changeTurnDate"],
+                  include: {
+                    model: models.User,
+                    attributes: [
+                      "id",
+                      "name",
+                      "lastName",
+                      "dni",
+                      "email",
+                      "picture"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        ]
+      });
+      if (visits) {
+        (RESPONSE.error = false), (RESPONSE.msg = "Busqueda exitosa!");
+        RESPONSE.data = visits;
+        res.json(RESPONSE);
+      }
+    } catch (error) {
+      RESPONSE.msg = error;
+      res.json(RESPONSE);
     }
   },
   createNoti: async function(req, res) {

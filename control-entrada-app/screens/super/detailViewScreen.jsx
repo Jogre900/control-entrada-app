@@ -12,7 +12,7 @@ import {
 } from "react-native";
 
 import { Ionicons } from "@expo/vector-icons";
-
+import moment from 'moment'
 import { TopNavigation } from "../../components/TopNavigation.component";
 import { DetailCard } from "../../components/detailCard.component";
 import { ProfileComponent } from "../../components/profile.component";
@@ -22,7 +22,11 @@ const cover = require("../../assets/images/background.jpg");
 const watchPic = require("../../assets/images/male-2.jpg");
 
 export const DetailViewScreen = (props) => {
-  const data = props.route.params;
+  const visit = props.route.params;
+  //console.log(visit)
+  console.log("visitas:-------",visit.Visitas)
+  console.log("DEstino:----",visit.Visitas[0].Destination)
+  console.log("Zona: -------",visit.Visitas[0].Destination.Zone)
 
   const [activeTab, setActiveTab] = React.useState("0");
   const [xTabOne, setXTabOne] = React.useState();
@@ -89,7 +93,7 @@ export const DetailViewScreen = (props) => {
     );
   };
 
-  const element1 = (data) => {
+  const element1 = (visit) => {
     return (
       <View
         style={{
@@ -101,26 +105,26 @@ export const DetailViewScreen = (props) => {
         <View style={{ width: "95%" }}>
           <View style={styles.dataBox}>
             <Text style={styles.labelText}>DNI:</Text>
-            <Text style={styles.dataText}>{data.cedula}</Text>
+      <Text style={styles.dataText}>{visit.dni}</Text>
           </View>
           <View style={styles.dataBox}>
             <Text style={styles.labelText}>Destino:</Text>
-            <Text style={styles.dataText}>{data.destino}</Text>
+            <Text style={styles.dataText}>{visit.Visitas[0].Destination.name}</Text>
           </View>
           <View style={styles.dataBox}>
             <Text style={styles.labelText}>Hora de Entrada:</Text>
-            <Text style={styles.dataText}>{data.hora_entrada}</Text>
+            <Text style={styles.dataText}>{moment(visit.Visitas[0].departureDate).format('HH:mm a')}</Text>
           </View>
           <View style={styles.dataBox}>
             <Text style={styles.labelText}>Hora de Salida:</Text>
-            <Text style={styles.dataText}>{data.hora_salida}</Text>
+            <Text style={styles.dataText}>{moment(visit.Visitas[0].entryDate).format('HH:mm a')}</Text>
           </View>
         </View>
       </View>
     );
   };
 
-  const element2 = () => {
+  const element2 = (visit) => {
     return (
       <View
         style={{
@@ -139,7 +143,7 @@ export const DetailViewScreen = (props) => {
           <View>
             <View style={styles.dataBox2}>
               <Text style={styles.labelText}>Nombre:</Text>
-              <Text style={styles.dataText}>Jose Del Corral</Text>
+        <Text style={styles.dataText}>{visit.Visitas[0].Destination.zone}</Text>
             </View>
             <View style={styles.dataBox2}>
               <Text style={styles.labelText}>DNI</Text>
@@ -178,10 +182,10 @@ export const DetailViewScreen = (props) => {
               }}
             >
               <View style={{ marginBottom: 10 }}>
-                <Image source={{ uri: data.foto }} style={styles.profilePic} />
+                <Image source={{ uri: visit.picture }} style={styles.profilePic} />
               </View>
               <Text style={styles.nameText}>
-                {data.nombre} {data.apellido}
+                {visit.name} {visit.lastName}
               </Text>
             </View>
           </View>
@@ -247,7 +251,7 @@ export const DetailViewScreen = (props) => {
             ],
           }}
         >
-          {element1(data)}
+          {element1(visit)}
         </Animated.View>
         <Animated.View
           style={{
@@ -261,7 +265,7 @@ export const DetailViewScreen = (props) => {
             ],
           }}
         >
-          {element2()}
+          {element2(visit)}
         </Animated.View>
       </View>
     </View>
@@ -333,3 +337,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
 });
+
+
+

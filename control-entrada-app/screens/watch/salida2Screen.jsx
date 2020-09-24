@@ -1,5 +1,19 @@
-import React, {useState, useRef} from "react";
-import { View, Text, StyleSheet, Animated, Dimensions, TouchableOpacity, ScrollView, ImageBackground, Image, KeyboardAvoidingView, Keyboard } from "react-native";
+import React, { useState, useRef, useEffect } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Animated,
+  Dimensions,
+  TouchableOpacity,
+  ScrollView,
+  ImageBackground,
+  Image,
+  KeyboardAvoidingView,
+  Keyboard,
+  Alert,
+  ActivityIndicator,
+} from "react-native";
 import { RectButton } from "react-native-gesture-handler";
 import { TopNavigation } from "../../components/TopNavigation.component";
 import Input from "../../components/input.component";
@@ -8,6 +22,8 @@ import { Ionicons } from "@expo/vector-icons";
 import FireMethods from "../../lib/methods.firebase";
 import * as ImagePicker from "expo-image-picker";
 import moment from "moment";
+import axios from "axios";
+import { API_PORT } from "../../config/index";
 
 const { width } = Dimensions.get("window");
 const cover = require("../../assets/images/background.jpg");
@@ -15,19 +31,22 @@ const profilePic = require("../../assets/images/female-2.jpg");
 const watchPic = require("../../assets/images/male-2.jpg");
 
 export const Salida2Screen = (props) => {
-  const [activeTab, setActiveTab] = useState("0");
-  const [buscar, setBuscar] = useState("");
+  const [dni, setDni] = useState("");
   const [messageText, setMessageText] = useState("");
-  const [person, setPerson] = useState(null);
-  const [horaSalida, setHoraSalida] = useState();
+  const [profile, setProfile] = useState();
+  const [visitId, setVisitId] = useState("");
+  const [visits, setVisits] = useState([]);
+  const [updateVisit, setUpdateVisit] = useState();
+  const [destiny, setDestiny] = useState({});
+  const [watchman, setWatchman] = useState();
+  const [saving, setSaving] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [entryCheck, setEntryCheck] = useState(false);
+  const [saved, setSaved] = useState(false);
 
-  const searchRef = useRef()
+  const [departure, setDeparture] = useState();
 
-  const getHour = () => {
-    let hour = moment().format("MMM D, h:mm");
-    setHoraSalida(hour);
-    return hour;
-  };
+  const searchRef = useRef();
 
   const goBackAction = () => {
     return (
@@ -42,30 +61,84 @@ export const Salida2Screen = (props) => {
       </View>
     );
   };
-
-  const buscarProfile = async (id) => {
-    setMessageText("");
-    setPerson(null);
-    let resp;
-    await FireMethods.getDuplicateDni(id, (data) => {
-      resp = data;
-    });
-    console.log("resp", resp);
-
-    if (resp.data != null) {
-      setPerson(resp.data);
-
+  //REQUEST VISIT
+  const requestVisit = async () => {
+    if (!dni) {
+      Alert.alert("Debe ingresar un DNI valido.");
     } else {
-      setMessageText(resp.msg);
+      try {
+        let res = await axios.get(`${API_PORT()}/api/findVisit/${dni}`);
+        if (res) {
+          setProfile(res.data.data);
+          if (
+            res.data.data.Visitas[0].entryDate !==
+            res.data.data.Visitas[0].departureDate
+          ) {
+            setEntryCheck(true);
+            console.log("las horas son distintas!!!!!");
+          } else {
+            console.log("las horas son iguales!!!!!");
+            setEntryCheck(false);
+          }
+
+          setVisits(res.data.data.Visitas[0]);
+
+          setVisitId(res.data.data.Visitas[0].id);
+          console.log("Visitas//----", res.data.data.Visitas[0]);
+          setDestiny(res.data.data.Visitas[0].Destination);
+
+          setWatchman(res.data.data.Visitas[0].UserZone.User);
+        }
+      } catch (error) {
+        console.log("error: ", error);
+      }
     }
-    Keyboard.dismiss();
   };
 
-  const update = () => {
-    console.log("person:  ", person);
-    FireMethods.updateEntrance(person.timeStamp, getHour());
+  //update entry
+  const updateEntry = async () => {
+    setSaving(true);
+    setSuccess(false);
+    setSaved(false);
+    let data = {
+      departureDate: moment(),
+      descriptionDeparture: departure,
+    };
+    try {
+      let res = await axios.put(
+        `${API_PORT()}/api/updateVisit/${visitId}`,
+        data
+      );
+      if (res) {
+        console.log(res.data);
+        setUpdateVisit(res.data.data);
+        setSuccess(true);
+        setSaving(false);
+      }
+    } catch (error) {
+      console.log("error: ", error);
+    }
   };
 
+  //LOADING
+  const Splash = () => {
+    return (
+      <View>
+        <ActivityIndicator size="large" color="#ff7e00" />
+      </View>
+    );
+  };
+
+  //REGISTER
+  const saveSuccess = () => {
+    Alert.alert("Registro Exitoso!");
+    setSuccess(false);
+    setSaved(true);
+  };
+
+  // useEffect(() => {
+  //   requestVisit()
+  // }, [saved])
   const MessageView = (props) => {
     return (
       <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
@@ -79,32 +152,38 @@ export const Salida2Screen = (props) => {
       <TopNavigation title="Salida" leftControl={goBackAction()} />
       <View style={styles.searchBox}>
         <View style={{ width: "70%" }}>
-          <Input 
-          title="Buscar por DNI" 
-          shape="round" 
-          alignText="center" 
-          style={{ backgroundColor: "white" }} 
-          retrunKeyType="search"
-          onSubmitEditing={() => buscarProfile()}
-          onChangeText={(valor) => setBuscar(valor)} 
-          value={buscar} />
+          <Input
+            title="Buscar por DNI"
+            shape="round"
+            alignText="center"
+            style={{ backgroundColor: "white" }}
+            retrunKeyType="search"
+            onSubmitEditing={() => requestVisit()}
+            onChangeText={(valor) => setDni(valor)}
+            value={dni}
+          />
         </View>
-        <TouchableOpacity onPress={() => buscarProfile(buscar)}>
+        <TouchableOpacity onPress={() => requestVisit()}>
           <Ionicons name="ios-search" size={28} color="white" />
         </TouchableOpacity>
       </View>
-      {person != null ? (
+      {profile != null ? (
         <View style={{ flex: 1 }}>
           <ImageBackground source={cover} style={styles.imgBackground}>
             <View style={styles.cover}>
               <View style={{ justifyContent: "center", alignItems: "center" }}>
                 {/* <Ionicons name="ios-person" size={120} color="#fff" /> */}
                 <View style={{ position: "relative", marginBottom: 10 }}>
-                  <Image source={{ uri: person.foto }} style={styles.profilePic} />
+                  <Image
+                    source={{
+                      uri: `${API_PORT()}/public/imgs/${profile.picture}`,
+                    }}
+                    style={styles.profilePic}
+                  />
                 </View>
                 <View style={styles.nameBox}>
                   <Text style={styles.nameText}>
-                    {person.nombre} {person.apellido}
+                    {profile.name} {profile.lastName}
                   </Text>
                 </View>
               </View>
@@ -114,27 +193,59 @@ export const Salida2Screen = (props) => {
             <View style={{ width: "75%" }}>
               <View style={styles.dataBox}>
                 <Text style={styles.labelText}>DNI:</Text>
-                <Text style={styles.dataText}>{person.cedula}</Text>
+                <Text style={styles.dataText}>{profile.dni}</Text>
               </View>
               <View style={styles.dataBox}>
                 <Text style={styles.labelText}>Destino:</Text>
-                <Text style={styles.dataText}>{person.destino}</Text>
+                <Text style={styles.dataText}>{destiny.name}</Text>
               </View>
               <View style={styles.dataBox}>
                 <Text style={styles.labelText}>Hora de Entrada:</Text>
-                <Text style={styles.dataText}>{person.hora_entrada}</Text>
-              </View>
-              <View style={styles.dataBox}>
-                <Text style={styles.labelText}>Hora de Salida:</Text>
-                <Text style={styles.dataText}>{horaSalida}</Text>
+                <Text style={styles.dataText}>
+                  {moment(visits.entryDate).format("HH:mm a")}
+                </Text>
               </View>
               <View>
-                <MainButton
-                  title="Marcar salida"
-                  onPress={() => {
-                    update();
-                  }}
-                />
+                {saved || entryCheck ? (
+                  <View>
+                    <View style={styles.dataBox}>
+                      <Text style={styles.labelText}>Hora de Salida:</Text>
+                      <Text style={styles.dataText}>
+                        {moment(visits.departureDate).format("HH:mm a") ||
+                          moment(updateVisit.departureDate).format("HH:mm a")}
+                      </Text>
+                    </View>
+                    <View style={styles.dataBox}>
+                      <Text style={styles.labelText}>Descipcion Salida:</Text>
+                      <Text style={styles.dataText}>
+                        {
+                          visits.descriptionDeparture
+                          //&& updateVisit.descriptionDeparture
+                        }
+                      </Text>
+                    </View>
+                  </View>
+                ) : (
+                  <View>
+                    <Input
+                      title="Descipcion Salida (opcional)"
+                      secureTextEntry={false}
+                      shape="flat"
+                      icon="ios-person"
+                      style={styles.input}
+                      onChangeText={(departure) => setDeparture(departure)}
+                      value={departure}
+                    />
+                    <View>
+                      <MainButton
+                        title="Marcar salida"
+                        onPress={() => {
+                          updateEntry();
+                        }}
+                      />
+                    </View>
+                  </View>
+                )}
               </View>
             </View>
           </View>
@@ -142,6 +253,8 @@ export const Salida2Screen = (props) => {
       ) : (
         <MessageView message={messageText} />
       )}
+      {saving ? <Splash /> : null}
+      {success && saveSuccess()}
     </View>
   );
 };

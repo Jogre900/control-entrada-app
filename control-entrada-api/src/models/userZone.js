@@ -16,6 +16,12 @@ export default ( sequelize, {UUID, UUIDV4, DATE}) => {
         }
     })
     UserZone.associate = models => {
+        UserZone.hasMany(models.visits, {
+            foreigKey: {
+                field: "userZoneId",
+                name: "user_zone_id"
+            }
+        })
         UserZone.belongsTo(models.employee)
         UserZone.belongsTo(models.zone)
         UserZone.belongsTo(models.User)

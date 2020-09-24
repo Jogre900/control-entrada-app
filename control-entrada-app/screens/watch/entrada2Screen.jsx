@@ -35,6 +35,8 @@ const profilePic = require("../../assets/images/profile-picture.png");
 const watchPic = require("../../assets/images/male-2.jpg");
 
 export const Entrada2Screen = (props) => {
+  const profile = props.route.params
+  console.log("profile:----", profile)
   const [saveImg, setSaveImg] = useState();
   const [changeImg, setChangeImg] = useState(false);
   const [userId, setUserId] = useState();
@@ -47,6 +49,7 @@ export const Entrada2Screen = (props) => {
   const [imgUrl, setImgUrl] = useState("");
   const [fileName, setFileName] = useState("");
   const [fileType, setFileType] = useState("");
+  const [userZoneId, setUserZoneId] = useState("")
   const [zones, setZones] = useState([]);
   const [zoneId, setZoneId] = useState("");
   const [destinys, setDestinys] = useState([]);
@@ -58,39 +61,24 @@ export const Entrada2Screen = (props) => {
   const lastNameRef = useRef();
   const dniRef = useRef();
   const destinyRef = useRef();
-  const getDate = () => {
-    let date = moment().format("MMM D, h:mm");
-    return date;
-  };
+  
 
-  //ZONES
-  const requestZone = async () => {
+  //USERZONES
+  const requestUserZone = async () => {
     try {
-      let res = await axios.get(`${API_PORT()}/api/findZones`);
-      if (res) {
-        setZones(res.data.data);
-        setZoneId(res.data.data[0].id);
+      let res = await axios.get(`${API_PORT()}/api/findUserZone/${profile.id}`)
+      if(res){
+        //setZones(res.data.data.Zone)
+        //console.log("zonas-----",res.data.data.Zone)
+        //setZoneId(res.data.data.ZoneId)
+        setUserZoneId(res.data.data.id)
+        console.log("userZoneid:-----", res.data.data.id)
+        setDestinys(res.data.data.Zone.Destinos);
+        console.log("destinos----",res.data.data.Zone.Destinos)
+        setDestinyId(res.data.data.Zone.Destinos[0].id);
       }
     } catch (error) {
-      console.log("error: ", error);
-    }
-  };
-
-  //DESTINYS
-  const requestDestiny = async () => {
-    if (zoneId) {
-      try {
-        let res = await axios.get(`${API_PORT()}/api/findDestiny/${zoneId}`);
-        if (res) {
-          console.log(res.data.data);
-          setDestinys(res.data.data);
-          setDestinyId(res.data.data[0].id);
-        }
-      } catch (error) {
-        console.log("error: ", error);
-      }
-    } else {
-      console.log("error");
+      console.log("error: ", error)
     }
   };
 
@@ -98,17 +86,18 @@ export const Entrada2Screen = (props) => {
   const createVisit = async () => {
     if (!name && !lastName) {
       alert("debe llenar los campos");
+      return
     } else {
       let data = new FormData();
       data.append("name", name);
       data.append("lastName", lastName);
       data.append("dni", dni);
       data.append("file", { uri: imgUrl, name: fileName, type: fileType });
-      data.append("picture", fileName);
       data.append("entryDate", moment().toString());
       data.append("departureDate", moment().toString());
       data.append("descriptionEntry", entry);
       data.append("descriptionDeparture", departure);
+      data.append("userZoneId", userZoneId)
       
       let data2 = new FormData();
       data2.append("name", "jose")
@@ -131,11 +120,11 @@ export const Entrada2Screen = (props) => {
     }
   };
 
+  // useEffect(() => {
+  //   requestDestiny();
+  // }, [zoneId]);
   useEffect(() => {
-    requestDestiny();
-  }, [zoneId]);
-  useEffect(() => {
-    requestZone();
+    requestUserZone();
   }, []);
 
   const pickImage = async () => {
@@ -281,7 +270,7 @@ export const Entrada2Screen = (props) => {
                 value={dni}
                 ref={dniRef}
               />
-              {zones ? (
+              {/* {zones ? (
                 <Picker
                   selectedValue={zoneId}
                   onValueChange={(value) => setZoneId(value)}
@@ -295,7 +284,7 @@ export const Entrada2Screen = (props) => {
                     />
                   ))}
                 </Picker>
-              ) : null}
+              ) : null} */}
               {destinys ? (
                 <Picker
                   selectedValue={destinyId}

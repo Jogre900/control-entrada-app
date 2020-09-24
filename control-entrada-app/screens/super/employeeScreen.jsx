@@ -35,7 +35,7 @@ export const EmployeeScreen = (props) => {
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
 
-    wait(3000).then(() => setRefreshing(false));
+    requestEmployee().then(() => setRefreshing(false));
   }, []);
 
   //LOADING
@@ -82,7 +82,7 @@ export const EmployeeScreen = (props) => {
         <Text>Fecha: {item.assignationDate}</Text>
         <Text>Foto: {item.picture}</Text>
         <Image
-          source={API_PORT() + "/public/imgs/" + item.picture}
+          source={{uri: `${API_PORT()}/public/imgs/${item.picture}`}}
           style={{ width: "100%", height: 120 }}
         />
       </View>

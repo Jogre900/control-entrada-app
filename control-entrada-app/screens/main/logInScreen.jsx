@@ -14,8 +14,8 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
 } from "react-native";
-import axios from 'axios'
-import asynStorage from '@react-native-community/async-storage'
+import axios from "axios";
+import AsyncStorage from "@react-native-community/async-storage";
 
 //components
 import { MainButton } from "../../components/mainButton.component";
@@ -25,7 +25,7 @@ import firebase from "../../lib/firebase";
 //constants
 import { mainColor } from "../../constants/Colors";
 
-const API_PORT = 'http://192.168.10.107:8000'
+const API_PORT = "http://192.168.10.107:8000";
 const { width, height } = Dimensions.get("window");
 
 const backAction = () => {
@@ -59,37 +59,47 @@ export const LogInScreen = (props) => {
 
   const storeData = async (value) => {
     try {
-      await AsyncStorage.setItem('userToken', value)
+      await AsyncStorage.setItem("watchToken", value);
     } catch (e) {
-      console.log("Error al Guardar", e)
+      console.log("Error al Guardar", e);
     }
-  }
+  };
   const signIn = async () => {
-    // console.log(email, pass) 
-    // let data = await axios.post(`${API_PORT}/api/login`, {email: email, password: pass})
-    // console.log('algo',data.data)
-    // if(data.data.data.privilege === 'Admin') props.navigation.navigate("super")
-    // storeData(data.data.token)
-    props.navigation.navigate("watch")
-
+    console.log(email, pass);
+    let data = await axios.post(`${API_PORT}/api/login`, {
+      email: email,
+      password: pass,
+    });
+    console.log("algo", data.data);
+    if (data) {
+      let privilege = data.data.data.privilege;
+      switch (privilege) {
+        case "Vigilante":
+          props.navigation.navigate("watch");
+          break;
+        case "Super":
+          props.navigation.navigate("super");
+          break;
+        default:
+          break;
+      }
+      //if(data.data.data.privilege === 'Admin') props.navigation.navigate("super")
+      storeData(data.data.token);
+    }
+    //props.navigation.navigate("watch")
   };
 
-  const signInStatus = () => {
-    firebase.auth().onAuthStateChanged((currentUser) => {
-      console.log("user: ", currentUser);
-      if (currentUser) {
-        switch (currentUser.email) {
-          case "supervisor@security.com":
-            props.navigation.navigate("super");
-            break;
-          case "entrancekeeper@security.com":
-            props.navigation.navigate("Home");
-            break;
-          default:
-            break;
-        }
+  const signInStatus = async () => {
+    let token = await AsyncStorage.getItem("wacthToken")
+    console.log("token en el storage:---", token)
+    if(token){
+      let res = await axios.get(`${API_PORT()}/api/verifyToken`, { headers: {
+        'Authorization': `bearer ${token}`
+      }})
+      if(res.data){
+        console.log(res.data)
       }
-    });
+    }
   };
 
   useEffect(() => {
@@ -100,7 +110,9 @@ export const LogInScreen = (props) => {
     //BackHandler.removeEventListener("hardwareBackPress", backAction);
   }, []);
 
-  
+  useEffect(() => {
+    signInStatus()
+  }, [])
 
   if (isSplash) {
     return <SplashScreen />;

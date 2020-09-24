@@ -114,7 +114,6 @@ export const CreateEmployeScreen = (props) => {
     data.append("lastName", lastName);
     data.append("dni", dni);
     data.append("email", email);
-    data.append("picture", fileName);
     data.append("password", "12345");
     data.append("privilege", privilege);
     data.append("assignationDate", date.toString());
@@ -197,6 +196,7 @@ export const CreateEmployeScreen = (props) => {
     }
 
     if (!result.cancelled) {
+      console.log(result)
       setImage(result.uri);
       let filename = result.uri.split("/").pop();
       setFileName(filename);
@@ -204,8 +204,8 @@ export const CreateEmployeScreen = (props) => {
       let match = /\.(\w+)$/.exec(filename);
       let type = match ? `image/${match[1]}` : `image`;
       setFileType(type);
-      console.log("fileName: ", fileName);
-      console.log("file type: ", fileType);
+      console.log("fileName: ", filename);
+      console.log("file type: ", type);
     }
   };
 
