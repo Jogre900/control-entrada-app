@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   TouchableHighlight,
   ActivityIndicator,
+  Image
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 //components
@@ -58,8 +59,9 @@ export const HomeSuperScreen = (props) => {
   const requestVisits = async () => {
     setLoading(true)
     try {
-      let res = await axios.get(`${API_PORT()}/api/findAllVisits`)
+      let res = await axios.get(`${API_PORT()}/api/findTodayVisits`)
       if(res){
+        console.log(res.data.data)
         setVisits(res.data.data)
         setLoading(false)
       } 
@@ -93,20 +95,24 @@ export const HomeSuperScreen = (props) => {
                   props.navigation.navigate("detail-view", elem)
                 }
               >
+                 <View style={styles.dataContainerView}>
+                  {/* <Image style={{height: 40, width: 40, borderRadius: 20}} source={{uri: `${API_PORT()}/public/imgs/${elem.picture}`}}/> */}
+                  
+                </View>
                 <View style={styles.dataContainerView}>
                   <Text>DNI</Text>
-                  <Text style={styles.dataText}>{elem.dni}</Text>
+                  <Text style={styles.dataText}>{elem.Citizen.dni}</Text>
                 </View>
                 <View style={styles.dataContainerView}>
                   <Text>Nombre</Text>
                   <Text style={styles.dataText}>
-                    {elem.name} {elem.lastName}
+                    {elem.Citizen.name} {elem.Citizen.lastName}
                   </Text>
                 </View>
                 <View style={styles.dataContainerView}>
                   <Text>Entrada</Text>
                   <Text style={styles.dataText}>
-                    {moment(elem.Visitas.entryDate).format('HH:mm a')}
+                    {moment(elem.ntryDate).format('HH:mm a')}
                   </Text>
                 </View>
               </TouchableOpacity>

@@ -52,5 +52,6 @@ const router = Router()
     router.post("/createVisit/:id", uploadImg.single('file'), Methods.createVisits)
     router.get("/findVisit/:id", Methods.findVisit)
     router.put("/updateVisit/:id", Methods.updateVisit)
-    router.get("/findAllVisits", Methods.findAllVisits)
+    router.get("/findTodayVisits/", Methods.findTodayVisits)
+    router.get("/findWeekVisits/", Methods.findWeekVisits)
 module.exports = router

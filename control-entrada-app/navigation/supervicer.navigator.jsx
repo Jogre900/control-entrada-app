@@ -16,6 +16,7 @@ import { PerfilScreen } from '../screens/super/perfilScreen'
 import { NotificationScreen } from '../screens/super/notificationScreen'
 import { EmployeeScreen } from '../screens/super/employeeScreen'
 import { CreateEmployeScreen } from '../screens/super/createEmployeeScreen'
+import { EmployeeDetailScreen } from '../screens/super/employeeDetailScreen'
 const drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
 
@@ -27,6 +28,7 @@ function SupervicerNav() {
       <Stack.Screen name="detail-view" component={DetailViewScreen} />
       <Stack.Screen name='notification' component={NotificationScreen}/>
       <Stack.Screen name='zone_detail' component={ZoneDetailScreen}/>
+      <Stack.Screen name='employee_detail' component={EmployeeDetailScreen}/>
     </Stack.Navigator>
   );
 }

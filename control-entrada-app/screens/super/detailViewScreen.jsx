@@ -12,6 +12,7 @@ import {
 } from "react-native";
 
 import { Ionicons } from "@expo/vector-icons";
+import { API_PORT } from '../../config/index'
 import moment from 'moment'
 import { TopNavigation } from "../../components/TopNavigation.component";
 import { DetailCard } from "../../components/detailCard.component";
@@ -24,9 +25,13 @@ const watchPic = require("../../assets/images/male-2.jpg");
 export const DetailViewScreen = (props) => {
   const visit = props.route.params;
   //console.log(visit)
-  console.log("visitas:-------",visit.Visitas)
-  console.log("DEstino:----",visit.Visitas[0].Destination)
-  console.log("Zona: -------",visit.Visitas[0].Destination.Zone)
+  const citizen = visit.Citizen
+
+  const watchman = visit.UserZone.User
+  console.log("visitas:-------",visit.Citizen)
+  console.log("DEstino:----",visit.Destination)
+  console.log("Zona: -------",visit.UserZone.Zone)
+  console.log("WATCHMAN:--------", visit.UserZone.User)
 
   const [activeTab, setActiveTab] = React.useState("0");
   const [xTabOne, setXTabOne] = React.useState();
@@ -37,26 +42,28 @@ export const DetailViewScreen = (props) => {
   const translateContent1 = new Animated.Value(0);
   const translateContent2 = new Animated.Value(width);
 
-  const animatedOverlay = async (tabCoor, tabActive) => {
+  const animatedOverlay = (tabCoor, tabActive) => {
     //setActiveTab(tabActive)
-    await Animated.spring(translateTab, {
+    Animated.spring(translateTab, {
       toValue: tabCoor,
       duration: 500,
       speed: 12,
       bounciness: 5,
+      useNativeDriver: false
     }).start();
     if (tabActive == 0) {
       Animated.parallel([
         Animated.spring(translateContent1, {
           toValue: 0,
           duration: 500,
+          useNativeDriver: false
         }).start(),
         Animated.spring(translateContent2, {
           toValue: width,
           duration: 500,
           speed: 12,
-
           bounciness: 5,
+          useNativeDriver: false
         }).start(),
       ]);
       //setActiveTab1({color: 'orange'})
@@ -93,7 +100,7 @@ export const DetailViewScreen = (props) => {
     );
   };
 
-  const element1 = (visit) => {
+  const element1 = (citizen, visit) => {
     return (
       <View
         style={{
@@ -105,26 +112,26 @@ export const DetailViewScreen = (props) => {
         <View style={{ width: "95%" }}>
           <View style={styles.dataBox}>
             <Text style={styles.labelText}>DNI:</Text>
-      <Text style={styles.dataText}>{visit.dni}</Text>
+      <Text style={styles.dataText}>{citizen.dni}</Text>
           </View>
           <View style={styles.dataBox}>
             <Text style={styles.labelText}>Destino:</Text>
-            <Text style={styles.dataText}>{visit.Visitas[0].Destination.name}</Text>
+            <Text style={styles.dataText}>{visit.Destination.name}</Text>
           </View>
           <View style={styles.dataBox}>
             <Text style={styles.labelText}>Hora de Entrada:</Text>
-            <Text style={styles.dataText}>{moment(visit.Visitas[0].departureDate).format('HH:mm a')}</Text>
+            <Text style={styles.dataText}>{moment(visit.departureDate).format('HH:mm a')}</Text>
           </View>
           <View style={styles.dataBox}>
             <Text style={styles.labelText}>Hora de Salida:</Text>
-            <Text style={styles.dataText}>{moment(visit.Visitas[0].entryDate).format('HH:mm a')}</Text>
+            <Text style={styles.dataText}>{moment(visit.entryDate).format('HH:mm a')}</Text>
           </View>
         </View>
       </View>
     );
   };
 
-  const element2 = (visit) => {
+  const element2 = (watchman) => {
     return (
       <View
         style={{
@@ -143,11 +150,11 @@ export const DetailViewScreen = (props) => {
           <View>
             <View style={styles.dataBox2}>
               <Text style={styles.labelText}>Nombre:</Text>
-        <Text style={styles.dataText}>{visit.Visitas[0].Destination.zone}</Text>
+        <Text style={styles.dataText}>{watchman.name}</Text>
             </View>
             <View style={styles.dataBox2}>
               <Text style={styles.labelText}>DNI</Text>
-              <Text style={styles.dataText}>19222907</Text>
+        <Text style={styles.dataText}>{watchman.dni}</Text>
             </View>
             <View style={styles.dataBox2}>
               <Text style={styles.labelText}>Identificaion:</Text>
@@ -156,7 +163,7 @@ export const DetailViewScreen = (props) => {
           </View>
           <View>
             <Image
-              source={watchPic}
+              source={{uri: `${API_PORT()}/public/imgs/${watchman.picture}`}}
               style={{ width: 140, height: 140, borderRadius: 70 }}
             />
             <Image
@@ -182,10 +189,10 @@ export const DetailViewScreen = (props) => {
               }}
             >
               <View style={{ marginBottom: 10 }}>
-                <Image source={{ uri: visit.picture }} style={styles.profilePic} />
+                <Image source={{ uri: `${API_PORT()}/public/imgs/${citizen.picture}` }} style={styles.profilePic} />
               </View>
               <Text style={styles.nameText}>
-                {visit.name} {visit.lastName}
+                {citizen.name} {citizen.lastName}
               </Text>
             </View>
           </View>
@@ -251,7 +258,7 @@ export const DetailViewScreen = (props) => {
             ],
           }}
         >
-          {element1(visit)}
+          {element1(citizen, visit)}
         </Animated.View>
         <Animated.View
           style={{
@@ -265,7 +272,7 @@ export const DetailViewScreen = (props) => {
             ],
           }}
         >
-          {element2(visit)}
+          {element2(watchman)}
         </Animated.View>
       </View>
     </View>

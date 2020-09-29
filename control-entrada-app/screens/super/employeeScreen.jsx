@@ -10,6 +10,7 @@ import {
   ScrollView,
   Alert,
   ActivityIndicator,
+  TouchableOpacity,
 } from "react-native";
 
 import axios from "axios";
@@ -18,7 +19,6 @@ import Input from "../../components/input.component";
 import { TopNavigation } from "../../components/TopNavigation.component";
 import { MainButton } from "../../components/mainButton.component";
 import { Ionicons } from "@expo/vector-icons";
-import Constants from "expo-constants";
 
 export const EmployeeScreen = (props) => {
   const [employee, setEmployee] = useState([]);
@@ -64,6 +64,7 @@ export const EmployeeScreen = (props) => {
     try {
       let res = await axios.get(`${API_PORT()}/api/findUsers`);
       if (res) {
+        console.log(res.data.data);
         setEmployee(res.data.data);
         setLoading(false);
       }
@@ -71,24 +72,7 @@ export const EmployeeScreen = (props) => {
       console.log("error: ", error);
     }
   };
-  const renderEmplyee = ({ item }) => {
-    console.log(item);
-    return (
-      <View>
-        <Text>Nombre: {item.name}</Text>
-        <Text>Apellido: {item.lastName}</Text>
-        <Text>DNI: {item.dni}</Text>
-        <Text>Correo: {item.email}</Text>
-        <Text>Fecha: {item.assignationDate}</Text>
-        <Text>Foto: {item.picture}</Text>
-        <Image
-          source={{uri: `${API_PORT()}/public/imgs/${item.picture}`}}
-          style={{ width: "100%", height: 120 }}
-        />
-      </View>
-    );
-  };
-
+  
   useEffect(() => {
     requestEmployee();
   }, []);
@@ -109,8 +93,38 @@ export const EmployeeScreen = (props) => {
           splash()
         ) : (
           <View>
-            <Text>Lista de Empleados:</Text>
-            <FlatList data={employee} renderItem={renderEmplyee} />
+            {employee &&
+              employee.map((item, i) => (
+                <TouchableOpacity
+                  style={styles.listItemBox}
+                  onPress={() =>
+                    props.navigation.navigate("employee_detail", item)
+                  }
+                  key={i}
+                >
+                  <View>
+                    <View style={styles.privilegeBox}>
+                      {item.privilege == "Supervisor" ? (
+                        <Text style={styles.privilegeText}>S</Text>
+                      ) : (
+                        <Text style={styles.privilegeText}>V</Text>
+                      )}
+                    </View>
+                  </View>
+                  <View style={styles.itemDataBox}>
+                    <Text style={styles.itemDataText}>
+                      {item.name} {item.lastName}
+                    </Text>
+                    <Text style={styles.itemDataText}>{item.email}</Text>
+                  </View>
+                  <View style={styles.itemDataBox}>
+                    <Text style={styles.itemDataText}>Zona</Text>
+                    <Text style={styles.itemDataText}>
+                      {item.userZone[0].Zone.zone}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              ))}
           </View>
         )}
       </ScrollView>
@@ -125,8 +139,34 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
-    //backgroundColor: "pink",
+  },
+  listItemBox: {
+    flexDirection: "row",
+    paddingHorizontal: 12,
+    paddingVertical: 5,
+    justifyContent: "space-between",
     alignItems: "center",
+    backgroundColor: "#fff",
+    marginVertical: 10,
+  },
+  privilegeBox: {
+    backgroundColor: "orange",
+    width: 50,
+    height: 50,
+    borderRadius: 25,
     justifyContent: "center",
+    alignItems: "center",
+  },
+  privilegeText: {
+    color: "#ffffff",
+    fontSize: 22,
+    fontWeight: "bold",
+  },
+  itemDataBox: {
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  itemDataText: {
+    fontSize: 15,
   },
 });
