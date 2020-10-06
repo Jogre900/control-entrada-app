@@ -3,7 +3,7 @@ import { View, TouchableHighlight, Image, Text, StyleSheet } from 'react-native'
 
 //COMPONENT
 import {TopNavigation} from '../../components/TopNavigation.component'
-import {API_PORT} from '../../config/index'
+import {API_PORT, ThirdColor} from '../../config/index'
 import { Ionicons } from "@expo/vector-icons";
 export const EmployeeDetailScreen = (props) => {
     const profile = props.route.params
@@ -28,17 +28,21 @@ export const EmployeeDetailScreen = (props) => {
               style={{width: 120, height: 120, borderRadius: 60, resizeMode: 'cover'}}
               source={{uri: `${API_PORT()}/public/imgs/${profile.picture}`}}/>
               <Text style={styles.profileName}>{profile.name} {profile.lastName}</Text>
+              <Text>{profile.email}</Text>
               <View style={styles.privilegeBox}>
               <Text style={styles.privilegeText}>{profile.privilege}</Text>
               </View>
             </View>
             <View style={styles.section2}>
             <Text>{profile.dni}</Text>
-              <Text>{profile.email}</Text>
+              
               
               <Text>Contratado el: {profile.userZone[0].assignationDate}</Text>
               <Text>Cambio de Turno: {profile.userZone[0].changeTurnDate}</Text>
-              <Text>{profile.userZone[0].Zone.zone}</Text> 
+              <View>
+              <Ionicons name='ios-business' size={28} color={ThirdColor}/>
+              <Text>{profile.userZone[0].Zone.zone}</Text>
+              </View> 
             </View>
         </View>
     )
@@ -60,15 +64,16 @@ const styles = StyleSheet.create({
     color: 'black'
   },
   privilegeBox: {
-    backgroundColor: 'orange',
-    borderRadius: 5
+    backgroundColor: ThirdColor,
+    borderRadius: 12
   },
   privilegeText: {
     alignSelf: 'center',
     fontSize: 18,
     color: '#fff',
     fontWeight: 'normal',
-    paddingHorizontal: 10
+    paddingHorizontal: 10,
+    paddingVertical: 3
   }
 })
 

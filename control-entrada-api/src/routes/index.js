@@ -53,5 +53,6 @@ const router = Router()
     router.get("/findVisit/:id", Methods.findVisit)
     router.put("/updateVisit/:id", Methods.updateVisit)
     router.get("/findTodayVisits/", Methods.findTodayVisits)
+    router.get("/findTodayVisitsByUser/:id", Methods.findTodayVisitsByUser)
     router.get("/findWeekVisits/", Methods.findWeekVisits)
 module.exports = router

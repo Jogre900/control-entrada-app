@@ -24,35 +24,16 @@ const { width, height } = Dimensions.get("window");
 
 export const HomeScreen = (props) => {
   const [profile, setProfile] = useState()
-  const getProfile = async () => {
-    const token = await AsyncStorage.getItem("watchToken")
-    console.log(token)
-    if(token){
-      try {
-        let res = await axios.get(`${API_PORT()}/api/profile`, {
-          headers: {
-            'Authorization': `bearer ${token}` 
-          }
-        })
-        if(res){
-          console.log("Profile:--", res.data)
-          setProfile(res.data.data)
-        }
-      } catch (error) {
-        console.log("error: ", error) 
-      }
-    }
-    
-  }
+  
   const goBackAction = () => {
     return (
       <View>
         <TouchableOpacity
           onPress={() => {
-            props.navigation.goBack();
+            props.navigation.navigate("watch-profile");
           }}
         >
-          <Ionicons name="ios-arrow-back" size={28} color="white" />
+          <Ionicons name="ios-person" size={28} color="white" />
         </TouchableOpacity>
       </View>
     );
@@ -68,9 +49,7 @@ export const HomeScreen = (props) => {
     );
   };
 
-  useEffect(() => {
-    getProfile()
-  }, [])
+  
   return (
     <View style={styles.container}>
       <TopNavigation

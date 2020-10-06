@@ -1,27 +1,64 @@
-import * as React from 'react';
-import { Platform, StatusBar, StyleSheet, View } from 'react-native';
-import { SplashScreen } from 'expo';
-import * as Font from 'expo-font';
-import { Ionicons } from '@expo/vector-icons';
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
-
-import { MainNavigator } from './navigation/main.navigator'
-import BottomTabNavigator from './navigation/BottomTabNavigator';
-import useLinking from './navigation/useLinking';
+import * as React from "react";
+import { Platform, StatusBar, StyleSheet, View } from "react-native";
+import { SplashScreen } from "expo";
+import * as Font from "expo-font";
+import { Ionicons } from "@expo/vector-icons";
+import { NavigationContainer } from "@react-navigation/native";
+import { createStackNavigator } from "@react-navigation/stack";
+import Constants from "expo-constants";
+import * as Notifications from "expo-notifications";
+import * as Permissions from "expo-permissions";
+import { MainNavigator } from "./navigation/main.navigator";
+import BottomTabNavigator from "./navigation/BottomTabNavigator";
+import useLinking from "./navigation/useLinking";
 
 const Stack = createStackNavigator();
-
-
 
 export default function App(props) {
   const [isLoadingComplete, setLoadingComplete] = React.useState(false);
   const [initialNavigationState, setInitialNavigationState] = React.useState();
+  const [tokenDevice, setTokenDevice] = React.useState();
   const containerRef = React.useRef();
   const { getInitialState } = useLinking(containerRef);
 
+  // Notification Permisssions
+  async function registerForPushNotificationsAsync() {
+    let token;
+    if (Constants.isDevice) {
+      const { status: existingStatus } = await Permissions.getAsync(
+        Permissions.NOTIFICATIONS
+      );
+      let finalStatus = existingStatus;
+      if (existingStatus !== "granted") {
+        const { status } = await Permissions.askAsync(
+          Permissions.NOTIFICATIONS
+        );
+        finalStatus = status;
+      }
+      if (finalStatus !== "granted") {
+        alert("Failed to get push token for push notification!");
+        return;
+      }
+      token = (await Notifications.getDevicePushTokenAsync()).data;
+      console.log("devicetoken: ",token);
+    } else {
+      alert("Must use physical device for Push Notifications");
+    }
+
+    if (Platform.OS === "android") {
+      Notifications.setNotificationChannelAsync("default", {
+        name: "default",
+        importance: Notifications.AndroidImportance.MAX,
+        vibrationPattern: [0, 250, 250, 250],
+        lightColor: "#FF231F7C",
+      });
+    }
+
+    return token;
+  }
+
   // Load any resources or data that we need prior to rendering the app
-  
+
   React.useEffect(() => {
     async function loadResourcesAndDataAsync() {
       try {
@@ -33,7 +70,7 @@ export default function App(props) {
         // Load fonts
         await Font.loadAsync({
           ...Ionicons.font,
-          'space-mono': require('./assets/fonts/SpaceMono-Regular.ttf'),
+          "space-mono": require("./assets/fonts/SpaceMono-Regular.ttf"),
         });
       } catch (e) {
         // We might want to provide this error information to an error reporting service
@@ -46,7 +83,11 @@ export default function App(props) {
 
     loadResourcesAndDataAsync();
   }, []);
-  
+
+  React.useEffect(() => {
+    registerForPushNotificationsAsync()
+    .then(token => setTokenDevice(token))
+  }, [])
 
   if (!isLoadingComplete && !props.skipLoadingScreen) {
     return null;
@@ -54,8 +95,7 @@ export default function App(props) {
     return (
       <React.Fragment>
         <NavigationContainer>
-
-        <MainNavigator/>
+          <MainNavigator />
         </NavigationContainer>
       </React.Fragment>
       // <View style={styles.container}>
@@ -65,7 +105,7 @@ export default function App(props) {
       //       <Stack.Screen name="root" component={mainNavigator} />
       //     </Stack.Navigator>
       //   </NavigationContainer>
-        
+
       // </View>
     );
   }
@@ -74,6 +114,6 @@ export default function App(props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
 });

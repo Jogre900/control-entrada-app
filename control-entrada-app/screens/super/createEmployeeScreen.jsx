@@ -8,11 +8,13 @@ import {
   ScrollView,
   Image,
   ActivityIndicator,
-  Alert
+  Alert,
+  TouchableOpacity,
 } from "react-native";
 
 import axios from "axios";
 import { API_PORT } from "../../config/index.js";
+import { lightColor } from "../../assets/colors.js";
 import Input from "../../components/input.component";
 import { TopNavigation } from "../../components/TopNavigation.component";
 import { MainButton } from "../../components/mainButton.component";
@@ -20,9 +22,7 @@ import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Picker } from "@react-native-community/picker";
 import * as ImagePicker from "expo-image-picker";
-
-
-
+import moment from "moment";
 
 export const CreateEmployeScreen = (props) => {
   const [zones, setZones] = useState([]);
@@ -43,8 +43,8 @@ export const CreateEmployeScreen = (props) => {
   const [image, setImage] = useState();
   const [fileName, setFileName] = useState("");
   const [fileType, setFileType] = useState("");
-  const [saving, setSaving] = useState(false)
-  const [success, setSuccess] = useState(false)
+  const [saving, setSaving] = useState(false);
+  const [success, setSuccess] = useState(false);
   const goBackAction = () => {
     return (
       <View>
@@ -105,8 +105,8 @@ export const CreateEmployeScreen = (props) => {
   };
 
   const createEmploye = async () => {
-    setSaving(true)
-    setSuccess(false)
+    setSaving(true);
+    setSuccess(false);
     setCreate(false);
     let data = new FormData();
     data.append("file", { uri: image, name: fileName, type: fileType });
@@ -118,19 +118,7 @@ export const CreateEmployeScreen = (props) => {
     data.append("privilege", privilege);
     data.append("assignationDate", date.toString());
     data.append("changeTurnDate", changeTurn.toString());
-    // let data = {
-    //   name,
-    //   lastName,
-    //   dni,
-    //   email,
-    //   password: "12345",
-    //   picture,
-    //   privilege,
-    //   assignationDate: date,
-    //   changeTurnDate: changeTurn,
-    // };
-    console.log("zine Id:", zoneId);
-    console.log(data);
+
     try {
       let res = await axios.post(
         `${API_PORT()}/api/createUser/${zoneId}`,
@@ -141,14 +129,11 @@ export const CreateEmployeScreen = (props) => {
           },
         }
       );
-      console.log(res.data);
+
       if (res.data.error === false) {
-        console.log("asigna: ", date);
-        console.log("turno: ", changeTurn);
-        console.log(res.data);
         setCreate(true);
-        setSaving(false)
-        setSuccess(true)
+        setSaving(false);
+        setSuccess(true);
       }
     } catch (error) {
       console.log("error: ", error);
@@ -158,12 +143,11 @@ export const CreateEmployeScreen = (props) => {
   const requestZone = async () => {
     try {
       let res = await axios.get(`${API_PORT()}/api/findZones`);
-      if (res){
-        console.log("zones array:-----", res.data.data[0].zone)
+      if (res) {
+        console.log("zones array:-----", res.data.data[0].zone);
         setZones(res.data.data);
-        setZoneId(res.data.data[0].id)
-      } 
-
+        setZoneId(res.data.data[0].id);
+      }
     } catch (error) {
       console.log("error: ", error);
     }
@@ -196,7 +180,7 @@ export const CreateEmployeScreen = (props) => {
     }
 
     if (!result.cancelled) {
-      console.log(result)
+      console.log(result);
       setImage(result.uri);
       let filename = result.uri.split("/").pop();
       setFileName(filename);
@@ -215,8 +199,30 @@ export const CreateEmployeScreen = (props) => {
   return (
     <View style={{ flex: 1 }}>
       <TopNavigation title="Crear Empleado" leftControl={goBackAction()} />
-      <ScrollView>
-        <View>
+      <ScrollView contentContainerStyle={styles.container}>
+        <View style={styles.mainWrapper}>
+          <View style={styles.imageContainer}>
+            <View style={styles.imageBox}>
+              {image ? (
+                <Image
+                  source={{ uri: image }}
+                  style={{ width: 150, height: 150, resizeMode: 'stretch' }}
+                />
+              ) : (
+                <Ionicons name="md-photos" size={36} color="#ccc" />
+              )}
+            </View>
+
+            <View style={styles.photoButtonBox}>
+              <TouchableOpacity onPress={() => getImage("galery")}>
+                <Ionicons name="md-photos" size={28} color={lightColor} />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => getImage("camera")}>
+                <Ionicons name="ios-camera" size={28} color={lightColor} />
+              </TouchableOpacity>
+            </View>
+          </View>
+
           <Input
             style={{ borderColor: "black", marginBottom: 10 }}
             styleInput={{ color: "black" }}
@@ -269,57 +275,51 @@ export const CreateEmployeScreen = (props) => {
             }}
             value={email}
           />
+
+          {/* ----ROLL---- */}
           <View>
-            {image && (
+            <Text>Rol</Text>
+            <Picker
+              mode="dropdown"
+              selectedValue={privilege}
+              onValueChange={(value) => setPrivilege(value)}
+            >
+              <Picker.Item label={"Supervisor"} value={"Supervisor"} />
+              <Picker.Item label={"Vigilante"} value={"Vigilante"} />
+            </Picker>
+
+            {privilege === "Vigilante" ? (
               <View>
-                <Image
-                  source={{ uri: image }}
-                  style={{ width: 120, height: 120 }}
-                />
+                <Text>Zonas</Text>
+                {zones && (
+                  <Picker
+                    mode="dropdown"
+                    selectedValue={zoneId}
+                    onValueChange={(value) => setZoneId(value)}
+                  >
+                    {zones.map((item, i) => (
+                      <Picker.Item label={item.zone} value={item.id} key={i} />
+                    ))}
+                  </Picker>
+                )}
               </View>
-            )}
-            <Button title="Galeria" onPress={() => getImage("galery")} />
-            <Button title="Camara" onPress={() => getImage("camera")} />
-          </View>
-          <Picker
-            mode="dropdown"
-            selectedValue={privilege}
-            onValueChange={(value) => setPrivilege(value)}
-          >
-            <Picker.Item label={"Supervisor"} value={"Supervisor"}/>
-            <Picker.Item label={"Vigilante"} value={"Vigilante"}/>
-          </Picker>
-          {
-            <View style={{ backgroundColor: "red" }}>
-              <Text>algo{privilege}</Text>
-            </View>
-          }
-          {privilege === "Vigilante" ? (
-            <View>
-              <Text>Zonas</Text>
-              {zones && (
-                <Picker
-                  mode="dropdown"
-                  selectedValue={zoneId}
-                  onValueChange={(value) => setZoneId(value)}
-                >
-                  {zones.map((item, i) => (
-                    <Picker.Item label={item.zone} value={item.id} key={i} />
-                  ))}
-                </Picker>
-              )}
-            </View>
-          ) : null}
-          <View style={{ backgroundColor: "orange" }}>
-            <Text>Zone id: {zoneId}</Text>
+            ) : null}
           </View>
 
           <View>
             <View>
-              <Button onPress={showDatepicker} title="Fecha de asignacion" />
+              <TouchableOpacity onPress={() => showDatepicker()}>
+                <Text>Fecha de Asignacion</Text>
+                <Ionicons name="ios-clock" size={28} color={lightColor} />
+                <Ionicons name="md-arrow-dropup" size={28} color="green" />
+              </TouchableOpacity>
             </View>
             <View>
-              <Button onPress={showDatepicker2} title="Cambio de Turno" />
+              <TouchableOpacity onPress={() => showDatepicker2()}>
+                <Text>Cambio de Turno</Text>
+                <Ionicons name="ios-clock" size={28} color={lightColor} />
+                <Ionicons name="md-arrow-dropdown" size={28} color="red" />
+              </TouchableOpacity>
             </View>
             {show && (
               <View>
@@ -345,7 +345,7 @@ export const CreateEmployeScreen = (props) => {
             )}
           </View>
           <View>
-            <Text>{date.toString()}</Text>
+            <Text>{moment(date).format("Do MM YYYY, HH:mm a")}</Text>
           </View>
           <View>
             <Text>{changeTurn.toString()}</Text>
@@ -357,17 +357,33 @@ export const CreateEmployeScreen = (props) => {
               createEmploye();
             }}
           />
-          {saving ? (
-            <Splash/>
-          ) : null}
-          {
-            success &&
-            saveSuccess()
-          }
+          {saving ? <Splash /> : null}
+          {success && saveSuccess()}
         </View>
       </ScrollView>
     </View>
   );
 };
 
-const styles = StyleSheet.create();
+const styles = StyleSheet.create({
+  container: {
+    alignItems: "center",
+  },
+  mainWrapper: {
+    width: "90%",
+  },
+  imagecontainer: {
+    backgroundColor: "#f09",
+  },
+  imageBox: {
+    borderColor: "#ccc",
+    borderWidth: 2,
+    borderStyle: "dotted",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  photoButtonBox: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+});

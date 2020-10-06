@@ -443,15 +443,17 @@ const Methods = {
           RESPONSE.data = user;
           RESPONSE.token = token;
         } else {
-          RESPONSE.msg = "Usuario no Registrado";
+          RESPONSE.msg = "Clave Invalida";
+          res.status(401).json(RESPONSE)
         }
       } else {
-        RESPONSE.msg = "Correo no registrado";
+        RESPONSE.msg = "Usuario no registrado";
+        res.status(404).json(RESPONSE)
       }
-      res.json(RESPONSE);
+      res.status(200).json(RESPONSE);
     } catch (error) {
       RESPONSE.msg = error;
-      res.json(RESPONSE);
+      res.status(500).json(RESPONSE);
     }
   },
   getProfile: async function(req, res) {
@@ -777,6 +779,53 @@ const Methods = {
     } catch (error) {
       RESPONSE.msg = error;
       res.json(RESPONSE);
+    }
+  },
+  findTodayVisitsByUser: async function(req, res) {
+    let RESPONSE = {
+      error: true,
+      msg: "",
+      data: null,
+      tokn: null
+    };
+    const { id } = req.params;
+    try {
+      let visits = await models.visits.findAll({
+        where: {
+          UserZoneId: id,
+          entryDate: {
+            [Op.between]: [
+              `${moment().format("YYYY-MM-DD")} 00:00:00`,
+              `${moment().format("YYYY-MM-DD")} 23:59:00`
+            ]
+          }
+        },
+        include: [
+          { model: models.citizen },
+          { model: models.destination, attributes: ["id", "name"] },
+          {
+            model: models.userZone,
+            attributes: ["id", "changeTurnDate", "assignationDate"],
+            include: [
+              { model: models.zone, attributes: ["id", "zone"] },
+              {
+                model: models.User,
+                attributes: [
+                  "id",
+                  "name",
+                  "lastName",
+                  "dni",
+                  "email",
+                  "picture"
+                ]
+              }
+            ]
+          }
+        ]
+      });
+      console.log(visits)
+    } catch (error) {
+      console.log(error)
     }
   },
   findWeekVisits: async function(req, res) {

@@ -1,16 +1,41 @@
 import React, { useRef, useImperativeHandle } from "react";
-import { View, TextInput, StyleSheet, TouchableWithoutFeedback } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  TouchableWithoutFeedback,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { MainColor } from '../assets/colors.js'
 
 const Input = (props, ref) => {
   // ----LA REF NO ME LLEGA POR PROPS----!!!
 
-  const { title, textColor, onChangeText, value, shape, icon, alignText, style, styleInput, keyboardType, returnKeyType, secureTextEntry, autoCorrect, onSubmitEditing } = props;
-  //console.log('input ref: ', props.ref)
+  const {
+    title,
+    textColor,
+    onChangeText,
+    value,
+    shape,
+    icon,
+    alignText,
+    style,
+    styleInput,
+    keyboardType,
+    returnKeyType,
+    secureTextEntry,
+    autoCorrect,
+    onSubmitEditing,
+    caption
+  } = props;
+  
   const [eyeIcon, setEyeIcon] = React.useState(true);
   const [iconInput, setIconInput] = React.useState("ios-eye-off");
   const [styleRound, setStyleRound] = React.useState(null);
 
+  const refInput = useRef();
+  
   const showPass = () => {
     if (secureTextEntry) {
       eyeIcon ? setIconInput("ios-eye") : setIconInput("ios-eye-off");
@@ -34,9 +59,9 @@ const Input = (props, ref) => {
     }
   });
 
-  const refInput = useRef();
   return (
-    <TouchableWithoutFeedback onPress={() => focus()}>
+    <View style={{marginBottom: 10}}>
+      <TouchableWithoutFeedback onPress={() => focus()}>
       <View style={[style, styles.flatShape, styleRound]}>
         {shape != "round" ? (
           <TouchableWithoutFeedback onPress={() => showPass()} style={{ alignItems: "center", justifyContent: "center" }}>
@@ -59,6 +84,10 @@ const Input = (props, ref) => {
         />
       </View>
     </TouchableWithoutFeedback>
+      <View>
+        <Text style={styles.captionText}>{caption}</Text>
+      </View>
+    </View>
   );
 };
 
@@ -71,6 +100,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     borderWidth: 0.5,
     height: 40,
+    borderColor: MainColor
   },
   squareShape: {
     borderRadius: 3,
@@ -84,4 +114,9 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0.5,
     height: 40,
   },
+  captionText: {
+    color: 'red',
+    alignSelf: 'center',
+    fontSize: 14
+  }
 });

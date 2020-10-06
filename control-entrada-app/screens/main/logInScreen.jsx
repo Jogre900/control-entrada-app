@@ -13,17 +13,17 @@ import {
   KeyboardAvoidingView,
   TouchableWithoutFeedback,
   Keyboard,
+  ActivityIndicator,
 } from "react-native";
 import axios from "axios";
 import AsyncStorage from "@react-native-community/async-storage";
 
 //components
-import { MainButton } from "../../components/mainButton.component";
+import { MainColor } from "../../assets/colors";
 import Input from "../../components/input.component";
 import { SplashScreen } from "../../components/splashScreen.component";
-import firebase from "../../lib/firebase";
-//constants
-import { mainColor } from "../../constants/Colors";
+import { MainButton } from "../../components/mainButton.component";
+import Modal from "react-native-modal";
 
 const API_PORT = "http://192.168.10.107:8000";
 const { width, height } = Dimensions.get("window");
@@ -43,8 +43,10 @@ const backAction = () => {
 export const LogInScreen = (props) => {
   const { navigation } = props;
   const [email, setEmail] = useState();
-  const [pass, setPass] = useState();
-
+  const [pass, setPass] = useState('');
+  const [modalVisible, setModalVisible] = useState(false);
+  const [passCaption, setPassCaption] = useState('')
+  const [emailCaption, setEmailCaption] = useState('')
   const [isSplash, setIsSplash] = useState(true);
 
   const backHandler = useRef(null);
@@ -56,7 +58,26 @@ export const LogInScreen = (props) => {
       setIsSplash(false);
     }, 500);
   };
-
+  //LOADING
+  const LoadingModal = () => {
+    return (
+      <Modal
+        isVisible={modalVisible}
+        onBackdropPress={() => setModalVisible(!modalVisible)}
+      >
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: "transparent",
+            justifyContent: "center",
+          }}
+        >
+          <ActivityIndicator size="large" color={MainColor} />
+        </View>
+      </Modal>
+    );
+  };
+  //STORE TOKEN
   const storeData = async (value) => {
     try {
       await AsyncStorage.setItem("watchToken", value);
@@ -64,40 +85,77 @@ export const LogInScreen = (props) => {
       console.log("Error al Guardar", e);
     }
   };
+  
+  //VALIDAR EMAIL
+  const validateEmail = email => {
+    var re = /^(([^<>()\[\]\\.,;:\s@”]+(\.[^<>()\[\]\\.,;:\s@”]+)*)|(“.+”))@((\[[0–9]{1,3}\.[0–9]{1,3}\.[0–9]{1,3}\.[0–9]{1,3}])|(([a-zA-Z\-0–9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(email);
+    };
+
+  //SIGN IN
   const signIn = async () => {
-    console.log(email, pass);
-    let data = await axios.post(`${API_PORT}/api/login`, {
-      email: email,
-      password: pass,
-    });
-    console.log("algo", data.data);
-    if (data) {
-      let privilege = data.data.data.privilege;
-      switch (privilege) {
-        case "Vigilante":
+    setModalVisible(true);
+    if (!email || !pass) {
+      setModalVisible(false);
+      alert("Debe llenar los campos");
+      return;
+    }
+      // }else{
+    //   if(!validateEmail(email)){
+    //     setModalVisible(false);
+    //     setEmailCaption('Debe ingresar un correo valido')
+    //     return;
+    //   }
+    // }
+    try {
+      let res = await axios.post(`${API_PORT}/api/login`, {
+        email,
+        password: pass,
+      });
+      if (res) {
+        console.log("res----------",res.data)
+        await storeData(res.data.token);
+        let privilege = res.data.data.privilege;
+        switch (privilege) {
+          case "Vigilante":
+          setModalVisible(false)  
           props.navigation.navigate("watch");
+            break;
+          case "Super":
+            props.navigation.navigate("super");
+            break;
+          default:
+            break;
+        }
+      }
+    } catch (error) {
+      setModalVisible(false);
+      switch (error.response.status) {
+        case 401:
+        setPassCaption(error.response.data.msg)
+        setPass('')  
+        //alert(error.response.data.msg);
           break;
-        case "Super":
-          props.navigation.navigate("super");
+        case 404:
+          alert(error.response.data.msg);
           break;
         default:
           break;
       }
-      //if(data.data.data.privilege === 'Admin') props.navigation.navigate("super")
-      storeData(data.data.token);
     }
-    //props.navigation.navigate("watch")
   };
 
   const signInStatus = async () => {
-    let token = await AsyncStorage.getItem("wacthToken")
-    console.log("token en el storage:---", token)
-    if(token){
-      let res = await axios.get(`${API_PORT()}/api/verifyToken`, { headers: {
-        'Authorization': `bearer ${token}`
-      }})
-      if(res.data){
-        console.log(res.data)
+    let token = await AsyncStorage.getItem("wacthToken");
+    console.log("token en el storage:---", token);
+    if (token) {
+      let res = await axios.get(`${API_PORT()}/api/verifyToken`, {
+        headers: {
+          Authorization: `bearer ${token}`,
+        },
+      });
+      if (res.data) {
+        console.log(res.data);
       }
     }
   };
@@ -111,8 +169,8 @@ export const LogInScreen = (props) => {
   }, []);
 
   useEffect(() => {
-    signInStatus()
-  }, [])
+    signInStatus();
+  }, []);
 
   if (isSplash) {
     return <SplashScreen />;
@@ -137,7 +195,6 @@ export const LogInScreen = (props) => {
             />
             <View style={styles.buttonBox}>
               <Input
-                style={{ borderColor: "#ff7e00", marginBottom: 10 }}
                 styleInput={{ color: "white" }}
                 title="Correo"
                 textColor="white"
@@ -145,27 +202,32 @@ export const LogInScreen = (props) => {
                 alignText="center"
                 keyboardType="email-address"
                 returnKeyType="next"
+                caption={emailCaption}
                 onSubmitEditing={() => nextInput.current.focus()}
                 onChangeText={(correo) => {
-                  setEmail(correo);
+                  setEmail(correo), setEmailCaption('')
                 }}
                 value={email}
               />
               <Input
-                style={{ borderColor: "#ff7e00", marginBottom: 10 }}
                 styleInput={{ color: "white" }}
                 title="Clave"
                 textColor="white"
                 shape="round"
                 alignText="center"
-                returnKeyType="go"
+                returnKeyType="done"
                 secureTextEntry={true}
+                caption={passCaption}
+                onSubmitEditing={() => signIn()}
                 onChangeText={(pass) => {
-                  setPass(pass);
+                  setPass(pass), setPassCaption('')
                 }}
                 value={pass}
                 ref={nextInput}
               />
+
+              <LoadingModal />
+
               <MainButton
                 title="Iniciar Sesion"
                 onPress={() => {
