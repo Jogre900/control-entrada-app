@@ -471,7 +471,22 @@ const Methods = {
       let profile = await models.User.findOne({
         where: {
           id: decode.id
-        }
+        },
+        include: [
+          {
+            model: models.NotificationRead,
+            as: "notificationUsers",
+            include: { model: models.Notification, as: "notification" }
+          },
+          {
+            model: models.userZone,
+            as: "userZone",
+            include: {
+              model: models.zone,
+              include: {model: models.destination, as: "Destinos"}
+            }
+          }
+        ]
       });
       if (profile) {
         RESPONSE.error = false;
@@ -485,6 +500,35 @@ const Methods = {
     } catch (error) {
       RESPONSE.error = error;
       res.json(RESPONSE);
+    }
+  },
+  updatePass: async function(req, res){
+    let RESPONSE = {
+      error: true,
+      msg: "",
+      data: null,
+      token: null
+    };
+    const { id } = req.params
+    const { password } = req.body
+    console.log(req.params)
+    console.log(req.body)
+    try {
+      let user = await models.User.findOne({
+        where: {
+          id
+        },
+      })
+      let hash = await bcrypt.hash(password, 10)
+      user.password = hash
+      await user.save()
+      RESPONSE.error = false 
+      RESPONSE.msg = "Cambio de contraseña exitoso!"
+      RESPONSE.data = user 
+      res.status(200).json(RESPONSE)
+    } catch (error) {
+      RESPONSE.msg = error
+      res.status(error.response.status).json(RESPONSE)
     }
   },
   findUserZone: async function(req, res) {

@@ -29,7 +29,7 @@ const Input = (props, ref) => {
     onSubmitEditing,
     caption
   } = props;
-  
+  console.log("onChange", onChangeText)
   const [eyeIcon, setEyeIcon] = React.useState(true);
   const [iconInput, setIconInput] = React.useState("ios-eye-off");
   const [styleRound, setStyleRound] = React.useState(null);

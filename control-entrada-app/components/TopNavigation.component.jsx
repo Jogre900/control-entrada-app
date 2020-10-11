@@ -10,22 +10,22 @@ import {
 } from "react-native";
 import { RectButton } from "react-native-gesture-handler";
 import { Ionicons } from "@expo/vector-icons";
+import { MainColor } from "../assets/colors.js";
 
 //constants
+import Constants from 'expo-constants';
 import { tintColor } from "../constants/Colors";
 
 function NormalNav() {
-  
   return (
-    <View style={styles.rightControlBox}>
-      <Ionicons name="ios-notifications" size={28} color="#ff7e00" />
+    <View style={styles.controlBox}>
+      <Ionicons name="ios-notifications" size={28} color={MainColor} />
     </View>
   );
 }
 
 export const TopNavigation = (props) => {
   const { title, leftControl, rightControl } = props;
-  
 
   return (
     <View style={styles.container}>
@@ -42,7 +42,7 @@ export const TopNavigation = (props) => {
       {rightControl ? (
         <TouchableOpacity
           onPress={rightControl.props.children.props.onPress}
-          style={styles.rightControlBox}
+          style={styles.controlBox}
         >
           {rightControl}
         </TouchableOpacity>
@@ -58,23 +58,18 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingHorizontal: 2,
-    backgroundColor: "#ff7e00",
-    paddingTop: 20,
+    paddingHorizontal: 10,
+    backgroundColor: MainColor,
+    //paddingTop: Constants.statusBarHeight,
     marginBottom: 0,
-    maxHeight: 60,
+    //maxHeight: 60,
+    height: 60
   },
-  leftControlBox: {
+  controlBox: {
     justifyContent: "center",
     alignItems: "center",
     width: "10%",
-    height: '100%',
-  },
-  rightControlBox: {
-    justifyContent: "center",
-    alignItems: "center",
-    width: "10%",
-    height: '100%',
+    height: "100%",
   },
   titleBox: {
     justifyContent: "center",
