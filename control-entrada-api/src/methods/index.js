@@ -433,7 +433,22 @@ const Methods = {
       let user = await models.User.findOne({
         where: {
           email
-        }
+        },
+        include: [
+          {
+            model: models.NotificationRead,
+            as: "notificationUsers",
+            include: { model: models.Notification, as: "notification" }
+          },
+          {
+            model: models.userZone,
+            as: "userZone",
+            include: {
+              model: models.zone,
+              include: { model: models.destination, as: "Destinos" }
+            }
+          }
+        ]
       });
       if (user) {
         if (bcrypt.compareSync(password, user.password)) {
@@ -444,11 +459,11 @@ const Methods = {
           RESPONSE.token = token;
         } else {
           RESPONSE.msg = "Clave Invalida";
-          res.status(401).json(RESPONSE)
+          res.status(401).json(RESPONSE);
         }
       } else {
         RESPONSE.msg = "Usuario no registrado";
-        res.status(404).json(RESPONSE)
+        res.status(404).json(RESPONSE);
       }
       res.status(200).json(RESPONSE);
     } catch (error) {
@@ -483,7 +498,7 @@ const Methods = {
             as: "userZone",
             include: {
               model: models.zone,
-              include: {model: models.destination, as: "Destinos"}
+              include: { model: models.destination, as: "Destinos" }
             }
           }
         ]
@@ -502,33 +517,33 @@ const Methods = {
       res.json(RESPONSE);
     }
   },
-  updatePass: async function(req, res){
+  updatePass: async function(req, res) {
     let RESPONSE = {
       error: true,
       msg: "",
       data: null,
       token: null
     };
-    const { id } = req.params
-    const { password } = req.body
-    console.log(req.params)
-    console.log(req.body)
+    const { id } = req.params;
+    const { password } = req.body;
+    console.log(req.params);
+    console.log(req.body);
     try {
       let user = await models.User.findOne({
         where: {
           id
-        },
-      })
-      let hash = await bcrypt.hash(password, 10)
-      user.password = hash
-      await user.save()
-      RESPONSE.error = false 
-      RESPONSE.msg = "Cambio de contraseña exitoso!"
-      RESPONSE.data = user 
-      res.status(200).json(RESPONSE)
+        }
+      });
+      let hash = await bcrypt.hash(password, 10);
+      user.password = hash;
+      await user.save();
+      RESPONSE.error = false;
+      RESPONSE.msg = "Cambio de contraseña exitoso!";
+      RESPONSE.data = user;
+      res.status(200).json(RESPONSE);
     } catch (error) {
-      RESPONSE.msg = error
-      res.status(error.response.status).json(RESPONSE)
+      RESPONSE.msg = error;
+      res.status(error.response.status).json(RESPONSE);
     }
   },
   findUserZone: async function(req, res) {
@@ -654,7 +669,8 @@ const Methods = {
     };
     console.log(req.body);
     console.log(req.params);
-    console.log(req.file);
+    console.log("1 foto:---", req.file);
+    console.log("varias fotos----", req.files);
     const {
       dni,
       name,
@@ -667,36 +683,102 @@ const Methods = {
     } = req.body;
     const { id } = req.params;
     try {
-      let visits = await models.citizen.create(
-        {
-          dni,
-          name,
-          lastName,
-          picture: req.file.filename,
-          Visitas: {
+      let person = await models.citizen.findOne({
+        where: {
+          dni
+        }
+      });
+      if (person) {
+        let visit = await models.visits.create(
+          {
             entryDate,
             descriptionEntry,
             departureDate,
             descriptionDeparture,
             destinationId: id,
-            UserZoneId: userZoneId
-          }
-        },
-        {
-          include: [
-            {
-              model: models.visits,
-              as: "Visitas"
+            UserZoneId: userZoneId,
+            citizenId: person.id,
+            Fotos: {
+              picture: req.file.filename,
+              entry: "algo",
             }
-          ]
-        }
-      );
-      (RESPONSE.error = false), (RESPONSE.msg = "Registro Exitoso");
-      RESPONSE.data = visits;
-      res.json(RESPONSE);
+          },
+          {
+            include: {
+              model: models.picture,
+              as: "Fotos"
+            }
+          }
+        );
+        //console.log("visita con dni ya registrado", visit)
+        RESPONSE.msg = "Registro Exitoso!";
+        RESPONSE.data = visit;
+        res.status(200).json(RESPONSE);
+      } else {
+        let visits = await models.citizen.create(
+          {
+            dni,
+            name,
+            lastName,
+            picture: req.files[0].filename,
+            Visitas: {
+              entryDate,
+              descriptionEntry,
+              departureDate,
+              descriptionDeparture,
+              destinationId: id,
+              UserZoneId: userZoneId,
+              Fotos: {
+                picture: req.files[1].filename,
+                entry: "algo"
+              }
+            }
+          },
+          {
+            include: [
+              {
+                model: models.visits,
+                as: "Visitas",
+                include: { model: models.picture, as: "Fotos" }
+              }
+            ]
+          }
+        );
+        RESPONSE.error = false;
+        RESPONSE.msg = "Registro Exitoso";
+        RESPONSE.data = visits;
+        res.status(200).json(RESPONSE);
+      }
     } catch (error) {
-      RESPONSE.msg = error;
+      RESPONSE.msg = error.message;
       res.json(RESPONSE);
+    }
+  },
+  //DELETE Visits
+  deleteVisit: async function(req, res){
+    let RESPONSE = {
+      error: true,
+      msg: "",
+      data: null,
+      token: null
+    }
+    const { id } = req.params
+    try {
+      let visit = await models.visits.findOne({
+        where: {
+          id
+        }
+      })
+      if(visit){
+        visit.destroy()
+        RESPONSE.error = false
+        RESPONSE.data = visit
+        RESPONSE.msg = "Registro borrado con exito!"
+        res.status(200).json(RESPONSE)
+      }
+    } catch (error) {
+      RESPONSE.msg = error.message
+      res.status(error.response.status).json(RESPONSE)
     }
   },
   updateVisit: async function(req, res) {
@@ -708,7 +790,7 @@ const Methods = {
     };
     const { departureDate, descriptionDeparture } = req.body;
     const { id } = req.params;
-
+    console.log(req.body, req.params)
     try {
       let visit = await models.visits.findOne({
         where: {
@@ -716,7 +798,7 @@ const Methods = {
         }
       });
       if (visit) {
-        console.log(visit);
+        //console.log(visit);
         visit.departureDate = departureDate;
         visit.descriptionDeparture = descriptionDeparture;
         await visit.save();
@@ -724,13 +806,14 @@ const Methods = {
         RESPONSE.error = false;
         RESPONSE.msg = "Actualizacion Existosa";
         RESPONSE.data = visit;
-        res.json(RESPONSE);
+        res.status(200).json(RESPONSE);
       }
     } catch (error) {
-      RESPONSE.msg = error;
+      RESPONSE.msg = error.message;
       res.json(RESPONSE);
     }
   },
+  //FIND BY DNI
   findVisit: async function(req, res) {
     let RESPONSE = {
       error: true,
@@ -750,6 +833,7 @@ const Methods = {
             as: "Visitas",
             include: [
               { model: models.destination },
+              { model: models.picture, as: "Fotos" },
               {
                 model: models.userZone,
                 include: [{ model: models.zone }, { model: models.User }]
@@ -765,9 +849,12 @@ const Methods = {
         RESPONSE.data = visit;
 
         res.json(RESPONSE);
+      }else{
+        RESPONSE.msg= "Dni no registrado"
+        res.status(404).json(RESPONSE)
       }
     } catch (error) {
-      RESPONSE.msg = error;
+      RESPONSE.msg = error.message;
       res.json(RESPONSE);
     }
   },
@@ -793,6 +880,7 @@ const Methods = {
         },
         include: [
           { model: models.citizen },
+          { model: models.picture, as: "Fotos" },
           { model: models.destination, attributes: ["id", "name"] },
           {
             model: models.userZone,
@@ -821,7 +909,7 @@ const Methods = {
         res.json(RESPONSE);
       }
     } catch (error) {
-      RESPONSE.msg = error;
+      RESPONSE.msg = error.message;
       res.json(RESPONSE);
     }
   },
@@ -833,6 +921,7 @@ const Methods = {
       tokn: null
     };
     const { id } = req.params;
+    console.log(req.params);
     try {
       let visits = await models.visits.findAll({
         where: {
@@ -846,6 +935,7 @@ const Methods = {
         },
         include: [
           { model: models.citizen },
+          { model: models.picture, as: "Fotos" },
           { model: models.destination, attributes: ["id", "name"] },
           {
             model: models.userZone,
@@ -867,9 +957,20 @@ const Methods = {
           }
         ]
       });
-      console.log(visits)
+      if (visits) {
+        console.log("visits", visits);
+        RESPONSE.error = false;
+        RESPONSE.msg = "Busqueda Exitosa!";
+        RESPONSE.data = visits;
+        res.status(200).json(RESPONSE);
+      } else {
+        RESPONSE.error = false;
+        RESPONSE.msg = "No hay Resultados!";
+        res.status(404).json(RESPONSE);
+      }
     } catch (error) {
-      console.log(error)
+      RESPONSE.msg = error;
+      res.status(error.respone.status).json(RESPONSE);
     }
   },
   findWeekVisits: async function(req, res) {
@@ -894,6 +995,7 @@ const Methods = {
         },
         include: [
           { model: models.citizen },
+          { model: models.picture, as: "Fotos" },
           { model: models.destination, attributes: ["id", "name"] },
           {
             model: models.userZone,

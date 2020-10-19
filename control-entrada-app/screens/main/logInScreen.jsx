@@ -42,7 +42,7 @@ const backAction = () => {
 
 export const LogInScreen = (props) => {
   const { navigation } = props;
-  const [email, setEmail] = useState();
+  const [email, setEmail] = useState("");
   const [pass, setPass] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
   const [passCaption, setPassCaption] = useState('')
@@ -115,11 +115,15 @@ export const LogInScreen = (props) => {
       if (res) {
         console.log("res----------",res.data)
         await storeData(res.data.token);
+        let profile = res.data.data
         let privilege = res.data.data.privilege;
         switch (privilege) {
           case "Vigilante":
           setModalVisible(false)  
-          props.navigation.navigate("watch");
+          props.navigation.navigate("watch", {
+            screen: 'watch-home',
+            params: { profile }
+          });
             break;
           case "Super":
             props.navigation.navigate("super");

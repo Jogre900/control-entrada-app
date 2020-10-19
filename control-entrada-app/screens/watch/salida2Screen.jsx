@@ -13,6 +13,7 @@ import {
   Keyboard,
   Alert,
   ActivityIndicator,
+  FlatList,
 } from "react-native";
 import { RectButton } from "react-native-gesture-handler";
 import { TopNavigation } from "../../components/TopNavigation.component";
@@ -24,26 +25,26 @@ import * as ImagePicker from "expo-image-picker";
 import moment from "moment";
 import axios from "axios";
 import { API_PORT } from "../../config/index";
+import { MainColor, lightColor } from "../../assets/colors.js";
+import Modal from "react-native-modal";
 
 const { width } = Dimensions.get("window");
-const cover = require("../../assets/images/background.jpg");
-const profilePic = require("../../assets/images/female-2.jpg");
-const watchPic = require("../../assets/images/male-2.jpg");
 
 export const Salida2Screen = (props) => {
+  const profile = props.route.params.profile;
+  const [findIt, setFindIt] = useState(false);
+  const [citizen, setCitizen] = useState();
+  const [showList, setShowList] = useState(false);
   const [dni, setDni] = useState("");
-  const [messageText, setMessageText] = useState("");
-  const [profile, setProfile] = useState();
   const [visitId, setVisitId] = useState("");
   const [visits, setVisits] = useState([]);
+  const [visitsDni, setvisitsDni] = useState();
   const [updateVisit, setUpdateVisit] = useState();
   const [destiny, setDestiny] = useState({});
   const [watchman, setWatchman] = useState();
-  const [saving, setSaving] = useState(false);
-  const [success, setSuccess] = useState(false);
   const [entryCheck, setEntryCheck] = useState(false);
   const [saved, setSaved] = useState(false);
-
+  const [modalVisible, setModalVisible] = useState(false);
   const [departure, setDeparture] = useState();
 
   const searchRef = useRef();
@@ -61,6 +62,23 @@ export const Salida2Screen = (props) => {
       </View>
     );
   };
+  //REQUEST TODAY VISITS
+  const todayVisit = async () => {
+    setModalVisible(true);
+    try {
+      let res = await axios.get(
+        `${API_PORT()}/api/findTodayVisitsByUser/${profile.userZone[0].id}`
+      );
+      if (res) {
+        console.log("today Visits:", res.data.data);
+        setVisits(res.data.data);
+        setModalVisible(false);
+      }
+    } catch (error) {
+      console.log("error: ", error);
+    }
+  };
+
   //REQUEST VISIT
   const requestVisit = async () => {
     if (!dni) {
@@ -69,7 +87,11 @@ export const Salida2Screen = (props) => {
       try {
         let res = await axios.get(`${API_PORT()}/api/findVisit/${dni}`);
         if (res) {
-          setProfile(res.data.data);
+          console.log("busqueda por dni:----- ", res.data.data);
+          setCitizen(res.data.data);
+          setvisitsDni(res.data.data.Visitas);
+          setFindIt(true);
+          setShowList(false);
           if (
             res.data.data.Visitas[0].entryDate !==
             res.data.data.Visitas[0].departureDate
@@ -81,13 +103,8 @@ export const Salida2Screen = (props) => {
             setEntryCheck(false);
           }
 
-          setVisits(res.data.data.Visitas[0]);
-
           setVisitId(res.data.data.Visitas[0].id);
-          console.log("Visitas//----", res.data.data.Visitas[0]);
-          setDestiny(res.data.data.Visitas[0].Destination);
-
-          setWatchman(res.data.data.Visitas[0].UserZone.User);
+          //console.log("Visitas//----", res.data.data.Visitas[0]);
         }
       } catch (error) {
         console.log("error: ", error);
@@ -95,57 +112,52 @@ export const Salida2Screen = (props) => {
     }
   };
 
-  //update entry
-  const updateEntry = async () => {
-    setSaving(true);
-    setSuccess(false);
-    setSaved(false);
-    let data = {
-      departureDate: moment(),
-      descriptionDeparture: departure,
-    };
-    try {
-      let res = await axios.put(
-        `${API_PORT()}/api/updateVisit/${visitId}`,
-        data
-      );
-      if (res) {
-        console.log(res.data);
-        setUpdateVisit(res.data.data);
-        setSuccess(true);
-        setSaving(false);
-      }
-    } catch (error) {
-      console.log("error: ", error);
-    }
-  };
-
-  //LOADING
-  const Splash = () => {
+   //LOADING MODAL
+  const LoadingModal = () => {
     return (
-      <View>
-        <ActivityIndicator size="large" color="#ff7e00" />
-      </View>
+      <Modal
+        isVisible={modalVisible}
+        onBackdropPress={() => setModalVisible(!modalVisible)}
+      >
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: "transparent",
+            justifyContent: "center",
+          }}
+        >
+          <ActivityIndicator size="large" color={MainColor} />
+        </View>
+      </Modal>
     );
   };
-
-  //REGISTER
-  const saveSuccess = () => {
-    Alert.alert("Registro Exitoso!");
-    setSuccess(false);
-    setSaved(true);
-  };
-
-  // useEffect(() => {
-  //   requestVisit()
-  // }, [saved])
-  const MessageView = (props) => {
-    return (
-      <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-        <Text>{props.message}</Text>
+  //RENDER TODAY VISIT
+  const renderVisits = ({ item }) => (
+    <TouchableOpacity onPress={() => props.navigation.navigate('departure', {item})} style={styles.listItemBox}>
+      <Image
+        style={{ height: 50, width: 50, borderRadius: 25, resizeMode: "cover" }}
+        source={{ uri: `${API_PORT()}/public/imgs/${item.Fotos[0].picture}` }}
+      />
+      <View style={styles.subItemBox}>
+        <Text style={styles.subItemTitle}>Nombre:</Text>
+        <Text>
+          {item.Citizen.name} {item.Citizen.lastName}
+        </Text>
       </View>
-    );
-  };
+      <View style={styles.subItemBox}>
+        <Text style={styles.subItemTitle}>Destino: </Text>
+        <Text>{item.Destination.name}</Text>
+      </View>
+      <View style={styles.subItemBox}>
+        <Text style={styles.subItemTitle}>Hora de Entrada:</Text>
+        <Text>{moment(item.entryDate).format("HH:mm a")}</Text>
+      </View>
+    </TouchableOpacity>
+  );
+
+  useEffect(() => {
+    todayVisit();
+  }, []);
 
   return (
     <View style={{ flex: 1 }}>
@@ -166,52 +178,96 @@ export const Salida2Screen = (props) => {
         <TouchableOpacity onPress={() => requestVisit()}>
           <Ionicons name="ios-search" size={28} color="white" />
         </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            setShowList(true), setFindIt(false);
+          }}
+        >
+          <Ionicons name="ios-list" size={28} color="white" />
+        </TouchableOpacity>
       </View>
-      {profile != null ? (
+      {
+        showList || !findIt
+          ? visits && (
+              <View>
+                <FlatList data={visits} renderItem={renderVisits} />
+              </View>
+            )
+          : null
+        // <LoadingModal />
+      }
+      {findIt ? (
         <View style={{ flex: 1 }}>
-          <ImageBackground source={cover} style={styles.imgBackground}>
-            <View style={styles.cover}>
-              <View style={{ justifyContent: "center", alignItems: "center" }}>
-                {/* <Ionicons name="ios-person" size={120} color="#fff" /> */}
-                <View style={{ position: "relative", marginBottom: 10 }}>
+          {visitsDni.map((elem, i) => (
+            <TouchableOpacity onPress={() => props.navigation.navigate('departure', {entry: elem, citizen})} style={styles.listItemBox} key={elem.id}>
+              <View>
+                {elem.Fotos.map((foto) => (
                   <Image
+                    key={foto.id}
                     source={{
-                      uri: `${API_PORT()}/public/imgs/${profile.picture}`,
+                      uri: `${API_PORT()}/public/imgs/${foto.picture}`,
                     }}
                     style={styles.profilePic}
                   />
-                </View>
-                <View style={styles.nameBox}>
-                  <Text style={styles.nameText}>
-                    {profile.name} {profile.lastName}
-                  </Text>
-                </View>
+                ))}
               </View>
-            </View>
-          </ImageBackground>
-          <View style={{ flex: 1, alignItems: "center" }}>
-            <View style={{ width: "75%" }}>
-              <View style={styles.dataBox}>
-                <Text style={styles.labelText}>DNI:</Text>
-                <Text style={styles.dataText}>{profile.dni}</Text>
+              <View style={styles.subItemBox}>
+                <Text style={styles.nameText}>
+                  {citizen.name} {citizen.lastName}
+                </Text>
+                <Text style={styles.dataText}>{citizen.dni}</Text>
               </View>
-              <View style={styles.dataBox}>
-                <Text style={styles.labelText}>Destino:</Text>
-                <Text style={styles.dataText}>{destiny.name}</Text>
+              <View style={styles.subItemBox}>
+                <Ionicons name="ios-pin" size={22} color="grey" />
+                <Text style={styles.dataText}>{elem.Destination.name}</Text>
               </View>
-              <View style={styles.dataBox}>
-                <Text style={styles.labelText}>Hora de Entrada:</Text>
+              <View style={styles.subItemBox}>
+                <Text style={styles.labelText}>Entrada:</Text>
                 <Text style={styles.dataText}>
-                  {moment(visits.entryDate).format("HH:mm a")}
+                  {moment(elem.entryDate).format("HH:mm a")}
                 </Text>
               </View>
+              {/* <View style={styles.subItemBox}>
+                <Ionicons
+                  name="md-timer"
+                  size={22}
+                  color={
+                    moment(elem.entryDate).format("HH:mm:ss") !==
+                      moment(elem.departureDate).format("HH:mm:ss") &&
+                    moment(elem.UserZone.Zone.firsDepartureTime).format(
+                      "HH:mm:ss"
+                    ) > moment(elem.departureDate).format("HH:mm:ss")
+                      ? "grey"
+                      : moment(elem.entryDate).format("HH:mm:ss") !==
+                      moment(elem.departureDate).format("HH:mm:ss") &&
+                    moment(elem.UserZone.Zone.firsDepartureTime).format(
+                      "HH:mm:ss"
+                    ) < moment(elem.departureDate).format("HH:mm:ss")
+                      ? "green"
+                      : moment().format("HH:mm:ss") <
+                          moment(elem.UserZone.Zone.firsDepartureTime).format(
+                            "HH:mm:ss")
+                           &&
+                        moment(elem.UserZone.Zone.firsDepartureTime).format(
+                          "HH:mm:ss"
+                        ) < moment(elem.departureDate).format("HH:mm:ss")
+                      ? "red"
+                      : null
+                  }
+                />
+              </View> */}
+            </TouchableOpacity>
+          ))}
+
+          {/* <View style={{ flex: 1, alignItems: "center" }}>
+            <View style={{ width: "75%" }}>
               <View>
                 {saved || entryCheck ? (
                   <View>
                     <View style={styles.dataBox}>
                       <Text style={styles.labelText}>Hora de Salida:</Text>
                       <Text style={styles.dataText}>
-                        {moment(visits.departureDate).format("HH:mm a") ||
+                        {moment(visitByDni.Visitas[0].departureDate).format("HH:mm a") ||
                           moment(updateVisit.departureDate).format("HH:mm a")}
                       </Text>
                     </View>
@@ -248,13 +304,11 @@ export const Salida2Screen = (props) => {
                 )}
               </View>
             </View>
-          </View>
+          </View> */}
         </View>
       ) : (
-        <MessageView message={messageText} />
+        <LoadingModal />
       )}
-      {saving ? <Splash /> : null}
-      {success && saveSuccess()}
     </View>
   );
 };
@@ -272,19 +326,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 5,
     paddingBottom: 5,
     alignItems: "center",
-    backgroundColor: "#ff7e00",
+    backgroundColor: MainColor,
   },
   cover: {
-    backgroundColor: "black",
-    flex: 1,
+    backgroundColor: "#fff",
+    flexDirection: "row",
     alignItems: "center",
-    opacity: 0.8,
-    justifyContent: "center",
+    justifyContent: "space-between",
   },
   profilePic: {
-    width: 140,
-    height: 140,
-    borderRadius: 70,
+    width: 50,
+    height: 50,
+    borderRadius: 25,
   },
   cameraIcon: {
     position: "absolute",
@@ -292,17 +345,11 @@ const styles = StyleSheet.create({
     right: 5,
   },
   nameBox: {
-    height: 40,
-    //backgroundColor: "orange",
-    paddingHorizontal: 10,
-    borderRadius: 20,
-    top: "10%",
     justifyContent: "center",
   },
   nameText: {
     textAlign: "center",
-    fontSize: 32,
-    color: "#fff",
+    fontSize: 14,
   },
 
   //elemento 1
@@ -315,12 +362,24 @@ const styles = StyleSheet.create({
   },
   labelText: {
     fontSize: 14,
-    color: "grey",
   },
   dataText: {
     fontSize: 17,
-    //fontWeight:'200',
-    paddingLeft: 20,
   },
-  //emento 2
+  //TODAY LIST STYLE
+  listItemBox: {
+    flexDirection: "row",
+    paddingHorizontal: 12,
+    paddingVertical: 5,
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: "#fff",
+    marginVertical: 10,
+  },
+  subItemBox: {
+    alignItems: "center",
+  },
+  subItemTitle: {
+    fontWeight: "bold",
+  },
 });

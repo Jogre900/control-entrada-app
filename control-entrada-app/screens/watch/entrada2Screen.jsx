@@ -3,17 +3,14 @@ import {
   View,
   Text,
   StyleSheet,
-  Animated,
-  Dimensions,
   TouchableOpacity,
   ScrollView,
-  ImageBackground,
   Image,
   KeyboardAvoidingView,
   TouchableWithoutFeedback,
-  Keyboard,
   Alert,
   ActivityIndicator,
+  Platform,
 } from "react-native";
 
 //components
@@ -22,21 +19,20 @@ import Input from "../../components/input.component";
 import { MainButton } from "../../components/mainButton.component";
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
-import firebase from "../../lib/firebase";
-import FireMethods from "../../lib/methods.firebase";
 import moment from "moment";
 import axios from "axios";
 import { Picker } from "@react-native-community/picker";
 import { API_PORT } from "../../config/index";
-
-const { width } = Dimensions.get("window");
-const cover = require("../../assets/images/background.jpg");
-const profilePic = require("../../assets/images/profile-picture.png");
-const watchPic = require("../../assets/images/male-2.jpg");
+import { Divider } from "../../components/Divider";
+import { MainColor, ligthColor } from "../../assets/colors";
+import Modal from "react-native-modal";
 
 export const Entrada2Screen = (props) => {
-  const profile = props.route.params
-  console.log("profile:----", profile)
+  const profile = props.route.params.profile;
+  const destinys = profile.userZone[0].Zone.Destinos;
+
+  const userZoneId = profile.userZone[0].id;
+
   const [saveImg, setSaveImg] = useState();
   const [changeImg, setChangeImg] = useState(false);
   const [userId, setUserId] = useState();
@@ -45,62 +41,44 @@ export const Entrada2Screen = (props) => {
   const [dni, setDni] = useState("");
   const [destiny, setDestiny] = useState("");
   const [entry, setEntry] = useState("");
-  const [departure, setDeparture] = useState("");
-  const [imgUrl, setImgUrl] = useState("");
+  const [imgUrl, setImgUrl] = useState();
+  const [visitImg, setVisitImg] = useState();
   const [fileName, setFileName] = useState("");
   const [fileType, setFileType] = useState("");
-  const [userZoneId, setUserZoneId] = useState("")
-  const [zones, setZones] = useState([]);
-  const [zoneId, setZoneId] = useState("");
-  const [destinys, setDestinys] = useState([]);
+  const [fileName2, setFileName2] = useState("");
+  const [fileType2, setFileType2] = useState("");
   const [destinyId, setDestinyId] = useState("");
-  const [saving, setSaving] = useState();
-  const [saveSuccess, setSaveSuccess] = useState(false);
-
+  const [modalVisibility, setModalVisibility] = useState(false);
+  const [profileCaption, setProfileCaption] = useState("");
+  const [destinyCaption, setDestinyCaption] = useState("");
+  const [editable, setEditable] = useState(true);
   const nameRef = useRef();
   const lastNameRef = useRef();
   const dniRef = useRef();
   const destinyRef = useRef();
-  
-
-  //USERZONES
-  const requestUserZone = async () => {
-    try {
-      let res = await axios.get(`${API_PORT()}/api/findUserZone/${profile.id}`)
-      if(res){
-        //setZones(res.data.data.Zone)
-        //console.log("zonas-----",res.data.data.Zone)
-        //setZoneId(res.data.data.ZoneId)
-        setUserZoneId(res.data.data.id)
-        console.log("userZoneid:-----", res.data.data.id)
-        setDestinys(res.data.data.Zone.Destinos);
-        console.log("destinos----",res.data.data.Zone.Destinos)
-        setDestinyId(res.data.data.Zone.Destinos[0].id);
-      }
-    } catch (error) {
-      console.log("error: ", error)
-    }
-  };
 
   //CREATE VISIT
   const createVisit = async () => {
-    if (!name && !lastName) {
-      alert("debe llenar los campos");
-      return
+    console.log("destiny id---------------", destinyId);
+    if (!name || !lastName || !dni) {
+      setProfileCaption("Debe ingresar todos los datos");
+      return;
     } else {
+      setModalVisibility(true);
       let data = new FormData();
       data.append("name", name);
       data.append("lastName", lastName);
       data.append("dni", dni);
-      data.append("file", { uri: imgUrl, name: fileName, type: fileType });
+      data.append("file", { uri: imgUrl, 
+        name: fileName, 
+        type: fileType 
+      });
+      data.append("file", { uri: visitImg, name: fileName2, type: fileType2 });
       data.append("entryDate", moment().toString());
       data.append("departureDate", moment().toString());
       data.append("descriptionEntry", entry);
-      data.append("descriptionDeparture", departure);
-      data.append("userZoneId", userZoneId)
-      
-      let data2 = new FormData();
-      data2.append("name", "jose")
+      data.append("userZoneId", userZoneId);
+
       try {
         let res = await axios.post(
           `${API_PORT()}/api/createVisit/${destinyId}`,
@@ -112,22 +90,42 @@ export const Entrada2Screen = (props) => {
           }
         );
         if (res) {
-          console.log(res.data);
+          console.log(res, data);
+          setModalVisibility(false);
+          alert("Registro exitoso!");
+          clearInputs();
         }
       } catch (error) {
-        console.log("error: ", error);
+        setModalVisibility(false);
+        console.log("error: ", error.response);
+        alert(error.message);
       }
     }
   };
-
-  // useEffect(() => {
-  //   requestDestiny();
-  // }, [zoneId]);
-  useEffect(() => {
-    requestUserZone();
-  }, []);
-
-  const pickImage = async () => {
+  //CHECK DNI
+  const checkDni = async () => {
+    try {
+      let res = await axios.get(`${API_PORT()}/api/findVisit/${dni}`);
+      console.log(res.data);
+      if (res.data.data !== null) {
+        console.log(res.data);
+        let citizen = res.data.data;
+        //console.log(citizen)
+        setName(citizen.name);
+        setLastName(citizen.lastName);
+        setImgUrl(citizen.picture);
+        setEditable(false);
+      }
+    } catch (error) {
+      console.log("error:---", error.message);
+      if (error.response.status === 404) {
+        alert(error.response.data.msg);
+      }
+    }
+  };
+  //PICK IMAGE
+  const pickImage = async (type) => {
+    console.log(type);
     let options = {
       allowsEditing: false,
       aspect: [4, 3],
@@ -138,20 +136,42 @@ export const Entrada2Screen = (props) => {
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         ...options,
       });
-      if (!result.cancelled) {
-        setImgUrl(result.uri);
-        let filename = result.uri.split("/").pop();
-        setFileName(filename);
-        // Infer the type of the image
-        let match = /\.(\w+)$/.exec(filename);
-        let type = match ? `image/${match[1]}` : `image`;
-        setFileType(type);
-        setChangeImg(true);
-      } else {
-        setChangeImg(false);
+
+      switch (type) {
+        case "profile":
+          if (!result.cancelled) {
+            setImgUrl(result.uri);
+            let filename = result.uri.split("/").pop();
+            setFileName(filename);
+            // Infer the type of the image
+            let match = /\.(\w+)$/.exec(filename);
+            let type = match ? `image/${match[1]}` : `image`;
+            setFileType(type);
+            setChangeImg(true);
+          } else {
+            setChangeImg(false);
+          }
+          break;
+        case "visit":
+          if (!result.cancelled) {
+            setVisitImg(result.uri);
+            let filename2 = result.uri.split("/").pop();
+            setFileName2(filename2);
+            // Infer the type of the image
+            let match2 = /\.(\w+)$/.exec(filename2);
+            let type2 = match2 ? `image/${match2[1]}` : `image`;
+            setFileType2(type2);
+            setChangeImg(true);
+          } else {
+            setChangeImg(false);
+          }
+          break;
+
+        default:
+          break;
       }
     } catch (error) {
-      console.log("error: ", error);
+      console.log("error: ", error.message);
     }
   };
 
@@ -165,12 +185,23 @@ export const Entrada2Screen = (props) => {
     );
   };
 
-  const splash = () => {
+  //LOADING
+  const LoadingModal = () => {
     return (
-      <View>
-        <ActivityIndicator size="large" color="#ff7e00" />
-        <ActivityIndicator size="small" color="#ff7e00" />
-      </View>
+      <Modal
+        isVisible={modalVisibility}
+        onBackdropPress={() => setModalVisibility(!modalVisibility)}
+      >
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: "transparent",
+            justifyContent: "center",
+          }}
+        >
+          <ActivityIndicator size="large" color={MainColor} />
+        </View>
+      </Modal>
     );
   };
 
@@ -180,89 +211,79 @@ export const Entrada2Screen = (props) => {
     setDni("");
     setDestiny("");
     setSaveImg("");
+    setImgUrl("");
   };
 
-  const savedSuccess = () => {
-    return (
-      <Text style={{ textAlign: "center", color: "green" }}>
-        Guardado exitoso
-      </Text>
-    );
-  };
-
+  useEffect(() => {
+    (async () => {
+      if (Platform.OS !== "web") {
+        const {
+          status,
+        } = await ImagePicker.requestCameraRollPermissionsAsync();
+        if (status !== "granted") {
+          alert("Sorry, we need camera roll permissions to make this work!");
+        }
+      }
+    })();
+  }, []);
   return (
-    <TouchableWithoutFeedback
-      style={{ flex: 1 }}
-      onPress={() => Keyboard.dismiss()}
-    >
+    <View style={{ flex: 1 }}>
       <KeyboardAvoidingView style={styles.containerKeyboard} behavior="padding">
         <TopNavigation title="Entrada" leftControl={goBackAction()} />
-        <ScrollView>
-          <ImageBackground source={cover} style={styles.imgBackground}>
-            <View style={styles.cover}>
-              <View style={{ position: "relative", marginBottom: 10 }}>
-                {imgUrl ? (
-                  <Image source={{ uri: imgUrl }} style={styles.profilePic} />
-                ) : (
-                  <View style={styles.profilePicBox}>
-                    <Image source={profilePic} style={styles.profilePic} />
-                    {/* <Ionicons name="ios-person" size={120} color="grey" /> */}
-                  </View>
-                )}
-                <TouchableOpacity
-                  onPress={() =>
-                    pickImage((res) => {
-                      console.log(res);
-                    })
-                  }
-                  style={styles.cameraIcon}
-                >
-                  {changeImg ? (
-                    <Ionicons name="ios-close" size={42} color="#ff7e00" />
-                  ) : (
-                    <Ionicons name="ios-camera" size={42} color="#ff7e00" />
-                  )}
+        <ScrollView contentContainerStyle={{ alignItems: "center" }}>
+          <View style={styles.imgBackground}>
+            <View style={styles.profilePicBox}>
+              {imgUrl ? (
+                <Image source={{ uri: imgUrl }} style={styles.profilePic} />
+              ) : (
+                <TouchableOpacity onPress={() => pickImage("profile")}>
+                  <Ionicons name="ios-camera" size={48} color="grey" />
                 </TouchableOpacity>
-              </View>
+              )}
+              <TouchableOpacity
+                onPress={() => pickImage("profile")}
+                style={styles.cameraIcon}
+              >
+                {changeImg && (
+                  <Ionicons name="ios-close" size={42} color="#ff7e00" />
+                )}
+              </TouchableOpacity>
             </View>
-          </ImageBackground>
-          <View style={{ flex: 1, alignItems: "center" }}>
-            <View
-              style={{
-                marginTop: 20,
-                width: "75%",
-              }}
-            >
-              <Input
-                title="Nombre"
-                secureTextEntry={false}
-                shape="flat"
-                icon="ios-person"
-                style={styles.input}
-                returnKeyType="next"
-                onSubmitEditing={() => lastNameRef.current.focus()}
-                onChangeText={(name) => setName(name)}
-                value={name}
-                ref={nameRef}
-              />
-              <Input
-                title="Apellido"
-                secureTextEntry={false}
-                shape="flat"
-                icon="ios-person"
-                style={styles.input}
-                returnKeyType="next"
-                onSubmitEditing={() => dniRef.current.focus()}
-                onChangeText={(lastname) => setLastName(lastname)}
-                value={lastName}
-                ref={lastNameRef}
-              />
+          </View>
+
+          <View style={styles.dateContainer}>
+            <Text style={styles.containerTitle}>Datos Personales</Text>
+            <Divider size="small" />
+            <Input
+              title="Nombre"
+              secureTextEntry={false}
+              shape="flat"
+              icon="ios-person"
+              returnKeyType="next"
+              onSubmitEditing={() => lastNameRef.current.focus()}
+              onChangeText={(name) => setName(name)}
+              editable={editable}
+              value={name}
+              ref={nameRef}
+            />
+            <Input
+              title="Apellido"
+              secureTextEntry={false}
+              shape="flat"
+              icon="ios-person"
+              returnKeyType="next"
+              onSubmitEditing={() => dniRef.current.focus()}
+              onChangeText={(lastname) => setLastName(lastname)}
+              editable={editable}
+              value={lastName}
+              ref={lastNameRef}
+            />
+            <View>
               <Input
                 title="DNI"
                 secureTextEntry={false}
                 shape="flat"
                 icon="ios-card"
-                style={styles.input}
                 keyBoradType="numeric"
                 returnKeyType="next"
                 onSubmitEditing={() => destinyRef.current.focus()}
@@ -270,21 +291,19 @@ export const Entrada2Screen = (props) => {
                 value={dni}
                 ref={dniRef}
               />
-              {/* {zones ? (
-                <Picker
-                  selectedValue={zoneId}
-                  onValueChange={(value) => setZoneId(value)}
-                  mode="dropdown"
-                >
-                  {zones.map((elem) => (
-                    <Picker.Item
-                      label={elem.zone}
-                      value={elem.id}
-                      key={elem.id}
-                    />
-                  ))}
-                </Picker>
-              ) : null} */}
+              <TouchableOpacity onPress={() => checkDni()}>
+                <Ionicons name="ios-search" size={28} color="grey" />
+              </TouchableOpacity>
+            </View>
+            <View>
+              <Text style={styles.captionText}>{profileCaption}</Text>
+            </View>
+          </View>
+          <View style={styles.dateContainer}>
+            <Text style={styles.containerTitle}>Datos de Ingreso</Text>
+            <Divider size="small" />
+            <View>
+              <Text>Selecione un destino:</Text>
               {destinys ? (
                 <Picker
                   selectedValue={destinyId}
@@ -300,38 +319,39 @@ export const Entrada2Screen = (props) => {
                   ))}
                 </Picker>
               ) : null}
-              <Input
-                title="Descipcion Entrada (opcional)"
-                secureTextEntry={false}
-                shape="flat"
-                icon="ios-person"
-                style={styles.input}
-                onChangeText={(entry) => setEntry(entry)}
-                value={entry}
-              />
-              <Input
-                title="Descipcion Salida (opcional)"
-                secureTextEntry={false}
-                shape="flat"
-                icon="ios-person"
-                style={styles.input}
-                onChangeText={(departure) => setDeparture(departure)}
-                value={departure}
-              />
-              <View>
-                <MainButton
-                  title="Registrar Entrada"
-                  style={{ marginTop: 10 }}
-                  onPress={() => createVisit()}
-                />
-              </View>
-              {saving ? splash() : null}
-              {saveSuccess ? savedSuccess() : null}
             </View>
+            <View>
+              <Text>Foto de Entrada</Text>
+              <TouchableOpacity onPress={() => pickImage("visit")}>
+                <Ionicons name="ios-camera" size={48} color="grey" />
+              </TouchableOpacity>
+              <View>
+                <Image source={{ uri: visitImg }} style={{width: 100, height: 100}} />
+              </View>
+            </View>
+            <Input
+              title="Descipcion Entrada (opcional)"
+              secureTextEntry={false}
+              shape="flat"
+              icon="ios-person"
+              onChangeText={(entry) => setEntry(entry)}
+              value={entry}
+            />
+            <View>
+              <Text style={styles.captionText}>{destinyCaption}</Text>
+            </View>
+          </View>
+          <LoadingModal />
+          <View style={{ width: "90%" }}>
+            <MainButton
+              title="Registrar Entrada"
+              style={{ marginTop: 10 }}
+              onPress={() => createVisit()}
+            />
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
-    </TouchableWithoutFeedback>
+    </View>
   );
 };
 
@@ -339,38 +359,51 @@ const styles = StyleSheet.create({
   containerKeyboard: {
     flex: 1,
     justifyContent: "center",
+    backgroundColor: "#eee",
   },
   imgBackground: {
-    flex: 1,
-    resizeMode: "cover",
+    width: "90%",
+    marginVertical: 5,
+    backgroundColor: "#fff",
+    borderRadius: 5,
     justifyContent: "center",
-  },
-  cover: {
-    backgroundColor: "black",
-    flex: 1,
     alignItems: "center",
-    opacity: 0.8,
-    justifyContent: "center",
+    paddingVertical: "10%",
   },
   profilePicBox: {
-    borderRadius: 70,
-    backgroundColor: "white",
-    width: 140,
-    height: 140,
+    width: 200,
+    height: 200,
+    borderRadius: 100,
+    backgroundColor: "pink",
     justifyContent: "center",
     alignItems: "center",
   },
   profilePic: {
-    width: 140,
-    height: 140,
-    borderRadius: 70,
+    width: "100%",
+    height: "100%",
+    borderRadius: 100,
+    //resizeMode: 'contain'
   },
   cameraIcon: {
     position: "absolute",
     bottom: 0,
     right: 5,
   },
-  input: {
-    marginBottom: 10,
+  dateContainer: {
+    backgroundColor: "#fff",
+    width: "90%",
+    borderRadius: 5,
+    marginVertical: 2.5,
+    padding: 8,
+  },
+  containerTitle: {
+    fontSize: 16,
+    fontWeight: "normal",
+    color: MainColor,
+  },
+  captionText: {
+    fontSize: 16,
+    fontWeight: "normal",
+    color: "red",
   },
 });

@@ -23,8 +23,8 @@ const cover = require("../../assets/images/background.jpg");
 const { width, height } = Dimensions.get("window");
 
 export const HomeScreen = (props) => {
-  const [profile, setProfile] = useState()
-  
+  console.log("params:----",props.route.params)
+  const profile = props.route.params
   const goBackAction = () => {
     return (
       <View>
@@ -72,7 +72,7 @@ export const HomeScreen = (props) => {
                 title="Salida"
                 style={styles.button}
                 onPress={() => {
-                  props.navigation.navigate("salida");
+                  props.navigation.navigate("salida", profile);
                 }}
               />
             </View>

@@ -61,11 +61,11 @@ export const WatchProfileScreen = (props) => {
   };
   //UPDATE PASSWORD
   const updatePassword = async () => {
-    console.log(passChange, repeatPass)
+    console.log(passChange, repeatPass);
     setLoading(true);
     if (passChange === "") {
       setPassCaption("Debe Llenar los campos");
-      return
+      return;
     } else if (passChange != repeatPass) {
       setPassCaption("Las contraseñas no son iguales");
     } else {
@@ -125,15 +125,14 @@ export const WatchProfileScreen = (props) => {
     return (
       <View>
         <View>
-         
           <Input
             title="Clave"
             icon="ios-eye-off"
             shape="flat"
             secureTextEntry={true}
-            onChangeText={(value) => 
-              {setPassChange(value), setPassCaption("")}
-            }
+            onChangeText={(value) => {
+              setPassChange(value), setPassCaption("");
+            }}
             value={passChange}
           />
           <Input
@@ -142,8 +141,7 @@ export const WatchProfileScreen = (props) => {
             secureTextEntry={true}
             shape="flat"
             onChangeText={(text) => {
-              setRepeatPass(text),
-              setPassCaption("")
+              setRepeatPass(text), setPassCaption("");
             }}
             value={repeatPass}
           />
@@ -302,7 +300,47 @@ export const WatchProfileScreen = (props) => {
                   <Ionicons name="md-create" size={22} color="grey" />
                 </TouchableOpacity>
               </View>
-              {editVisibility && <ChangePass />}
+              {editVisibility && (
+                <View>
+                  <View>
+                    <Input
+                      title="Clave"
+                      icon="ios-eye-off"
+                      shape="flat"
+                      secureTextEntry={true}
+                      onChangeText={(value) => {
+                        setPassChange(value), setPassCaption("");
+                      }}
+                      value={passChange}
+                    />
+                    <Input
+                      icon="ios-eye-off"
+                      title="Repetir Clave"
+                      secureTextEntry={true}
+                      shape="flat"
+                      onChangeText={(text) => {
+                        setRepeatPass(text), setPassCaption("");
+                      }}
+                      value={repeatPass}
+                    />
+                    <Text
+                      style={{
+                        color: "red",
+                        fontSize: 16,
+                        alignSelf: "center",
+                      }}
+                    >
+                      {passCaption}
+                    </Text>
+                  </View>
+
+                  <MainButton
+                    onPress={() => updatePassword()}
+                    style={{ width: "100%" }}
+                    title="Guardar Cambios"
+                  />
+                </View>
+              )}
             </View>
           </View>
         </ScrollView>
