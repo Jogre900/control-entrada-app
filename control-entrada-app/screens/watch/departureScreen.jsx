@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -17,23 +17,16 @@ import { MainColor } from "../../assets/colors";
 import { Divider } from "../../components/Divider";
 import { MainButton } from "../../components/mainButton.component";
 import Input from "../../components/input.component";
+import AsyncStorage from "@react-native-community/async-storage";
 
 export const DepartureScreen = (props) => {
   console.log("PARAMETROS----", props.route.params);
-  
-    const item = props.route.params.item
-    const citizen = props.route.params.citizen
-  // if(props.route.params.citizen) {const citizen = props.route.params.item}
-  // if(props.route.params.entry) {const entry = props.route.params.item }
-  
-  console.log("item-----", item)
-  // console.log("citizen:-----", citizen)
-  // console.log("entry-----", entry)
+  const { id } = props.route.params;
 
-  //const { entry, citizen, item } = props.route.params;
+  const [visit, setVisit] = useState();
   const [departureText, setDepartureText] = useState("");
   const [entryCheck, setEntryCheck] = useState(false);
-  const [updateVisit, setUpdateVisit] = useState()
+  const [updateVisit, setUpdateVisit] = useState();
   //GO BACK
   const goBackAction = () => {
     return (
@@ -48,77 +41,116 @@ export const DepartureScreen = (props) => {
       </View>
     );
   };
-
+  //FIND VISIT BY ID
+  const findVisitId = async () => {
+    try {
+      let res = await axios.get(`${API_PORT()}/api/findVisitId/${id}`);
+      if (res) {
+        console.log(res.data);
+        setVisit(res.data.data);
+      }
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
   //UPDATE ENTRY
   const updateEntry = async () => {
     let data = {
-      departureDate: moment().format("MMM d YY, HH:mm a"),
+      departureDate: moment(),
       descriptionDeparture: departureText,
     };
+    let token = await getToken();
     try {
-      let res = await axios.put(
-        `${API_PORT()}/api/updateVisit/${entry.id}`,
-        data
-      );
+      let res = await axios.put(`${API_PORT()}/api/updateVisit/${id}`, data, {
+        headers: {
+          Authorization: `bearer ${token}`,
+        },
+      });
       if (res) {
         console.log(res.data);
         setEntryCheck(true);
-        setUpdateVisit(res.data.data)
+        setUpdateVisit(res.data.data);
+        alert("salida registrada!")
       }
     } catch (error) {
       console.log("error: ", error.message);
+      alert(error.message)
     }
   };
-const algo = "otra cosa"
+
+  //GET TOKEN
+  const getToken = async () => {
+    const token = await AsyncStorage.getItem("watchToken");
+    if (token) {
+      console.log("token------", token);
+      return token;
+    }
+  };
+  useEffect(() => {
+    findVisitId();
+  }, [id]);
+
   return (
     <View style={{ flex: 1 }}>
       <TopNavigation title="Marcar Salida" leftControl={goBackAction()} />
-  <Text>{citizen.name}</Text>
-      {/* <ScrollView>
-        <View>
-          <Image
-            style={styles.profilePic}
-            source={{
-              uri: `${API_PORT()}/public/imgs/${entry.Fotos[0].picture}`,
-            }}
-          /> 
-        </View>
-         <View style={styles.dateContainer}>
-          <Text>Datos de Ingreso</Text>
-          <Divider size="small" />
-          <Text>
-            Nombre {item.Citizen.name} || {citizen.name}
-            {citizen.lastName || item.Citizen.lastName}
-          </Text>
-          <Text>DNI{citizen.dni}</Text>
-          <Text>Destino{entry.Destination.name}</Text>
-          <Text>
-            Hora de entrada{moment(entry.entryDate).format("MMM d, HH:mm a")}
-          </Text>
-          <Text>Observacion entrada {entry.descriptionEntry}</Text>
 
-          {
+      {visit ? (
+        <ScrollView>
+          <View>
+            <Image
+              style={styles.profilePic}
+              source={{
+                uri: `${API_PORT()}/public/imgs/${visit.Citizen.picture}`,
+              }}
+            />
+          </View>
+          <View style={styles.dateContainer}>
+            <Text>Datos de Ingreso</Text>
+            <Divider size="small" />
+            <Text>
+              Nombre {visit.Citizen.name}
+              {visit.Citizen.lastName}
+            </Text>
+            <Text>DNI{visit.Citizen.dni}</Text>
+            <Text>Visita</Text>
+            <Divider size="small" />
+            <Text>Destino{visit.Destination.name}</Text>
+            <Text>
+              Hora de entrada{moment(visit.entryDate).format("MMM Do, HH:mm a")}
+            </Text>
+            <Image
+              style={{ width: 100, height: 100 }}
+              source={{
+                uri: `${API_PORT()}/public/imgs/${visit.Fotos[0].picture}`,
+              }}
+            />
+            <Text>Observacion entrada {visit.descriptionEntry}</Text>
+
             <View>
               <Text>
                 Hora de salida
-                {moment(entry.departureDate).format("MMM d, HH:mm a") || moment(updateVisit.departureDate).format("MMM d, HH:mm a")}
+                {moment(visit.departureDate).format("D, HH:mm a")}
               </Text>
-              <Text>Observacion salida {entry.descriptionDeparture || updateVisit.descriptionDeparture}</Text>
+              <Text>Observacion salida {visit.descriptionDeparture}</Text>
             </View>
-          }
-          {
-            <Input
-              title="Descripcion Salida (Opcional)"
-              value={departureText}
-              onChangeText={(value) => setDepartureText(value)}
-              shape="flat"
+
+            {
+              <Input
+                title="Descripcion Salida (Opcional)"
+                value={departureText}
+                onChangeText={(value) => setDepartureText(value)}
+                shape="flat"
+              />
+            }
+          </View>
+          <View>
+            <MainButton
+              title="Registrar Salida"
+              onPress={() => updateEntry()}
             />
-          }
-        </View>
-        <View>
-          <MainButton title="Registrar Salida" onPress={() => updateEntry()} />
-        </View>
-      </ScrollView> */}
+          </View>
+        </ScrollView>
+      ) : null}
     </View>
   );
 };

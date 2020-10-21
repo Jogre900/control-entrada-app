@@ -101,6 +101,7 @@ export default (sequelize, { BOOLEAN, STRING, UUID, UUIDV4, ENUM }) => {
       onDelete: 'CASCADE',
       onUpdate: 'CASCADE'
     })
+    User.belongsTo(models.company)
   };
 
   return User;

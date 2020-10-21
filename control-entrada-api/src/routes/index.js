@@ -32,16 +32,14 @@ const uploadImg = multer({
 
 //VERIFY TOKEN MIDDLEWARE
 const middleware = {
-  
-  verifyToken: function (req, res, next) {
+  verifyToken: function(req, res, next) {
     if (!req.headers["authorization"])
       return next(createError(401, "Usuario no Autorizado"));
     const headerToken = req.headers["authorization"];
     const token = headerToken.split(" ")[1];
     jwt.verify(token, SECRETKEY, (err, payload) => {
-      console.log(payload)
-      if (err)
-        return next(createError(401, err.message));
+      console.log(payload);
+      if (err) return next(createError(401, err.message));
       res.payload = payload;
       next();
     });
@@ -50,9 +48,9 @@ const middleware = {
 
 const router = Router();
 
-router.post("/createUser/:id?", uploadImg.single("file"), Methods.createUser);
+router.post("/createUser/:privilege", uploadImg.single("file"), Methods.createUser);
 router.post("/login", Methods.login);
-router.get("/findUsers", Methods.findUsers);
+router.get("/findUsers/:companyId", Methods.findUsers);
 router.put("/updatePass/:id", Methods.updatePass);
 router.delete("/deleteUser/:id", Methods.deleteUser);
 router.post("/createCompany", Methods.createCompany);
@@ -71,20 +69,16 @@ router.get("/displayPicture", Methods.displayPicture);
 router.get("/profile", Methods.getProfile);
 router.get("/findUserZone/:id", Methods.findUserZone);
 router.get("/verifyToken", Methods.verifyExpToken);
-router.post(
-  "/createVisit/:id",
-  
-  uploadImg.array("file"),
-  Methods.createVisits
-);
+router.post("/createVisit/:id", middleware.verifyToken, uploadImg.array("file"), Methods.createVisits);
 router.delete("/deleteVisit/:id", Methods.deleteVisit);
 router.get("/findVisit/:id", Methods.findVisit);
-router.put("/updateVisit/:id", Methods.updateVisit);
+router.get("/findVisitId/:id", Methods.findVisitId)
+router.put("/updateVisit/:id", middleware.verifyToken, Methods.updateVisit);
 router.get("/findTodayVisits/", Methods.findTodayVisits);
 router.get("/findTodayVisitsByUser/:id", Methods.findTodayVisitsByUser);
 router.get("/findWeekVisits/", Methods.findWeekVisits);
 //PRUEBAS
-router.get("/test", middleware.verifyToken, (req, res) => {
+router.get("/test", (req, res) => {
   res.send("hello world");
 });
 module.exports = router;

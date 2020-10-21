@@ -18,7 +18,7 @@ import moment from "moment";
 import { MainColor } from "../../assets/colors";
 import Modal from "react-native-modal";
 
-export const HomeSuperScreen = (props) => {
+export const HomeAdminScreen = (props) => {
   const [object, setObject] = useState({});
   const [loading, setLoading] = useState(true);
   const [visits, setVisits] = useState([]);
