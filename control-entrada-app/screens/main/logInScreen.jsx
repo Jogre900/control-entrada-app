@@ -81,7 +81,7 @@ export const LogInScreen = (props) => {
   //STORE TOKEN
   const storeData = async (value) => {
     try {
-      await AsyncStorage.setItem("watchToken", value);
+      await AsyncStorage.setItem("userToken", value);
     } catch (e) {
       console.log("Error al Guardar", e);
     }
@@ -109,7 +109,7 @@ export const LogInScreen = (props) => {
     //   }
     // }
     try {
-      let res = await axios.post(`${API_PORT}/api/login`, {
+      let res = await axios.post(`${API_PORT()}/api/login`, {
         email,
         password: pass,
       });
@@ -126,7 +126,8 @@ export const LogInScreen = (props) => {
               params: { profile },
             });
             break;
-          case "Super":
+          case "Admin":
+            setModalVisible(false);
             props.navigation.navigate("admin");
             break;
           default:
@@ -137,24 +138,24 @@ export const LogInScreen = (props) => {
       setModalVisible(false);
       alert(error.message)
       console.log(error)
-      // switch (error.response.status) {
-      //   case 401:
-      //     setPassCaption(error.response.data.msg);
-      //     setPass("");
-      //     //alert(error.response.data.msg);
-      //     break;
-      //   case 404:
-      //     alert(error.response.data.msg);
-      //     break;
-      //   default:
-      //     break;
-      // }
+      switch (error.response.status) {
+        case 401:
+          setPassCaption(error.response.data.msg);
+          setPass("");
+          //alert(error.response.data.msg);
+          break;
+        case 404:
+          alert(error.response.data.msg);
+          break;
+        default:
+          break;
+      }
     }
   };
 
   const signInStatus = async () => {
-    let token = await AsyncStorage.getItem("AdminToken");
-    console.log("token en el storage:---", token);
+    let token = await AsyncStorage.getItem("userToken");
+    //console.log("token en el storage:---", token);
     if (token) {
       setModalVisible(true);
       try {
@@ -163,14 +164,14 @@ export const LogInScreen = (props) => {
             Authorization: `bearer ${token}`,
           },
         });
-        if (res) {
-          console.log(res.data.data);
-          setPayload(res.data.data);
-          console.log(res.data.data.privilege);
+        if (res.data.data) {
+          //console.log("res--", res.data.data);
+          let profile = res.data.data;
+          console.log(profile)
           setModalVisible(false);
           switch (res.data.data.privilege) {
             case "Admin":
-              props.navigation.navigate("admin");
+              props.navigation.navigate("admin", {screen: "admin-home", params: {profile}});
               break;
             case "Supervisor":
               props.navigation.navigate("super");
@@ -183,7 +184,8 @@ export const LogInScreen = (props) => {
           }
         }
       } catch (error) {
-        console.log("error---------",error)
+        console.log("error---------",error.message)
+        setModalVisible(false);
         alert(error.message);
       }
     }

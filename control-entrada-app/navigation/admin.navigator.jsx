@@ -25,7 +25,7 @@ const Stack = createStackNavigator();
 function AdminNav() {
   return (
     <Stack.Navigator headerMode="none">
-      <Stack.Screen name="supervicer-home" component={HomeAdminScreen} />
+      <Stack.Screen name="admin-home" component={HomeAdminScreen} />
       <Stack.Screen name="detail-view" component={DetailViewScreen} />
       <Stack.Screen name='notification' component={NotificationScreen}/>
       <Stack.Screen name='zone_detail' component={ZoneDetailScreen}/>
@@ -49,8 +49,13 @@ function DrawerHeader(props) {
     </View>
   );
 }
+
+const deleteToken = async (props) => {
+  await AsyncStorage.removeItem("userToken")
+  .then(() => props.navigation.navigate("logIn"))
+}
 function DrawerBody(props) {
-  console.log("draer body props---", props)
+  //console.log("drawer body props---", props)
   return (
     <View>
       <DrawerItem
@@ -82,11 +87,7 @@ function DrawerBody(props) {
       <DrawerItem
         label="Cerrar Sesion"
         onPress={() => {
-          AsyncStorage.removeItem('AdminToken', (error) => {
-            if(error) alert(error)
-          }).then(res => {
-            res && navigation.pop("logIn")
-          })
+          deleteToken(props)
         }}
       />
     </View>

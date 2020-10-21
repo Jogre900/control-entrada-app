@@ -19,6 +19,7 @@ import { MainColor } from "../../assets/colors";
 import Modal from "react-native-modal";
 
 export const HomeAdminScreen = (props) => {
+  console.log(props.route.params)
   const [object, setObject] = useState({});
   const [loading, setLoading] = useState(true);
   const [visits, setVisits] = useState([]);

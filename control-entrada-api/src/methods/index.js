@@ -624,19 +624,21 @@ const Methods = {
     };
     console.log(req.headers)
     const token = req.headers.authorization.split(" ")[1];
-    console.log(token)
+    console.log("token---",token)
     try {
       let decode = jwt.verify(token, SECRETKEY);
-      console.log(decode)
-      if (decode) {
+      console.log("decode------",decode)
+      
           RESPONSE.error = false;
           RESPONSE.data = decode
           RESPONSE.msg = "token activo"
           RESPONSE.token = token;
           res.status(200).json(RESPONSE);
-      }
+      
     } catch (error) {
       RESPONSE.msg = error.message;
+      console.log(error.response)
+      res.json(RESPONSE)
     }
   },
   findUsers: async function(req, res) {
