@@ -16,19 +16,20 @@ const Methods = {
       data: null,
       token: null
     };
-    const { name, email, dni } = req.body;
+    const { companyName, companyEmail, companyDni } = req.body;
+    console.log(req.body);
     try {
       let company = await models.company.create({
-        name,
-        email,
-        dni
+        companyName,
+        companyEmail,
+        companyDni
       });
       RESPONSE.error = false;
-      RESPONSE.msg = "Creacion de Empresa Exitoso!";
+      RESPONSE.msg = "Registro Exitoso!";
       RESPONSE.data = company;
-      res.json(RESPONSE);
+      res.status(200).json(RESPONSE);
     } catch (error) {
-      RESPONSE.msg = error;
+      RESPONSE.msg = error.message;
       res.json(RESPONSE);
     }
   },
@@ -334,11 +335,11 @@ const Methods = {
       dni,
       email,
       password,
-      privilege,
+      zoneId,
       assignationDate,
       changeTurnDate
     } = req.body;
-    const { id } = req.params;
+    const { privilege } = req.params;
     console.log(req.file);
     try {
       let user = await models.User.findOne({
@@ -349,48 +350,81 @@ const Methods = {
       console.log("user", user);
       if (user == null) {
         try {
-          //console.log("es null")
-          //console.log(password)
           let hash = await bcrypt.hash(password, 10);
           password = hash;
-          let userR = await models.User.create(
-            {
-              name,
-              lastName,
-              dni,
-              email,
-              password,
-              picture: req.file.filename,
-              privilege,
-              userZone: {
-                assignationDate,
-                changeTurnDate,
-                ZoneId: id
-              }
-            },
-            {
-              include: [{ model: models.userZone, as: "userZone" }]
-            }
-          );
-          //console.log(userR)
+          switch (privilege) {
+            case "Admin":
+              let admin = await models.User.create({
+                name,
+                lastName,
+                dni,
+                email,
+                password,
+                picture: req.file.filename,
+                privilege
+              });
+              let token = jwt.sign(admin.dataValues, SECRETKEY, {
+                expiresIn: "1d"
+              });
+              (RESPONSE.error = false), (RESPONSE.msg = "Registro Exitoso!");
+              (RESPONSE.data = admin), (RESPONSE.token = token);
+              res.status(200).json(RESPONSE);
+              break;
+            case "Supervisor":
+              let supervisor = await models.User.create({
+                name,
+                lastName,
+                dni,
+                email,
+                password,
+                picture: req.file.filename,
+                privilege
+              });
 
-          //let token = jwt.sign(userR.dataValues, SECRETKEY, { expiresIn: 1440 });
-          RESPONSE.error = false;
-          RESPONSE.msg = "Registro Exitoso!";
-          RESPONSE.data = userR;
-          //RESPONSE.token = token;
-          res.json(RESPONSE);
+              (RESPONSE.error = false), (RESPONSE.msg = "Registro Exitoso!");
+              (RESPONSE.data = supervisor), res.status(200).json(RESPONSE);
+              break;
+            case "Watchman":
+              let watch = await models.User.create(
+                {
+                  name,
+                  lastName,
+                  dni,
+                  email,
+                  password,
+                  picture: req.file.filename,
+                  privilege,
+                  userZone: {
+                    assignationDate,
+                    changeTurnDate,
+                    ZoneId: zoneId
+                  }
+                },
+                {
+                  include: {
+                    model: models.userZone,
+                    as: "userZone"
+                  }
+                }
+              );
+
+              (RESPONSE.error = false), (RESPONSE.msg = "Registro Exitoso!");
+              (RESPONSE.data = watch), res.status(200).json(RESPONSE);
+              break;
+            default:
+              break;
+          }
         } catch (error) {
-          console.log(error);
+          RESPONSE.msg = error.message;
+          res.json(RESPONSE);
         }
       } else {
-        RESPONSE.error = true;
         RESPONSE.msg = "Usuario ya Registrado";
         RESPONSE.data = user;
         res.json(RESPONSE);
       }
     } catch (error) {
-      RESPONSE.msg = error;
+      RESPONSE.msg = error.message;
       res.json(RESPONSE);
     }
 
@@ -467,8 +501,8 @@ const Methods = {
       }
       res.status(200).json(RESPONSE);
     } catch (error) {
-      RESPONSE.msg = error;
-      res.status(500).json(RESPONSE);
+      RESPONSE.msg = error.message;
+      res.json(RESPONSE);
     }
   },
   getProfile: async function(req, res) {
@@ -543,7 +577,7 @@ const Methods = {
       res.status(200).json(RESPONSE);
     } catch (error) {
       RESPONSE.msg = error;
-      res.status(error.response.status).json(RESPONSE);
+      res.json(RESPONSE);
     }
   },
   findUserZone: async function(req, res) {
@@ -588,19 +622,23 @@ const Methods = {
       data: null,
       token: null
     };
+    console.log(req.headers)
     const token = req.headers.authorization.split(" ")[1];
+    console.log("token---",token)
     try {
       let decode = jwt.verify(token, SECRETKEY);
-      if (decode) {
-        if (decode.exp) {
+      console.log("decode------",decode)
+      
           RESPONSE.error = false;
-          (RESPONSE.data = decode), (RESPONSE.msg = "token activo");
-          RESPONSE.token = decode;
-          res.json(RESPONSE);
-        }
-      }
+          RESPONSE.data = decode
+          RESPONSE.msg = "token activo"
+          RESPONSE.token = token;
+          res.status(200).json(RESPONSE);
+      
     } catch (error) {
-      RESPONSE.msg = error;
+      RESPONSE.msg = error.message;
+      console.log(error.response)
+      res.json(RESPONSE)
     }
   },
   findUsers: async function(req, res) {
@@ -610,8 +648,12 @@ const Methods = {
       data: null,
       token: null
     };
+    const { companyId } = req.params;
     try {
       let user = await models.User.findAll({
+        where: {
+          companyId
+        },
         include: [
           {
             model: models.NotificationRead,
@@ -629,9 +671,9 @@ const Methods = {
       });
       (RESPONSE.error = false), (RESPONSE.msg = "Busqueda Exitosa");
       RESPONSE.data = user;
-      res.json(RESPONSE);
+      res.status(200).json(RESPONSE);
     } catch (error) {
-      RESPONSE.msg = error;
+      RESPONSE.msg = error.message;
       res.json(RESPONSE);
     }
   },
@@ -700,7 +742,7 @@ const Methods = {
             citizenId: person.id,
             Fotos: {
               picture: req.file.filename,
-              entry: "algo",
+              entry: "algo"
             }
           },
           {
@@ -755,30 +797,30 @@ const Methods = {
     }
   },
   //DELETE Visits
-  deleteVisit: async function(req, res){
+  deleteVisit: async function(req, res) {
     let RESPONSE = {
       error: true,
       msg: "",
       data: null,
       token: null
-    }
-    const { id } = req.params
+    };
+    const { id } = req.params;
     try {
       let visit = await models.visits.findOne({
         where: {
           id
         }
-      })
-      if(visit){
-        visit.destroy()
-        RESPONSE.error = false
-        RESPONSE.data = visit
-        RESPONSE.msg = "Registro borrado con exito!"
-        res.status(200).json(RESPONSE)
+      });
+      if (visit) {
+        visit.destroy();
+        RESPONSE.error = false;
+        RESPONSE.data = visit;
+        RESPONSE.msg = "Registro borrado con exito!";
+        res.status(200).json(RESPONSE);
       }
     } catch (error) {
-      RESPONSE.msg = error.message
-      res.status(error.response.status).json(RESPONSE)
+      RESPONSE.msg = error.message;
+      res.json(RESPONSE);
     }
   },
   updateVisit: async function(req, res) {
@@ -790,7 +832,7 @@ const Methods = {
     };
     const { departureDate, descriptionDeparture } = req.body;
     const { id } = req.params;
-    console.log(req.body, req.params)
+    console.log(req.body, req.params);
     try {
       let visit = await models.visits.findOne({
         where: {
@@ -811,6 +853,37 @@ const Methods = {
     } catch (error) {
       RESPONSE.msg = error.message;
       res.json(RESPONSE);
+    }
+  },
+  //FIND VISIT BY ID
+  findVisitId: async function(req, res) {
+    let RESPONSE = {
+      error: true,
+      msg: "",
+      data: null,
+      tokn: null
+    };
+    const { id } = req.params;
+    try {
+      let visit = await models.visits.findOne({
+        where: {
+          id
+        },
+        include: [
+          { model: models.citizen },
+          { model: models.picture, as: "Fotos" },
+          { model: models.destination, attributes: ["id", "name"] }
+        ]
+      });
+      if (visit) {
+        RESPONSE.error = false;
+        RESPONSE.msg = "Busqueda Exitosa!";
+        RESPONSE.data = visit;
+        res.status(200).json(RESPONSE);
+      }
+    } catch (error) {
+      RESPONSE.msg = error.message;
+      res.status(error.respone.status).json(RESPONSE);
     }
   },
   //FIND BY DNI
@@ -849,9 +922,9 @@ const Methods = {
         RESPONSE.data = visit;
 
         res.json(RESPONSE);
-      }else{
-        RESPONSE.msg= "Dni no registrado"
-        res.status(404).json(RESPONSE)
+      } else {
+        RESPONSE.msg = "Dni no registrado";
+        res.status(404).json(RESPONSE);
       }
     } catch (error) {
       RESPONSE.msg = error.message;

@@ -112,7 +112,7 @@ export const Salida2Screen = (props) => {
     }
   };
 
-   //LOADING MODAL
+  //LOADING MODAL
   const LoadingModal = () => {
     return (
       <Modal
@@ -133,24 +133,31 @@ export const Salida2Screen = (props) => {
   };
   //RENDER TODAY VISIT
   const renderVisits = ({ item }) => (
-    <TouchableOpacity onPress={() => props.navigation.navigate('departure', {item})} style={styles.listItemBox}>
+    <TouchableOpacity
+      onPress={() => props.navigation.navigate("departure", { id: item.id })}
+      style={styles.listItemBox}
+    >
       <Image
         style={{ height: 50, width: 50, borderRadius: 25, resizeMode: "cover" }}
         source={{ uri: `${API_PORT()}/public/imgs/${item.Fotos[0].picture}` }}
       />
       <View style={styles.subItemBox}>
         <Text style={styles.subItemTitle}>Nombre:</Text>
-        <Text>
+        <Text style={styles.dataText}>
           {item.Citizen.name} {item.Citizen.lastName}
         </Text>
       </View>
       <View style={styles.subItemBox}>
         <Text style={styles.subItemTitle}>Destino: </Text>
-        <Text>{item.Destination.name}</Text>
+        <Text style={styles.dataText}>{item.Destination.name}</Text>
       </View>
       <View style={styles.subItemBox}>
-        <Text style={styles.subItemTitle}>Hora de Entrada:</Text>
-        <Text>{moment(item.entryDate).format("HH:mm a")}</Text>
+        <Text style={styles.subItemTitle}>Entrada:</Text>
+        <Text style={styles.dataText}>{moment(item.entryDate).format("MMM D, HH:mm a")}</Text>
+      </View>
+      <View style={styles.subItemBox}>
+        <Text style={styles.subItemTitle}>Salida:</Text>
+        <Text style={styles.dataText}>{moment(item.departureDate).format("MMM D, HH:mm a")}</Text>
       </View>
     </TouchableOpacity>
   );
@@ -199,7 +206,13 @@ export const Salida2Screen = (props) => {
       {findIt ? (
         <View style={{ flex: 1 }}>
           {visitsDni.map((elem, i) => (
-            <TouchableOpacity onPress={() => props.navigation.navigate('departure', {entry: elem, citizen})} style={styles.listItemBox} key={elem.id}>
+            <TouchableOpacity
+              onPress={() =>
+                props.navigation.navigate("departure", { id: elem.id })
+              }
+              style={styles.listItemBox}
+              key={elem.id}
+            >
               <View>
                 {elem.Fotos.map((foto) => (
                   <Image
@@ -224,7 +237,15 @@ export const Salida2Screen = (props) => {
               <View style={styles.subItemBox}>
                 <Text style={styles.labelText}>Entrada:</Text>
                 <Text style={styles.dataText}>
-                  {moment(elem.entryDate).format("HH:mm a")}
+                  {
+                    moment(elem.entryDate).format("MMM D, HH:mm a")}
+                </Text>
+              </View>
+              <View style={styles.subItemBox}>
+                <Text style={styles.labelText}>Salida:</Text>
+                <Text style={styles.dataText}>
+                  {
+                   moment(elem.departureDate).format("MMM D, HH:mm a")}
                 </Text>
               </View>
               {/* <View style={styles.subItemBox}>
@@ -258,53 +279,6 @@ export const Salida2Screen = (props) => {
               </View> */}
             </TouchableOpacity>
           ))}
-
-          {/* <View style={{ flex: 1, alignItems: "center" }}>
-            <View style={{ width: "75%" }}>
-              <View>
-                {saved || entryCheck ? (
-                  <View>
-                    <View style={styles.dataBox}>
-                      <Text style={styles.labelText}>Hora de Salida:</Text>
-                      <Text style={styles.dataText}>
-                        {moment(visitByDni.Visitas[0].departureDate).format("HH:mm a") ||
-                          moment(updateVisit.departureDate).format("HH:mm a")}
-                      </Text>
-                    </View>
-                    <View style={styles.dataBox}>
-                      <Text style={styles.labelText}>Descipcion Salida:</Text>
-                      <Text style={styles.dataText}>
-                        {
-                          visits.descriptionDeparture
-                          //&& updateVisit.descriptionDeparture
-                        }
-                      </Text>
-                    </View>
-                  </View>
-                ) : (
-                  <View>
-                    <Input
-                      title="Descipcion Salida (opcional)"
-                      secureTextEntry={false}
-                      shape="flat"
-                      icon="ios-person"
-                      style={styles.input}
-                      onChangeText={(departure) => setDeparture(departure)}
-                      value={departure}
-                    />
-                    <View>
-                      <MainButton
-                        title="Marcar salida"
-                        onPress={() => {
-                          updateEntry();
-                        }}
-                      />
-                    </View>
-                  </View>
-                )}
-              </View>
-            </View>
-          </View> */}
         </View>
       ) : (
         <LoadingModal />
@@ -364,7 +338,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   dataText: {
-    fontSize: 17,
+    fontSize: 12,
   },
   //TODAY LIST STYLE
   listItemBox: {

@@ -26,6 +26,7 @@ import { API_PORT } from "../../config/index";
 import { Divider } from "../../components/Divider";
 import { MainColor, ligthColor } from "../../assets/colors";
 import Modal from "react-native-modal";
+import AsyncStorage from "@react-native-community/async-storage";
 
 export const Entrada2Screen = (props) => {
   const profile = props.route.params.profile;
@@ -57,9 +58,19 @@ export const Entrada2Screen = (props) => {
   const dniRef = useRef();
   const destinyRef = useRef();
 
+  //GET TOKEN
+  const getToken = async () => {
+    const token = await AsyncStorage.getItem("watchToken");
+    console.log("token del local storage:---", token);
+    if(token) return token
+  }
+
+  
+  
   //CREATE VISIT
   const createVisit = async () => {
     console.log("destiny id---------------", destinyId);
+    let token = await getToken()
     if (!name || !lastName || !dni) {
       setProfileCaption("Debe ingresar todos los datos");
       return;
@@ -86,6 +97,7 @@ export const Entrada2Screen = (props) => {
           {
             headers: {
               "content-type": "multipart/form-data",
+              Authorization: `bearer ${token}` 
             },
           }
         );
@@ -125,7 +137,6 @@ export const Entrada2Screen = (props) => {
   };
   //PICK IMAGE
   const pickImage = async (type) => {
-    console.log(type);
     let options = {
       allowsEditing: false,
       aspect: [4, 3],
@@ -226,6 +237,10 @@ export const Entrada2Screen = (props) => {
       }
     })();
   }, []);
+
+  useEffect(() => {
+    getToken()
+  }, [])
   return (
     <View style={{ flex: 1 }}>
       <KeyboardAvoidingView style={styles.containerKeyboard} behavior="padding">

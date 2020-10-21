@@ -29,15 +29,24 @@ export default (sequelize, { UUID, UUIDV4, STRING }) => {
   });
 
   Company.associate = (models) => {
-    Company.hasMany(models.employee, {
+    // Company.hasMany(models.employee, {
+    //   foreignKey: {
+    //     name: "companyId",
+    //     field: "company_id",
+    //   },
+    //   as: "Empleado",
+    //   onDelete: "CASCADE",
+    //   onUpdate: "CASCADE",
+    // });
+    Company.hasMany(models.User, {
       foreignKey: {
         name: "companyId",
-        field: "company_id",
+        field: "company_id"
       },
       as: "Empleado",
       onDelete: "CASCADE",
-      onUpdate: "CASCADE",
-    });
+      onUpdate: "CASCADE"
+    })
     Company.hasMany(models.zone, {
       foreignKey: {
         name: "companyId",

@@ -24,8 +24,8 @@ import Input from "../../components/input.component";
 import { SplashScreen } from "../../components/splashScreen.component";
 import { MainButton } from "../../components/mainButton.component";
 import Modal from "react-native-modal";
+import { API_PORT } from "../../config/index";
 
-const API_PORT = "http://192.168.10.107:8000";
 const { width, height } = Dimensions.get("window");
 
 const backAction = () => {
@@ -43,11 +43,12 @@ const backAction = () => {
 export const LogInScreen = (props) => {
   const { navigation } = props;
   const [email, setEmail] = useState("");
-  const [pass, setPass] = useState('');
+  const [pass, setPass] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
-  const [passCaption, setPassCaption] = useState('')
-  const [emailCaption, setEmailCaption] = useState('')
+  const [passCaption, setPassCaption] = useState("");
+  const [emailCaption, setEmailCaption] = useState("");
   const [isSplash, setIsSplash] = useState(true);
+  const [payload, setPayload] = useState();
 
   const backHandler = useRef(null);
   const translate = new Animated.Value(1);
@@ -80,17 +81,17 @@ export const LogInScreen = (props) => {
   //STORE TOKEN
   const storeData = async (value) => {
     try {
-      await AsyncStorage.setItem("watchToken", value);
+      await AsyncStorage.setItem("userToken", value);
     } catch (e) {
       console.log("Error al Guardar", e);
     }
   };
-  
+
   //VALIDAR EMAIL
-  const validateEmail = email => {
+  const validateEmail = (email) => {
     var re = /^(([^<>()\[\]\\.,;:\s@”]+(\.[^<>()\[\]\\.,;:\s@”]+)*)|(“.+”))@((\[[0–9]{1,3}\.[0–9]{1,3}\.[0–9]{1,3}\.[0–9]{1,3}])|(([a-zA-Z\-0–9]+\.)+[a-zA-Z]{2,}))$/;
     return re.test(email);
-    };
+  };
 
   //SIGN IN
   const signIn = async () => {
@@ -100,7 +101,7 @@ export const LogInScreen = (props) => {
       alert("Debe llenar los campos");
       return;
     }
-      // }else{
+    // }else{
     //   if(!validateEmail(email)){
     //     setModalVisible(false);
     //     setEmailCaption('Debe ingresar un correo valido')
@@ -108,25 +109,26 @@ export const LogInScreen = (props) => {
     //   }
     // }
     try {
-      let res = await axios.post(`${API_PORT}/api/login`, {
+      let res = await axios.post(`${API_PORT()}/api/login`, {
         email,
         password: pass,
       });
       if (res) {
-        console.log("res----------",res.data)
+        console.log("res----------", res.data);
         await storeData(res.data.token);
-        let profile = res.data.data
+        let profile = res.data.data;
         let privilege = res.data.data.privilege;
         switch (privilege) {
           case "Vigilante":
-          setModalVisible(false)  
-          props.navigation.navigate("watch", {
-            screen: 'watch-home',
-            params: { profile }
-          });
+            setModalVisible(false);
+            props.navigation.navigate("watch", {
+              screen: "watch-home",
+              params: { profile },
+            });
             break;
-          case "Super":
-            props.navigation.navigate("super");
+          case "Admin":
+            setModalVisible(false);
+            props.navigation.navigate("admin");
             break;
           default:
             break;
@@ -134,11 +136,13 @@ export const LogInScreen = (props) => {
       }
     } catch (error) {
       setModalVisible(false);
+      alert(error.message)
+      console.log(error)
       switch (error.response.status) {
         case 401:
-        setPassCaption(error.response.data.msg)
-        setPass('')  
-        //alert(error.response.data.msg);
+          setPassCaption(error.response.data.msg);
+          setPass("");
+          //alert(error.response.data.msg);
           break;
         case 404:
           alert(error.response.data.msg);
@@ -150,16 +154,39 @@ export const LogInScreen = (props) => {
   };
 
   const signInStatus = async () => {
-    let token = await AsyncStorage.getItem("wacthToken");
-    console.log("token en el storage:---", token);
+    let token = await AsyncStorage.getItem("userToken");
+    //console.log("token en el storage:---", token);
     if (token) {
-      let res = await axios.get(`${API_PORT()}/api/verifyToken`, {
-        headers: {
-          Authorization: `bearer ${token}`,
-        },
-      });
-      if (res.data) {
-        console.log(res.data);
+      setModalVisible(true);
+      try {
+        let res = await axios.get(`${API_PORT()}/api/verifyToken`, {
+          headers: {
+            Authorization: `bearer ${token}`,
+          },
+        });
+        if (res.data.data) {
+          //console.log("res--", res.data.data);
+          let profile = res.data.data;
+          console.log(profile)
+          setModalVisible(false);
+          switch (res.data.data.privilege) {
+            case "Admin":
+              props.navigation.navigate("admin", {screen: "admin-home", params: {profile}});
+              break;
+            case "Supervisor":
+              props.navigation.navigate("super");
+              break;
+            case "Watch":
+              props.navigation.navigate("watch");
+              break;
+            default:
+              break;
+          }
+        }
+      } catch (error) {
+        console.log("error---------",error.message)
+        setModalVisible(false);
+        alert(error.message);
       }
     }
   };
@@ -209,7 +236,7 @@ export const LogInScreen = (props) => {
                 caption={emailCaption}
                 onSubmitEditing={() => nextInput.current.focus()}
                 onChangeText={(correo) => {
-                  setEmail(correo), setEmailCaption('')
+                  setEmail(correo), setEmailCaption("");
                 }}
                 value={email}
               />
@@ -224,7 +251,7 @@ export const LogInScreen = (props) => {
                 caption={passCaption}
                 onSubmitEditing={() => signIn()}
                 onChangeText={(pass) => {
-                  setPass(pass), setPassCaption('')
+                  setPass(pass), setPassCaption("");
                 }}
                 value={pass}
                 ref={nextInput}
@@ -239,9 +266,9 @@ export const LogInScreen = (props) => {
                 }}
               />
               <MainButton
-                title="Supervisor"
+                title="Registrate"
                 onPress={() => {
-                  props.navigation.navigate("super");
+                  props.navigation.navigate("register");
                 }}
               />
             </View>
