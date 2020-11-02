@@ -21,6 +21,7 @@ const sequelize = new Sequelize(database, username, password, {
 
 // Models
 const models = {
+  Admin: sequelize.import("./Admin.js"),
   User: sequelize.import("./User"),
   //SIN EDITAR O REVISAR
   Notification: sequelize.import("./Notification"),

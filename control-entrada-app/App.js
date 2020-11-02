@@ -11,6 +11,8 @@ import * as Permissions from "expo-permissions";
 import { MainNavigator } from "./navigation/main.navigator";
 import BottomTabNavigator from "./navigation/BottomTabNavigator";
 import useLinking from "./navigation/useLinking";
+import { Provider } from "react-redux";
+import store from "./store/store";
 
 const Stack = createStackNavigator();
 
@@ -40,7 +42,7 @@ export default function App(props) {
         return;
       }
       token = (await Notifications.getDevicePushTokenAsync()).data;
-      console.log("devicetoken: ",token);
+      console.log("devicetoken: ", token);
     } else {
       alert("Must use physical device for Push Notifications");
     }
@@ -85,18 +87,19 @@ export default function App(props) {
   }, []);
 
   React.useEffect(() => {
-    registerForPushNotificationsAsync()
-    .then(token => setTokenDevice(token))
-  }, [])
+    registerForPushNotificationsAsync().then((token) => setTokenDevice(token));
+  }, []);
 
   if (!isLoadingComplete && !props.skipLoadingScreen) {
     return null;
   } else {
     return (
       <React.Fragment>
-        <NavigationContainer>
-          <MainNavigator />
-        </NavigationContainer>
+        <Provider store={store}>
+          <NavigationContainer>
+            <MainNavigator />
+          </NavigationContainer>
+        </Provider>
       </React.Fragment>
       // <View style={styles.container}>
       // {Platform.OS === 'ios' && <StatusBar barStyle="default" />}

@@ -94,7 +94,7 @@ export const RegisterScreen = (props) => {
   const storeToken = async (token) => {
     console.log("token:-------",token)
     try {
-      await AsyncStorage.setItem("AdminToken", token)
+      await AsyncStorage.setItem("userToken", token)
     } catch (error) {
       console.log(error.message)
     }
@@ -107,6 +107,7 @@ export const RegisterScreen = (props) => {
     data.append("lastName", lastName);
     data.append("dni", dni);
     data.append("email", email);
+    //data.append("privilege", "Admin")
     data.append("password", repeatPass)
     data.append("file", { uri: imgUrl, name: fileName, type: fileType });
     try {
@@ -115,11 +116,11 @@ export const RegisterScreen = (props) => {
           "content-type": "multipart/form-data"
         }
       });
-      if (res) {
+      if (res.data) {
         console.log(res.data);
         await storeToken(res.data.token);
         setModalVisible(false)
-        props.navigation.navigate("super")
+        props.navigation.navigate("admin", {profile: res.data.data})
       }
     } catch (error) {
       alert(error.message);

@@ -3,7 +3,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 
 //screen
 import { HomeScreen } from "../screens/watch/homeScreen";
-import { WatchProfileScreen } from "../screens/watch/watchProfileScreen.jsx";
+import WatchProfileScreen from "../screens/watch/watchProfileScreen.jsx";
 import { Entrada2Screen } from "../screens/watch/entrada2Screen";
 import { Salida2Screen } from "../screens/watch/salida2Screen";
 import { DepartureScreen } from "../screens/watch/departureScreen";

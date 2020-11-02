@@ -18,8 +18,9 @@ import moment from "moment";
 import { MainColor } from "../../assets/colors";
 import Modal from "react-native-modal";
 
+const companyId = "9a28095a-9029-40ec-88c2-30e3fac69bc5";
+
 export const HomeAdminScreen = (props) => {
-  console.log(props.route.params)
   const [object, setObject] = useState({});
   const [loading, setLoading] = useState(true);
   const [visits, setVisits] = useState([]);
@@ -74,17 +75,21 @@ export const HomeAdminScreen = (props) => {
   const requestVisits = async () => {
     setModalVisible(!modalVisible);
     try {
-      let res = await axios.get(`${API_PORT()}/api/findTodayVisits`);
-      if (res) {
+      let res = await axios.get(
+        `${API_PORT()}/api/findTodayVisits/${companyId}`
+      );
+      console.log(res.data.data);
+      if (res.data.data.length === 0) {
+        setModalVisible(false);
+        alert("No hay registros");
+      } else if (!res.data.error) {
         console.log(res.data.data);
         setVisits(res.data.data);
         setModalVisible(!modalVisible);
       }
     } catch (error) {
-      if ((error = "Network Error")) {
-        setModalVisible(false);
-        alert("Erorr de conexion!");
-      }
+      setModalVisible(false);
+      alert(error.message);
     }
   };
 

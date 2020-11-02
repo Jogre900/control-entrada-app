@@ -14,7 +14,7 @@ import {
 
 import axios from "axios";
 import { API_PORT } from "../../config/index.js";
-import { lightColor } from "../../assets/colors.js";
+import { MainColor, lightColor } from "../../assets/colors.js";
 import Input from "../../components/input.component";
 import { TopNavigation } from "../../components/TopNavigation.component";
 import { MainButton } from "../../components/mainButton.component";
@@ -23,6 +23,9 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import { Picker } from "@react-native-community/picker";
 import * as ImagePicker from "expo-image-picker";
 import moment from "moment";
+import { Divider } from "../../components/Divider";
+
+const companyId = "9a28095a-9029-40ec-88c2-30e3fac69bc5";
 
 export const CreateEmployeScreen = (props) => {
   const [zones, setZones] = useState([]);
@@ -115,13 +118,14 @@ export const CreateEmployeScreen = (props) => {
     data.append("dni", dni);
     data.append("email", email);
     data.append("password", "12345");
-    data.append("privilege", privilege);
+    data.append("zoneId", zoneId);
     data.append("assignationDate", date.toString());
     data.append("changeTurnDate", changeTurn.toString());
+    data.append("companyId", companyId);
 
     try {
       let res = await axios.post(
-        `${API_PORT()}/api/createUser/${zoneId}`,
+        `${API_PORT()}/api/createUser/${privilege}`,
         data,
         {
           headers: {
@@ -130,26 +134,28 @@ export const CreateEmployeScreen = (props) => {
         }
       );
 
-      if (res.data.error === false) {
+      if (!res.data.error) {
+        console.log(res.data.data);
         setCreate(true);
         setSaving(false);
         setSuccess(true);
       }
     } catch (error) {
-      console.log("error: ", error);
+      console.log("error-----: ", error.message);
+      alert(error.message);
     }
   };
 
   const requestZone = async () => {
     try {
-      let res = await axios.get(`${API_PORT()}/api/findZones`);
-      if (res) {
-        console.log("zones array:-----", res.data.data[0].zone);
+      let res = await axios.get(`${API_PORT()}/api/findZones/${companyId}`);
+      if (!res.data.error) {
+        console.log("zones array:-----", res.data.data[0]);
         setZones(res.data.data);
         setZoneId(res.data.data[0].id);
       }
     } catch (error) {
-      console.log("error: ", error);
+      alert(error.message);
     }
   };
 
@@ -201,124 +207,133 @@ export const CreateEmployeScreen = (props) => {
       <TopNavigation title="Crear Empleado" leftControl={goBackAction()} />
       <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.mainWrapper}>
-          <View style={styles.imageContainer}>
+          <View style={image ? styles.imageContainer2 : styles.imageContainer}>
             <View style={styles.imageBox}>
               {image ? (
                 <Image
                   source={{ uri: image }}
-                  style={{ width: 150, height: 150, resizeMode: 'stretch' }}
+                  style={{ width: 150, height: 150 }}
                 />
               ) : (
-                <Ionicons name="md-photos" size={36} color="#ccc" />
+                <TouchableOpacity
+                  style={{ justifyContent: "center", alignItems: "center" }}
+                  onPress={() => getImage("galery")}
+                >
+                  <Ionicons name="md-photos" size={28} color={lightColor} />
+                  <Text>Agregar Foto</Text>
+                </TouchableOpacity>
               )}
             </View>
 
-            <View style={styles.photoButtonBox}>
-              <TouchableOpacity onPress={() => getImage("galery")}>
-                <Ionicons name="md-photos" size={28} color={lightColor} />
-              </TouchableOpacity>
+            {/* <View style={styles.photoButtonBox}>
               <TouchableOpacity onPress={() => getImage("camera")}>
                 <Ionicons name="ios-camera" size={28} color={lightColor} />
               </TouchableOpacity>
-            </View>
+            </View> */}
           </View>
 
-          <Input
-            style={{ borderColor: "black", marginBottom: 10 }}
-            styleInput={{ color: "black" }}
-            title="Nombre"
-            textColor="black"
-            shape="square"
-            alignText="center"
-            returnKeyType="next"
-            onChangeText={(nombre) => {
-              setName(nombre);
-            }}
-            value={name}
-          />
-          <Input
-            style={{ borderColor: "black", marginBottom: 10 }}
-            styleInput={{ color: "black" }}
-            title="Apellido"
-            textColor="black"
-            shape="square"
-            alignText="center"
-            returnKeyType="next"
-            onChangeText={(apellido) => {
-              setLastName(apellido);
-            }}
-            value={lastName}
-          />
-          <Input
-            style={{ borderColor: "black", marginBottom: 10 }}
-            styleInput={{ color: "black" }}
-            title="DNI"
-            textColor="black"
-            shape="square"
-            alignText="center"
-            returnKeyType="next"
-            onChangeText={(dni) => {
-              setDni(dni);
-            }}
-            value={dni}
-          />
-          <Input
-            style={{ borderColor: "black", marginBottom: 10 }}
-            styleInput={{ color: "black" }}
-            title="Email"
-            textColor="black"
-            shape="square"
-            alignText="center"
-            returnKeyType="next"
-            onChangeText={(email) => {
-              setEmail(email);
-            }}
-            value={email}
-          />
+          <View style={styles.dataContainer}>
+            <Text style={styles.containerTitle}>Datos Personales</Text>
+            <Divider size="small" />
+            <Input
+              style={{ borderColor: "black", marginBottom: 10 }}
+              styleInput={{ color: "black" }}
+              title="Nombre"
+              textColor="black"
+              icon="ios-person"
+              //shape="square"
+              //alignText="center"
+              returnKeyType="next"
+              onChangeText={(nombre) => {
+                setName(nombre);
+              }}
+              value={name}
+            />
+            <Input
+              style={{ borderColor: "black", marginBottom: 10 }}
+              styleInput={{ color: "black" }}
+              icon="ios-people"
+              title="Apellido"
+              textColor="black"
+              //shape="square"
+              //alignText="center"
+              returnKeyType="next"
+              onChangeText={(apellido) => {
+                setLastName(apellido);
+              }}
+              value={lastName}
+            />
+            <Input
+              style={{ borderColor: "black", marginBottom: 10 }}
+              styleInput={{ color: "black" }}
+              title="DNI"
+              icon="ios-card"
+              textColor="black"
+              //shape="square"
+              //alignText="center"
+              returnKeyType="next"
+              onChangeText={(dni) => {
+                setDni(dni);
+              }}
+              value={dni}
+            />
+            <Input
+              style={{ borderColor: "black", marginBottom: 10 }}
+              styleInput={{ color: "black" }}
+              title="Email"
+              icon="ios-mail"
+              textColor="black"
+              //shape="flat"
+              //alignText="center"
+              returnKeyType="next"
+              onChangeText={(email) => {
+                setEmail(email);
+              }}
+              value={email}
+            />
+          </View>
 
           {/* ----ROLL---- */}
-          <View>
-            <Text>Rol</Text>
+          <View style={styles.dataContainer}>
+            <Text style={styles.containerTitle}>Tipo Usuario</Text>
+            <Divider size="small" />
             <Picker
               mode="dropdown"
               selectedValue={privilege}
               onValueChange={(value) => setPrivilege(value)}
             >
               <Picker.Item label={"Supervisor"} value={"Supervisor"} />
-              <Picker.Item label={"Vigilante"} value={"Vigilante"} />
+              <Picker.Item label={"Vigilante"} value={"Watchman"} />
             </Picker>
-
-            {privilege === "Vigilante" ? (
-              <View>
-                <Text>Zonas</Text>
-                {zones && (
-                  <Picker
-                    mode="dropdown"
-                    selectedValue={zoneId}
-                    onValueChange={(value) => setZoneId(value)}
-                  >
-                    {zones.map((item, i) => (
-                      <Picker.Item label={item.zone} value={item.id} key={i} />
-                    ))}
-                  </Picker>
-                )}
-              </View>
-            ) : null}
+            <View>
+              <Text>Zonas</Text>
+              {zones && (
+                <Picker
+                  mode="dropdown"
+                  selectedValue={zoneId}
+                  onValueChange={(value) => setZoneId(value)}
+                >
+                  {zones.map((item, i) => (
+                    <Picker.Item label={item.zone} value={item.id} key={i} />
+                  ))}
+                </Picker>
+              )}
+            </View>
           </View>
 
-          <View>
+          <View style={styles.dataContainer}>
+            <Text style={styles.containerTitle}>Horario</Text>
+            <Divider size="small"/>
             <View>
               <TouchableOpacity onPress={() => showDatepicker()}>
                 <Text>Fecha de Asignacion</Text>
-                <Ionicons name="ios-clock" size={28} color={lightColor} />
-                <Ionicons name="md-arrow-dropup" size={28} color="green" />
+                
               </TouchableOpacity>
             </View>
             <View>
               <TouchableOpacity onPress={() => showDatepicker2()}>
                 <Text>Cambio de Turno</Text>
-                <Ionicons name="ios-clock" size={28} color={lightColor} />
-                <Ionicons name="md-arrow-dropdown" size={28} color="red" />
+                
               </TouchableOpacity>
             </View>
             {show && (
@@ -345,14 +360,15 @@ export const CreateEmployeScreen = (props) => {
             )}
           </View>
           <View>
-            <Text>{moment(date).format("Do MM YYYY, HH:mm a")}</Text>
+            <Text>{moment(date).format("D MMM YYYY")}</Text>
           </View>
           <View>
-            <Text>{changeTurn.toString()}</Text>
+            <Text>{moment(changeTurn).format('D MMM YYYY')}</Text>
           </View>
-
+              <MainButton.Icon name="ios-arrow-back" size={22} color="#f09"/>
           <MainButton
             title="Crear Empleado"
+            outlined
             onPress={() => {
               createEmploye();
             }}
@@ -372,18 +388,46 @@ const styles = StyleSheet.create({
   mainWrapper: {
     width: "90%",
   },
-  imagecontainer: {
-    backgroundColor: "#f09",
-  },
-  imageBox: {
+  imageContainer: {
+    //backgroundColor: "#f09",
+    justifyContent: "center",
+    alignItems: "center",
+    marginVertical: 2.5,
+    height: 250,
     borderColor: "#ccc",
     borderWidth: 2,
     borderStyle: "dotted",
+  },
+  imageContainer2: {
+    backgroundColor: "#fff",
     justifyContent: "center",
     alignItems: "center",
+    marginVertical: 2.5,
+    height: 250,
+    // borderColor: "#ccc",
+    // borderWidth: 2,
+    // borderStyle: "dotted",
+  },
+  imageBox: {
+    
+    justifyContent: "center",
+    alignItems: "center",
+    //height: 150
+    //backgroundColor: "red",
   },
   photoButtonBox: {
     flexDirection: "row",
     alignItems: "center",
+  },
+  dataContainer: {
+    backgroundColor: "#fff",
+    borderRadius: 5,
+    marginVertical: 2.5,
+    padding: 8,
+  },
+  containerTitle: {
+    fontSize: 16,
+    fontWeight: "normal",
+    color: MainColor,
   },
 });

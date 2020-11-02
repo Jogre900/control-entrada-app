@@ -19,7 +19,7 @@ import { MainButton } from "../../components/mainButton.component";
 import { Ionicons } from "@expo/vector-icons";
 
 const DEVICE_WIDTH = Dimensions.get("window").width;
-
+const companyId = '9a28095a-9029-40ec-88c2-30e3fac69bc5'
 export const DestinyScreen = (props) => {
   const [zones, setZones] = useState([]);
   const [zoneId, setZoneId] = useState();
@@ -64,14 +64,14 @@ export const DestinyScreen = (props) => {
     setLoading(true);
     setNotFound(false)
     try {
-      let res = await axios.get(`${API_PORT()}/api/findZones`);
-      if (res) {
+      let res = await axios.get(`${API_PORT()}/api/findZones/${companyId}`);
+      if (!res.data.error) {
         setZones(res.data.data);
         setZoneId(res.data.data[0].id)
         setLoading(false);
       }
     } catch (error) {
-      console.log("error: ", error);
+      console.log("error: ", error.message);
     }
   };
   const requestDestiny = async () => {

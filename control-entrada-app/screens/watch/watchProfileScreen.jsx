@@ -16,7 +16,7 @@ import axios from "axios";
 import { API_PORT } from "../../config/index";
 import AsyncStorage from "@react-native-community/async-storage";
 import moment from "moment";
-
+import {connect} from 'react-redux'
 //components
 import { TopNavigation } from "../../components/TopNavigation.component";
 import { MainButton } from "../../components/mainButton.component";
@@ -25,7 +25,8 @@ import { MainColor, lightColor } from "../../assets/colors.js";
 import Modal from "react-native-modal";
 import { Divider } from "../../components/Divider";
 
-export const WatchProfileScreen = (props) => {
+const WatchProfileScreen = ({navigation, profileRedux}) => {
+  console.log("redux:----", profileRedux)
   const [editVisibility, setEditVisibility] = useState(false);
   const [passChange, setPassChange] = useState("");
   const [repeatPass, setRepeatPass] = useState("");
@@ -76,7 +77,7 @@ export const WatchProfileScreen = (props) => {
             password: repeatPass,
           }
         );
-        if (res) {
+        if (!res.data.error) {
           console.log(res.data);
           setLoading(false);
           setPassChange("");
@@ -84,7 +85,7 @@ export const WatchProfileScreen = (props) => {
           alert("Cambio de contraseña exitoso");
         }
       } catch (error) {
-        console.log(error.response);
+        console.log(error.message);
       }
     }
   };
@@ -93,7 +94,7 @@ export const WatchProfileScreen = (props) => {
       <View>
         <TouchableHighlight
           onPress={() => {
-            props.navigation.goBack();
+            navigation.goBack();
           }}
         >
           <Ionicons name="ios-arrow-back" size={28} color="white" />
@@ -118,44 +119,6 @@ export const WatchProfileScreen = (props) => {
           <ActivityIndicator size="large" color={MainColor} />
         </View>
       </Modal>
-    );
-  };
-  //RENDER CHANGE PASS CONTAINER
-  const ChangePass = () => {
-    return (
-      <View>
-        <View>
-          <Input
-            title="Clave"
-            icon="ios-eye-off"
-            shape="flat"
-            secureTextEntry={true}
-            onChangeText={(value) => {
-              setPassChange(value), setPassCaption("");
-            }}
-            value={passChange}
-          />
-          <Input
-            icon="ios-eye-off"
-            title="Repetir Clave"
-            secureTextEntry={true}
-            shape="flat"
-            onChangeText={(text) => {
-              setRepeatPass(text), setPassCaption("");
-            }}
-            value={repeatPass}
-          />
-          <Text style={{ color: "red", fontSize: 16, alignSelf: "center" }}>
-            {passCaption}
-          </Text>
-        </View>
-
-        <MainButton
-          onPress={() => updatePassword()}
-          style={{ width: "100%" }}
-          title="Guardar Cambios"
-        />
-      </View>
     );
   };
 
@@ -350,6 +313,12 @@ export const WatchProfileScreen = (props) => {
     </View>
   );
 };
+
+const mapStateToPRops = state => ({
+  profileRedux: state.profileReducer.profile
+})
+
+export default connect(mapStateToPRops, {})(WatchProfileScreen)
 
 const styles = StyleSheet.create({
   container: {

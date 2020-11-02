@@ -7,9 +7,11 @@ import {
   FlatList,
   ScrollView,
   TouchableOpacity,
-  Alert
+  Alert,
+  Image,
 } from "react-native";
-import axios from 'axios'
+import axios from "axios";
+import { connect } from 'react-redux'
 
 //componentes
 import { API_PORT } from "../../config/index.js";
@@ -17,20 +19,29 @@ import { TopNavigation } from "../../components/TopNavigation.component.jsx";
 import Input from "../../components/input.component";
 import { MainButton } from "../../components/mainButton.component";
 import { Ionicons } from "@expo/vector-icons";
-import moment from 'moment'
+import moment from "moment";
+import { Divider } from "../../components/Divider";
+import { MainColor, lightColor } from "../../assets/colors";
 
-export const ZoneDetailScreen = (props) => {
-  //console.log(props)
-  const { id, zone, entryTime, departureTime, destinys, watchmen } = props.route.params;
-  console.log(props.route.params)
-  const [destiny, setDestiny] = useState(destinys)
+const ZoneDetailScreen = ({route, navigation, zoneRedux}) => {
+  console.log("redux----", zoneRedux)
+  const {
+    id,
+    zone,
+    entryTime,
+    departureTime,
+    destinys,
+    watchmen,
+  } = route?.params;
   
+  const [destiny, setDestiny] = useState(destinys);
+  const zoneId = id
   const goBackAction = () => {
     return (
       <View>
         <TouchableHighlight
           onPress={() => {
-            props.navigation.navigate("zonas");
+            navigation.navigate("zonas");
           }}
         >
           <Ionicons name="ios-arrow-back" size={28} color="white" />
@@ -39,21 +50,46 @@ export const ZoneDetailScreen = (props) => {
     );
   };
   const renderDestiny = ({ item }) => (
-    <View>
-      <Text>{item.name}</Text>
+    <View
+      style={{
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: 'space-between',
+        marginVertical: 5
+      }}
+    >
+      <View style={{ flexDirection: "row", backgroundColor: "skyblue" }}>
+        <Ionicons name="ios-checkmark" size={22} color={lightColor} />
+        <Text>{item.name}</Text>
+      </View>
       <TouchableOpacity onPress={() => deleteDestiny(item.id)}>
-        <Ionicons name="ios-trash" size={28} color="#ccc"/>
+        <Ionicons name="ios-trash" size={28} color="#ccc" />
       </TouchableOpacity>
     </View>
   );
   const renderWatchman = ({ item }) => (
-    <View>
-      <Text>
-        Nombre: {item.User.name} {item.User.lastName}
-      </Text>
-      <Text>Correo: {item.User.email}</Text>
-      <Text>Fecha Asignado: {item.assignationDate}</Text>
-      <Text>Cambio de Turno: {item.changeTurnDate}</Text>
+    <View style={styles.listEmployeBox}>
+      <Image
+        style={styles.avatar}
+        source={{ uri: `${API_PORT()}/public/imgs/${item.User.picture}` }}
+      />
+      <View style={styles.listSubItemBox}>
+        <View style={{ alignItems: "center" }}>
+          <View style={styles.privilegeBox}>
+            <Text style={{ color: "#fff", fontSize: 16, lineHeight: 16 }}>
+              {item.User.privilege}
+            </Text>
+          </View>
+          <Text>
+            {item.User.name} {item.User.lastName}
+          </Text>
+        </View>
+        <View style={{ alignItems: "center" }}>
+          <Text>Asignado:</Text>
+          <Text>{moment(item.assignationDate).format("D MMM YYYY")}</Text>
+        </View>
+        {/* <Text>Cambio de Turno: {moment(item.changeTurnDate).format('D MMM YYYY')}</Text> */}
+      </View>
     </View>
   );
 
@@ -72,33 +108,37 @@ export const ZoneDetailScreen = (props) => {
   // ])
   // }
   const deleteDestiny = async (destinyId) => {
-    console.log(destinyId)
+    console.log(destinyId);
     try {
-      let res = await axios.delete(`${API_PORT()}/api/deleteDestiny/${destinyId}`)
-      if(res){
-      console.log(res)
-      setDestiny(destiny => destiny.filter(elem => elem.id != destinyId))
+      let res = await axios.delete(
+        `${API_PORT()}/api/deleteDestiny/${destinyId}`
+      );
+      if (res) {
+        console.log(res);
+        setDestiny((destiny) => destiny.filter((elem) => elem.id != destinyId));
       }
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
-  }
+  };
   return (
-    <View style={{flex:1}}>
+    <View style={{ flex: 1 }}>
       <TopNavigation title={zone} leftControl={goBackAction()} />
       <ScrollView style={{ flex: 1 }}>
         <Text>Zona:</Text>
         <View>
           <Text>{zone}</Text>
-          <Text>{moment(entryTime).format('HH:mm a')}</Text>
-          <Text>{moment(departureTime).format('HH:mm a')}</Text>
+          <Text>{moment(entryTime).format("HH:mm a")}</Text>
+          <Text>{moment(departureTime).format("HH:mm a")}</Text>
         </View>
-        <View>
-          <Text>Destinos:</Text>
+        <View style={styles.dataContainer}>
+          <Text style={styles.containerTitle}>Destinos</Text>
+          <Divider size="small" />
           <FlatList data={destiny} renderItem={renderDestiny} />
         </View>
-        <View>
-          <Text>Encargados:</Text>
+        <View style={styles.dataContainer}>
+          <Text style={styles.containerTitle}>Encargados</Text>
+          <Divider size="small" />
           <FlatList data={watchmen} renderItem={renderWatchman} />
         </View>
       </ScrollView>
@@ -106,4 +146,57 @@ export const ZoneDetailScreen = (props) => {
   );
 };
 
-const styles = StyleSheet.create({});
+
+const mapStateToProps = (state, zoneId) => ({
+  zoneRedux: state.zonesReducer
+})
+
+export default connect(mapStateToProps, {})(ZoneDetailScreen)
+
+const styles = StyleSheet.create({
+  dataContainer: {
+    backgroundColor: "#fff",
+    borderRadius: 5,
+    marginVertical: 2.5,
+    padding: 8,
+    width: "90%",
+  },
+  containerTitle: {
+    fontSize: 16,
+    fontWeight: "normal",
+    color: MainColor,
+  },
+  avatar: {
+    height: 70,
+    width: 70,
+    borderRadius: 70 / 2,
+  },
+  listEmployeBox: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginVertical: 5,
+    backgroundColor: "#fff",
+    justifyContent: "space-around",
+    padding: 5,
+  },
+  listSubItemBox: {
+    borderBottomWidth: 0.5,
+    borderColor: "grey",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-around",
+    //backgroundColor: 'pink',
+    width: "80%",
+    height: 70,
+  },
+  privilegeBox: {
+    backgroundColor: MainColor,
+    borderRadius: 25,
+    padding: 5,
+    height: 32,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+});
+
+

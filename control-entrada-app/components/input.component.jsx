@@ -83,7 +83,7 @@ const Input = (props, ref) => {
                 name={secureTextEntry ? iconInput : icon}
                 size={28}
                 color="grey"
-                style={{ marginRight: 5 }}
+                style={{ marginRight: 12 }}
               />
             </TouchableWithoutFeedback>
           ) : null}

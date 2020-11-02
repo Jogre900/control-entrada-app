@@ -11,6 +11,7 @@ import {
   Alert,
   ActivityIndicator,
   TouchableOpacity,
+  TouchableOpacityBase,
 } from "react-native";
 
 import axios from "axios";
@@ -20,8 +21,11 @@ import { TopNavigation } from "../../components/TopNavigation.component";
 import { MainButton } from "../../components/mainButton.component";
 import { Ionicons } from "@expo/vector-icons";
 
+const companyId = '9a28095a-9029-40ec-88c2-30e3fac69bc5'
+
 export const EmployeeScreen = (props) => {
   const [employee, setEmployee] = useState([]);
+  const [employeeId, setEmployeeId] = useState("")
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -51,7 +55,7 @@ export const EmployeeScreen = (props) => {
       <View>
         <TouchableHighlight
           onPress={() => {
-            props.navigation.goBack();
+            props.navigation.navigate("Home");
           }}
         >
           <Ionicons name="ios-arrow-back" size={28} color="white" />
@@ -59,17 +63,31 @@ export const EmployeeScreen = (props) => {
       </View>
     );
   };
+
+  //DELETE EMPLOYEE
+  const deleteEmployee = async (id) => {
+    try {
+      let res = await axios.delete(`${API_PORT()}/api/deleteUser/${id}`)
+      if(!res.data.error){
+        console.log(res.data.data)
+        alert("Borrado con exito")
+      }
+    } catch (error) {
+      alert(error.message)
+    }
+  }
+
   const requestEmployee = async () => {
     setLoading(true);
     try {
-      let res = await axios.get(`${API_PORT()}/api/findUsers`);
-      if (res) {
+      let res = await axios.get(`${API_PORT()}/api/findUsers/${companyId}`);
+      if (!res.data.error) {
         console.log(res.data.data);
         setEmployee(res.data.data);
         setLoading(false);
       }
     } catch (error) {
-      console.log("error: ", error);
+      console.log("error: ", error.message);
     }
   };
   
@@ -102,6 +120,9 @@ export const EmployeeScreen = (props) => {
                   }
                   key={i}
                 >
+                  <TouchableOpacity onPress={() => deleteEmployee(item.id)}>
+                  <Ionicons name="ios-trash" size={22} color="grey"/>
+                  </TouchableOpacity>
                   <View>
                     <View style={styles.privilegeBox}>
                       {item.privilege == "Supervisor" ? (
@@ -119,9 +140,9 @@ export const EmployeeScreen = (props) => {
                   </View>
                   <View style={styles.itemDataBox}>
                     <Text style={styles.itemDataText}>Zona</Text>
-                    <Text style={styles.itemDataText}>
+                    {/* <Text style={styles.itemDataText}>
                       {item.userZone[0].Zone.zone}
-                    </Text>
+                    </Text> */}
                   </View>
                 </TouchableOpacity>
               ))}

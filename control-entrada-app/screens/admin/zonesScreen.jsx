@@ -11,6 +11,7 @@ import {
   Alert,
   ScrollView,
 } from "react-native";
+import { connect } from "react-redux";
 import axios from "axios";
 import { Ionicons } from "@expo/vector-icons";
 import { Picker } from "@react-native-community/picker";
@@ -22,16 +23,20 @@ import { TopNavigation } from "../../components/TopNavigation.component.jsx";
 import Input from "../../components/input.component.jsx";
 import { MainButton } from "../../components/mainButton.component";
 import moment from "moment";
+import { Maincolor } from "../../assets/colors";
+const adminId = "e6cf69f4-e718-4b5f-a127-c1910db5f162";
 
 const DEVICE_WIDTH = Dimensions.get("window").width;
 
-export const ZonasScreen = (props) => {
+const ZonasScreen = ({ navigation, companyRedux, saveZones, zonesRedux }) => {
+  console.log("company REdux  ", companyRedux);
+  console.log("company REdux  ", zonesRedux);
   const [zone, setZone] = useState([]);
   const [zoneName, setZoneName] = useState("");
   const [create, setCreate] = useState(false);
   const [deleteZone, setDeleteZone] = useState(false);
-  const [company, setCompany] = useState([]);
-  const [companyId, setCompanyId] = useState("");
+  const [company, setCompany] = useState(companyRedux);
+  const [companyId, setCompanyId] = useState(companyRedux.id);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -45,7 +50,7 @@ export const ZonasScreen = (props) => {
       <View>
         <TouchableHighlight
           onPress={() => {
-            props.navigation.navigate("supervicer-home");
+            navigation.navigate("admin-home");
           }}
         >
           <Ionicons name="ios-arrow-back" size={28} color="white" />
@@ -103,27 +108,35 @@ export const ZonasScreen = (props) => {
     setDepartureTime(currentDate);
   };
 
-  const requestCompany = async () => {
-    setLoading(true);
-    try {
-      let res = await axios.get(`${API_PORT()}/api/findCompany`);
-      console.log("res.data: ", res.data);
-      if (res.data.data) {
-        setCompany(res.data.data);
-        setCompanyId(res.data.data[0].id)
-        setLoading(false);
-      }
-    } catch (error) {
-      console.log("error: ", error);
-    }
-  };
+  // const requestCompany = async () => {
+  //   setLoading(true);
+  //   try {
+  //     let res = await axios.get(`${API_PORT()}/api/findCompany/${adminId}`);
+  //     console.log("res.data: ", res.data);
+  //     if (!res.data.error) {
+  //       alert("busqueda exitosa");
+  //       setCompany(res.data.data);
+  //       setCompanyId(res.data.data[0].id);
+  //       setLoading(false);
+  //     }
+  //   } catch (error) {
+  //     alert(error.message);
+  //   }
+  // };
 
   //ZONE API
 
   const requestZone = async () => {
-    let res = await axios.get(`${API_PORT()}/api/findZones`);
-    setZone(res.data.data);
-    console.log("zones:-------", res.data.data);
+    try {
+      let res = await axios.get(`${API_PORT()}/api/findZones/${companyId}`);
+      if (!res.data.error) {
+        setZone(res.data.data);
+        await saveZones(res.data.data);
+        console.log("zones:-------", res.data.data);
+      }
+    } catch (error) {
+      alert(error.message);
+    }
   };
 
   const createZone = async () => {
@@ -131,22 +144,19 @@ export const ZonasScreen = (props) => {
     setCreate(false);
     setSaving(true);
     try {
-      let res = await axios.post(
-        `${API_PORT()}/api/createZone/${companyId}`,
-        {
-          zone: zoneName,
-          firsEntryTime: entranceTime.toString(),
-          firsDepartureTime: departureTime.toString(),
-        }
-      );
-      if (res) {
+      let res = await axios.post(`${API_PORT()}/api/createZone/${companyId}`, {
+        zone: zoneName,
+        firsEntryTime: entranceTime.toString(),
+        firsDepartureTime: departureTime.toString(),
+      });
+      if (!res.data.error) {
         console.log(res);
         setCreate(true);
         setSaving(false);
         setSuccess(true);
       }
     } catch (error) {
-      console.log(error);
+      alert(error.message);
     }
   };
 
@@ -192,19 +202,19 @@ export const ZonasScreen = (props) => {
       </View>
     );
   };
-  useEffect(() => {
-    requestCompany();
-  }, []);
+  // useEffect(() => {
+  //   requestCompany();
+  // }, []);
   useEffect(() => {
     requestZone();
-  }, [create, deleteZone]);
+  }, []);
   return (
     <View style={{ flex: 1 }}>
       <TopNavigation title="Zonas" leftControl={goBackAction()} />
       <ScrollView>
         <View>
-          <View>
-            {/* //company box */}
+          {/* <View>
+            //company box
             <Text>Selecione Empresa:</Text>
             {loading ? (
               <Splash />
@@ -216,23 +226,29 @@ export const ZonasScreen = (props) => {
                   setCompanyId(itemValue)
                 }
               >
-                {company.map((item) => (
-                <Picker.Item label={item.name} value={item.id} key={item.id} />
-              ))}
+                {Object.values(company).map((item, i) => (
+                  
+                   <Picker.Item
+                     label={item}
+                     value={item}
+                     key={item}
+                   />
+                 ))}
               </Picker>
             )}
-          </View>
+          </View> */}
           <View>
             <Text>company ID: {companyId}</Text>
           </View>
           <View>
             <Text>Zonas:</Text>
-            {zone &&
+            {zone ? (
               zone.map((item, i) => (
                 <View key={i}>
+                  {console.log(item)}
                   <TouchableOpacity
                     onPress={() =>
-                      props.navigation.navigate("zone_detail", {
+                      navigation.navigate("zone_detail", {
                         id: item.id,
                         zone: item.zone,
                         destinys: item.Destinos,
@@ -259,8 +275,10 @@ export const ZonasScreen = (props) => {
                   </View>
                 </View>
               ))
+            ) : (
               // <FlatList data={zone} renderItem={renderItem} numColumns={3} />
-            }
+              <ActivityIndicator size="large" color={MainColor} />
+            )}
           </View>
           <Text>Crear Zona</Text>
 
@@ -281,7 +299,9 @@ export const ZonasScreen = (props) => {
             <TouchableOpacity onPress={() => displayTimePicker()}>
               <Text>Hora de Entrada</Text>
             </TouchableOpacity>
-            <Text>hora de entrada: {entranceTime.toString()}</Text>
+            <Text>
+              hora de entrada: {moment(entranceTime).format("HH:mm a")}
+            </Text>
             {show1 && (
               <DateTimePicker
                 value={entranceTime}
@@ -296,7 +316,9 @@ export const ZonasScreen = (props) => {
             <TouchableOpacity onPress={() => displayTimePicker2()}>
               <Text>Hora de Salida</Text>
             </TouchableOpacity>
-            <Text>hora de salida: {departureTime.toString()}</Text>
+            <Text>
+              hora de salida: {moment(departureTime).format("HH:mm a")}
+            </Text>
             {show2 && (
               <DateTimePicker
                 value={departureTime}
@@ -337,3 +359,18 @@ const styles = StyleSheet.create({
     //minWidth: Math.floor(DEVICE_WIDTH / 3),
   },
 });
+const stateToProps = (state) => ({
+  companyRedux: state.profileReducer.company,
+  zonesRedux: state.zonesReducer.zones,
+});
+
+const mapDispatchToProps = (dispatch) => ({
+  saveZones(zones) {
+    dispatch({
+      type: "setZones",
+      payload: zones,
+    });
+  },
+});
+
+export default connect(stateToProps, mapDispatchToProps)(ZonasScreen);

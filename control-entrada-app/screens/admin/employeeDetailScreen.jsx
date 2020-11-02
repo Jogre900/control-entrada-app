@@ -1,22 +1,24 @@
 import React from 'react'
-import { View, TouchableHighlight, Image, Text, StyleSheet } from 'react-native'
+import { View, TouchableWithoutFeedback, Image, Text, StyleSheet } from 'react-native'
 
 //COMPONENT
 import {TopNavigation} from '../../components/TopNavigation.component'
 import {API_PORT, ThirdColor} from '../../config/index'
 import { Ionicons } from "@expo/vector-icons";
+
 export const EmployeeDetailScreen = (props) => {
-    const profile = props.route.params
+  console.log(props.route.params)  
+  const profile = props.route.params
     const goBackAction = () => {
         return (
           <View>
-            <TouchableHighlight
+            <TouchableWithoutFeedback
               onPress={() => {
-                props.navigation.goBack();
+                props.navigation.navigate("Employee");
               }}
             >
               <Ionicons name="ios-arrow-back" size={28} color="white" />
-            </TouchableHighlight>
+            </TouchableWithoutFeedback>
           </View>
         );
       };
@@ -37,11 +39,11 @@ export const EmployeeDetailScreen = (props) => {
             <Text>{profile.dni}</Text>
               
               
-              <Text>Contratado el: {profile.userZone[0].assignationDate}</Text>
-              <Text>Cambio de Turno: {profile.userZone[0].changeTurnDate}</Text>
+              {/* <Text>Contratado el: {profile.userZone[0].assignationDate}</Text>
+              <Text>Cambio de Turno: {profile.userZone[0].changeTurnDate}</Text> */}
               <View>
               <Ionicons name='ios-business' size={28} color={ThirdColor}/>
-              <Text>{profile.userZone[0].Zone.zone}</Text>
+              {/* <Text>{profile.userZone[0].Zone.zone}</Text> */}
               </View> 
             </View>
         </View>

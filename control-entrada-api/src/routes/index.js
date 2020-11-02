@@ -48,15 +48,21 @@ const middleware = {
 
 const router = Router();
 
-router.post("/createUser/:privilege", uploadImg.single("file"), Methods.createUser);
+//router.post("/createAdmin", uploadImg.single("file"), Methods.createAdmin);
+router.post(
+  "/createUser/:privilege",
+  uploadImg.single("file"),
+  Methods.createUser
+);
+router.put("/updatePass/:id", Methods.updatePass);
+router.put("/updateAdmin/:companyId", Methods.updateAdminId)
 router.post("/login", Methods.login);
 router.get("/findUsers/:companyId", Methods.findUsers);
-router.put("/updatePass/:id", Methods.updatePass);
 router.delete("/deleteUser/:id", Methods.deleteUser);
-router.post("/createCompany", Methods.createCompany);
-router.get("/findCompany", Methods.findCompany);
+router.post("/createCompany/", Methods.createCompany);
+router.get("/findCompany/:id", Methods.findCompany);
 router.post("/createZone/:id", Methods.createZone);
-router.get("/findZones", Methods.findZones);
+router.get("/findZones/:companyId", Methods.findZones);
 router.delete("/deleteZone/:id", Methods.deleteZone);
 router.post("/createDestiny/:id", Methods.createDestiny);
 router.get("/findDestiny/:id", Methods.findDestinyByZone);
@@ -69,12 +75,17 @@ router.get("/displayPicture", Methods.displayPicture);
 router.get("/profile", Methods.getProfile);
 router.get("/findUserZone/:id", Methods.findUserZone);
 router.get("/verifyToken", Methods.verifyExpToken);
-router.post("/createVisit/:id", middleware.verifyToken, uploadImg.array("file"), Methods.createVisits);
+router.post(
+  "/createVisit/:id",
+  middleware.verifyToken,
+  uploadImg.array("file"),
+  Methods.createVisits
+);
 router.delete("/deleteVisit/:id", Methods.deleteVisit);
 router.get("/findVisit/:id", Methods.findVisit);
-router.get("/findVisitId/:id", Methods.findVisitId)
+router.get("/findVisitId/:id", Methods.findVisitId);
 router.put("/updateVisit/:id", middleware.verifyToken, Methods.updateVisit);
-router.get("/findTodayVisits/", Methods.findTodayVisits);
+router.get("/findTodayVisits/:companyId", Methods.findTodayVisits);
 router.get("/findTodayVisitsByUser/:id", Methods.findTodayVisitsByUser);
 router.get("/findWeekVisits/", Methods.findWeekVisits);
 //PRUEBAS

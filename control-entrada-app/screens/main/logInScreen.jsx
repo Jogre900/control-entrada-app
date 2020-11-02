@@ -1,64 +1,44 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState, useRef } from "react";
 import {
   View,
   Text,
   StyleSheet,
-  StatusBar,
-  BackHandler,
-  Alert,
-  Image,
-  Dimensions,
-  Animated,
-  ImageBackground,
-  KeyboardAvoidingView,
-  TouchableWithoutFeedback,
-  Keyboard,
+  TouchableOpacity,
   ActivityIndicator,
 } from "react-native";
+import { connect } from 'react-redux'
 import axios from "axios";
-import AsyncStorage from "@react-native-community/async-storage";
-
-//components
-import { MainColor } from "../../assets/colors";
-import Input from "../../components/input.component";
-import { SplashScreen } from "../../components/splashScreen.component";
-import { MainButton } from "../../components/mainButton.component";
-import Modal from "react-native-modal";
 import { API_PORT } from "../../config/index";
+import { TopNavigation } from "../../components/TopNavigation.component";
+import { Divider } from "../../components/Divider";
+import { MainButton } from "../../components/mainButton.component";
+import Input from "../../components/input.component";
+import Modal from "react-native-modal";
+import AsyncStorage from "@react-native-community/async-storage";
+import { Ionicons } from "@expo/vector-icons";
+import { MainColor } from "../../assets/colors";
 
-const { width, height } = Dimensions.get("window");
-
-const backAction = () => {
-  Alert.alert("", "Cerrar App?", [
-    {
-      text: "No",
-      onPress: () => null,
-      style: "cancel",
-    },
-    { text: "Cerrar", onPress: () => BackHandler.exitApp() },
-  ]);
-  return true;
-};
-
-export const LogInScreen = (props) => {
-  const { navigation } = props;
+const LoginScreen = ({ navigation, saveProfile, saveCompany }) => {
   const [email, setEmail] = useState("");
   const [pass, setPass] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
   const [passCaption, setPassCaption] = useState("");
   const [emailCaption, setEmailCaption] = useState("");
-  const [isSplash, setIsSplash] = useState(true);
-  const [payload, setPayload] = useState();
-
-  const backHandler = useRef(null);
-  const translate = new Animated.Value(1);
   const nextInput = useRef(null);
-
-  const activeSplash = () => {
-    setTimeout(() => {
-      setIsSplash(false);
-    }, 500);
+  const goBackAction = () => {
+    return (
+      <View>
+        <TouchableOpacity
+          onPress={() => {
+            navigation.goBack();
+          }}
+        >
+          <Ionicons name="ios-arrow-back" size={28} color="white" />
+        </TouchableOpacity>
+      </View>
+    );
   };
+
   //LOADING
   const LoadingModal = () => {
     return (
@@ -86,13 +66,6 @@ export const LogInScreen = (props) => {
       console.log("Error al Guardar", e);
     }
   };
-
-  //VALIDAR EMAIL
-  const validateEmail = (email) => {
-    var re = /^(([^<>()\[\]\\.,;:\s@”]+(\.[^<>()\[\]\\.,;:\s@”]+)*)|(“.+”))@((\[[0–9]{1,3}\.[0–9]{1,3}\.[0–9]{1,3}\.[0–9]{1,3}])|(([a-zA-Z\-0–9]+\.)+[a-zA-Z]{2,}))$/;
-    return re.test(email);
-  };
-
   //SIGN IN
   const signIn = async () => {
     setModalVisible(true);
@@ -117,6 +90,9 @@ export const LogInScreen = (props) => {
         console.log("res----------", res.data);
         await storeData(res.data.token);
         let profile = res.data.data;
+        let company = res.data.data.Company
+        await saveProfile(profile)
+        await saveCompany(company)
         let privilege = res.data.data.privilege;
         switch (privilege) {
           case "Vigilante":
@@ -128,7 +104,7 @@ export const LogInScreen = (props) => {
             break;
           case "Admin":
             setModalVisible(false);
-            props.navigation.navigate("admin");
+            navigation.navigate("admin");
             break;
           default:
             break;
@@ -136,174 +112,124 @@ export const LogInScreen = (props) => {
       }
     } catch (error) {
       setModalVisible(false);
-      alert(error.message)
-      console.log(error)
-      switch (error.response.status) {
-        case 401:
-          setPassCaption(error.response.data.msg);
-          setPass("");
-          //alert(error.response.data.msg);
-          break;
-        case 404:
-          alert(error.response.data.msg);
-          break;
-        default:
-          break;
-      }
+      alert(error.message);
+      // console.log(error.response.data.msg);
+      // switch (error.response.status) {
+      //   case 401:
+      //     setPassCaption(error.response.data.msg);
+      //     setPass("");
+      //     //alert(error.response.data.msg);
+      //     break;
+      //   case 404:
+      //     setEmailCaption(error.response.data.msg);
+      //     //alert(error.response.data.msg);
+      //     break;
+      //   default:
+      //     break;
+      // }
     }
   };
-
-  const signInStatus = async () => {
-    let token = await AsyncStorage.getItem("userToken");
-    //console.log("token en el storage:---", token);
-    if (token) {
-      setModalVisible(true);
-      try {
-        let res = await axios.get(`${API_PORT()}/api/verifyToken`, {
-          headers: {
-            Authorization: `bearer ${token}`,
-          },
-        });
-        if (res.data.data) {
-          //console.log("res--", res.data.data);
-          let profile = res.data.data;
-          console.log(profile)
-          setModalVisible(false);
-          switch (res.data.data.privilege) {
-            case "Admin":
-              props.navigation.navigate("admin", {screen: "admin-home", params: {profile}});
-              break;
-            case "Supervisor":
-              props.navigation.navigate("super");
-              break;
-            case "Watch":
-              props.navigation.navigate("watch");
-              break;
-            default:
-              break;
-          }
-        }
-      } catch (error) {
-        console.log("error---------",error.message)
-        setModalVisible(false);
-        alert(error.message);
-      }
-    }
-  };
-
-  useEffect(() => {
-    activeSplash();
-    // backHandler.current = BackHandler.addEventListener("hardwareBackPress", backAction);
-    // return () => {
-    //   backHandler.current.remove()
-    //BackHandler.removeEventListener("hardwareBackPress", backAction);
-  }, []);
-
-  useEffect(() => {
-    signInStatus();
-  }, []);
-
-  if (isSplash) {
-    return <SplashScreen />;
-  }
-
   return (
-    <View style={styles.container}>
-      <ImageBackground
-        source={require("../../assets/images/background.jpg")}
-        style={styles.imageBackground}
-      >
-        <StatusBar hidden={true} />
-
-        <TouchableWithoutFeedback
-          style={styles.backCover}
-          onPress={() => Keyboard.dismiss()}
-        >
-          <KeyboardAvoidingView style={styles.backCover} behavior="padding">
-            <Image
-              style={styles.logo}
-              source={require("../../assets/images/security-logo.png")}
-            />
-            <View style={styles.buttonBox}>
-              <Input
-                styleInput={{ color: "white" }}
-                title="Correo"
-                textColor="white"
-                shape="round"
-                alignText="center"
-                keyboardType="email-address"
-                returnKeyType="next"
-                caption={emailCaption}
-                onSubmitEditing={() => nextInput.current.focus()}
-                onChangeText={(correo) => {
-                  setEmail(correo), setEmailCaption("");
-                }}
-                value={email}
-              />
-              <Input
-                styleInput={{ color: "white" }}
-                title="Clave"
-                textColor="white"
-                shape="round"
-                alignText="center"
-                returnKeyType="done"
-                secureTextEntry={true}
-                caption={passCaption}
-                onSubmitEditing={() => signIn()}
-                onChangeText={(pass) => {
-                  setPass(pass), setPassCaption("");
-                }}
-                value={pass}
-                ref={nextInput}
-              />
-
-              <LoadingModal />
-
-              <MainButton
-                title="Iniciar Sesion"
-                onPress={() => {
-                  signIn();
-                }}
-              />
-              <MainButton
-                title="Registrate"
-                onPress={() => {
-                  props.navigation.navigate("register");
-                }}
-              />
-            </View>
-          </KeyboardAvoidingView>
-        </TouchableWithoutFeedback>
-      </ImageBackground>
+    <View style={{flex: 1}}>
+      <TopNavigation title="Inicio" leftControl={goBackAction()} />
+      <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+        <View style={styles.buttonContainer}>
+          <Text style={styles.labelTitle}>Porfavor ingrese sus datos de usuario</Text>
+          <Divider size="small"/>
+        <View style={styles.subContainer}>
+        <Input
+          //styleInput={{ color: "white" }}
+          icon="ios-mail"
+          title="Correo"
+          textColor="grey"
+          shape="flat"
+          keyboardType="email-address"
+          returnKeyType="next"
+          caption={emailCaption}
+          onSubmitEditing={() => nextInput.current.focus()}
+          onChangeText={(correo) => {
+            setEmail(correo), setEmailCaption("");
+          }}
+          value={email}
+        />
+        <Input
+          //styleInput={{ color: "white" }}
+          icon="ios-lock"
+          title="Clave"
+          textColor="grey"
+          shape="flat"
+          returnKeyType="done"
+          secureTextEntry={true}
+          caption={passCaption}
+          onSubmitEditing={() => signIn()}
+          onChangeText={(pass) => {
+            setPass(pass), setPassCaption("");
+          }}
+          value={pass}
+          ref={nextInput}
+        />
+        </View>
+        
+        <View style={styles.subContainer}>
+        <MainButton
+          title="Iniciar Sesion"
+          onPress={() => {
+            signIn();
+          }}
+        />
+        </View>
+        <Divider size="small"/>
+        <View style={styles.forgetcontainer}>
+          <Text>Olvidaste tu contraseña?</Text>
+          <TouchableOpacity onPress={() => alert("recuperar contraseña")}>
+          <Text style={{color: MainColor}}> Recuperar</Text>
+        </TouchableOpacity>
+        </View>
+        </View>
+        <LoadingModal />
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
+  buttonContainer: {
+    backgroundColor: "#fff",
+    width: "90%",
+    borderRadius: 5,
+    marginVertical: 2.5,
+    padding: 8,
   },
-  buttonBox: {
-    marginBottom: "10%",
-    width: "75%",
-    //position: "absolute",
+  subContainer: {
+    marginVertical: 10
   },
-  imageBackground: {
-    resizeMode: "cover",
-    flex: 1,
+  labelTitle: {
+    fontSize: 16,
+    lineHeight: 18,
+    color: MainColor
   },
-  backCover: {
-    backgroundColor: "black",
-    flex: 1,
-    width: width,
-    height: height,
-    opacity: 0.8,
-    justifyContent: "flex-end",
-    alignItems: "center",
-  },
-  logo: {
-    width: 200,
-    height: 200,
-    bottom: "25%",
-  },
+  forgetcontainer: {
+    flexDirection: 'row',
+    justifyContent: 'center'
+  }
 });
+const mapStateToProps = () => {
+  return {}
+}
+
+const mapDispatchToProps = dispatch => ({
+  saveProfile(profile){
+    dispatch({
+      type: "setProfile",
+      payload: profile
+    })
+  },
+  saveCompany(company){
+    dispatch({
+      type: "setCompany",
+      payload: company
+    })
+  }
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(LoginScreen)

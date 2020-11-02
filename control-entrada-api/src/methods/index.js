@@ -9,6 +9,45 @@ import { Op } from "sequelize";
 const SECRETKEY = process.env.SECRETKEY || $security().secretKey;
 
 const Methods = {
+  createAdmin: async function(req, res) {
+    let RESPONSE = {
+      error: true,
+      msg: "",
+      data: null,
+      token: null
+    };
+    const { name, lastName, dni, email, password, privilege } = req.body;
+    console.log(req.body);
+    console.log(req.file);
+    try {
+      let admin = await models.Admin.create({
+        name,
+        lastName,
+        dni,
+        email,
+        password,
+        picture: req.file.filename,
+        privilege
+      });
+      let token = jwt.sign(admin.dataValues, SECRETKEY, {
+        expiresIn: "1d"
+      });
+      (RESPONSE.error = false), (RESPONSE.msg = "Registro Exitoso!");
+      (RESPONSE.data = admin), (RESPONSE.token = token);
+      res.status(200).json(RESPONSE);
+    } catch (error) {
+      RESPONSE.msg = error.message;
+      res.json(RESPONSE);
+    }
+  },
+  findAdmin: async function(req, res) {
+    let RESPONSE = {
+      error: true,
+      msg: "",
+      data: null,
+      token: null
+    };
+  },
   createCompany: async function(req, res) {
     let RESPONSE = {
       error: true,
@@ -17,17 +56,20 @@ const Methods = {
       token: null
     };
     const { companyName, companyEmail, companyDni } = req.body;
+
     console.log(req.body);
     try {
       let company = await models.company.create({
-        companyName,
-        companyEmail,
-        companyDni
+        name: companyName,
+        email: companyEmail,
+        dni: companyDni
       });
-      RESPONSE.error = false;
-      RESPONSE.msg = "Registro Exitoso!";
-      RESPONSE.data = company;
-      res.status(200).json(RESPONSE);
+      if (company) {
+        RESPONSE.error = false;
+        RESPONSE.msg = "Registro Exitoso!";
+        RESPONSE.data = company;
+        res.status(200).json(RESPONSE);
+      }
     } catch (error) {
       RESPONSE.msg = error.message;
       res.json(RESPONSE);
@@ -40,14 +82,26 @@ const Methods = {
       data: null,
       token: null
     };
+
+    const { id } = req.params;
     try {
-      let company = await models.company.findAll();
-      RESPONSE.error = false;
-      RESPONSE.msg = "Busqueda Exitosa";
-      RESPONSE.data = company;
-      res.json(RESPONSE);
+      let company = await models.company.findAll({
+        include: {
+          model: models.User,
+          as: "Empleado",
+          where: {
+            id
+          }
+        }
+      });
+      if (company) {
+        RESPONSE.error = false;
+        RESPONSE.msg = "Busqueda Exitosa";
+        RESPONSE.data = company;
+        res.json(RESPONSE);
+      }
     } catch (error) {
-      RESPONSE.msg = error;
+      RESPONSE.msg = error.message;
       res.json(RESPONSE);
     }
   },
@@ -83,18 +137,23 @@ const Methods = {
       data: null,
       token: null
     };
+    const { companyId } = req.params;
     try {
-      let zones = await models.zone.findAll({
-        include: [
-          //{ model: models.company, as: "companyZone" },
-          { model: models.destination, as: "Destinos" },
-          {
-            model: models.userZone,
-            as: "encargado_zona",
-            include: [models.User]
-          }
-        ]
-      });
+      let zones = await models.zone.findAll(
+        {
+          where: {
+            companyId
+          },
+          include: [
+            { model: models.destination, as: "Destinos" },
+            {
+              model: models.userZone,
+              as: "encargado_zona",
+              include: [models.User]
+            }
+          ]
+        },
+      );
       RESPONSE.error = false;
       RESPONSE.msg = "Busqueda Exitosa!";
       RESPONSE.data = zones;
@@ -335,6 +394,7 @@ const Methods = {
       dni,
       email,
       password,
+      companyId,
       zoneId,
       assignationDate,
       changeTurnDate
@@ -344,83 +404,60 @@ const Methods = {
     try {
       let user = await models.User.findOne({
         where: {
-          email
+          [Op.or]: [{ email }, { dni }]
         }
       });
       console.log("user", user);
-      if (user == null) {
-        try {
-          let hash = await bcrypt.hash(password, 10);
-          password = hash;
-          switch (privilege) {
-            case "Admin":
-              let admin = await models.User.create({
-                name,
-                lastName,
-                dni,
-                email,
-                password,
-                picture: req.file.filename,
-                privilege
-              });
-              let token = jwt.sign(admin.dataValues, SECRETKEY, {
-                expiresIn: "1d"
-              });
-              (RESPONSE.error = false), (RESPONSE.msg = "Registro Exitoso!");
-              (RESPONSE.data = admin), (RESPONSE.token = token);
-              res.status(200).json(RESPONSE);
-              break;
-            case "Supervisor":
-              let supervisor = await models.User.create({
-                name,
-                lastName,
-                dni,
-                email,
-                password,
-                picture: req.file.filename,
-                privilege
-              });
+      if (!user) {
+        let hash = await bcrypt.hash(password, 10);
+        password = hash;
+        if(privilege === "Admin") { 
+            let admin = await models.User.create({
+              name,
+              lastName,
+              dni,
+              email,
+              password,
+              picture: req.file.filename,
+              privilege
+            });
+            let token = jwt.sign(admin.dataValues, SECRETKEY, {
+              expiresIn: "1d"
+            });
+            (RESPONSE.error = false), (RESPONSE.msg = "Registro Exitoso!");
+            (RESPONSE.data = admin), (RESPONSE.token = token);
+            res.status(200).json(RESPONSE);
+            
+        }else{
+          let employee = await models.User.create(
+            {
+              name,
+              lastName,
+              dni,
+              email,
+              password,
+              picture: req.file.filename,
+              privilege,
+              companyId,
+              userZone: {
+                assignationDate,
+                changeTurnDate,
+                ZoneId: zoneId
+              }
+            },
+            {
+              include: {
+                model: models.userZone,
+                as: "userZone"
+              }
+            }
+          );
 
-              (RESPONSE.error = false), (RESPONSE.msg = "Registro Exitoso!");
-              (RESPONSE.data = supervisor), res.status(200).json(RESPONSE);
-              break;
-            case "Watchman":
-              let watch = await models.User.create(
-                {
-                  name,
-                  lastName,
-                  dni,
-                  email,
-                  password,
-                  picture: req.file.filename,
-                  privilege,
-                  userZone: {
-                    assignationDate,
-                    changeTurnDate,
-                    ZoneId: zoneId
-                  }
-                },
-                {
-                  include: {
-                    model: models.userZone,
-                    as: "userZone"
-                  }
-                }
-              );
-
-              (RESPONSE.error = false), (RESPONSE.msg = "Registro Exitoso!");
-              (RESPONSE.data = watch), res.status(200).json(RESPONSE);
-              break;
-            default:
-              break;
-          }
-        } catch (error) {
-          RESPONSE.msg = error.message;
-          res.json(RESPONSE);
+          (RESPONSE.error = false), (RESPONSE.msg = "Registro Exitoso!");
+          (RESPONSE.data = employee), res.status(200).json(RESPONSE);
         }
       } else {
-        RESPONSE.msg = "Usuario ya Registrado";
-        RESPONSE.data = user;
+        RESPONSE.msg = "usuario ya existe";
         res.json(RESPONSE);
       }
     } catch (error) {
@@ -481,6 +518,9 @@ const Methods = {
               model: models.zone,
               include: { model: models.destination, as: "Destinos" }
             }
+          },
+          {
+            model: models.company
           }
         ]
       });
@@ -512,7 +552,7 @@ const Methods = {
       data: null,
       token: null
     };
-
+    console.log(req.headers);
     const token = req.headers.authorization.split(" ")[1];
 
     let decode = jwt.verify(token, SECRETKEY);
@@ -548,6 +588,35 @@ const Methods = {
       }
     } catch (error) {
       RESPONSE.error = error;
+      res.json(RESPONSE);
+    }
+  },
+  updateAdminId: async function(req, res) {
+    let RESPONSE = {
+      error: true,
+      msg: "",
+      data: null,
+      token: null
+    };
+    const { id } = req.body;
+    const { companyId } = req.params;
+    console.log(req.body);
+    console.log(req.params);
+    try {
+      let admin = await models.User.findOne({
+        where: {
+          id
+        }
+      });
+      if (admin) {
+        admin.companyId = companyId;
+        await admin.save();
+        RESPONSE.error = false;
+        RESPONSE.msg = "Registro actualizado!";
+        RESPONSE.data = admin;
+      }
+    } catch (error) {
+      RESPONSE.msg = error.message;
       res.json(RESPONSE);
     }
   },
@@ -622,23 +691,23 @@ const Methods = {
       data: null,
       token: null
     };
-    console.log(req.headers)
+    console.log(req.headers);
     const token = req.headers.authorization.split(" ")[1];
-    console.log("token---",token)
+    console.log("token---", token);
     try {
       let decode = jwt.verify(token, SECRETKEY);
-      console.log("decode------",decode)
-      
-          RESPONSE.error = false;
-          RESPONSE.data = decode
-          RESPONSE.msg = "token activo"
-          RESPONSE.token = token;
-          res.status(200).json(RESPONSE);
-      
+      console.log("decode------", decode);
+      if (decode) {
+        RESPONSE.error = false;
+        RESPONSE.data = decode;
+        RESPONSE.msg = "token activo";
+        RESPONSE.token = token;
+        res.status(200).json(RESPONSE);
+      }
     } catch (error) {
       RESPONSE.msg = error.message;
-      console.log(error.response)
-      res.json(RESPONSE)
+      console.log(error.response);
+      res.json(RESPONSE);
     }
   },
   findUsers: async function(req, res) {
@@ -652,7 +721,12 @@ const Methods = {
     try {
       let user = await models.User.findAll({
         where: {
-          companyId
+          [Op.and]: [
+            { companyId },
+            {
+              [Op.or]: [{ privilege: "Supervisor" }, { privilege: "Watchman" }]
+            }
+          ]
         },
         include: [
           {
@@ -684,6 +758,7 @@ const Methods = {
       data: null,
       token: null
     };
+    console.log(req.params)
     const { id } = req.params;
     try {
       let user = await models.User.findOne({
@@ -938,7 +1013,7 @@ const Methods = {
       data: null,
       tokn: null
     };
-    const { date } = req.params;
+    const { companyId } = req.params;
 
     console.log(req.params);
     try {
@@ -959,7 +1034,11 @@ const Methods = {
             model: models.userZone,
             attributes: ["id", "changeTurnDate", "assignationDate"],
             include: [
-              { model: models.zone, attributes: ["id", "zone"] },
+              {
+                model: models.zone,
+                where: { companyId },
+                attributes: ["id", "zone"]
+              },
               {
                 model: models.User,
                 attributes: [
