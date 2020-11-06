@@ -16,6 +16,7 @@ import axios from "axios";
 import { Ionicons } from "@expo/vector-icons";
 import { Picker } from "@react-native-community/picker";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import { useFocusEffect } from '@react-navigation/native';
 
 //componentes
 import { API_PORT } from "../../config/index.js";
@@ -108,28 +109,13 @@ const ZonasScreen = ({ navigation, companyRedux, saveZones, zonesRedux }) => {
     setDepartureTime(currentDate);
   };
 
-  // const requestCompany = async () => {
-  //   setLoading(true);
-  //   try {
-  //     let res = await axios.get(`${API_PORT()}/api/findCompany/${adminId}`);
-  //     console.log("res.data: ", res.data);
-  //     if (!res.data.error) {
-  //       alert("busqueda exitosa");
-  //       setCompany(res.data.data);
-  //       setCompanyId(res.data.data[0].id);
-  //       setLoading(false);
-  //     }
-  //   } catch (error) {
-  //     alert(error.message);
-  //   }
-  // };
 
   //ZONE API
 
   const requestZone = async () => {
     try {
       let res = await axios.get(`${API_PORT()}/api/findZones/${companyId}`);
-      if (!res.data.error) {
+      if (!res.data.error && res.data.data.length >= 1) {
         setZone(res.data.data);
         await saveZones(res.data.data);
         console.log("zones:-------", res.data.data);
@@ -170,44 +156,19 @@ const ZonasScreen = ({ navigation, companyRedux, saveZones, zonesRedux }) => {
     }
   };
 
-  const renderItem = ({ item }) => {
-    return (
-      <View>
-        <TouchableOpacity
-          onPress={() =>
-            props.navigation.navigate("zone_detail", {
-              id: item.id,
-              zone: item.zone,
-              destinys: item.Destinos,
-              watchmen: item.encargado_zona,
-              entryTime: item.firsEntryTime,
-              departureTime: item.firsDepartureTime,
-            })
-          }
-          style={styles.zones}
-        >
-          <Text>{item.zone}</Text>
-          <Text>Entrada: {moment(item.firsEntryTime).format("HH: mm a")}</Text>
-          <Text>
-            Salida: {moment(item.firsDepartureTime).format("HH:mm a")}
-          </Text>
-          <Ionicons name="md-pin" size={28} color="grey" />
-        </TouchableOpacity>
-
-        <View>
-          <TouchableOpacity onPress={() => deleteZones(item.id)}>
-            <Ionicons name="ios-trash" size={28} color="#cccc" />
-          </TouchableOpacity>
-        </View>
-      </View>
-    );
-  };
   // useEffect(() => {
   //   requestCompany();
   // }, []);
-  useEffect(() => {
-    requestZone();
-  }, []);
+  // useEffect(() => {
+  //   requestZone();
+  // }, []);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      setZone([])
+      requestZone()
+    }, [])
+  );
   return (
     <View style={{ flex: 1 }}>
       <TopNavigation title="Zonas" leftControl={goBackAction()} />
@@ -242,7 +203,8 @@ const ZonasScreen = ({ navigation, companyRedux, saveZones, zonesRedux }) => {
           </View>
           <View>
             <Text>Zonas:</Text>
-            {zone ? (
+            {console.log("zones:---",zone)}
+            {zone.length >=1 ? (
               zone.map((item, i) => (
                 <View key={i}>
                   {console.log(item)}
@@ -277,7 +239,9 @@ const ZonasScreen = ({ navigation, companyRedux, saveZones, zonesRedux }) => {
               ))
             ) : (
               // <FlatList data={zone} renderItem={renderItem} numColumns={3} />
-              <ActivityIndicator size="large" color={MainColor} />
+              <View style={{backgroundColor:'red', height: 150}}>
+                <Text>Cargando</Text>
+              </View>
             )}
           </View>
           <Text>Crear Zona</Text>

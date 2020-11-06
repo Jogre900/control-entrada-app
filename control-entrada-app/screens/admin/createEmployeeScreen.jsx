@@ -3,13 +3,12 @@ import {
   View,
   Text,
   StyleSheet,
-  TouchableHighlight,
-  Button,
   ScrollView,
   Image,
   ActivityIndicator,
   Alert,
   TouchableOpacity,
+  TouchableWithoutFeedback
 } from "react-native";
 
 import axios from "axios";
@@ -51,13 +50,13 @@ export const CreateEmployeScreen = (props) => {
   const goBackAction = () => {
     return (
       <View>
-        <TouchableHighlight
+        <TouchableOpacity
           onPress={() => {
             props.navigation.goBack();
           }}
         >
           <Ionicons name="ios-arrow-back" size={28} color="white" />
-        </TouchableHighlight>
+        </TouchableOpacity>
       </View>
     );
   };

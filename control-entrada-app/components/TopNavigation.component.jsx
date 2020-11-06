@@ -5,8 +5,8 @@ import {
   StyleSheet,
   Alert,
   StatusBar,
-  TouchableHighlight,
   TouchableOpacity,
+  TouchableWithoutFeedback
 } from "react-native";
 import { RectButton } from "react-native-gesture-handler";
 import { Ionicons } from "@expo/vector-icons";
@@ -16,23 +16,26 @@ import { MainColor } from "../assets/colors.js";
 import Constants from 'expo-constants';
 import { tintColor } from "../constants/Colors";
 
-function NormalNav() {
+function NormalNav({size}) {
+  //console.log("normla nav props----",size)
   return (
-    <View style={styles.controlBox}>
-      <Ionicons name="ios-notifications" size={28} color={MainColor} />
+    <View style={styles.controlBox(size)}>
+      <Ionicons name="ios-notifications" size={size} color={MainColor} />
     </View>
   );
 }
 
 export const TopNavigation = (props) => {
   const { title, leftControl, rightControl } = props;
+  const size = leftControl.props.children.props.children.props.size
+  //console.log("left props",leftControl.props.children.props.children.props.size)
 
   return (
     <View style={styles.container}>
       <StatusBar hidden={true} />
       <TouchableOpacity
         onPress={leftControl.props.children.props.onPress}
-        style={styles.leftControlBox}
+        style={styles.controlBox(size)}
       >
         {leftControl}
       </TouchableOpacity>
@@ -42,12 +45,12 @@ export const TopNavigation = (props) => {
       {rightControl ? (
         <TouchableOpacity
           onPress={rightControl.props.children.props.onPress}
-          style={styles.controlBox}
+          style={styles.controlBox(size)}
         >
           {rightControl}
         </TouchableOpacity>
       ) : (
-        NormalNav()
+        <NormalNav size={size}/>
       )}
     </View>
   );
@@ -58,23 +61,29 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingHorizontal: 10,
+    paddingTop: Constants.statusBarHeight,
     backgroundColor: MainColor,
     //paddingTop: Constants.statusBarHeight,
     marginBottom: 0,
     //maxHeight: 60,
-    height: 60
+    //height: 60
   },
-  controlBox: {
+  controlBox: function(size){
+    return {
     justifyContent: "center",
     alignItems: "center",
-    width: "10%",
-    height: "100%",
+    height: size*1.5,
+    width: size*1.5,
+    borderRadius: size*1.5/2,
+    //backgroundColor: 'red',
+    justifyContent: "center",
+    alignItems: "center",
+    }
   },
   titleBox: {
-    justifyContent: "center",
-    width: "80%",
-    height: "100%",
+    //justifyContent: "center",
+    
+    //height: "100%",
   },
   title: {
     fontSize: 20,

@@ -18,6 +18,7 @@ import {
 import { connect } from 'react-redux'
 import axios from "axios";
 import AsyncStorage from "@react-native-community/async-storage";
+import { useFocusEffect } from '@react-navigation/native';
 
 //components
 import { MainColor } from "../../assets/colors";
@@ -144,6 +145,13 @@ const MainScreen = ({navigation, saveProfile, saveCompany}) => {
     signInStatus();
   }, []);
 
+  useFocusEffect(() => {
+      return console.log("is Focused")
+
+    }, [])
+  
+
+
   if (isSplash) {
     return <SplashScreen />;
   }
@@ -172,12 +180,14 @@ const MainScreen = ({navigation, saveProfile, saveCompany}) => {
 
               <MainButton
                 title="Ingresar"
+                style={styles.input}
                 onPress={() => {
                   navigation.navigate("LogIn");
                 }}
               />
               <MainButton
                 title="Registrate"
+                style={styles.input}
                 onPress={() => {
                   navigation.navigate("register");
                 }}
@@ -217,6 +227,9 @@ const styles = StyleSheet.create({
     height: 200,
     bottom: "25%",
   },
+  input: {
+    marginVertical: 2.5
+  }  
 });
 
 const mapDispatchToProps = dispatch => ({

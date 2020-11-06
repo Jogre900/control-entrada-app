@@ -11,7 +11,7 @@ import {
   Image,
 } from "react-native";
 import axios from "axios";
-import { connect } from 'react-redux'
+import { connect } from "react-redux";
 
 //componentes
 import { API_PORT } from "../../config/index.js";
@@ -23,8 +23,9 @@ import moment from "moment";
 import { Divider } from "../../components/Divider";
 import { MainColor, lightColor } from "../../assets/colors";
 
-const ZoneDetailScreen = ({route, navigation, zoneRedux}) => {
-  console.log("redux----", zoneRedux)
+const ZoneDetailScreen = ({ route, navigation, zoneRedux }) => {
+  //console.log("redux----", zoneRedux)
+  console.log(route);
   const {
     id,
     zone,
@@ -32,16 +33,16 @@ const ZoneDetailScreen = ({route, navigation, zoneRedux}) => {
     departureTime,
     destinys,
     watchmen,
-  } = route?.params;
-  
-  const [destiny, setDestiny] = useState(destinys);
-  const zoneId = id
+  } = route.params;
+
+  //const [destiny, setDestiny] = useState(destinys);
+  const zoneId = id;
   const goBackAction = () => {
     return (
       <View>
         <TouchableHighlight
           onPress={() => {
-            navigation.navigate("zonas");
+            navigation.navigate("Zones");
           }}
         >
           <Ionicons name="ios-arrow-back" size={28} color="white" />
@@ -54,8 +55,8 @@ const ZoneDetailScreen = ({route, navigation, zoneRedux}) => {
       style={{
         flexDirection: "row",
         alignItems: "center",
-        justifyContent: 'space-between',
-        marginVertical: 5
+        justifyContent: "space-between",
+        marginVertical: 5,
       }}
     >
       <View style={{ flexDirection: "row", backgroundColor: "skyblue" }}>
@@ -134,24 +135,31 @@ const ZoneDetailScreen = ({route, navigation, zoneRedux}) => {
         <View style={styles.dataContainer}>
           <Text style={styles.containerTitle}>Destinos</Text>
           <Divider size="small" />
-          <FlatList data={destiny} renderItem={renderDestiny} />
+          {destinys.length >= 1 ? (
+            <FlatList data={destinys} renderItem={renderDestiny} />
+          ) : (
+            <Text>no hay datos</Text>
+          )}
         </View>
         <View style={styles.dataContainer}>
           <Text style={styles.containerTitle}>Encargados</Text>
           <Divider size="small" />
-          <FlatList data={watchmen} renderItem={renderWatchman} />
+          {watchmen.length >= 1 ? (
+            <FlatList data={watchmen} renderItem={renderWatchman} />
+          ) : (
+            <Text>no hay datos</Text>
+          )}
         </View>
       </ScrollView>
     </View>
   );
 };
 
-
 const mapStateToProps = (state, zoneId) => ({
-  zoneRedux: state.zonesReducer
-})
+  zoneRedux: state.zonesReducer,
+});
 
-export default connect(mapStateToProps, {})(ZoneDetailScreen)
+export default connect(mapStateToProps, {})(ZoneDetailScreen);
 
 const styles = StyleSheet.create({
   dataContainer: {
@@ -198,5 +206,3 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
 });
-
-
