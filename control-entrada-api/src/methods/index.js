@@ -171,15 +171,31 @@ const Methods = {
       token: null
     };
     const { id } = req.params;
+    console.log(req.params)
     try {
       let zone = await models.zone.findOne({
         where: {
           id
-        }
+        },
+        include: [
+          {model: models.userZone, as: "encargado_zona",
+            include: {model: models.User}
+          },
+          {model: models.destination, as: "Destinos", attributes:['id', 'name']}
+        ]
       });
+      //console.log("zone*-------",zone.encargado_zona[0].User);
+      if(zone.encargado_zona.length >= 1){
+        let zoneEmployee = zone.encargado_zona
+        zoneEmployee.forEach(element => {
+          console.log("user---",element.User)
+           element.User.privilege = "Available" 
+            element.User.save()
+            element.destroy()
+        });
+      }
       if (zone) {
-        console.log(zone);
-        zone.destroy();
+        //zone.destroy();
         (RESPONSE.error = false), (RESPONSE.msg = "Registro borrado!");
         RESPONSE.data = zone;
         res.json(RESPONSE);
@@ -724,7 +740,7 @@ const Methods = {
           [Op.and]: [
             { companyId },
             {
-              [Op.or]: [{ privilege: "Supervisor" }, { privilege: "Watchman" }]
+              [Op.or]: [{ privilege: "Supervisor" }, { privilege: "Watchman" }, {privilege: "Available"}]
             }
           ]
         },
@@ -749,6 +765,35 @@ const Methods = {
     } catch (error) {
       RESPONSE.msg = error.message;
       res.json(RESPONSE);
+    }
+  },
+  findAvailableUsers: async function(req, res){
+    let RESPONSE = {
+      error: true,
+      msg: "",
+      data: null,
+      token: null
+    };
+    const {companyId} = req.params
+    console.log(req.params)
+    try {
+      let users = await models.User.findAll({
+        where: {
+          [Op.and]: [
+            {companyId},
+            {privilege: "Available"}
+          ]
+        }
+      })
+      if(users){
+        RESPONSE.error = false
+        RESPONSE.msg = "Busqueda Exitosa"
+        RESPONSE.data = users
+        res.json(RESPONSE)
+      }
+    } catch (error) {
+      RESPONSE.msg = error.message
+      res.json(RESPONSE)
     }
   },
   deleteUser: async function(req, res) {

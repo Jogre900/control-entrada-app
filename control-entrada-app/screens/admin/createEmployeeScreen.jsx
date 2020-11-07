@@ -216,7 +216,7 @@ export const CreateEmployeScreen = (props) => {
               ) : (
                 <TouchableOpacity
                   style={{ justifyContent: "center", alignItems: "center" }}
-                  onPress={() => getImage("galery")}
+                  onPress={() => getImage()}
                 >
                   <Ionicons name="md-photos" size={28} color={lightColor} />
                   <Text>Agregar Foto</Text>

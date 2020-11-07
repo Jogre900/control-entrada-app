@@ -43,7 +43,9 @@ export default (sequelize, { UUID, UUIDV4, STRING, DATE }) => {
             name: 'ZoneId',
             field: 'zone_id'
         },
-        as: 'encargado_zona'
+        as: 'encargado_zona',
+        onDelete: "CASCADE",
+        onUpdate: "CASCADE"
     })
     Zone.belongsTo(models.company)
   };

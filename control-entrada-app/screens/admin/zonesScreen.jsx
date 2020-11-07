@@ -150,9 +150,12 @@ const ZonasScreen = ({ navigation, companyRedux, saveZones, zonesRedux }) => {
     setDeleteZone(false);
     try {
       let res = await axios.delete(`${API_PORT()}/api/deleteZone/${id}`);
-      if (res) setDeleteZone(true);
+      if (!res.data.error){
+        console.log(res.data)
+        setDeleteZone(true);
+      } 
     } catch (error) {
-      console.log("error: ", error);
+      alert(error.message)
     }
   };
 
@@ -217,6 +220,7 @@ const ZonasScreen = ({ navigation, companyRedux, saveZones, zonesRedux }) => {
                         watchmen: item.encargado_zona,
                         entryTime: item.firsEntryTime,
                         departureTime: item.firsDepartureTime,
+                        companyId: item.companyId
                       })
                     }
                     style={styles.zones}

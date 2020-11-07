@@ -58,6 +58,7 @@ router.put("/updatePass/:id", Methods.updatePass);
 router.put("/updateAdmin/:companyId", Methods.updateAdminId)
 router.post("/login", Methods.login);
 router.get("/findUsers/:companyId", Methods.findUsers);
+router.get("/findAvailableUsers/:companyId", Methods.findAvailableUsers)
 router.delete("/deleteUser/:id", Methods.deleteUser);
 router.post("/createCompany/", Methods.createCompany);
 router.get("/findCompany/:id", Methods.findCompany);

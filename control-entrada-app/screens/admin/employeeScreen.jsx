@@ -140,9 +140,20 @@ export const EmployeeScreen = (props) => {
                   </View>
                   <View style={styles.itemDataBox}>
                     <Text style={styles.itemDataText}>Zona</Text>
-                    {/* <Text style={styles.itemDataText}>
+                    {
+                      item.userZone.length > 0 ?
+                      <Text style={styles.itemDataText}>
+                      {/* si tiene */}
                       {item.userZone[0].Zone.zone}
-                    </Text> */}
+                      </Text>
+                      :
+                      <Text style={styles.itemDataText}>
+                      -------
+                      </Text>
+                      }
+                    <Text style={styles.itemDataText}>
+                      
+                    </Text>
                   </View>
                 </TouchableOpacity>
               ))}

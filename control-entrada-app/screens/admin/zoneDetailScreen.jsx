@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -33,9 +33,12 @@ const ZoneDetailScreen = ({ route, navigation, zoneRedux }) => {
     departureTime,
     destinys,
     watchmen,
+    companyId,
   } = route.params;
 
   //const [destiny, setDestiny] = useState(destinys);
+  const [availableU, setAvailableU] = useState([]);
+  const [listVisible, setListVisible] = useState(false);
   const zoneId = id;
   const goBackAction = () => {
     return (
@@ -108,6 +111,20 @@ const ZoneDetailScreen = ({ route, navigation, zoneRedux }) => {
   //     }
   // ])
   // }
+
+  const findAvailableUsers = async () => {
+    try {
+      let res = await axios.get(
+        `${API_PORT()}/api/findAvailableUsers/${companyId}`
+      );
+      console.log("User Avai--", res.data);
+      if (!res.data.error) {
+        setAvailableU(res.data.data);
+      }
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
   const deleteDestiny = async (destinyId) => {
     console.log(destinyId);
     try {
@@ -122,6 +139,10 @@ const ZoneDetailScreen = ({ route, navigation, zoneRedux }) => {
       console.log(error);
     }
   };
+
+  useEffect(() => {
+    findAvailableUsers();
+  }, []);
   return (
     <View style={{ flex: 1 }}>
       <TopNavigation title={zone} leftControl={goBackAction()} />
@@ -147,7 +168,64 @@ const ZoneDetailScreen = ({ route, navigation, zoneRedux }) => {
           {watchmen.length >= 1 ? (
             <FlatList data={watchmen} renderItem={renderWatchman} />
           ) : (
-            <Text>no hay datos</Text>
+            <View>
+              <Text>La zona no posea Personal Asignado</Text>
+              <View>
+                <Text>Agregar Personal</Text>
+                <MainButton.Icon
+                  onPress={() => setListVisible(!listVisible)}
+                  name={listVisible ? "ios-arrow-up" : "ios-arrow-down"}
+                  size={22}
+                  color="#4f4f4f"
+                />
+              </View>
+              {listVisible && (
+                <View>
+                  {availableU.length > 0 ? (
+                    availableU.map((user, i) => (
+                      <View style={styles.listEmployeBox} key={i}>
+                        <Image
+                          style={styles.avatar}
+                          source={{
+                            uri: `${API_PORT()}/public/imgs/${user.picture}`,
+                          }}
+                        />
+                        <View style={styles.listSubItemBox}>
+                          <View style={{ alignItems: "center" }}>
+                            <View style={styles.privilegeBox}>
+                              <Text
+                                style={{
+                                  color: "#fff",
+                                  fontSize: 16,
+                                  lineHeight: 16,
+                                }}
+                              >
+                                {user.privilege}
+                              </Text>
+                            </View>
+                            <Text>
+                              {user.name} {user.lastName}
+                            </Text>
+                          </View>
+                          <View style={{ alignItems: "center" }}>
+                            <Text>Registrado el:</Text>
+                            <Text>
+                              {moment(user.createdAt).format("D MMM YYYY")}
+                            </Text>
+                          </View>
+                          {/* <Text>Cambio de Turno: {moment(item.changeTurnDate).format('D MMM YYYY')}</Text> */}
+                        </View>
+                      </View>
+                    ))
+                  ) : (
+                    <Text>
+                      No Tiene Empleados disponibles, cree uno nuevo para
+                      asignarlo
+                    </Text>
+                  )}
+                </View>
+              )}
+            </View>
           )}
         </View>
       </ScrollView>
