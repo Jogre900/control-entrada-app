@@ -23,7 +23,7 @@ const cover = require("../../assets/images/background.jpg");
 const watchPic = require("../../assets/images/male-2.jpg");
 
 export const DetailViewScreen = (props) => {
-  const visit = props.route.params;
+  const visit = props.route?.params;
   //console.log(visit)
   const citizen = visit.Citizen
 
@@ -201,6 +201,7 @@ export const DetailViewScreen = (props) => {
 
       {/* -------------TAB BAR----------- */}
       <View style={{ flex: 1, paddingHorizontal: 5 }}>
+        
         <View style={styles.tabBar}>
           <Animated.View
             style={{

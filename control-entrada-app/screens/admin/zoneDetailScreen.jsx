@@ -22,8 +22,10 @@ import { Ionicons } from "@expo/vector-icons";
 import moment from "moment";
 import { Divider } from "../../components/Divider";
 import { MainColor, lightColor } from "../../assets/colors";
+import CheckBox from "@react-native-community/checkbox";
+import Avatar from "../../components/avatar.component";
 
-const ZoneDetailScreen = ({ route, navigation, zoneRedux }) => {
+const ZoneDetailScreen = ({ route, navigation, zoneRedux, availableU }) => {
   //console.log("redux----", zoneRedux)
   console.log(route);
   const {
@@ -37,22 +39,64 @@ const ZoneDetailScreen = ({ route, navigation, zoneRedux }) => {
   } = route.params;
 
   //const [destiny, setDestiny] = useState(destinys);
-  const [availableU, setAvailableU] = useState([]);
+  //const [availableU, setAvailableU] = useState([]);
   const [listVisible, setListVisible] = useState(false);
+  const [check, setCheck] = useState(false);
   const zoneId = id;
   const goBackAction = () => {
     return (
       <View>
-        <TouchableHighlight
+        <TouchableOpacity
           onPress={() => {
             navigation.navigate("Zones");
           }}
         >
           <Ionicons name="ios-arrow-back" size={28} color="white" />
-        </TouchableHighlight>
+        </TouchableOpacity>
       </View>
     );
   };
+
+  const renderAvailable = ({ item }) => (
+    <View>
+      <View style={styles.listEmployeBox}>
+        <Avatar.Picture
+          size={50}
+          uri={`${API_PORT()}/public/imgs/${item.picture}`}
+        />
+        <View style={styles.listSubItemBox}>
+          <View style={{ alignItems: "center" }}>
+            <View style={styles.privilegeBox}>
+              <Text
+                style={{
+                  color: "#fff",
+                  fontSize: 16,
+                  lineHeight: 16,
+                }}
+              >
+                {item.privilege}
+              </Text>
+            </View>
+            <Text>
+              {item.name} {item.lastName}
+            </Text>
+          </View>
+          <View style={{ alignItems: "center" }}>
+            <CheckBox onChange={(e) => console.log(e)} value={check} />
+            {/* <Text>Registrado el:</Text>
+                            <Text>
+                            {moment(item.createdAt).format("D MMM YYYY")}
+                          </Text> */}
+          </View>
+          {/* <Text>Cambio de Turno: {moment(item.changeTurnDate).format('D MMM YYYY')}</Text> */}
+        </View>
+      </View>
+      <View style={{ flexDirection: "row" }}>
+        <MainButton outlined title="Fecha Asignado" />
+        <MainButton outlined title="Cambio Turno" />
+      </View>
+    </View>
+  );
   const renderDestiny = ({ item }) => (
     <View
       style={{
@@ -112,37 +156,37 @@ const ZoneDetailScreen = ({ route, navigation, zoneRedux }) => {
   // ])
   // }
 
-  const findAvailableUsers = async () => {
-    try {
-      let res = await axios.get(
-        `${API_PORT()}/api/findAvailableUsers/${companyId}`
-      );
-      console.log("User Avai--", res.data);
-      if (!res.data.error) {
-        setAvailableU(res.data.data);
-      }
-    } catch (error) {
-      console.log(error.message);
-    }
-  };
-  const deleteDestiny = async (destinyId) => {
-    console.log(destinyId);
-    try {
-      let res = await axios.delete(
-        `${API_PORT()}/api/deleteDestiny/${destinyId}`
-      );
-      if (res) {
-        console.log(res);
-        setDestiny((destiny) => destiny.filter((elem) => elem.id != destinyId));
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  // const findAvailableUsers = async () => {
+  //   try {
+  //     let res = await axios.get(
+  //       `${API_PORT()}/api/findAvailableUsers/${companyId}`
+  //     );
+  //     console.log("User Avai--", res.data);
+  //     if (!res.data.error) {
+  //       setAvailableU(res.data.data);
+  //     }
+  //   } catch (error) {
+  //     console.log(error.message);
+  //   }
+  // };
+  // const deleteDestiny = async (destinyId) => {
+  //   console.log(destinyId);
+  //   try {
+  //     let res = await axios.delete(
+  //       `${API_PORT()}/api/deleteDestiny/${destinyId}`
+  //     );
+  //     if (res) {
+  //       console.log(res);
+  //       setDestiny((destiny) => destiny.filter((elem) => elem.id != destinyId));
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
 
-  useEffect(() => {
-    findAvailableUsers();
-  }, []);
+  // useEffect(() => {
+  //   findAvailableUsers();
+  // }, []);
   return (
     <View style={{ flex: 1 }}>
       <TopNavigation title={zone} leftControl={goBackAction()} />
@@ -182,41 +226,11 @@ const ZoneDetailScreen = ({ route, navigation, zoneRedux }) => {
               {listVisible && (
                 <View>
                   {availableU.length > 0 ? (
-                    availableU.map((user, i) => (
-                      <View style={styles.listEmployeBox} key={i}>
-                        <Image
-                          style={styles.avatar}
-                          source={{
-                            uri: `${API_PORT()}/public/imgs/${user.picture}`,
-                          }}
-                        />
-                        <View style={styles.listSubItemBox}>
-                          <View style={{ alignItems: "center" }}>
-                            <View style={styles.privilegeBox}>
-                              <Text
-                                style={{
-                                  color: "#fff",
-                                  fontSize: 16,
-                                  lineHeight: 16,
-                                }}
-                              >
-                                {user.privilege}
-                              </Text>
-                            </View>
-                            <Text>
-                              {user.name} {user.lastName}
-                            </Text>
-                          </View>
-                          <View style={{ alignItems: "center" }}>
-                            <Text>Registrado el:</Text>
-                            <Text>
-                              {moment(user.createdAt).format("D MMM YYYY")}
-                            </Text>
-                          </View>
-                          {/* <Text>Cambio de Turno: {moment(item.changeTurnDate).format('D MMM YYYY')}</Text> */}
-                        </View>
-                      </View>
-                    ))
+                    <FlatList
+                      renderItem={renderAvailable}
+                      data={availableU}
+                      keyExtractor={(item) => item.id}
+                    />
                   ) : (
                     <Text>
                       No Tiene Empleados disponibles, cree uno nuevo para
@@ -233,8 +247,9 @@ const ZoneDetailScreen = ({ route, navigation, zoneRedux }) => {
   );
 };
 
-const mapStateToProps = (state, zoneId) => ({
+const mapStateToProps = (state) => ({
   zoneRedux: state.zonesReducer,
+  availableU: state.employeeReducer.available,
 });
 
 export default connect(mapStateToProps, {})(ZoneDetailScreen);
@@ -253,16 +268,16 @@ const styles = StyleSheet.create({
     color: MainColor,
   },
   avatar: {
-    height: 70,
-    width: 70,
-    borderRadius: 70 / 2,
+    height: 30,
+    width: 30,
+    borderRadius: 30 / 2,
   },
   listEmployeBox: {
     flexDirection: "row",
     alignItems: "center",
     marginVertical: 5,
     backgroundColor: "#fff",
-    justifyContent: "space-around",
+    justifyContent: "space-between",
     padding: 5,
   },
   listSubItemBox: {

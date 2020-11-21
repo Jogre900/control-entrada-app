@@ -17,10 +17,17 @@ import { API_PORT } from "../../config/index";
 import moment from "moment";
 import { MainColor } from "../../assets/colors";
 import Modal from "react-native-modal";
-
+import { connect } from "react-redux";
+import Avatar from '../../components/avatar.component'
 const companyId = "9a28095a-9029-40ec-88c2-30e3fac69bc5";
 
-export const HomeAdminScreen = (props) => {
+const HomeAdminScreen = ({
+  navigation,
+  company,
+  saveEmployee,
+  saveTodayVisits,
+  saveAvailable
+}) => {
   const [object, setObject] = useState({});
   const [loading, setLoading] = useState(true);
   const [visits, setVisits] = useState([]);
@@ -30,7 +37,7 @@ export const HomeAdminScreen = (props) => {
       <View>
         <TouchableHighlight
           onPress={() => {
-            props.navigation.toggleDrawer();
+            navigation.toggleDrawer();
           }}
         >
           <Ionicons name="ios-menu" size={28} color="white" />
@@ -43,7 +50,7 @@ export const HomeAdminScreen = (props) => {
       <View>
         <TouchableHighlight
           onPress={() => {
-            props.navigation.navigate("notification");
+            navigation.navigate("notification");
           }}
         >
           <Ionicons name="md-notifications" size={28} color="white" />
@@ -73,10 +80,11 @@ export const HomeAdminScreen = (props) => {
 
   //VISITS
   const requestVisits = async () => {
-    setModalVisible(!modalVisible);
+    if(company){
+      setModalVisible(true);
     try {
       let res = await axios.get(
-        `${API_PORT()}/api/findTodayVisits/${companyId}`
+        `${API_PORT()}/api/findTodayVisits/${company.id}`
       );
       console.log(res.data.data);
       if (res.data.data.length === 0) {
@@ -84,14 +92,59 @@ export const HomeAdminScreen = (props) => {
         alert("No hay registros");
       } else if (!res.data.error) {
         console.log(res.data.data);
+        saveTodayVisits(res.data.data);
         setVisits(res.data.data);
-        setModalVisible(!modalVisible);
+        setModalVisible(false);
       }
     } catch (error) {
       setModalVisible(false);
       alert(error.message);
     }
+    }
   };
+  //REQUEST EMPLOYEE
+  const requestEmployee = async () => {
+    if (company) {
+      setModalVisible(true);
+      try {
+        let res = await axios.get(`${API_PORT()}/api/findUsers/${company.id}`);
+        if (!res.data.error) {
+          console.log(res.data.data);
+          saveEmployee(res.data.data);
+          setLoading(false);
+        }
+      } catch (error) {
+        setLoading(false);
+        console.log("error: ", error.message);
+      }
+    }
+  };
+  //REQUEST AVAILABLE
+  const findAvailableUsers = async () => {
+    if (company) {
+      setModalVisible(true);
+      try {
+        let res = await axios.get(
+          `${API_PORT()}/api/findAvailableUsers/${company.id}`
+        );
+        console.log("User Avai--", res.data);
+        if (!res.data.error) {
+          saveAvailable(res.data.data);
+          setModalVisible(false);
+        }
+      } catch (error) {
+        setModalVisible(false);
+        console.log(error.message);
+      }
+    }
+  };
+  useEffect(() => {
+    findAvailableUsers();
+  }, []);
+
+  useEffect(() => {
+    requestEmployee();
+  }, []);
 
   useEffect(() => {
     requestVisits();
@@ -113,10 +166,10 @@ export const HomeAdminScreen = (props) => {
             <TouchableOpacity
               style={styles.entryBox}
               key={i}
-              onPress={() => props.navigation.navigate("detail-view", elem)}
+              onPress={() => navigation.navigate("detail-view", elem)}
             >
               <View style={styles.dataContainerView}>
-                {/* <Image style={{height: 40, width: 40, borderRadius: 20}} source={{uri: `${API_PORT()}/public/imgs/${elem.picture}`}}/> */}
+                <Avatar.Picture size={50} uri={`${API_PORT()}/public/imgs/${elem.Citizen.picture}`}/>
               </View>
               <View style={styles.dataContainerView}>
                 <Text>DNI</Text>
@@ -141,6 +194,33 @@ export const HomeAdminScreen = (props) => {
     </View>
   );
 };
+
+const mapStateToProps = (state) => ({
+  company: state.profileReducer.company,
+});
+
+const mapDispatchToProps = (dispatch) => ({
+  saveTodayVisits(todayVisits) {
+    dispatch({
+      type: "SAVE_VISITS",
+      payload: todayVisits,
+    });
+  },
+  saveEmployee(employee) {
+    dispatch({
+      type: "SAVE_EMPLOYEE",
+      payload: employee,
+    });
+  },
+  saveAvailable(availables){
+    dispatch({
+      type: "SAVE_AVAILABLE",
+      payload: availables
+    })
+  }
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(HomeAdminScreen);
 
 const styles = StyleSheet.create({
   listEntry: {

@@ -27,11 +27,11 @@ import axios from "axios";
 import { API_PORT } from "../../config/index";
 import { MainColor, lightColor } from "../../assets/colors.js";
 import Modal from "react-native-modal";
-
+import {connect} from 'react-redux'
 const { width } = Dimensions.get("window");
 
-export const Salida2Screen = (props) => {
-  const profile = props.route.params.profile;
+const VisitScreen = ({navigation, profile}) => {
+  
   const [findIt, setFindIt] = useState(false);
   const [citizen, setCitizen] = useState();
   const [showList, setShowList] = useState(false);
@@ -54,7 +54,7 @@ export const Salida2Screen = (props) => {
       <View>
         <TouchableOpacity
           onPress={() => {
-            props.navigation.goBack();
+            navigation.goBack();
           }}
         >
           <Ionicons name="ios-arrow-back" size={28} color="white" />
@@ -134,7 +134,7 @@ export const Salida2Screen = (props) => {
   //RENDER TODAY VISIT
   const renderVisits = ({ item }) => (
     <TouchableOpacity
-      onPress={() => props.navigation.navigate("departure", { id: item.id })}
+      onPress={() => navigation.navigate("departure", { id: item.id })}
       style={styles.listItemBox}
     >
       <Image
@@ -208,7 +208,7 @@ export const Salida2Screen = (props) => {
           {visitsDni.map((elem, i) => (
             <TouchableOpacity
               onPress={() =>
-                props.navigation.navigate("departure", { id: elem.id })
+                navigation.navigate("departure", { id: elem.id })
               }
               style={styles.listItemBox}
               key={elem.id}
@@ -286,6 +286,11 @@ export const Salida2Screen = (props) => {
     </View>
   );
 };
+const mapStateToProps = state => ({
+  profile: state.profileReducer.profile
+})
+
+export default connect(mapStateToProps, {})(VisitScreen)
 
 const styles = StyleSheet.create({
   imgBackground: {

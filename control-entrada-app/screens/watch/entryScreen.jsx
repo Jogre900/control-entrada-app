@@ -27,9 +27,11 @@ import { Divider } from "../../components/Divider";
 import { MainColor, ligthColor } from "../../assets/colors";
 import Modal from "react-native-modal";
 import AsyncStorage from "@react-native-community/async-storage";
+import {connect} from 'react-redux'
+import {storage} from '../../helpers/asyncStorage'
 
-export const Entrada2Screen = (props) => {
-  const profile = props.route.params.profile;
+const EntryScreen = ({navigation, profile, saveVisit}) => {
+  //const profile = props.route.params.profile;
   const destinys = profile.userZone[0].Zone.Destinos;
 
   const userZoneId = profile.userZone[0].id;
@@ -58,19 +60,14 @@ export const Entrada2Screen = (props) => {
   const dniRef = useRef();
   const destinyRef = useRef();
 
-  //GET TOKEN
-  const getToken = async () => {
-    const token = await AsyncStorage.getItem("watchToken");
-    console.log("token del local storage:---", token);
-    if(token) return token
-  }
+  
 
   
   
   //CREATE VISIT
   const createVisit = async () => {
     console.log("destiny id---------------", destinyId);
-    let token = await getToken()
+    let token = await storage.getItem('userToken')
     if (!name || !lastName || !dni) {
       setProfileCaption("Debe ingresar todos los datos");
       return;
@@ -101,15 +98,15 @@ export const Entrada2Screen = (props) => {
             },
           }
         );
-        if (res) {
-          console.log(res, data);
+        if (!res.data.error) {
+          console.log(res.data);
+          saveVisit(res.data.data)
           setModalVisibility(false);
           alert("Registro exitoso!");
           clearInputs();
         }
       } catch (error) {
         setModalVisibility(false);
-        console.log("error: ", error.response);
         alert(error.message);
       }
     }
@@ -189,7 +186,7 @@ export const Entrada2Screen = (props) => {
   const goBackAction = () => {
     return (
       <View>
-        <TouchableWithoutFeedback onPress={() => props.navigation.goBack()}>
+        <TouchableWithoutFeedback onPress={() => navigation.goBack()}>
           <Ionicons name="ios-arrow-back" size={28} color="white" />
         </TouchableWithoutFeedback>
       </View>
@@ -238,9 +235,6 @@ export const Entrada2Screen = (props) => {
     })();
   }, []);
 
-  useEffect(() => {
-    getToken()
-  }, [])
   return (
     <View style={{ flex: 1 }}>
       <KeyboardAvoidingView style={styles.containerKeyboard} behavior="padding">
@@ -369,6 +363,21 @@ export const Entrada2Screen = (props) => {
     </View>
   );
 };
+
+const mapStateToProps = state => ({
+  profile: state.profileReducer.profile,
+})
+
+const mapDispatchToProps = dispatch => ({
+  saveVisit(visit){
+    dispatch({
+      type: "SAVE_VISIT",
+      payload: visit
+    })
+  }
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(EntryScreen)
 
 const styles = StyleSheet.create({
   containerKeyboard: {

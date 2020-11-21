@@ -26,6 +26,7 @@ import { SplashScreen } from "../../components/splashScreen.component";
 import { MainButton } from "../../components/mainButton.component";
 import Modal from "react-native-modal";
 import { API_PORT } from "../../config/index";
+import { storage } from '../../helpers/asyncStorage'
 
 const { width, height } = Dimensions.get("window");
 
@@ -90,7 +91,7 @@ const MainScreen = ({navigation, saveProfile, saveCompany}) => {
   
 
   const signInStatus = async () => {
-    let token = await AsyncStorage.getItem("userToken");
+    let token = await storage.getItem("userToken");
     if (token) {
       setModalVisible(true);
       try {
@@ -119,8 +120,8 @@ const MainScreen = ({navigation, saveProfile, saveCompany}) => {
             case "Supervisor":
               navigation.navigate("super");
               break;
-            case "Watch":
-              navigation.navigate("watch");
+            case "Watchman":
+              navigation.navigate("watch", {screen: "watch-home"});
               break;
             default:
               break;
@@ -130,7 +131,7 @@ const MainScreen = ({navigation, saveProfile, saveCompany}) => {
         setModalVisible(false);
         alert(error.message);
       }
-    }
+    }else alert("No hay token almacenado")
   };
 
   useEffect(() => {

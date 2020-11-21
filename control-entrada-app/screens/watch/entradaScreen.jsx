@@ -11,13 +11,14 @@ import {
 } from "react-native";
 import { RectButton } from "react-native-gesture-handler";
 import { Ionicons } from "@expo/vector-icons";
+import {connect} from 'react-redux'
 
 //components
 import { TopNavigation } from "../../components/TopNavigation.component";
 import { MainButton } from "../../components/mainButton.component";
 import { Input } from "../../components/input.component";
 
-export const EntradaScreen = (props) => {
+const EntryScreen = (props) => {
   const goBackAction = () => {
     return (
       <View>
@@ -96,6 +97,9 @@ export const EntradaScreen = (props) => {
   );
 };
 
+const mapStateToProps
+
+export default connect(mapStateToProps, mapDispatchToProps)(EntryScreen)
 const styles = StyleSheet.create({
   container: {
     flex: 1,

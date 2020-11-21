@@ -25,41 +25,42 @@ import { MainColor, lightColor } from "../../assets/colors.js";
 import Modal from "react-native-modal";
 import { Divider } from "../../components/Divider";
 
-const WatchProfileScreen = ({navigation, profileRedux}) => {
-  console.log("redux:----", profileRedux)
+const WatchProfileScreen = ({navigation, profile}) => {
+  //console.log("redux:----", profileRedux)
+  const destiny = profile.userZone[0].Zone.Destinos
   const [editVisibility, setEditVisibility] = useState(false);
   const [passChange, setPassChange] = useState("");
   const [repeatPass, setRepeatPass] = useState("");
   const [passCaption, setPassCaption] = useState("");
-  const [profile, setProfile] = useState();
-  const [destiny, setDestiny] = useState();
+  //const [profile, setProfile] = useState();
+  //const [destiny, setDestiny] = useState();
   const [destinyvisibility, setDestinyvisibility] = useState(false);
   const [loading, setLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
 
-  //GET PROFILE
-  const getProfile = async () => {
-    setLoading(true);
-    const token = await AsyncStorage.getItem("watchToken");
-    console.log("token del local storage:---", token);
-    if (token) {
-      try {
-        let res = await axios.get(`${API_PORT()}/api/profile`, {
-          headers: {
-            Authorization: `bearer ${token}`,
-          },
-        });
-        if (res) {
-          console.log("Profile:--", res.data);
-          setLoading(false);
-          setProfile(res.data.data);
-          setDestiny(res.data.data.userZone[0].Zone.Destinos);
-        }
-      } catch (error) {
-        console.log("error: ", error.response);
-      }
-    }
-  };
+  // //GET PROFILE
+  // const getProfile = async () => {
+  //   setLoading(true);
+  //   const token = await AsyncStorage.getItem("watchToken");
+  //   console.log("token del local storage:---", token);
+  //   if (token) {
+  //     try {
+  //       let res = await axios.get(`${API_PORT()}/api/profile`, {
+  //         headers: {
+  //           Authorization: `bearer ${token}`,
+  //         },
+  //       });
+  //       if (res) {
+  //         console.log("Profile:--", res.data);
+  //         setLoading(false);
+  //         setProfile(res.data.data);
+  //         setDestiny(res.data.data.userZone[0].Zone.Destinos);
+  //       }
+  //     } catch (error) {
+  //       console.log("error: ", error.response);
+  //     }
+  //   }
+  // };
   //UPDATE PASSWORD
   const updatePassword = async () => {
     console.log(passChange, repeatPass);
@@ -123,7 +124,7 @@ const WatchProfileScreen = ({navigation, profileRedux}) => {
   };
 
   //RENDER DESTINY LIST
-  const DestinyList = () => {
+  const DestinyList = ({destiny}) => {
     return (
       <React.Fragment>
         {destiny.map((elem) => (
@@ -143,9 +144,9 @@ const WatchProfileScreen = ({navigation, profileRedux}) => {
       </React.Fragment>
     );
   };
-  useEffect(() => {
-    getProfile();
-  }, []);
+  // useEffect(() => {
+  //   getProfile();
+  // }, []);
 
   return (
     <View style={styles.container}>
@@ -243,7 +244,7 @@ const WatchProfileScreen = ({navigation, profileRedux}) => {
                     />
                   </TouchableOpacity>
                 </View>
-                {destinyvisibility && <DestinyList />}
+                {destinyvisibility && <DestinyList destiny={destiny}/>}
               </View>
             </View>
             <View style={styles.editContainer}>
@@ -315,7 +316,7 @@ const WatchProfileScreen = ({navigation, profileRedux}) => {
 };
 
 const mapStateToPRops = state => ({
-  profileRedux: state.profileReducer.profile
+  profile: state.profileReducer.profile
 })
 
 export default connect(mapStateToPRops, {})(WatchProfileScreen)

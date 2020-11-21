@@ -4,7 +4,7 @@ import {
   DrawerContentScrollView,
   DrawerItem,
 } from "@react-navigation/drawer";
-import { createStackNavigator } from "@react-navigation/stack";
+import { createStackNavigator, CardStyleInterpolators } from "@react-navigation/stack";
 import {
   View,
   Text,
@@ -19,7 +19,7 @@ import DrawerHeader from "./drawerHeader";
 import { MainColor, lightColor } from "../assets/colors";
 
 //screens
-import { HomeAdminScreen } from "../screens/admin/homeAdminScreen";
+import HomeAdminScreen from "../screens/admin/homeAdminScreen";
 import { DetailViewScreen } from "../screens/admin/detailViewScreen";
 import ZoneDetailScreen from "../screens/admin/zoneDetailScreen";
 import { NotificationScreen } from "../screens/admin/notificationScreen";
@@ -34,14 +34,20 @@ import { EmployeeDetailScreen } from "../screens/admin/employeeDetailScreen";
 const drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
 
+const options = {
+  gestureEnabled: true,
+  gestureDirection: 'horizontal',
+  cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS
+}
+
 function AdminNav() {
   return (
     <Stack.Navigator headerMode="none" initialRouteName="admin-home">
       <Stack.Screen name="admin-home" component={HomeAdminScreen} />
-      <Stack.Screen name="detail-view" component={DetailViewScreen} />
+      <Stack.Screen name="detail-view" component={DetailViewScreen} options={options}/>
       <Stack.Screen name="notification" component={NotificationScreen} />
-      <Stack.Screen name="zone_detail" component={ZoneDetailScreen} />
-      <Stack.Screen name="employee_detail" component={EmployeeDetailScreen} />
+      <Stack.Screen name="zone_detail" component={ZoneDetailScreen} options={options}/>
+      <Stack.Screen name="employee_detail" component={EmployeeDetailScreen} options={options}/>
     </Stack.Navigator>
   );
 }
@@ -51,7 +57,7 @@ const deleteToken = async () => {
 };
 
 const drawerData = [
-  { label: "Inicio", route: "Home", icon: "ios-home" },
+  { label: "Inicio", route: "admin-home", icon: "ios-home" },
   { label: "Empresa", route: "Company", icon: "ios-business" },
   { label: "Historial", route: "Historial", icon: "ios-calendar" },
   { label: "Empleados", route: "Employee", icon: "ios-people" },

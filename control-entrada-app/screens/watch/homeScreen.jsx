@@ -10,10 +10,13 @@ import axios from 'axios'
 import { API_PORT } from '../../config/index'
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from '@react-native-community/async-storage'
+import {connect} from 'react-redux'
+import {storage} from '../../helpers/asyncStorage'
 
 //components
 import { TopNavigation } from "../../components/TopNavigation.component";
 import { MainButton } from "../../components/mainButton.component";
+
 
 //constants
 import { mainColor } from "../../constants/Colors";
@@ -23,8 +26,7 @@ const cover = require("../../assets/images/background.jpg");
 const { width, height } = Dimensions.get("window");
 
 export const HomeScreen = (props) => {
-  console.log("params:----",props.route.params)
-  const profile = props.route.params
+
   const goBackAction = () => {
     return (
       <View>
@@ -39,6 +41,10 @@ export const HomeScreen = (props) => {
     );
   };
 
+  const signOut = async () => {
+    storage.removeItem('userToken')
+      .then(() => props.navigation.navigate("Main"))
+  }
   const rightControls = () => {
     return (
       <View>
@@ -65,14 +71,14 @@ export const HomeScreen = (props) => {
                 title="Entrada"
                 style={styles.button}
                 onPress={() => {
-                  props.navigation.navigate("entrada", profile);
+                  props.navigation.navigate("entrada");
                 }}
               />
               <MainButton
                 title="Salida"
                 style={styles.button}
                 onPress={() => {
-                  props.navigation.navigate("salida", profile);
+                  props.navigation.navigate("salida");
                 }}
               />
             </View>
@@ -82,6 +88,7 @@ export const HomeScreen = (props) => {
     </View>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {

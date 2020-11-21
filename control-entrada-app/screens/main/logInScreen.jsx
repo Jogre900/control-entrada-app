@@ -95,11 +95,10 @@ const LoginScreen = ({ navigation, saveProfile, saveCompany }) => {
         await saveCompany(company)
         let privilege = res.data.data.privilege;
         switch (privilege) {
-          case "Vigilante":
+          case "Watchman":
             setModalVisible(false);
-            props.navigation.navigate("watch", {
+            navigation.navigate("watch", {
               screen: "watch-home",
-              params: { profile },
             });
             break;
           case "Admin":
