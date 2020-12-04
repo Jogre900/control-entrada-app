@@ -17,7 +17,6 @@ import { Ionicons } from "@expo/vector-icons";
 import Input from "../../components/input.component";
 import Modal from "react-native-modal";
 import { API_PORT } from "../../config/index";
-import AsyncStorage from "@react-native-community/async-storage";
 import moment from "moment";
 import { Divider } from "../../components/Divider";
 

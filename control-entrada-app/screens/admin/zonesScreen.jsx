@@ -10,13 +10,14 @@ import {
   ActivityIndicator,
   Alert,
   ScrollView,
+  Vibration,
 } from "react-native";
 import { connect } from "react-redux";
 import axios from "axios";
 import { Ionicons } from "@expo/vector-icons";
 import { Picker } from "@react-native-community/picker";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect } from "@react-navigation/native";
 
 //componentes
 import { API_PORT } from "../../config/index.js";
@@ -32,6 +33,9 @@ const DEVICE_WIDTH = Dimensions.get("window").width;
 const ZonasScreen = ({ navigation, companyRedux, saveZones, zonesRedux }) => {
   console.log("company REdux  ", companyRedux);
   console.log("company REdux  ", zonesRedux);
+  const [selectItem, setSeletedItem] = useState([]);
+  const [changeStyle, setChangeStyle] = useState(false);
+
   const [zone, setZone] = useState([]);
   const [zoneName, setZoneName] = useState("");
   const [create, setCreate] = useState(false);
@@ -109,7 +113,6 @@ const ZonasScreen = ({ navigation, companyRedux, saveZones, zonesRedux }) => {
     setDepartureTime(currentDate);
   };
 
-
   //ZONE API
 
   const requestZone = async () => {
@@ -150,12 +153,12 @@ const ZonasScreen = ({ navigation, companyRedux, saveZones, zonesRedux }) => {
     setDeleteZone(false);
     try {
       let res = await axios.delete(`${API_PORT()}/api/deleteZone/${id}`);
-      if (!res.data.error){
-        console.log(res.data)
+      if (!res.data.error) {
+        console.log(res.data);
         setDeleteZone(true);
-      } 
+      }
     } catch (error) {
-      alert(error.message)
+      alert(error.message);
     }
   };
 
@@ -168,10 +171,21 @@ const ZonasScreen = ({ navigation, companyRedux, saveZones, zonesRedux }) => {
 
   useFocusEffect(
     React.useCallback(() => {
-      setZone([])
-      requestZone()
+      setZone([]);
+      setSeletedItem([]);
+      requestZone();
     }, [])
   );
+
+  const onLong = (id) => {
+    if (selectItem.includes(id)) {
+      setSeletedItem((value) => value.filter((elem) => elem !== id));
+      return;
+    }
+    Vibration.vibrate(100),
+      setSeletedItem(selectItem.concat(id)),
+      setChangeStyle(!changeStyle);
+  };
   return (
     <View style={{ flex: 1 }}>
       <TopNavigation title="Zonas" leftControl={goBackAction()} />
@@ -204,26 +218,41 @@ const ZonasScreen = ({ navigation, companyRedux, saveZones, zonesRedux }) => {
           <View>
             <Text>company ID: {companyId}</Text>
           </View>
+          {selectItem.length >= 1 && (
+            <View>
+              <Text>ELEMENTOS SELECCIONADOS: {selectItem.length}</Text>
+            </View>
+          )}
           <View>
             <Text>Zonas:</Text>
-            {console.log("zones:---",zone)}
-            {zone.length >=1 ? (
+            {console.log("zones:---", zone)}
+            {zone.length >= 1 ? (
               zone.map((item, i) => (
-                <View key={i}>
+                <View
+                  key={i}
+                  style={
+                    selectItem.includes(item.id) ? styles.selectedItem : null
+                  }
+                >
                   {console.log(item)}
                   <TouchableOpacity
-                    onPress={() =>
-                      navigation.navigate("zone_detail", {
-                        id: item.id,
-                        zone: item.zone,
-                        destinys: item.Destinos,
-                        watchmen: item.encargado_zona,
-                        entryTime: item.firsEntryTime,
-                        departureTime: item.firsDepartureTime,
-                        companyId: item.companyId
-                      })
+                    onPress={
+                      selectItem.length >= 1
+                        ? () => onLong(item.id)
+                        : () =>
+                            navigation.navigate("zone_detail", {
+                              id: item.id,
+                              zone: item.zone,
+                              destinys: item.Destinos,
+                              watchmen: item.encargado_zona,
+                              entryTime: item.firsEntryTime,
+                              departureTime: item.firsDepartureTime,
+                              companyId: item.companyId,
+                            })
                     }
-                    style={styles.zones}
+                    onLongPress={() => onLong(item.id)}
+                    delayLongPress={200}
+                    style={styles.listItemBox}
                   >
                     <Text>{item.zone}</Text>
                     <Text>
@@ -243,7 +272,7 @@ const ZonasScreen = ({ navigation, companyRedux, saveZones, zonesRedux }) => {
               ))
             ) : (
               // <FlatList data={zone} renderItem={renderItem} numColumns={3} />
-              <View style={{backgroundColor:'red', height: 150}}>
+              <View style={{ backgroundColor: "red", height: 150 }}>
                 <Text>Cargando</Text>
               </View>
             )}
@@ -315,18 +344,6 @@ const ZonasScreen = ({ navigation, companyRedux, saveZones, zonesRedux }) => {
   );
 };
 
-const styles = StyleSheet.create({
-  zones: {
-    borderWidth: 1,
-    borderColor: "grey",
-    borderStyle: "dotted",
-    //backgroundColor: "pink",
-    alignItems: "center",
-    margin: 0.5,
-    padding: 10,
-    //minWidth: Math.floor(DEVICE_WIDTH / 3),
-  },
-});
 const stateToProps = (state) => ({
   companyRedux: state.profileReducer.company,
   zonesRedux: state.zonesReducer.zones,
@@ -342,3 +359,18 @@ const mapDispatchToProps = (dispatch) => ({
 });
 
 export default connect(stateToProps, mapDispatchToProps)(ZonasScreen);
+
+const styles = StyleSheet.create({
+  listItemBox: {
+    flexDirection: "row",
+    paddingHorizontal: 12,
+    paddingVertical: 5,
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: "#fff",
+    marginVertical: 10,
+  },
+  selectedItem: {
+    backgroundColor: "rgba(20, 144, 150, 0.4)",
+  },
+});

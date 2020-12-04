@@ -1,5 +1,11 @@
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity, TouchableHighlight } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  TouchableHighlight,
+} from "react-native";
 import { MainColor } from "../assets/colors";
 import { Ionicons } from "@expo/vector-icons";
 const Icon = ({ size, name, color, onPress }) => {
@@ -10,14 +16,17 @@ const Icon = ({ size, name, color, onPress }) => {
   );
 };
 
-export const MainButton = (props) => {
-  const { title, onPress, textStyle, style, outlined } = props;
+export const MainButton = ({ title, onPress, textStyle, style, outline, rounded }) => {
   return (
     <TouchableOpacity
-      style={[outlined ? styles.outlined : styles.button, style]}
+      style={[
+        rounded ? styles.rounded : styles.square,
+        outline ? styles.outline : styles.filled,
+        style,
+      ]}
       onPress={onPress}
     >
-      <Text style={[outlined ? styles.outlinedText : styles.text, textStyle]}>
+      <Text style={[outline ? styles.outlineText : styles.text, textStyle]}>
         {title}
       </Text>
     </TouchableOpacity>
@@ -26,30 +35,40 @@ export const MainButton = (props) => {
 
 MainButton.Icon = Icon;
 const styles = StyleSheet.create({
-  button: {
-    borderRadius: 20,
+  square: {
+    borderRadius: 5,
+    borderWidth: 1,
+    height: 40,
+    justifyContent: "center",
+    alignItems: "center",
     backgroundColor: MainColor,
     borderColor: MainColor,
     borderWidth: 1,
-    //marginBottom: 10,
+  },
+  rounded: {
+    borderRadius: 20,
+    borderWidth: 1,
     height: 40,
     justifyContent: "center",
     alignItems: "center",
   },
-  outlined: {
-    borderRadius: 20,
+  filled: {
+    backgroundColor: MainColor,
     borderColor: MainColor,
     borderWidth: 1,
-    //marginBottom: 10,
-    height: 40,
-    justifyContent: "center",
-    alignItems: "center",
+  },
+  outline: {
+    borderColor: MainColor,
+    backgroundColor: '#eee',
+    borderWidth: 1,
   },
   text: {
-    fontSize: 15,
+    fontSize: 16,
     color: "white",
+    fontWeight: "500",
+    // letterSpacing: 2,
   },
-  outlinedText: {
+  outlineText: {
     color: MainColor,
   },
   iconBox: function (size) {
