@@ -17,6 +17,7 @@ import Modal from "react-native-modal";
 import AsyncStorage from "@react-native-community/async-storage";
 import { Ionicons } from "@expo/vector-icons";
 import { MainColor } from "../../assets/colors";
+import { BackAction } from '../../helpers/ui/ui'
 
 const LoginScreen = ({ navigation, saveProfile, saveCompany }) => {
   const [email, setEmail] = useState("");
@@ -30,8 +31,9 @@ const LoginScreen = ({ navigation, saveProfile, saveCompany }) => {
       <View>
         <TouchableOpacity
           onPress={() => {
-            navigation.goBack();
+            navigation.goBack()
           }}
+            style={{backgroundColor: 'blue'}}
         >
           <Ionicons name="ios-arrow-back" size={28} color="white" />
         </TouchableOpacity>

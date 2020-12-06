@@ -53,13 +53,13 @@ export const EmployeeScreen = (props) => {
   const goBackAction = () => {
     return (
       <View>
-        <TouchableHighlight
+        <TouchableOpacity
           onPress={() => {
-            props.navigation.navigate("Home");
+            props.navigation.navigate("admin-home");
           }}
         >
           <Ionicons name="ios-arrow-back" size={28} color="white" />
-        </TouchableHighlight>
+        </TouchableOpacity>
       </View>
     );
   };

@@ -170,12 +170,13 @@ const Methods = {
       data: null,
       token: null
     };
-    const { id } = req.params;
-    console.log(req.params)
+    const { zonesId } = req.body;
+    console.log("body de delete--",req.body)
+    console.log(zonesId)
     try {
-      let zone = await models.zone.findOne({
+      let zone = await models.zone.findAll({
         where: {
-          id
+          id: zonesId
         },
         include: [
           {model: models.userZone, as: "encargado_zona",
@@ -184,22 +185,17 @@ const Methods = {
           {model: models.destination, as: "Destinos", attributes:['id', 'name']}
         ]
       });
-      //console.log("zone*-------",zone.encargado_zona[0].User);
-      if(zone.encargado_zona.length >= 1){
-        let zoneEmployee = zone.encargado_zona
-        zoneEmployee.forEach(element => {
-          console.log("user---",element.User)
-           element.User.privilege = "Available" 
-            element.User.save()
-            element.destroy()
-        });
-      }
-      if (zone) {
-        //zone.destroy();
-        (RESPONSE.error = false), (RESPONSE.msg = "Registro borrado!");
-        RESPONSE.data = zone;
-        res.json(RESPONSE);
-      }
+      //console.log("zone*-------",zone);
+      zone.map(async elem => {
+        console.log("zone name---",elem.id)
+        
+        await elem.destroy()
+       
+      })
+      RESPONSE.error = false
+      RESPONSE.msg = "Registro borrado!"
+    RESPONSE.data = zone
+    res.json(RESPONSE);
     } catch (error) {
       RESPONSE.msg = error;
       res.json(RESPONSE);

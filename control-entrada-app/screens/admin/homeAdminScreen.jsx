@@ -19,6 +19,7 @@ import { MainColor } from "../../assets/colors";
 import Modal from "react-native-modal";
 import { connect } from "react-redux";
 import Avatar from '../../components/avatar.component'
+import { DrawerAction, Notifications } from '../../helpers/ui/ui'
 const companyId = "9a28095a-9029-40ec-88c2-30e3fac69bc5";
 
 const HomeAdminScreen = ({
@@ -26,38 +27,14 @@ const HomeAdminScreen = ({
   company,
   saveEmployee,
   saveTodayVisits,
-  saveAvailable
+  saveAvailable,
+  saveZones
 }) => {
   const [object, setObject] = useState({});
   const [loading, setLoading] = useState(true);
   const [visits, setVisits] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
-  const drawerAction = () => {
-    return (
-      <View>
-        <TouchableHighlight
-          onPress={() => {
-            navigation.toggleDrawer();
-          }}
-        >
-          <Ionicons name="ios-menu" size={28} color="white" />
-        </TouchableHighlight>
-      </View>
-    );
-  };
-  const openNotifications = () => {
-    return (
-      <View>
-        <TouchableHighlight
-          onPress={() => {
-            navigation.navigate("notification");
-          }}
-        >
-          <Ionicons name="md-notifications" size={28} color="white" />
-        </TouchableHighlight>
-      </View>
-    );
-  };
+  
   //LOADING
   const LoadingModal = () => {
     return (
@@ -77,7 +54,17 @@ const HomeAdminScreen = ({
       </Modal>
     );
   };
-
+  //REQUEST ZONES
+  const requestZone = async () => {
+    try {
+      let res = await axios.get(`${API_PORT()}/api/findZones/${company.id}`);
+      if (!res.data.error && res.data.data.length > 0) {
+      saveZones(res.data.data);
+      }
+    } catch (error) {
+      alert(error.message);
+    }
+  };
   //VISITS
   const requestVisits = async () => {
     if(company){
@@ -141,7 +128,9 @@ const HomeAdminScreen = ({
   useEffect(() => {
     findAvailableUsers();
   }, []);
-
+  useEffect(() => {
+    requestZone();
+  }, []);
   useEffect(() => {
     requestEmployee();
   }, []);
@@ -154,8 +143,8 @@ const HomeAdminScreen = ({
     <View>
       <TopNavigation
         title="Entradas del Dia"
-        leftControl={drawerAction()}
-        rightControl={openNotifications()}
+        leftControl={DrawerAction(navigation)}
+        rightControl={Notifications(navigation)}
       />
 
       <LoadingModal />
@@ -200,6 +189,12 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = (dispatch) => ({
+  saveZones(zones){
+    dispatch({
+      type: "setZones",
+      payload: zones
+    })
+  },
   saveTodayVisits(todayVisits) {
     dispatch({
       type: "SAVE_VISITS",

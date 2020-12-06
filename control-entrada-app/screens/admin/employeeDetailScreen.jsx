@@ -1,7 +1,7 @@
 import React from "react";
 import {
   View,
-  TouchableWithoutFeedback,
+  TouchableOpacity,
   Image,
   Text,
   StyleSheet,
@@ -20,13 +20,13 @@ export const EmployeeDetailScreen = (props) => {
   const goBackAction = () => {
     return (
       <View>
-        <TouchableWithoutFeedback
+        <TouchableOpacity
           onPress={() => {
             props.navigation.navigate("Employee");
           }}
         >
           <Ionicons name="ios-arrow-back" size={28} color="white" />
-        </TouchableWithoutFeedback>
+        </TouchableOpacity>
       </View>
     );
   };

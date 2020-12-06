@@ -4,9 +4,6 @@ import {
   Text,
   StyleSheet,
   Image,
-  TextInput,
-  Alert,
-  TouchableHighlight,
   ScrollView,
   TouchableOpacity,
   ActivityIndicator
@@ -58,16 +55,29 @@ const LoadingModal = () => {
   const goBackAction = () => {
     return (
       <View>
-        <TouchableHighlight
+        <TouchableOpacity
           onPress={() => {
             navigation.goBack();
           }}
         >
           <Ionicons name="ios-arrow-back" size={28} color="white" />
-        </TouchableHighlight>
+        </TouchableOpacity>
       </View>
     );
   };
+  const editAction = () => {
+    return (
+      <View>
+      <TouchableOpacity
+        onPress={() => {
+          navigation.navigate("edit_profile");
+        }}
+      >
+        <Ionicons name="md-create" size={28} color="white" />
+      </TouchableOpacity>
+    </View>
+    )
+  }
   //GET TOKEN
   const getToken = async (value) => {
     try {
@@ -130,20 +140,32 @@ const LoadingModal = () => {
   // }, []);
   return (
     <View style={styles.container}>
-      <TopNavigation title="Perfil" leftControl={goBackAction()} />
+      <TopNavigation title="Perfil" leftControl={goBackAction()} rightControl={editAction()}/>
       
         {profile ? (
           <ScrollView contentContainerStyle={styles.perfilContainer}>
             <View style={styles.section1}>
+              <View 
+              style={{
+                width: 120,
+                  height: 150,
+      //            borderRadius: 20/2,
+   //               borderColor: '#ccc',
+     //             borderWidth: 3,
+                  overflow: 'hidden'
+              }}
+              >
               <Image
-                style={{
-                  width: 120,
-                  height: 120,
-                  borderRadius: 60,
-                  resizeMode: "cover",
-                }}
+                
+                style={{flex: 1,
+    width: null,
+    height: null,
+    borderRadius: 150/2,
+   resizeMode: 'contain'
+     }}
                 source={{ uri: `${API_PORT()}/public/imgs/${profile.picture}` }}
               />
+              </View>
               <Text style={styles.profileName}>
                 {profile.name} {profile.lastName}
               </Text>

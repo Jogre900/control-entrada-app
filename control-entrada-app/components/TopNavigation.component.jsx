@@ -8,7 +8,6 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback
 } from "react-native";
-import { RectButton } from "react-native-gesture-handler";
 import { Ionicons } from "@expo/vector-icons";
 import { MainColor } from "../assets/colors.js";
 
@@ -28,7 +27,8 @@ function NormalNav({size}) {
 export const TopNavigation = (props) => {
   const { title, leftControl, rightControl } = props;
   const size = leftControl.props.children.props.children.props.size
-  //console.log("left props",leftControl.props.children.props.children.props.size)
+  // console.log("rigth props",rightControl)
+  // console.log("left props",leftControl)
 
   return (
     <View style={styles.container}>
@@ -89,5 +89,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: "white",
     textAlign: "center",
+    fontWeight: '700',
+    letterSpacing: 1
   },
 });

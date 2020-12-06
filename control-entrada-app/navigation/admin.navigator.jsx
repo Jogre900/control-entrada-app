@@ -28,8 +28,9 @@ import ZonasScreen from "../screens/admin/zonesScreen";
 import { DestinyScreen } from "../screens/admin/destinyScreen";
 import { HistorialScreen } from "../screens/admin/historialScreen";
 import PerfilScreen from "../screens/admin/perfilScreen";
+import {EditProfileScreen} from '../screens/admin/editProfileScreen'
 import { EmployeeScreen } from "../screens/admin/employeeScreen";
-import { CreateEmployeScreen } from "../screens/admin/createEmployeeScreen";
+import CreateEmployeScreen from "../screens/admin/createEmployeeScreen";
 import { EmployeeDetailScreen } from "../screens/admin/employeeDetailScreen";
 const drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
@@ -46,6 +47,7 @@ function AdminNav() {
       <Stack.Screen name="admin-home" component={HomeAdminScreen} />
       <Stack.Screen name="detail-view" component={DetailViewScreen} options={options}/>
       <Stack.Screen name="notification" component={NotificationScreen} />
+      <Stack.Screen name="edit_profile" component={EditProfileScreen} options={options}/>
       <Stack.Screen name="zone_detail" component={ZoneDetailScreen} options={options}/>
       <Stack.Screen name="employee_detail" component={EmployeeDetailScreen} options={options}/>
     </Stack.Navigator>

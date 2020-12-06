@@ -19,8 +19,7 @@ import Modal from "react-native-modal";
 import { API_PORT } from "../../config/index";
 import moment from "moment";
 import { Divider } from "../../components/Divider";
-
-const adminId = "e6cf69f4-e718-4b5f-a127-c1910db5f162";
+import {BackAction} from '../../helpers/ui/ui'
 
 const inputProps = {
   textcolor: "grey",
@@ -131,7 +130,7 @@ const CompanyScreen = ({ navigation, savedCompany, profile }) => {
 
   return (
     <View style={{ flex: 1 }}>
-      <TopNavigation title="Registro de Empresa" leftControl={goBackAction()} />
+      <TopNavigation title="Registro de Empresa" leftControl={BackAction(navigation)} />
       <View style={{ flex: 1 }}>
         {data ? (
           <View style={styles.container}>

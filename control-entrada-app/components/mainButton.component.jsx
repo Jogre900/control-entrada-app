@@ -8,9 +8,9 @@ import {
 } from "react-native";
 import { MainColor } from "../assets/colors";
 import { Ionicons } from "@expo/vector-icons";
-const Icon = ({ size, name, color, onPress }) => {
+const Icon = ({ size, name, color, onPress, style }) => {
   return (
-    <TouchableOpacity style={styles.iconBox(size)} onPress={onPress}>
+    <TouchableOpacity style={[styles.iconBox(size), style]} onPress={onPress}>
       <Ionicons name={name} size={size} color={color} />
     </TouchableOpacity>
   );

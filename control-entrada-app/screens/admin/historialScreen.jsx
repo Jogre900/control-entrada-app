@@ -1,45 +1,28 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, TextInput, Button, TouchableHighlight } from "react-native";
+import { View, Text, StyleSheet, TextInput, Button, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { RectButton } from "react-native-gesture-handler";
 
 //components
 import { MainButton } from "../../components/mainButton.component";
 import Input from "../../components/input.component";
 import { TopNavigation } from "../../components/TopNavigation.component";
 
-import firebase from "../../lib/firebase";
-import FireMethods from "../../lib/methods.firebase";
-
 export const HistorialScreen = (props) => {
   const [object, setObject] = useState({});
-  var datos = [];
+
   const goBackAction = () => {
     return (
       <View>
-        <TouchableHighlight
+        <TouchableOpacity
           onPress={() => {
             props.navigation.goBack();
           }}
         >
           <Ionicons name="ios-arrow-back" size={28} color="white" />
-        </TouchableHighlight>
+        </TouchableOpacity>
       </View>
     );
   };
-
-  const getEntrada = async () => {
-    let data = new Object();
-    await FireMethods.getEntrance((object) => {
-      data = object;
-    });
-    setObject(data);
-    console.log("object:  ",object)
-  };
-
-  // useEffect(() => {
-  //   getEntrada();
-  // }, []);
 
   return (
     <View>

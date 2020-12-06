@@ -23,10 +23,10 @@ import { Picker } from "@react-native-community/picker";
 import * as ImagePicker from "expo-image-picker";
 import moment from "moment";
 import { Divider } from "../../components/Divider";
-
+import {connect} from 'react-redux'
 const companyId = "9a28095a-9029-40ec-88c2-30e3fac69bc5";
 
-export const CreateEmployeScreen = (props) => {
+const CreateEmployeScreen = ({navigation, zonesRedux}) => {
   const [zones, setZones] = useState([]);
   const [zoneId, setZoneId] = useState("");
   const [name, setName] = useState("");
@@ -52,7 +52,7 @@ export const CreateEmployeScreen = (props) => {
       <View>
         <TouchableOpacity
           onPress={() => {
-            props.navigation.goBack();
+            navigation.navigate("admin-home");
           }}
         >
           <Ionicons name="ios-arrow-back" size={28} color="white" />
@@ -306,13 +306,13 @@ export const CreateEmployeScreen = (props) => {
             </Picker>
             <View>
               <Text>Zonas</Text>
-              {zones && (
+              {zonesRedux && (
                 <Picker
                   mode="dropdown"
                   selectedValue={zoneId}
                   onValueChange={(value) => setZoneId(value)}
                 >
-                  {zones.map((item, i) => (
+                  {zonesRedux.map((item, i) => (
                     <Picker.Item label={item.zone} value={item.id} key={i} />
                   ))}
                 </Picker>
@@ -380,6 +380,10 @@ export const CreateEmployeScreen = (props) => {
   );
 };
 
+const mapStateToProps = state => ({
+  zonesRedux: state.zonesReducer.zones,
+})
+export default connect(mapStateToProps, {})(CreateEmployeScreen)
 const styles = StyleSheet.create({
   container: {
     alignItems: "center",
