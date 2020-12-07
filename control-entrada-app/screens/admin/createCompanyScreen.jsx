@@ -69,18 +69,24 @@ const CompanyScreen = ({ navigation, savedCompany, profile }) => {
   };
 
   const requestCompany = async () => {
-    //setLoading(true);
-    try {
-      let res = await axios.get(`${API_PORT()}/api/findCompany/${profile.id}`);
-      console.log("res.data: ", res.data);
-      if (!res.data.error) {
-        alert("busqueda exitosa");
-        setData(res.data.data);
-        //setCompanyId(res.data.data[0].id);
-        //setLoading(false);
+    setModalVisible(true)
+    if(!savedCompany){
+      try {
+        let res = await axios.get(`${API_PORT()}/api/findCompany/${profile.id}`);
+        console.log("res.data: ", res.data);
+        if (!res.data.error) {
+          alert("busqueda exitosa");
+          setData(res.data.data);
+          setModalVisible(false)
+          //setCompanyId(res.data.data[0].id);
+          //setLoading(false);
+        }
+      } catch (error) {
+        alert(error.message);
       }
-    } catch (error) {
-      alert(error.message);
+    }else{
+      setData(savedCompany)
+      setModalVisible(false)
     }
   };
 
@@ -132,6 +138,7 @@ const CompanyScreen = ({ navigation, savedCompany, profile }) => {
     <View style={{ flex: 1 }}>
       <TopNavigation title="Registro de Empresa" leftControl={BackAction(navigation)} />
       <View style={{ flex: 1 }}>
+        <LoadingModal/>
         {data ? (
           <View style={styles.container}>
             <View style={styles.dataContainer}>

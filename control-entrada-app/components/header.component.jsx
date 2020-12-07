@@ -1,14 +1,68 @@
-import React from "react";
+import React, {useState} from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import Constants from "expo-constants";
 import { Ionicons } from "@expo/vector-icons";
 import { MainButton } from "./mainButton.component";
 import { MainColor } from "../assets/colors.js";
+import Modal from "react-native-modal";
 
 const ICON_SIZE = 28
 export const Header = ({ value, clearAction, deleteAction }) => {
+  const [modalVisible, setModalVisible] = useState(false)
+  
+  const LoadingModal = () => {
+    return (
+      <Modal
+        isVisible={modalVisible}
+        backdropColor='transparent'
+        onBackdropPress={() => setModalVisible(!modalVisible)}
+        animationIn='fadeIn'
+        style={{
+          position: 'absolute',
+          top: 0,
+          right: 0,
+        }}      
+      >
+        <View
+          style={{
+            //flex: 1,
+            backgroundColor: "#fff",
+            padding: 5,
+            //justifyContent: "center",
+            borderRadius: 2
+          }}
+        >
+          <Text style={{
+            fontWeight: '700',
+            letterSpacing: 2,
+            //alignSelf: 'center',
+            fontSize: 16
+          }}>Seleccionar Todos</Text>
+          <Text style={{
+            fontWeight: '700',
+            letterSpacing: 2,
+            //alignSelf: 'center',
+            fontSize: 14
+          }}>Seleccionar Todos</Text>
+          <Text style={{
+            fontWeight: '700',
+            letterSpacing: 2,
+            //alignSelf: 'center',
+            fontSize: 14
+          }}>Seleccionar Todos</Text>
+          <Text style={{
+            fontWeight: '700',
+            letterSpacing: 2,
+            //alignSelf: 'center',
+            fontSize: 14
+          }}>Seleccionar Todos</Text>
+        </View>
+      </Modal>
+    );
+  };
   return (
     <View style={styles.headerContainer}>
+      <LoadingModal/>
       <TouchableOpacity style={styles.buttons} onPress={clearAction}>
         <Ionicons name="ios-arrow-round-back" size={ICON_SIZE} color="#fff"/>
       </TouchableOpacity>
@@ -19,7 +73,7 @@ export const Header = ({ value, clearAction, deleteAction }) => {
       <TouchableOpacity style={styles.buttons} onPress={deleteAction}>
         <Ionicons name="ios-trash" size={ICON_SIZE} color="#fff"/>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.buttons}>
+      <TouchableOpacity style={styles.buttons} onPress={() => setModalVisible(!modalVisible)}>
         <Ionicons name="ios-more" size={ICON_SIZE} color="#fff" style={styles.moreIcon}/>
       </TouchableOpacity>
       </View>
