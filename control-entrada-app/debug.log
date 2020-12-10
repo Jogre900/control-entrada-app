@@ -1400,3 +1400,19 @@
 [1205/140758.186:ERROR:exception_snapshot_win.cc(99)] thread ID 6116 not found in process
 [1205/140758.186:ERROR:exception_snapshot_win.cc(99)] thread ID 6132 not found in process
 [1206/021552.519:ERROR:directory_reader_win.cc(43)] FindFirstFile: El sistema no puede encontrar la ruta especificada. (0x3)
+[1206/230427.958:ERROR:process_reader_win.cc(123)] NtOpenThread: {Acceso denegado} Un proceso ha solicitado acceso a un objeto, pero no se le han concedido esos derechos de acceso. (0xc0000022)
+[1206/230427.958:ERROR:process_reader_win.cc(123)] NtOpenThread: {Acceso denegado} Un proceso ha solicitado acceso a un objeto, pero no se le han concedido esos derechos de acceso. (0xc0000022)
+[1206/230430.005:ERROR:exception_snapshot_win.cc(99)] thread ID 11040 not found in process
+[1206/230427.958:ERROR:process_reader_win.cc(123)] NtOpenThread: {Acceso denegado} Un proceso ha solicitado acceso a un objeto, pero no se le han concedido esos derechos de acceso. (0xc0000022)
+[1206/230430.005:ERROR:exception_snapshot_win.cc(99)] thread ID 1060 not found in process
+[1206/230427.974:ERROR:process_reader_win.cc(123)] NtOpenThread: {Acceso denegado} Un proceso ha solicitado acceso a un objeto, pero no se le han concedido esos derechos de acceso. (0xc0000022)
+[1206/230427.958:ERROR:process_reader_win.cc(123)] NtOpenThread: {Acceso denegado} Un proceso ha solicitado acceso a un objeto, pero no se le han concedido esos derechos de acceso. (0xc0000022)
+[1206/230430.005:ERROR:exception_snapshot_win.cc(99)] thread ID 2280 not found in process
+[1206/230430.005:ERROR:exception_snapshot_win.cc(99)] thread ID 4160 not found in process
+[1206/230430.005:ERROR:exception_snapshot_win.cc(99)] thread ID 13084 not found in process
+[1206/230430.083:ERROR:scoped_process_suspend.cc(40)] NtResumeProcess: Se intentó obtener acceso a un proceso que está cerrándose. (0xc000010a)
+[1206/230430.083:ERROR:scoped_process_suspend.cc(40)] NtResumeProcess: Se intentó obtener acceso a un proceso que está cerrándose. (0xc000010a)
+[1206/230430.083:ERROR:scoped_process_suspend.cc(40)] NtResumeProcess: Se intentó obtener acceso a un proceso que está cerrándose. (0xc000010a)
+[1206/230430.083:ERROR:scoped_process_suspend.cc(40)] NtResumeProcess: Se intentó obtener acceso a un proceso que está cerrándose. (0xc000010a)
+[1206/230430.083:ERROR:scoped_process_suspend.cc(40)] NtResumeProcess: Se intentó obtener acceso a un proceso que está cerrándose. (0xc000010a)
+[1207/095319.749:ERROR:directory_reader_win.cc(43)] FindFirstFile: El sistema no puede encontrar la ruta especificada. (0x3)

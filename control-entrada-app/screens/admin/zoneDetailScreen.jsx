@@ -24,10 +24,18 @@ import { Divider } from "../../components/Divider";
 import { MainColor, lightColor } from "../../assets/colors";
 import CheckBox from "@react-native-community/checkbox";
 import Avatar from "../../components/avatar.component";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import Modal from "react-native-modal";
 
-const ZoneDetailScreen = ({ route, navigation, zoneRedux, availableU }) => {
+const ZoneDetailScreen = ({
+  route,
+  navigation,
+  zoneRedux,
+  availableU,
+  setNewEmployee,
+}) => {
   //console.log("redux----", zoneRedux)
-  console.log(route);
+  console.log(availableU);
   const {
     id,
     zone,
@@ -40,6 +48,10 @@ const ZoneDetailScreen = ({ route, navigation, zoneRedux, availableU }) => {
 
   //const [destiny, setDestiny] = useState(destinys);
   //const [availableU, setAvailableU] = useState([]);
+  const [user, setUser] = useState();
+  const [modalVisible, setModalVisible] = useState(false);
+  const [show, setShow] = useState(false);
+  const [changeTurn, setChangeTurn] = useState(new Date());
   const [listVisible, setListVisible] = useState(false);
   const [check, setCheck] = useState(false);
   const zoneId = id;
@@ -56,9 +68,51 @@ const ZoneDetailScreen = ({ route, navigation, zoneRedux, availableU }) => {
       </View>
     );
   };
-
+  //FORM MODAL
+  // const FormModal = () => {
+  //   return (
+  //     <Modal
+  //       isVisible={modalVisible}
+  //       onBackdropPress={() => setModalVisible(!modalVisible)}
+  //       backdropColor="transparent"
+  //     >
+  //       <View
+  //         style={{
+  //           flex: 1,
+  //           backgroundColor: "#fff",
+  //           justifyContent: "center",
+  //         }}
+  //       >
+  //         {/* <Text>User Id: {user.id}</Text> */}
+  //         <Text>Entrada: {moment(changeTurn).format("Do MMM")}</Text>
+  //         <MainButton
+  //           title="Fecha de Entrada"
+  //           onPress={() => showDatepicker()}
+  //         />
+  //         {show && (
+  //       <View>
+  //         <DateTimePicker
+  //           testID="dateTimePicker1"
+  //           value={changeTurn}
+  //           mode="date"
+  //           is24Hour={true}
+  //           display="default"
+  //           onChange={onChange}
+  //         />
+  //       </View>
+  //     )}
+  //         <MainButton title="Cambio Turno" onPress={() => showDatepicker()} />
+  //         <MainButton title="Asignar" outline onPress={() => asignPersonal()} />
+  //       </View>
+  //     </Modal>
+  //   );
+  // };
   const renderAvailable = ({ item }) => (
-    <View>
+    <TouchableOpacity
+      onPress={() => {
+        navigation.push("asign_employee", {item, id, zone});
+      }}
+    >
       <View style={styles.listEmployeBox}>
         <Avatar.Picture
           size={50}
@@ -81,21 +135,10 @@ const ZoneDetailScreen = ({ route, navigation, zoneRedux, availableU }) => {
               {item.name} {item.lastName}
             </Text>
           </View>
-          <View style={{ alignItems: "center" }}>
-            <CheckBox onChange={(e) => console.log(e)} value={check} />
-            {/* <Text>Registrado el:</Text>
-                            <Text>
-                            {moment(item.createdAt).format("D MMM YYYY")}
-                          </Text> */}
-          </View>
           {/* <Text>Cambio de Turno: {moment(item.changeTurnDate).format('D MMM YYYY')}</Text> */}
         </View>
       </View>
-      <View style={{ flexDirection: "row" }}>
-        <MainButton outlined title="Fecha Asignado" />
-        <MainButton outlined title="Cambio Turno" />
-      </View>
-    </View>
+    </TouchableOpacity>
   );
   const renderDestiny = ({ item }) => (
     <View
@@ -156,37 +199,34 @@ const ZoneDetailScreen = ({ route, navigation, zoneRedux, availableU }) => {
   // ])
   // }
 
-  // const findAvailableUsers = async () => {
+  // const onChange = (event, selectedDate) => {
+  //   const currentDate = selectedDate || changeTurn;
+  //   setShow(Platform.OS === "ios");
+  //   setChangeTurn(currentDate);
+  // };
+  // const showDatepicker = () => {
+  //   showMode("date");
+  // };
+  // const showMode = (currentMode) => {
+  //   setShow(true);
+  //   //setMode(currentMode);
+  // };
+  // const asignPersonal = () => {
+  //   console.log(user)
   //   try {
-  //     let res = await axios.get(
-  //       `${API_PORT()}/api/findAvailableUsers/${companyId}`
-  //     );
-  //     console.log("User Avai--", res.data);
+  //     let res = axios.post(`${API_PORT()}/api//createUserZone`, {
+  //       userId: user.id,
+  //       zoneId: zone.id,
+  //       chargeTurn,
+  //     });
   //     if (!res.data.error) {
-  //       setAvailableU(res.data.data);
+  //       setNewEmployee(user);
+  //       setUser("");
   //     }
   //   } catch (error) {
   //     console.log(error.message);
   //   }
   // };
-  // const deleteDestiny = async (destinyId) => {
-  //   console.log(destinyId);
-  //   try {
-  //     let res = await axios.delete(
-  //       `${API_PORT()}/api/deleteDestiny/${destinyId}`
-  //     );
-  //     if (res) {
-  //       console.log(res);
-  //       setDestiny((destiny) => destiny.filter((elem) => elem.id != destinyId));
-  //     }
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   findAvailableUsers();
-  // }, []);
   return (
     <View style={{ flex: 1 }}>
       <TopNavigation title={zone} leftControl={goBackAction()} />
@@ -200,7 +240,7 @@ const ZoneDetailScreen = ({ route, navigation, zoneRedux, availableU }) => {
         <View style={styles.dataContainer}>
           <Text style={styles.containerTitle}>Destinos</Text>
           <Divider size="small" />
-          {destinys.length >= 1 ? (
+          {destinys.length > 0 ? (
             <FlatList data={destinys} renderItem={renderDestiny} />
           ) : (
             <Text>no hay datos</Text>
@@ -223,6 +263,7 @@ const ZoneDetailScreen = ({ route, navigation, zoneRedux, availableU }) => {
                   color="#4f4f4f"
                 />
               </View>
+              
               {listVisible && (
                 <View>
                   {availableU.length > 0 ? (
@@ -252,7 +293,16 @@ const mapStateToProps = (state) => ({
   availableU: state.employeeReducer.available,
 });
 
-export default connect(mapStateToProps, {})(ZoneDetailScreen);
+const mapDispatchToProps = (dispatch) => ({
+  setNewEmployee(user) {
+    dispatch({
+      type: "ASIGN_EMPLOYEE",
+      payload: user,
+    });
+  },
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(ZoneDetailScreen);
 
 const styles = StyleSheet.create({
   dataContainer: {

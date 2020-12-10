@@ -70,7 +70,7 @@ router.get("/findDestiny/:id", Methods.findDestinyByZone);
 router.delete("/deleteDestiny/:id", Methods.deleteDestiny);
 router.post("/createEmployee", Methods.createEmployee);
 router.get("/findEmployees", Methods.findEmployees);
-//router.post("/createUserZone/:id", Methods.createUserZone)
+router.post("/createUserZone", Methods.createUserZone)
 //router.post("/uploadImage", uploadImg.single('file'), Methods.uploadImage)
 router.get("/displayPicture", Methods.displayPicture);
 router.get("/profile", Methods.getProfile);

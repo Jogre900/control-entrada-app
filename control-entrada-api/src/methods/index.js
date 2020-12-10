@@ -139,21 +139,19 @@ const Methods = {
     };
     const { companyId } = req.params;
     try {
-      let zones = await models.zone.findAll(
-        {
-          where: {
-            companyId
-          },
-          include: [
-            { model: models.destination, as: "Destinos" },
-            {
-              model: models.userZone,
-              as: "encargado_zona",
-              include: [models.User]
-            }
-          ]
+      let zones = await models.zone.findAll({
+        where: {
+          companyId
         },
-      );
+        include: [
+          { model: models.destination, as: "Destinos" },
+          {
+            model: models.userZone,
+            as: "encargado_zona",
+            include: [models.User]
+          }
+        ]
+      });
       RESPONSE.error = false;
       RESPONSE.msg = "Busqueda Exitosa!";
       RESPONSE.data = zones;
@@ -171,33 +169,51 @@ const Methods = {
       token: null
     };
     const { zonesId } = req.body;
-    console.log("body de delete--",req.body)
-    console.log(zonesId)
+    console.log("body de delete--", req.body);
+    console.log(zonesId);
     try {
-      let zone = await models.zone.findAll({
+      let userZones = await models.userZone.findAll({
         where: {
-          id: zonesId
+          ZoneId: zonesId
         },
         include: [
-          {model: models.userZone, as: "encargado_zona",
-            include: {model: models.User}
-          },
-          {model: models.destination, as: "Destinos", attributes:['id', 'name']}
+          {
+            model: models.User
+          }
         ]
       });
-      //console.log("zone*-------",zone);
-      zone.map(async elem => {
-        console.log("zone name---",elem.id)
+      let zones = await models.zone.findAll({
+        where: {
+          id: zonesId
+        }
+      });
+      let trabajadores = [];
+      let trabajadoresId = [];
+      console.log("userZone*-------", userZones);
+      //console.log("zone*-------", zones);
+      if (userZones.length > 0) {
+        trabajadores = userZones.map(uz => uz.User);
+        console.log("trabajadores---",trabajadores);
         
-        await elem.destroy()
-       
-      })
-      RESPONSE.error = false
-      RESPONSE.msg = "Registro borrado!"
-    RESPONSE.data = zone
-    res.json(RESPONSE);
+        trabajadores.map(async trabajador => {
+          (trabajador.privilege = "Available"), await u.save();
+        });
+        userZones.map(async uz=> await uz.destroy())
+        zones.map(async zone => await zone.destroy());
+        RESPONSE.error = false;
+        RESPONSE.msg = "Registro borrado!";
+        RESPONSE.data = usersToUpdate;
+        res.json(RESPONSE);
+      } else {
+        console.log("zona sin encargados!!!!");
+        zones.map(async zone => await zone.destroy());
+        RESPONSE.error = false;
+        RESPONSE.msg = "Registro borrado!";
+        RESPONSE.data = zones;
+        res.json(RESPONSE);
+      }
     } catch (error) {
-      RESPONSE.msg = error;
+      RESPONSE.msg = error.message;
       res.json(RESPONSE);
     }
   },
@@ -330,21 +346,38 @@ const Methods = {
       data: null,
       token: null
     };
-    const { assignationDate, changeTurnDate, ZoneId } = req.body;
+    const {
+      assignationDate,
+      changeTurnDate,
+      zoneId,
+      userId,
+      privilege
+    } = req.body;
     const { id } = req.params;
+    console.log(req.body);
     try {
-      let userZone = await models.userZone.create({
-        assignationDate,
-        changeTurnDate,
-        ZoneId,
-        EmployeeId: id
+      let userA = await models.User.findOne({
+        where: {
+          id: userId
+        }
       });
-      RESPONSE.error = false;
-      RESPONSE.msg = "Creacion de UserZone Exitosa!";
-      RESPONSE.data = userZone;
-      res.json({ msg: userZone });
+      if (userA) {
+        console.log(userA);
+        userA.privilege = privilege;
+        await userA.save();
+        let userZone = await models.userZone.create({
+          assignationDate,
+          changeTurnDate,
+          ZoneId: zoneId,
+          UserId: userId
+        });
+        RESPONSE.error = false;
+        RESPONSE.msg = "Creacion de UserZone Exitosa!";
+        RESPONSE.data = userZone;
+        res.json({ msg: userZone });
+      }
     } catch (error) {
-      RESPONSE.msg = error;
+      RESPONSE.msg = error.message;
       res.json(RESPONSE);
     }
   },
@@ -423,24 +456,23 @@ const Methods = {
       if (!user) {
         let hash = await bcrypt.hash(password, 10);
         password = hash;
-        if(privilege === "Admin") { 
-            let admin = await models.User.create({
-              name,
-              lastName,
-              dni,
-              email,
-              password,
-              picture: req.file.filename,
-              privilege
-            });
-            let token = jwt.sign(admin.dataValues, SECRETKEY, {
-              expiresIn: "1d"
-            });
-            (RESPONSE.error = false), (RESPONSE.msg = "Registro Exitoso!");
-            (RESPONSE.data = admin), (RESPONSE.token = token);
-            res.status(200).json(RESPONSE);
-            
-        }else{
+        if (privilege === "Admin") {
+          let admin = await models.User.create({
+            name,
+            lastName,
+            dni,
+            email,
+            password,
+            picture: req.file.filename,
+            privilege
+          });
+          let token = jwt.sign(admin.dataValues, SECRETKEY, {
+            expiresIn: "1d"
+          });
+          (RESPONSE.error = false), (RESPONSE.msg = "Registro Exitoso!");
+          (RESPONSE.data = admin), (RESPONSE.token = token);
+          res.status(200).json(RESPONSE);
+        } else {
           let employee = await models.User.create(
             {
               name,
@@ -736,7 +768,11 @@ const Methods = {
           [Op.and]: [
             { companyId },
             {
-              [Op.or]: [{ privilege: "Supervisor" }, { privilege: "Watchman" }, {privilege: "Available"}]
+              [Op.or]: [
+                { privilege: "Supervisor" },
+                { privilege: "Watchman" },
+                { privilege: "Available" }
+              ]
             }
           ]
         },
@@ -763,33 +799,30 @@ const Methods = {
       res.json(RESPONSE);
     }
   },
-  findAvailableUsers: async function(req, res){
+  findAvailableUsers: async function(req, res) {
     let RESPONSE = {
       error: true,
       msg: "",
       data: null,
       token: null
     };
-    const {companyId} = req.params
-    console.log(req.params)
+    const { companyId } = req.params;
+    console.log(req.params);
     try {
       let users = await models.User.findAll({
         where: {
-          [Op.and]: [
-            {companyId},
-            {privilege: "Available"}
-          ]
+          [Op.and]: [{ companyId }, { privilege: "Available" }]
         }
-      })
-      if(users){
-        RESPONSE.error = false
-        RESPONSE.msg = "Busqueda Exitosa"
-        RESPONSE.data = users
-        res.json(RESPONSE)
+      });
+      if (users) {
+        RESPONSE.error = false;
+        RESPONSE.msg = "Busqueda Exitosa";
+        RESPONSE.data = users;
+        res.json(RESPONSE);
       }
     } catch (error) {
-      RESPONSE.msg = error.message
-      res.json(RESPONSE)
+      RESPONSE.msg = error.message;
+      res.json(RESPONSE);
     }
   },
   deleteUser: async function(req, res) {
@@ -799,7 +832,7 @@ const Methods = {
       data: null,
       token: null
     };
-    console.log(req.params)
+    console.log(req.params);
     const { id } = req.params;
     try {
       let user = await models.User.findOne({

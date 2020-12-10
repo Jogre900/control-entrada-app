@@ -20,12 +20,13 @@ import Input from "../../components/input.component";
 import { TopNavigation } from "../../components/TopNavigation.component";
 import { MainButton } from "../../components/mainButton.component";
 import { Ionicons } from "@expo/vector-icons";
+import { connect } from "react-redux";
+const companyId = "9a28095a-9029-40ec-88c2-30e3fac69bc5";
 
-const companyId = '9a28095a-9029-40ec-88c2-30e3fac69bc5'
-
-export const EmployeeScreen = (props) => {
-  const [employee, setEmployee] = useState([]);
-  const [employeeId, setEmployeeId] = useState("")
+const EmployeeScreen = ({ navigation, employee, removeEmployee }) => {
+  console.log("employee from redux:--", employee)
+  //const [employee, setEmployee] = useState([]);
+  const [employeeId, setEmployeeId] = useState("");
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -55,7 +56,7 @@ export const EmployeeScreen = (props) => {
       <View>
         <TouchableOpacity
           onPress={() => {
-            props.navigation.navigate("admin-home");
+            navigation.navigate("admin-home");
           }}
         >
           <Ionicons name="ios-arrow-back" size={28} color="white" />
@@ -67,33 +68,34 @@ export const EmployeeScreen = (props) => {
   //DELETE EMPLOYEE
   const deleteEmployee = async (id) => {
     try {
-      let res = await axios.delete(`${API_PORT()}/api/deleteUser/${id}`)
-      if(!res.data.error){
-        console.log(res.data.data)
-        alert("Borrado con exito")
-      }
-    } catch (error) {
-      alert(error.message)
-    }
-  }
-
-  const requestEmployee = async () => {
-    setLoading(true);
-    try {
-      let res = await axios.get(`${API_PORT()}/api/findUsers/${companyId}`);
+      let res = await axios.delete(`${API_PORT()}/api/deleteUser/${id}`);
       if (!res.data.error) {
         console.log(res.data.data);
-        setEmployee(res.data.data);
-        setLoading(false);
+        removeEmployee(res.data.data)
+        alert("Borrado con exito");
       }
     } catch (error) {
-      console.log("error: ", error.message);
+      alert(error.message);
     }
   };
-  
-  useEffect(() => {
-    requestEmployee();
-  }, []);
+
+  // const requestEmployee = async () => {
+  //   setLoading(true);
+  //   try {
+  //     let res = await axios.get(`${API_PORT()}/api/findUsers/${companyId}`);
+  //     if (!res.data.error) {
+  //       console.log(res.data.data);
+  //       setEmployee(res.data.data);
+  //       setLoading(false);
+  //     }
+  //   } catch (error) {
+  //     console.log("error: ", error.message);
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   requestEmployee();
+  // }, []);
   return (
     <View>
       <TopNavigation title="Empleados" leftControl={goBackAction()} />
@@ -115,20 +117,20 @@ export const EmployeeScreen = (props) => {
               employee.map((item, i) => (
                 <TouchableOpacity
                   style={styles.listItemBox}
-                  onPress={() =>
-                    props.navigation.navigate("employee_detail", item)
-                  }
+                  onPress={() => navigation.navigate("employee_detail", item)}
                   key={i}
                 >
                   <TouchableOpacity onPress={() => deleteEmployee(item.id)}>
-                  <Ionicons name="ios-trash" size={22} color="grey"/>
+                    <Ionicons name="ios-trash" size={22} color="grey" />
                   </TouchableOpacity>
                   <View>
                     <View style={styles.privilegeBox}>
                       {item.privilege == "Supervisor" ? (
                         <Text style={styles.privilegeText}>S</Text>
-                      ) : (
+                      ) : item.privilege == "Watchman" ? (
                         <Text style={styles.privilegeText}>V</Text>
+                      ) : (
+                        <Text style={styles.privilegeText}>--</Text>
                       )}
                     </View>
                   </View>
@@ -138,23 +140,18 @@ export const EmployeeScreen = (props) => {
                     </Text>
                     <Text style={styles.itemDataText}>{item.email}</Text>
                   </View>
-                  <View style={styles.itemDataBox}>
+                  {/* <View style={styles.itemDataBox}>
                     <Text style={styles.itemDataText}>Zona</Text>
-                    {
-                      item.userZone.length > 0 ?
+                    {item.userZone.length > 0 ? (
                       <Text style={styles.itemDataText}>
-                      {/* si tiene */}
-                      {item.userZone[0].Zone.zone}
+                        
+                        {item.userZone[0].Zone.zone}
                       </Text>
-                      :
-                      <Text style={styles.itemDataText}>
-                      -------
-                      </Text>
-                      }
-                    <Text style={styles.itemDataText}>
-                      
-                    </Text>
-                  </View>
+                    ) : (
+                      <Text style={styles.itemDataText}>-------</Text>
+                    )}
+                    <Text style={styles.itemDataText}></Text>
+                  </View> */}
                 </TouchableOpacity>
               ))}
           </View>
@@ -163,7 +160,19 @@ export const EmployeeScreen = (props) => {
     </View>
   );
 };
+const mapStateToProps = (state) => ({
+  employee: state.employeeReducer.employee,
+});
 
+const mapDispatchToProps = dispatch => ({
+  removeEmployee(employee){
+    dispatch({
+      type: 'REMOVE_EMPLOYEE',
+      payload: employee
+    })
+  }
+})
+export default connect(mapStateToProps, mapDispatchToProps)(EmployeeScreen);
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -173,7 +182,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   listItemBox: {
-    flexDirection: "row",
+    //flexDirection: "row",
     paddingHorizontal: 12,
     paddingVertical: 5,
     justifyContent: "space-between",

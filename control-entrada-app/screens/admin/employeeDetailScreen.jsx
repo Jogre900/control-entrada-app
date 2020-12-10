@@ -54,29 +54,29 @@ export const EmployeeDetailScreen = (props) => {
       <View style={styles.section2}>
         <Text>Datos Personales</Text>
         <Divider size="small" />
-        <View>
+        {/* <View>
           <Text>{profile.dni}</Text>
 
           {profile.userZone.length > 0 ? (
-            <View>
+             <View>
               <Text>Contratado el: {profile.userZone[0].assignationDate}</Text>
               <Text>Cambio de Turno: {profile.userZone[0].changeTurnDate}</Text>
-            </View>
+            </View> 
           ) : (
             <Text>
               Registrado el: {moment(profile.createdAt).format("D MMM YYYY")}
             </Text>
-          )}
-        </View>
+          )} 
+        </View> */}
 
-        <View>
+        {/* <View>
           <Ionicons name="ios-business" size={28} color={ThirdColor} />
           {profile.userZone.length > 0 ? (
             <Text>{profile.userZone[0].Zone.zone}</Text>
           ) : (
             <Text>El usuario no posea zona asignada.</Text>
           )}
-        </View>
+        </View> */}
       </View>
     </View>
   );

@@ -21,15 +21,16 @@ import { MainColor, lightColor } from "../assets/colors";
 //screens
 import HomeAdminScreen from "../screens/admin/homeAdminScreen";
 import { DetailViewScreen } from "../screens/admin/detailViewScreen";
+import ZonasScreen from "../screens/admin/zonesScreen";
 import ZoneDetailScreen from "../screens/admin/zoneDetailScreen";
+import AsignEmployee from '../screens/admin/asignEmployeeScreen'
 import { NotificationScreen } from "../screens/admin/notificationScreen";
 import CompanyScreen from "../screens/admin/createCompanyScreen";
-import ZonasScreen from "../screens/admin/zonesScreen";
 import { DestinyScreen } from "../screens/admin/destinyScreen";
 import { HistorialScreen } from "../screens/admin/historialScreen";
 import PerfilScreen from "../screens/admin/perfilScreen";
 import {EditProfileScreen} from '../screens/admin/editProfileScreen'
-import { EmployeeScreen } from "../screens/admin/employeeScreen";
+import EmployeeScreen from "../screens/admin/employeeScreen";
 import CreateEmployeScreen from "../screens/admin/createEmployeeScreen";
 import { EmployeeDetailScreen } from "../screens/admin/employeeDetailScreen";
 const drawer = createDrawerNavigator();
@@ -49,6 +50,7 @@ function AdminNav() {
       <Stack.Screen name="notification" component={NotificationScreen} />
       <Stack.Screen name="edit_profile" component={EditProfileScreen} options={options}/>
       <Stack.Screen name="zone_detail" component={ZoneDetailScreen} options={options}/>
+      <Stack.Screen name="asign_employee" component={AsignEmployee} />
       <Stack.Screen name="employee_detail" component={EmployeeDetailScreen} options={options}/>
     </Stack.Navigator>
   );

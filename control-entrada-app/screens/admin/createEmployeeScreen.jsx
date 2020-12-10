@@ -26,7 +26,7 @@ import { Divider } from "../../components/Divider";
 import {connect} from 'react-redux'
 const companyId = "9a28095a-9029-40ec-88c2-30e3fac69bc5";
 
-const CreateEmployeScreen = ({navigation, zonesRedux}) => {
+const CreateEmployeScreen = ({navigation, zonesRedux, addEmployee}) => {
   const [zones, setZones] = useState([]);
   const [zoneId, setZoneId] = useState("");
   const [name, setName] = useState("");
@@ -135,6 +135,7 @@ const CreateEmployeScreen = ({navigation, zonesRedux}) => {
 
       if (!res.data.error) {
         console.log(res.data.data);
+        addEmployee(res.data.data)
         setCreate(true);
         setSaving(false);
         setSuccess(true);
@@ -364,7 +365,6 @@ const CreateEmployeScreen = ({navigation, zonesRedux}) => {
           <View>
             <Text>{moment(changeTurn).format('D MMM YYYY')}</Text>
           </View>
-              <MainButton.Icon name="ios-arrow-back" size={22} color="#f09"/>
           <MainButton
             title="Crear Empleado"
             outlined
@@ -383,7 +383,16 @@ const CreateEmployeScreen = ({navigation, zonesRedux}) => {
 const mapStateToProps = state => ({
   zonesRedux: state.zonesReducer.zones,
 })
-export default connect(mapStateToProps, {})(CreateEmployeScreen)
+
+const mapDispatchToProps = dispatch => ({
+  addEmployee(employee){
+    dispatch({
+      type: 'ADD_EMPLOYEE',
+      payload: employee
+    })
+  }
+})
+export default connect(mapStateToProps, mapDispatchToProps)(CreateEmployeScreen)
 const styles = StyleSheet.create({
   container: {
     alignItems: "center",

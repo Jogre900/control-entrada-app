@@ -35,9 +35,10 @@ const ZonasScreen = ({
   addZones,
   removeZones,
   zonesRedux,
+  setAvailable
 }) => {
   //console.log("company REdux  ", companyRedux);
-  // console.log("company REdux  ", zonesRedux);
+  console.log("zonas desde REdux  ", zonesRedux);
   const [selectItem, setSeletedItem] = useState([]);
   const [changeStyle, setChangeStyle] = useState(false);
   const [deleted, setDeleted] = useState(false);
@@ -164,6 +165,14 @@ const ZonasScreen = ({
     }
   };
 
+  const getUserZone = (selectedItem) => {
+    let userZone = []
+    console.log("zona selec---", selectItem)
+      //zonesRedux.encargado_zona.map(e => console.log("encargado_zona---",e))
+    
+    return userZone
+  }
+  
   const deleteZones = async (zonesId) => {
     setDeleted(false);
     try {
@@ -176,6 +185,7 @@ const ZonasScreen = ({
       });
       console.log(res.data)
       if (!res.data.error) {
+        await setAvailable(res.data.data)
         await removeZones(zonesId);
         setSeletedItem([]);
         alert("Borrado!!");
@@ -188,6 +198,8 @@ const ZonasScreen = ({
   const clearSelect = () => {
     setSeletedItem([]);
   };
+
+  
   const onLong = (id) => {
     if (selectItem.includes(id)) {
       setSeletedItem((value) => value.filter((elem) => elem !== id));
@@ -219,7 +231,8 @@ const ZonasScreen = ({
         <Header
           value={selectItem.length}
           clearAction={() => clearSelect()}
-          deleteAction={() => deleteZones(selectItem)}
+           deleteAction={() => deleteZones(selectItem)}
+          //deleteAction={() => getUserZone(selectItem)}
         />
       ) : (
         <TopNavigation title="Zonas" leftControl={goBackAction()} />
@@ -390,6 +403,12 @@ const mapDispatchToProps = (dispatch) => ({
       payload: zonesId,
     });
   },
+  setAvailable(users){
+    dispatch({
+      type: 'SET_AVAILABLE',
+      payload: users
+    })
+  }
 });
 
 export default connect(stateToProps, mapDispatchToProps)(ZonasScreen);
