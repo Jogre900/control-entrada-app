@@ -1,12 +1,6 @@
 import React, { useState, useRef } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ActivityIndicator,
-} from "react-native";
-import { connect } from 'react-redux'
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from "react-native";
+import { connect } from "react-redux";
 import axios from "axios";
 import { API_PORT } from "../../config/index";
 import { TopNavigation } from "../../components/TopNavigation.component";
@@ -17,9 +11,9 @@ import Modal from "react-native-modal";
 import AsyncStorage from "@react-native-community/async-storage";
 import { Ionicons } from "@expo/vector-icons";
 import { MainColor } from "../../assets/colors";
-import { BackAction } from '../../helpers/ui/ui'
+import { BackAction } from "../../helpers/ui/ui";
 
-const LoginScreen = ({ navigation, saveProfile, saveCompany }) => {
+const LoginScreen = ({ navigation, saveProfile, saveCompany, saveLogin, savePrivilege }) => {
   const [email, setEmail] = useState("");
   const [pass, setPass] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
@@ -31,9 +25,9 @@ const LoginScreen = ({ navigation, saveProfile, saveCompany }) => {
       <View>
         <TouchableOpacity
           onPress={() => {
-            navigation.goBack()
+            navigation.goBack();
           }}
-            style={{backgroundColor: 'blue'}}
+          style={{ backgroundColor: "blue" }}
         >
           <Ionicons name="ios-arrow-back" size={28} color="white" />
         </TouchableOpacity>
@@ -44,10 +38,7 @@ const LoginScreen = ({ navigation, saveProfile, saveCompany }) => {
   //LOADING
   const LoadingModal = () => {
     return (
-      <Modal
-        isVisible={modalVisible}
-        onBackdropPress={() => setModalVisible(!modalVisible)}
-      >
+      <Modal isVisible={modalVisible} onBackdropPress={() => setModalVisible(!modalVisible)}>
         <View
           style={{
             flex: 1,
@@ -91,11 +82,47 @@ const LoginScreen = ({ navigation, saveProfile, saveCompany }) => {
       if (res) {
         console.log("res----------", res.data);
         await storeData(res.data.token);
-        let profile = res.data.data;
-        let company = res.data.data.Company
-        await saveProfile(profile)
-        await saveCompany(company)
-        let privilege = res.data.data.privilege;
+        let slogin = {
+          token: res.data.token,
+          userId: res.data.data.id,
+        };
+        let sprofile = {
+          id: res.data.data.Employee.id,
+          dni: res.data.data.Employee.dni,
+          name: res.data.data.Employee.name,
+          lastName: res.data.data.Employee.lastName,
+          picture: res.data.data.Employee.picture,
+          email: res.data.data.email,
+        };
+        let company = [];
+        res.data.data.UserCompany.map((comp) => {
+          company.push({
+            id: comp.Company.id,
+            companyName: comp.Company.companyName,
+            businessName: comp.Company.businessName,
+            nic: comp.Company.nic,
+            city: comp.Company.city,
+            address: comp.Company.address,
+            phoneNumber: comp.Company.phoneNumber,
+            phoneNumberOther: comp.Company.phoneNumberOther,
+            logo: comp.Company.logo,
+            privilege: comp.privilege,
+            select: true,
+          });
+        });
+
+        saveLogin(slogin);
+        saveProfile(sprofile);
+        saveCompany(company);
+
+        if (res.data.data.UserCompany.length > 1) {
+          setModalVisible(false);
+          navigation.navigate(); //TODO modal para seleccionar company
+          //TODO enviar res.data.data.UserCompany como parametro
+        }
+        let privilege = res.data.data.UserCompany[0].privilege;
+        savePrivilege(privilege);
+
         switch (privilege) {
           case "Watchman":
             setModalVisible(false);
@@ -104,6 +131,7 @@ const LoginScreen = ({ navigation, saveProfile, saveCompany }) => {
             });
             break;
           case "Admin":
+          case "Supervisor":
             setModalVisible(false);
             navigation.navigate("admin");
             break;
@@ -131,61 +159,61 @@ const LoginScreen = ({ navigation, saveProfile, saveCompany }) => {
     }
   };
   return (
-    <View style={{flex: 1}}>
+    <View style={{ flex: 1 }}>
       <TopNavigation title="Inicio" leftControl={goBackAction()} />
-      <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+      <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
         <View style={styles.buttonContainer}>
           <Text style={styles.labelTitle}>Porfavor ingrese sus datos de usuario</Text>
-          <Divider size="small"/>
-        <View style={styles.subContainer}>
-        <Input
-          //styleInput={{ color: "white" }}
-          icon="ios-mail"
-          title="Correo"
-          textColor="grey"
-          shape="flat"
-          keyboardType="email-address"
-          returnKeyType="next"
-          caption={emailCaption}
-          onSubmitEditing={() => nextInput.current.focus()}
-          onChangeText={(correo) => {
-            setEmail(correo), setEmailCaption("");
-          }}
-          value={email}
-        />
-        <Input
-          //styleInput={{ color: "white" }}
-          icon="ios-lock"
-          title="Clave"
-          textColor="grey"
-          shape="flat"
-          returnKeyType="done"
-          secureTextEntry={true}
-          caption={passCaption}
-          onSubmitEditing={() => signIn()}
-          onChangeText={(pass) => {
-            setPass(pass), setPassCaption("");
-          }}
-          value={pass}
-          ref={nextInput}
-        />
-        </View>
-        
-        <View style={styles.subContainer}>
-        <MainButton
-          title="Iniciar Sesion"
-          onPress={() => {
-            signIn();
-          }}
-        />
-        </View>
-        <Divider size="small"/>
-        <View style={styles.forgetcontainer}>
-          <Text>Olvidaste tu contraseña?</Text>
-          <TouchableOpacity onPress={() => alert("recuperar contraseña")}>
-          <Text style={{color: MainColor}}> Recuperar</Text>
-        </TouchableOpacity>
-        </View>
+          <Divider size="small" />
+          <View style={styles.subContainer}>
+            <Input
+              //styleInput={{ color: "white" }}
+              icon="ios-mail"
+              title="Correo"
+              textColor="grey"
+              shape="flat"
+              keyboardType="email-address"
+              returnKeyType="next"
+              caption={emailCaption}
+              onSubmitEditing={() => nextInput.current.focus()}
+              onChangeText={(correo) => {
+                setEmail(correo), setEmailCaption("");
+              }}
+              value={email}
+            />
+            <Input
+              //styleInput={{ color: "white" }}
+              icon="ios-lock"
+              title="Clave"
+              textColor="grey"
+              shape="flat"
+              returnKeyType="done"
+              secureTextEntry={true}
+              caption={passCaption}
+              onSubmitEditing={() => signIn()}
+              onChangeText={(pass) => {
+                setPass(pass), setPassCaption("");
+              }}
+              value={pass}
+              ref={nextInput}
+            />
+          </View>
+
+          <View style={styles.subContainer}>
+            <MainButton
+              title="Iniciar Sesion"
+              onPress={() => {
+                signIn();
+              }}
+            />
+          </View>
+          <Divider size="small" />
+          <View style={styles.forgetcontainer}>
+            <Text>Olvidaste tu contraseña?</Text>
+            <TouchableOpacity onPress={() => alert("recuperar contraseña")}>
+              <Text style={{ color: MainColor }}> Recuperar</Text>
+            </TouchableOpacity>
+          </View>
         </View>
         <LoadingModal />
       </View>
@@ -202,35 +230,47 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   subContainer: {
-    marginVertical: 10
+    marginVertical: 10,
   },
   labelTitle: {
     fontSize: 16,
     lineHeight: 18,
-    color: MainColor
+    color: MainColor,
   },
   forgetcontainer: {
-    flexDirection: 'row',
-    justifyContent: 'center'
-  }
+    flexDirection: "row",
+    justifyContent: "center",
+  },
 });
-const mapStateToProps = () => {
-  return {}
-}
+const mapStateToProps = (state) => {
+  return {};
+};
 
-const mapDispatchToProps = dispatch => ({
-  saveProfile(profile){
+const mapDispatchToProps = (dispatch) => ({
+  saveProfile(profile) {
     dispatch({
       type: "setProfile",
-      payload: profile
-    })
+      payload: profile,
+    });
   },
-  saveCompany(company){
+  saveCompany(company) {
     dispatch({
       type: "setCompany",
-      payload: company
-    })
-  }
-})
+      payload: company,
+    });
+  },
+  saveLogin(login) {
+    dispatch({
+      type: "SET_LOGIN",
+      payload: login,
+    });
+  },
+  savePrivilege(privilege) {
+    dispatch({
+      type: "setPrivilege",
+      payload: privilege,
+    });
+  },
+});
 
-export default connect(mapStateToProps, mapDispatchToProps)(LoginScreen)
+export default connect(mapStateToProps, mapDispatchToProps)(LoginScreen);

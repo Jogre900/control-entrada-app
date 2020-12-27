@@ -10,19 +10,6 @@ export default (sequelize, { BOOLEAN, STRING, UUID, UUIDV4, ENUM }) => {
         type: UUID,
         defaultValue: UUIDV4()
       },
-      name: {
-        type: STRING,
-        allowNull: false
-      },
-      lastName: {
-        type: STRING,
-        allowNull: false
-      },
-      dni: {
-        type: STRING,
-        allowNull: false,
-        unique: true
-      },
       email: {
         type: STRING,
         allowNull: false,
@@ -43,27 +30,12 @@ export default (sequelize, { BOOLEAN, STRING, UUID, UUIDV4, ENUM }) => {
         allowNull: false,
         defaultValue: makeid(4)
       },
-      picture: {
-        type: STRING,
-        allowNull: false
-      },
-      privilege: {
-        type: STRING,
-        allowNull: false,
-        // values: ["Admin", "Supervisor", "Watchmen"],
-        // defaultValue: "Admin"
-      },
-      active: {
-        type: BOOLEAN,
-        allowNull: false,
-        defaultValue: true
-      },
       tokenActivation: {
         type: STRING,
         allowNull: false,
         defaultValue: makeid(6)
       }
-    },
+    }
     // {
     //   hooks: {
     //     beforeCreate: user => {
@@ -83,6 +55,24 @@ export default (sequelize, { BOOLEAN, STRING, UUID, UUIDV4, ENUM }) => {
       onDelete: "CASCADE",
       onUpdate: "CASCADE"
     });*/
+    User.hasOne(models.employee, {
+      foreignKey: {
+        name: "userId",
+        field: "user_id"
+      },
+      as: "Employee",
+      onDelete: "CASCADE",
+      onUpdate: "CASCADE"
+    });
+    User.hasMany(models.userCompany, {
+      foreignKey: {
+        name: "userId",
+        field: "user_id"
+      },
+      as: "UserCompany",
+      onDelete: "CASCADE",
+      onUpdate: "CASCADE"
+    });
     User.hasMany(models.NotificationRead, {
       foreignKey: {
         name: "userId",
@@ -94,14 +84,13 @@ export default (sequelize, { BOOLEAN, STRING, UUID, UUIDV4, ENUM }) => {
     });
     User.hasMany(models.userZone, {
       foreignKey: {
-        name: 'UserId',
-        field: 'user_id'
+        name: "UserId",
+        field: "user_id"
       },
-      as: 'userZone',
-      onDelete: 'CASCADE',
-      onUpdate: 'CASCADE'
-    })
-    User.belongsTo(models.company)
+      as: "userZone",
+      onDelete: "CASCADE",
+      onUpdate: "CASCADE"
+    });
   };
 
   return User;

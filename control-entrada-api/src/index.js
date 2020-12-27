@@ -96,7 +96,7 @@ app.use(cors({ credentials: true, origin: true }));
 //Routes
 app.use("/api", routes);
 app.post("/api/uploadImg", uploadImg.single("file"), (req, res, next) => {
-  console.log(req.body)
+  console.log(req.body);
   const file = req.file;
   if (!file) {
     const error = new Error("Please upload a file");
@@ -106,9 +106,7 @@ app.post("/api/uploadImg", uploadImg.single("file"), (req, res, next) => {
   //retornar el nombre del archivo para guardar en la base de datos
   res.send(file.filename);
 });
-app.get("/api/showImage", (req, res) => {
-  
-})
+app.get("/api/showImage", (req, res) => {});
 
 // app.post("/api/login", async (req, res) => {
 //   let response = { value: "", error: false, msg: "" };
@@ -142,7 +140,7 @@ console.log("port: ", PORT);
 const alter = false;
 const force = false;
 
-models.sequelize.sync({ alter, force}).then(() => {
+models.sequelize.sync({ alter, force }).then(() => {
   app.listen(PORT, function() {
     console.log("Running!!! Port: ", PORT);
   });

@@ -55,26 +55,137 @@ const Methods = {
       data: null,
       token: null
     };
-    const { companyName, companyEmail, companyDni } = req.body;
+    /**
+     * companyName
+businessName
+nic
+city
+address
+phoneNumber
+phoneNumberOther
+logo
+active-def true
 
-    console.log(req.body);
+dni
+name
+lastName
+picture
+status-no
+
+email
+password
+
+privilege
+
+companyName: "Test Company",
+businessName: "Test Company C.A.",
+nic: "9453145-451",
+city: "San Juan",
+address: "Calle del medio",
+phoneNumber: "+58 426 1414253",
+phoneNumberOther: "",
+dni: "19760800",
+name: "Jose",
+lastName: "Segovia",
+email: "j@gmail.com",
+password: "123456",
+     */
+    const {
+      companyName,
+      businessName,
+      nic,
+      city,
+      address,
+      phoneNumber,
+      phoneNumberOther,
+      dni,
+      name,
+      lastName,
+      email,
+      password,
+      logo,
+      picture
+    } = req.body;
+
+    console.log("algo", req.body);
     try {
-      let company = await models.company.create({
-        name: companyName,
-        email: companyEmail,
-        dni: companyDni
+      let checkEmail = await models.User.findOne({
+        where: {
+          email: email.toLowerCase()
+        }
       });
-      if (company) {
-        RESPONSE.error = false;
-        RESPONSE.msg = "Registro Exitoso!";
-        RESPONSE.data = company;
-        res.status(200).json(RESPONSE);
+
+      if (checkEmail) {
+        RESPONSE.msg = "Este correo ya se encuentra registrado en una empresa";
+        res.json(RESPONSE);
       }
+
+      let newPass = await bcrypt.hash(password, 10);
+      let inputUser = {
+        email: email.toLowerCase(),
+        password: newPass,
+        Employee: {
+          dni: dni,
+          name: name,
+          lastName: lastName,
+          //picture: picture, ajustar a la carga de archivo
+          status: "Active"
+        }
+      };
+
+      let NewUser = await models.User.create(
+        { ...inputUser },
+        {
+          include: {
+            model: models.employee,
+            as: "Employee"
+          }
+        }
+      );
+
+      let inputCompany = {
+        companyName,
+        businessName,
+        nic,
+        city,
+        address,
+        phoneNumber
+        //logo, ajustar al subir archivo
+      };
+
+      if (phoneNumberOther) {
+        inputCompany.phoneNumberOther = phoneNumberOther;
+      }
+
+      let newCompany = await models.company.create({ ...inputCompany });
+
+      let inputUserCompany = {
+        companyId: newCompany.id,
+        userId: NewUser.id,
+        privilege: "Admin"
+      };
+
+      if (NewUser && newCompany) {
+        let userCompany = await models.userCompany.create({
+          ...inputUserCompany
+        });
+
+        if (userCompany) {
+          RESPONSE.error = false;
+          RESPONSE.msg = "Registro Exitoso!";
+          RESPONSE.data = NewUser;
+          res.status(200).json(RESPONSE);
+        }
+      }
+
+      RESPONSE.msg = "error al registrar empresa";
+      res.json(RESPONSE);
     } catch (error) {
       RESPONSE.msg = error.message;
       res.json(RESPONSE);
     }
   },
+
   findCompany: async function(req, res) {
     let RESPONSE = {
       error: true,
@@ -112,22 +223,48 @@ const Methods = {
       data: null,
       token: null
     };
-    const { zone, firsEntryTime, firsDepartureTime } = req.body;
+    const {
+      zone,
+      firsEntryTime,
+      firsDepartureTime,
+      SecondEntryTime,
+      SecondDepartureTime
+    } = req.body;
     const { id } = req.params;
     console.log(req.body);
     try {
-      let zoneC = await models.zone.create({
+      let inputZone = {
         zone,
-        firsEntryTime,
-        firsDepartureTime,
         companyId: id
+      };
+
+      if (firsEntryTime) {
+        inputZone.firsEntryTime = firsEntryTime;
+      }
+
+      if (firsDepartureTime) {
+        inputZone.firsDepartureTime = firsDepartureTime;
+      }
+
+      if (SecondEntryTime) {
+        inputZone.SecondEntryTime = SecondEntryTime;
+      }
+
+      if (SecondDepartureTime) {
+        inputZone.SecondDepartureTime = SecondDepartureTime;
+      }
+
+      let zoneC = await models.zone.create({
+        ...inputZone
       });
+
       RESPONSE.error = false;
       RESPONSE.msg = "Creacion de Zona Exitasa!";
       RESPONSE.data = zoneC;
       res.json(RESPONSE);
     } catch (error) {
-      RESPONSE.msg = error;
+      RESPONSE.msg = error.message;
+      res.json(RESPONSE);
     }
   },
   findZones: async function(req, res) {
@@ -193,12 +330,12 @@ const Methods = {
       //console.log("zone*-------", zones);
       if (userZones.length > 0) {
         trabajadores = userZones.map(uz => uz.User);
-        console.log("trabajadores---",trabajadores);
-        
+        console.log("trabajadores---", trabajadores);
+
         trabajadores.map(async trabajador => {
           (trabajador.privilege = "Available"), await u.save();
         });
-        userZones.map(async uz=> await uz.destroy())
+        userZones.map(async uz => await uz.destroy());
         zones.map(async zone => await zone.destroy());
         RESPONSE.error = false;
         RESPONSE.msg = "Registro borrado!";
@@ -424,6 +561,250 @@ const Methods = {
     let data = await models.picture.findAll();
     res.send({ msg: data });
   },
+  createUserWatchman: async function(req, res) {
+    let RESPONSE = {
+      error: true,
+      msg: "",
+      data: null,
+      token: null
+    };
+    console.log("SOY ALL", req.body);
+    let {
+      name,
+      lastName,
+      dni,
+      email,
+      password,
+      companyId,
+      zoneId,
+      assignationDate,
+      changeTurnDate
+    } = req.body;
+    const privilege = "Watchman";
+
+    console.log(req.file);
+    try {
+      let user = await models.User.findOne({
+        where: {
+          email: email
+        },
+        include: {
+          model: models.employee,
+          as: "Employee"
+        }
+      });
+      console.log("user", user);
+
+      if (!user) {
+        let hash = await bcrypt.hash(password, 10);
+        password = hash;
+
+        let inputUser = {
+          email,
+          password: hash,
+          Employee: {
+            name,
+            lastName,
+            dni,
+            picture: req.file.filename,
+            status: "Active"
+          },
+          userZone: {
+            assignationDate,
+            changeTurnDate,
+            ZoneId: zoneId
+          },
+          UserCompany: {
+            companyId,
+            privilege
+          }
+        };
+
+        let employee = await models.User.create(
+          {
+            ...inputUser
+          },
+          {
+            include: [
+              {
+                model: models.userZone,
+                as: "userZone"
+              },
+              {
+                model: models.employee,
+                as: "Employee"
+              },
+              {
+                model: models.userCompany,
+                as: "UserCompany"
+              }
+            ]
+          }
+        );
+
+        if (employee) {
+          RESPONSE.error = false;
+          RESPONSE.msg = "Registro Exitoso!";
+          RESPONSE.data = employee;
+          res.status(200).json(RESPONSE);
+        } else {
+          RESPONSE.msg = "Error al registrar";
+          res.json(RESPONSE);
+        }
+      } else {
+        RESPONSE.error = false;
+        RESPONSE.msg = "usuario ya existe";
+        RESPONSE.data = user;
+        res.json(RESPONSE);
+      }
+    } catch (error) {
+      RESPONSE.msg = error.message;
+      res.json(RESPONSE);
+    }
+
+    // let user = await models.User.create({
+    //   name: req.body.name,
+    //   lastName: req.body.lastName,
+    //   dni: req.body.dni,
+    //   email: req.body.email,
+    //   password: req.body.password
+    // });
+    //   if (user) {
+    //     let mailOptions = {
+    //       from: 'Segovia Develop 👻" <segoviadevelop@gmail.com>',
+    //       to: req.body.email,
+    //       subject: "Sending Email using Node.js - Control Entrada",
+    //       text: "That was easy!",
+    //       html:
+    //         "<h1>Hello " +
+    //         user.email +
+    //         "</h1><br />Your Pin: " +
+    //         user.pin +
+    //         " and token validate " +
+    //         user.tokenActivation
+    //     };
+    //     sendMail(mailOptions);
+    //   }
+
+    // console.log(user);
+    // res.json({ msg: user });
+  },
+  createUserSupervisor: async function(req, res) {
+    let RESPONSE = {
+      error: true,
+      msg: "",
+      data: null,
+      token: null
+    };
+    console.log("SOY ALL", req.body);
+    let { name, lastName, dni, email, password, companyId, zoneId } = req.body;
+    const privilege = "Supervisor";
+
+    console.log(req.file);
+    try {
+      let user = await models.User.findOne({
+        where: {
+          email: email
+        },
+        include: {
+          model: models.employee,
+          as: "Employee"
+        }
+      });
+      console.log("user", user);
+
+      if (!user) {
+        let hash = await bcrypt.hash(password, 10);
+        password = hash;
+
+        let inputUser = {
+          email,
+          password: hash,
+          Employee: {
+            name,
+            lastName,
+            dni,
+            picture: req.file.filename,
+            status: "Active"
+          },
+          userZone: {
+            ZoneId: zoneId
+          },
+          UserCompany: {
+            companyId,
+            privilege
+          }
+        };
+
+        let employee = await models.User.create(
+          {
+            ...inputUser
+          },
+          {
+            include: [
+              {
+                model: models.userZone,
+                as: "userZone"
+              },
+              {
+                model: models.employee,
+                as: "Employee"
+              },
+              {
+                model: models.userCompany,
+                as: "UserCompany"
+              }
+            ]
+          }
+        );
+
+        if (employee) {
+          RESPONSE.error = false;
+          RESPONSE.msg = "Registro Exitoso!";
+          RESPONSE.data = employee;
+          res.status(200).json(RESPONSE);
+        } else {
+          RESPONSE.msg = "Error al registrar";
+          res.json(RESPONSE);
+        }
+      } else {
+        RESPONSE.error = false;
+        RESPONSE.msg = "usuario ya existe";
+        RESPONSE.data = user;
+        res.json(RESPONSE);
+      }
+    } catch (error) {
+      RESPONSE.msg = error.message;
+      res.json(RESPONSE);
+    }
+
+    // let user = await models.User.create({
+    //   name: req.body.name,
+    //   lastName: req.body.lastName,
+    //   dni: req.body.dni,
+    //   email: req.body.email,
+    //   password: req.body.password
+    // });
+    //   if (user) {
+    //     let mailOptions = {
+    //       from: 'Segovia Develop 👻" <segoviadevelop@gmail.com>',
+    //       to: req.body.email,
+    //       subject: "Sending Email using Node.js - Control Entrada",
+    //       text: "That was easy!",
+    //       html:
+    //         "<h1>Hello " +
+    //         user.email +
+    //         "</h1><br />Your Pin: " +
+    //         user.pin +
+    //         " and token validate " +
+    //         user.tokenActivation
+    //     };
+    //     sendMail(mailOptions);
+    //   }
+
+    // console.log(user);
+    // res.json({ msg: user });
+  },
   createUser: async function(req, res) {
     let RESPONSE = {
       error: true,
@@ -547,7 +928,7 @@ const Methods = {
     try {
       let user = await models.User.findOne({
         where: {
-          email
+          email: email.toLowerCase()
         },
         include: [
           {
@@ -564,10 +945,26 @@ const Methods = {
             }
           },
           {
-            model: models.company
+            model: models.employee,
+            as: "Employee"
+          },
+          {
+            model: models.userCompany,
+            as: "UserCompany",
+            where: {
+              active: true
+            },
+            include: {
+              model: models.company,
+              as: "Company",
+              where: {
+                active: true
+              }
+            }
           }
         ]
       });
+
       if (user) {
         if (bcrypt.compareSync(password, user.password)) {
           let token = jwt.sign(user.dataValues, SECRETKEY, { expiresIn: "1d" });
@@ -1287,24 +1684,6 @@ const Methods = {
     res.json({
       msg: notification
     });
-  },
-  logIn: async function(req, res) {
-    let response = { value: "", error: false, msg: "" };
-    // random endpoint so that the client can call something
-    let user = await models.User.findOne({
-      where: {
-        email: req.body.email,
-        password: encrypt(req.body.password)
-      }
-    });
-
-    if (user) {
-      response.value = user;
-    } else {
-      response.error = true;
-      response.msg = "Usuario Invalido!";
-    }
-    res.json(response);
   }
 };
 

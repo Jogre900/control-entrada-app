@@ -1,14 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  Alert,
-  TouchableOpacity,
-  TouchableHighlight,
-  ActivityIndicator,
-  Image,
-} from "react-native";
+import { View, Text, StyleSheet, Alert, TouchableOpacity, TouchableHighlight, ActivityIndicator, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 //components
 import { TopNavigation } from "../../components/TopNavigation.component";
@@ -18,30 +9,20 @@ import moment from "moment";
 import { MainColor } from "../../assets/colors";
 import Modal from "react-native-modal";
 import { connect } from "react-redux";
-import Avatar from '../../components/avatar.component'
-import { DrawerAction, Notifications } from '../../helpers/ui/ui'
+import Avatar from "../../components/avatar.component";
+import { DrawerAction, Notifications } from "../../helpers/ui/ui";
 const companyId = "9a28095a-9029-40ec-88c2-30e3fac69bc5";
 
-const HomeAdminScreen = ({
-  navigation,
-  company,
-  saveEmployee,
-  saveTodayVisits,
-  saveAvailable,
-  saveZones
-}) => {
+const HomeAdminScreen = ({ navigation, company, saveEmployee, saveTodayVisits, saveAvailable, saveZones }) => {
   const [object, setObject] = useState({});
   const [loading, setLoading] = useState(true);
   const [visits, setVisits] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
-  
+
   //LOADING
   const LoadingModal = () => {
     return (
-      <Modal
-        isVisible={modalVisible}
-        onBackdropPress={() => setModalVisible(!modalVisible)}
-      >
+      <Modal isVisible={modalVisible} onBackdropPress={() => setModalVisible(!modalVisible)}>
         <View
           style={{
             flex: 1,
@@ -57,36 +38,37 @@ const HomeAdminScreen = ({
   //REQUEST ZONES
   const requestZone = async () => {
     try {
-      let res = await axios.get(`${API_PORT()}/api/findZones/${company.id}`);
+      /* let res = await axios.get(`${API_PORT()}/api/findZones/${company.id}`);
       if (!res.data.error && res.data.data.length > 0) {
-      saveZones(res.data.data);
-      }
+        saveZones(res.data.data);
+      }*/
+      saveZones([]);
     } catch (error) {
       alert(error.message);
     }
   };
   //VISITS
   const requestVisits = async () => {
-    if(company){
+    if (company) {
       setModalVisible(true);
-    try {
-      let res = await axios.get(
-        `${API_PORT()}/api/findTodayVisits/${company.id}`
-      );
-      console.log(res.data.data);
-      if (res.data.data.length === 0) {
-        setModalVisible(false);
-        alert("No hay registros");
-      } else if (!res.data.error) {
+      try {
+        /*let res = await axios.get(`${API_PORT()}/api/findTodayVisits/${company.id}`);
         console.log(res.data.data);
-        saveTodayVisits(res.data.data);
-        setVisits(res.data.data);
+        if (res.data.data.length === 0) {
+          setModalVisible(false);
+          alert("No hay registros");
+        } else if (!res.data.error) {
+          console.log(res.data.data);
+          saveTodayVisits(res.data.data);
+          setVisits(res.data.data);
+          setModalVisible(false);
+        }*/
+        setVisits([]);
         setModalVisible(false);
+      } catch (error) {
+        setModalVisible(false);
+        alert(error.message);
       }
-    } catch (error) {
-      setModalVisible(false);
-      alert(error.message);
-    }
     }
   };
   //REQUEST EMPLOYEE
@@ -94,12 +76,14 @@ const HomeAdminScreen = ({
     if (company) {
       setModalVisible(true);
       try {
-        let res = await axios.get(`${API_PORT()}/api/findUsers/${company.id}`);
+        /*let res = await axios.get(`${API_PORT()}/api/findUsers/${company.id}`);
         if (!res.data.error) {
           console.log(res.data.data);
           saveEmployee(res.data.data);
           setLoading(false);
-        }
+        }*/
+        saveEmployee([]);
+        setLoading(false);
       } catch (error) {
         setLoading(false);
         console.log("error: ", error.message);
@@ -111,14 +95,14 @@ const HomeAdminScreen = ({
     if (company) {
       setModalVisible(true);
       try {
-        let res = await axios.get(
-          `${API_PORT()}/api/findAvailableUsers/${company.id}`
-        );
+        /*let res = await axios.get(`${API_PORT()}/api/findAvailableUsers/${company.id}`);
         console.log("User Avai--", res.data);
         if (!res.data.error) {
           saveAvailable(res.data.data);
           setModalVisible(false);
-        }
+        }*/
+        saveAvailable([]);
+        setModalVisible(false);
       } catch (error) {
         setModalVisible(false);
         console.log(error.message);
@@ -141,24 +125,16 @@ const HomeAdminScreen = ({
 
   return (
     <View>
-      <TopNavigation
-        title="Entradas del Dia"
-        leftControl={DrawerAction(navigation)}
-        rightControl={Notifications(navigation)}
-      />
+      <TopNavigation title="Entradas del Dia" leftControl={DrawerAction(navigation)} rightControl={Notifications(navigation)} />
 
       <LoadingModal />
 
       <View style={styles.listEntry}>
         {visits.map((elem, i) => {
           return (
-            <TouchableOpacity
-              style={styles.entryBox}
-              key={i}
-              onPress={() => navigation.navigate("detail-view", elem)}
-            >
+            <TouchableOpacity style={styles.entryBox} key={i} onPress={() => navigation.navigate("detail-view", elem)}>
               <View style={styles.dataContainerView}>
-                <Avatar.Picture size={50} uri={`${API_PORT()}/public/imgs/${elem.Citizen.picture}`}/>
+                <Avatar.Picture size={50} uri={`${API_PORT()}/public/imgs/${elem.Citizen.picture}`} />
               </View>
               <View style={styles.dataContainerView}>
                 <Text>DNI</Text>
@@ -172,9 +148,7 @@ const HomeAdminScreen = ({
               </View>
               <View style={styles.dataContainerView}>
                 <Text>Entrada</Text>
-                <Text style={styles.dataText}>
-                  {moment(elem.ntryDate).format("HH:mm a")}
-                </Text>
+                <Text style={styles.dataText}>{moment(elem.ntryDate).format("HH:mm a")}</Text>
               </View>
             </TouchableOpacity>
           );
@@ -185,15 +159,15 @@ const HomeAdminScreen = ({
 };
 
 const mapStateToProps = (state) => ({
-  company: state.profileReducer.company,
+  company: state.profile.companySelect,
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  saveZones(zones){
+  saveZones(zones) {
     dispatch({
       type: "setZones",
-      payload: zones
-    })
+      payload: zones,
+    });
   },
   saveTodayVisits(todayVisits) {
     dispatch({
@@ -207,12 +181,12 @@ const mapDispatchToProps = (dispatch) => ({
       payload: employee,
     });
   },
-  saveAvailable(availables){
+  saveAvailable(availables) {
     dispatch({
       type: "SAVE_AVAILABLE",
-      payload: availables
-    })
-  }
+      payload: availables,
+    });
+  },
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(HomeAdminScreen);

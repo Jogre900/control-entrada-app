@@ -15,10 +15,10 @@ import {
   Keyboard,
   ActivityIndicator,
 } from "react-native";
-import { connect } from 'react-redux'
+import { connect } from "react-redux";
 import axios from "axios";
 import AsyncStorage from "@react-native-community/async-storage";
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect } from "@react-navigation/native";
 
 //components
 import { MainColor } from "../../assets/colors";
@@ -26,7 +26,7 @@ import { SplashScreen } from "../../components/splashScreen.component";
 import { MainButton } from "../../components/mainButton.component";
 import Modal from "react-native-modal";
 import { API_PORT } from "../../config/index";
-import { storage } from '../../helpers/asyncStorage'
+import { storage } from "../../helpers/asyncStorage";
 
 const { width, height } = Dimensions.get("window");
 
@@ -42,8 +42,7 @@ const backAction = () => {
   return true;
 };
 
-const MainScreen = ({navigation, saveProfile, saveCompany}) => {
-
+const MainScreen = ({ navigation, saveProfile, saveCompany, isToken, token, privilege }) => {
   const [email, setEmail] = useState("");
   const [pass, setPass] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
@@ -54,7 +53,6 @@ const MainScreen = ({navigation, saveProfile, saveCompany}) => {
 
   const backHandler = useRef(null);
   const translate = new Animated.Value(1);
-  
 
   const activeSplash = () => {
     setTimeout(() => {
@@ -64,10 +62,7 @@ const MainScreen = ({navigation, saveProfile, saveCompany}) => {
   //LOADING
   const LoadingModal = () => {
     return (
-      <Modal
-        isVisible={modalVisible}
-        onBackdropPress={() => setModalVisible(!modalVisible)}
-      >
+      <Modal isVisible={modalVisible} onBackdropPress={() => setModalVisible(!modalVisible)}>
         <View
           style={{
             flex: 1,
@@ -80,7 +75,6 @@ const MainScreen = ({navigation, saveProfile, saveCompany}) => {
       </Modal>
     );
   };
-  
 
   //VALIDAR EMAIL
   const validateEmail = (email) => {
@@ -88,11 +82,9 @@ const MainScreen = ({navigation, saveProfile, saveCompany}) => {
     return re.test(email);
   };
 
-  
-
   const signInStatus = async () => {
-    let token = await storage.getItem("userToken");
-    if (token) {
+    /*let token = await storage.getItem("userToken");
+    if (Token) {
       setModalVisible(true);
       try {
         let res = await axios.get(`${API_PORT()}/api/verifyToken`, {
@@ -132,6 +124,60 @@ const MainScreen = ({navigation, saveProfile, saveCompany}) => {
         alert(error.message);
       }
     }else alert("No hay token almacenado")
+    */
+    if (isToken) {
+      setModalVisible(true);
+      try {
+        //TODO verificar esta ruta en la api para que de la estructura nueva
+        /* let res = await axios.get(`${API_PORT()}/api/verifyToken`, {
+          headers: {
+            Authorization: `bearer ${token}`,
+          },
+        });
+        if (res.data.error && res.data.msg === "jwt expired") {
+          alert("token expiro!");
+          setModalVisible(false);
+          return;
+        }
+        if (!res.data.error) {
+          //let profile = res.data.data;
+          // let company = res.data.data.Company;
+          // await saveCompany(company);
+          //await saveProfile(profile);
+          //console.log(profile);
+          setModalVisible(false);
+          switch (res.data.data.privilege) {
+            case "Admin":
+              navigation.navigate("admin", { screen: "admin-home" });
+              break;
+            case "Supervisor":
+              navigation.navigate("super");
+              break;
+            case "Watchman":
+              navigation.navigate("watch", { screen: "watch-home" });
+              break;
+            default:
+              break;
+          }
+        }*/
+        switch (privilege) {
+          case "Admin":
+            navigation.navigate("admin", { screen: "admin-home" });
+            break;
+          case "Supervisor":
+            navigation.navigate("super");
+            break;
+          case "Watchman":
+            navigation.navigate("watch", { screen: "watch-home" });
+            break;
+          default:
+            break;
+        }
+      } catch (error) {
+        setModalVisible(false);
+        alert(error.message);
+      }
+    } else alert("No hay token almacenado");
   };
 
   useEffect(() => {
@@ -147,11 +193,8 @@ const MainScreen = ({navigation, saveProfile, saveCompany}) => {
   }, []);
 
   useFocusEffect(() => {
-      return console.log("is Focused")
-
-    }, [])
-  
-
+    return console.log("is Focused");
+  }, []);
 
   if (isSplash) {
     return <SplashScreen />;
@@ -159,24 +202,13 @@ const MainScreen = ({navigation, saveProfile, saveCompany}) => {
 
   return (
     <View style={styles.container}>
-      <ImageBackground
-        source={require("../../assets/images/background.jpg")}
-        style={styles.imageBackground}
-      >
+      <ImageBackground source={require("../../assets/images/background.jpg")} style={styles.imageBackground}>
         <StatusBar hidden={true} />
 
-        <TouchableWithoutFeedback
-          style={styles.backCover}
-          onPress={() => Keyboard.dismiss()}
-        >
+        <TouchableWithoutFeedback style={styles.backCover} onPress={() => Keyboard.dismiss()}>
           <KeyboardAvoidingView style={styles.backCover} behavior="padding">
-            <Image
-              style={styles.logo}
-              source={require("../../assets/images/security-logo.png")}
-            />
+            <Image style={styles.logo} source={require("../../assets/images/security-logo.png")} />
             <View style={styles.buttonBox}>
-              
-
               <LoadingModal />
 
               <MainButton
@@ -229,22 +261,30 @@ const styles = StyleSheet.create({
     bottom: "25%",
   },
   input: {
-    marginVertical: 2.5
-  }  
+    marginVertical: 2.5,
+  },
 });
 
-const mapDispatchToProps = dispatch => ({
-  saveProfile(profile){
+const mapStateToProps = (state) => {
+  return {
+    isToken: state.profile.login.token == "" ? false : true,
+    token: state.profile.login.token,
+    privilege: state.profile.login.privilege,
+  };
+};
+
+const mapDispatchToProps = (dispatch) => ({
+  saveProfile(profile) {
     dispatch({
       type: "setProfile",
-      payload: profile
-    })
+      payload: profile,
+    });
   },
-  saveCompany(company){
+  saveCompany(company) {
     dispatch({
       type: "setCompany",
-      payload: company
-    })
-  }
-})
-export default connect(null, mapDispatchToProps)(MainScreen)
+      payload: company,
+    });
+  },
+});
+export default connect(mapStateToProps, mapDispatchToProps)(MainScreen);

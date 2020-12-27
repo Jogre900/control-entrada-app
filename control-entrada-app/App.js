@@ -1,5 +1,6 @@
 import * as React from "react";
 import { Platform, StatusBar, StyleSheet, View } from "react-native";
+import { PersistGate } from "redux-persist/integration/react";
 import { SplashScreen } from "expo";
 import * as Font from "expo-font";
 import { Ionicons } from "@expo/vector-icons";
@@ -12,7 +13,7 @@ import { MainNavigator } from "./navigation/main.navigator";
 import BottomTabNavigator from "./navigation/BottomTabNavigator";
 import useLinking from "./navigation/useLinking";
 import { Provider } from "react-redux";
-import store from "./store/store";
+import { store, persistor } from "./store";
 
 const Stack = createStackNavigator();
 
@@ -27,14 +28,10 @@ export default function App(props) {
   async function registerForPushNotificationsAsync() {
     let token;
     if (Constants.isDevice) {
-      const { status: existingStatus } = await Permissions.getAsync(
-        Permissions.NOTIFICATIONS
-      );
+      const { status: existingStatus } = await Permissions.getAsync(Permissions.NOTIFICATIONS);
       let finalStatus = existingStatus;
       if (existingStatus !== "granted") {
-        const { status } = await Permissions.askAsync(
-          Permissions.NOTIFICATIONS
-        );
+        const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
         finalStatus = status;
       }
       if (finalStatus !== "granted") {
@@ -96,9 +93,11 @@ export default function App(props) {
     return (
       <React.Fragment>
         <Provider store={store}>
-          <NavigationContainer>
-            <MainNavigator />
-          </NavigationContainer>
+          <PersistGate loading={null} persistor={persistor}>
+            <NavigationContainer>
+              <MainNavigator />
+            </NavigationContainer>
+          </PersistGate>
         </Provider>
       </React.Fragment>
       // <View style={styles.container}>

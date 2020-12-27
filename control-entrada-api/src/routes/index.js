@@ -55,12 +55,11 @@ router.post(
   Methods.createUser
 );
 router.put("/updatePass/:id", Methods.updatePass);
-router.put("/updateAdmin/:companyId", Methods.updateAdminId)
+router.put("/updateAdmin/:companyId", Methods.updateAdminId);
 router.post("/login", Methods.login);
 router.get("/findUsers/:companyId", Methods.findUsers);
-router.get("/findAvailableUsers/:companyId", Methods.findAvailableUsers)
+router.get("/findAvailableUsers/:companyId", Methods.findAvailableUsers);
 router.delete("/deleteUser/:id", Methods.deleteUser);
-router.post("/createCompany/", Methods.createCompany);
 router.get("/findCompany/:id", Methods.findCompany);
 router.post("/createZone/:id", Methods.createZone);
 router.get("/findZones/:companyId", Methods.findZones);
@@ -70,7 +69,7 @@ router.get("/findDestiny/:id", Methods.findDestinyByZone);
 router.delete("/deleteDestiny/:id", Methods.deleteDestiny);
 router.post("/createEmployee", Methods.createEmployee);
 router.get("/findEmployees", Methods.findEmployees);
-router.post("/createUserZone", Methods.createUserZone)
+router.post("/createUserZone", Methods.createUserZone);
 //router.post("/uploadImage", uploadImg.single('file'), Methods.uploadImage)
 router.get("/displayPicture", Methods.displayPicture);
 router.get("/profile", Methods.getProfile);
@@ -89,6 +88,18 @@ router.put("/updateVisit/:id", middleware.verifyToken, Methods.updateVisit);
 router.get("/findTodayVisits/:companyId", Methods.findTodayVisits);
 router.get("/findTodayVisitsByUser/:id", Methods.findTodayVisitsByUser);
 router.get("/findWeekVisits/", Methods.findWeekVisits);
+// NUEVAS RUTA AJUSTE SISTEMA
+router.post("/createCompany", Methods.createCompany);
+router.post(
+  "/createUserSupervisor",
+  uploadImg.single("file"),
+  Methods.createUserSupervisor
+);
+router.post(
+  "/createUserWatchman",
+  uploadImg.single("file"),
+  Methods.createUserWatchman
+);
 //PRUEBAS
 router.get("/test", (req, res) => {
   res.send("hello world");

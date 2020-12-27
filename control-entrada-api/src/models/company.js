@@ -1,4 +1,4 @@
-export default (sequelize, { UUID, UUIDV4, STRING }) => {
+export default (sequelize, { UUID, UUIDV4, STRING, BOOLEAN }) => {
   const Company = sequelize.define("Company", {
     id: {
       primaryKey: true,
@@ -6,29 +6,46 @@ export default (sequelize, { UUID, UUIDV4, STRING }) => {
       type: UUID,
       defaultValue: UUIDV4()
     },
-    name: {
-      type: STRING,
-      allowNull: false,
+    companyName: {
+      allowNull: true,
+      type: STRING
     },
-    email: {
-      type: STRING,
-      allowNull: false,
-      unique: true,
-      validate: {
-        isEmail: {
-          args: true,
-          msg: "Invalid Email",
-        },
-      },
+    businessName: {
+      allowNull: true,
+      type: STRING
     },
-    dni: {
-      type: STRING,
-      allowNull: false,
-      unique: true,
+    nic: {
+      allowNull: true,
+      type: STRING
     },
+    city: {
+      allowNull: true,
+      type: STRING
+    },
+    address: {
+      allowNull: true,
+      type: STRING
+    },
+    phoneNumber: {
+      allowNull: true,
+      type: STRING
+    },
+    phoneNumberOther: {
+      allowNull: true,
+      type: STRING
+    },
+    logo: {
+      allowNull: true,
+      type: STRING
+    },
+    active: {
+      type: BOOLEAN,
+      allowNull: false,
+      defaultValue: true
+    }
   });
 
-  Company.associate = (models) => {
+  Company.associate = models => {
     // Company.hasMany(models.employee, {
     //   foreignKey: {
     //     name: "companyId",
@@ -38,23 +55,23 @@ export default (sequelize, { UUID, UUIDV4, STRING }) => {
     //   onDelete: "CASCADE",
     //   onUpdate: "CASCADE",
     // });
-    Company.hasMany(models.User, {
+    Company.hasMany(models.zone, {
       foreignKey: {
         name: "companyId",
         field: "company_id"
       },
-      as: "Empleado",
-      onDelete: "CASCADE",
-      onUpdate: "CASCADE"
-    })
-    Company.hasMany(models.zone, {
-      foreignKey: {
-        name: "companyId",
-        field: "company_id",
-      },
       as: "companyZone",
       onDelete: "CASCADE",
-      onUpdate: "CASCADE",
+      onUpdate: "CASCADE"
+    });
+    Company.hasMany(models.userCompany, {
+      foreignKey: {
+        name: "companyId",
+        field: "company_id"
+      },
+      as: "UserCompany",
+      onDelete: "CASCADE",
+      onUpdate: "CASCADE"
     });
   };
   return Company;
