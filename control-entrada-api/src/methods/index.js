@@ -77,18 +77,18 @@ password
 
 privilege
 
-companyName: "Test Company",
-businessName: "Test Company C.A.",
-nic: "9453145-451",
-city: "San Juan",
-address: "Calle del medio",
-phoneNumber: "+58 426 1414253",
-phoneNumberOther: "",
-dni: "19760800",
-name: "Jose",
-lastName: "Segovia",
-email: "j@gmail.com",
-password: "123456",
+companyName: "Test Company,
+businessName: "Test Company C.A.,
+nic: "9453145-451,
+city: "San Juan,
+address: "Calle del medio,
+phoneNumber: "+58 426 1414253,
+phoneNumberOther: ",
+dni: "19760800,
+name: "Jose,
+lastName: "Segovia,
+email: "j@gmail.com,
+password: "123456,
      */
     const {
       companyName,
@@ -181,6 +181,7 @@ password: "123456",
       RESPONSE.msg = "error al registrar empresa";
       res.json(RESPONSE);
     } catch (error) {
+      console.log(error);
       RESPONSE.msg = error.message;
       res.json(RESPONSE);
     }
@@ -196,14 +197,16 @@ password: "123456",
 
     const { id } = req.params;
     try {
-      let company = await models.company.findAll({
-        include: {
-          model: models.User,
-          as: "Empleado",
-          where: {
-            id
+      let company = await models.userCompany.findOne({
+        where: {
+          userId: id
+        },
+        include: [
+          {
+            model: models.company,
+            as: "Company",
           }
-        }
+        ]
       });
       if (company) {
         RESPONSE.error = false;
@@ -212,7 +215,8 @@ password: "123456",
         res.json(RESPONSE);
       }
     } catch (error) {
-      RESPONSE.msg = error.message;
+      console.log(error);
+      RESPONSE.msg = error;
       res.json(RESPONSE);
     }
   },
@@ -925,6 +929,7 @@ password: "123456",
       token: null
     };
     const { email, password } = req.body;
+    console.log(req.body)
     try {
       let user = await models.User.findOne({
         where: {
@@ -972,15 +977,15 @@ password: "123456",
           RESPONSE.msg = "Inicio Exitoso";
           RESPONSE.data = user;
           RESPONSE.token = token;
+          res.json(RESPONSE)
         } else {
           RESPONSE.msg = "Clave Invalida";
-          res.status(401).json(RESPONSE);
+          res.json(RESPONSE);
         }
       } else {
         RESPONSE.msg = "Usuario no registrado";
-        res.status(404).json(RESPONSE);
+        res.json(RESPONSE);
       }
-      res.status(200).json(RESPONSE);
     } catch (error) {
       RESPONSE.msg = error.message;
       res.json(RESPONSE);
@@ -1160,32 +1165,19 @@ password: "123456",
     };
     const { companyId } = req.params;
     try {
-      let user = await models.User.findAll({
+      let user = await models.userCompany.findAll({
         where: {
-          [Op.and]: [
-            { companyId },
-            {
-              [Op.or]: [
-                { privilege: "Supervisor" },
-                { privilege: "Watchman" },
-                { privilege: "Available" }
-              ]
-            }
-          ]
+          companyId
         },
         include: [
           {
-            model: models.NotificationRead,
-            as: "notificationUsers",
-            include: { model: models.Notification, as: "notification" }
+            model: models.User,
+            as: "User",
+            include: [
+              { model: models.employee, as: "Employee" },
+              {model: models.userZone, as: "userZone"}
+            ]
           },
-          {
-            model: models.userZone,
-            as: "userZone",
-            include: {
-              model: models.zone
-            }
-          }
         ]
       });
       (RESPONSE.error = false), (RESPONSE.msg = "Busqueda Exitosa");

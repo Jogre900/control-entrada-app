@@ -17,8 +17,10 @@ const LoginScreen = ({ navigation, saveProfile, saveCompany, saveLogin, savePriv
   const [email, setEmail] = useState("");
   const [pass, setPass] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
-  const [passCaption, setPassCaption] = useState("");
+  const [caption, setCaption] = useState("");
   const [emailCaption, setEmailCaption] = useState("");
+  const [passCaption, setPassCaption] = useState("");
+  
   const nextInput = useRef(null);
   const goBackAction = () => {
     return (
@@ -62,6 +64,7 @@ const LoginScreen = ({ navigation, saveProfile, saveCompany, saveLogin, savePriv
   //SIGN IN
   const signIn = async () => {
     setModalVisible(true);
+    setCaption('')
     if (!email || !pass) {
       setModalVisible(false);
       alert("Debe llenar los campos");
@@ -79,8 +82,8 @@ const LoginScreen = ({ navigation, saveProfile, saveCompany, saveLogin, savePriv
         email,
         password: pass,
       });
-      if (res) {
-        console.log("res----------", res.data);
+      console.log("res----------", res.data);
+      if (!res.data.error) {
         await storeData(res.data.token);
         let slogin = {
           token: res.data.token,
@@ -138,10 +141,14 @@ const LoginScreen = ({ navigation, saveProfile, saveCompany, saveLogin, savePriv
           default:
             break;
         }
+      }else{
+        setModalVisible(false);
+        setCaption(res.data.msg);  
       }
     } catch (error) {
       setModalVisible(false);
       alert(error.message);
+      setCaption(error.message)
       // console.log(error.response.data.msg);
       // switch (error.response.status) {
       //   case 401:
@@ -197,6 +204,9 @@ const LoginScreen = ({ navigation, saveProfile, saveCompany, saveLogin, savePriv
               value={pass}
               ref={nextInput}
             />
+          </View>
+          <View>
+            <Text style={{color: 'red'}}>{caption}</Text>
           </View>
 
           <View style={styles.subContainer}>
