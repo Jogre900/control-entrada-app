@@ -14,6 +14,7 @@ import BottomTabNavigator from "./navigation/BottomTabNavigator";
 import useLinking from "./navigation/useLinking";
 import { Provider } from "react-redux";
 import { store, persistor } from "./store";
+import OneSignalProvider from "./lib/OneSignal";
 
 const Stack = createStackNavigator();
 
@@ -94,9 +95,11 @@ export default function App(props) {
       <React.Fragment>
         <Provider store={store}>
           <PersistGate loading={null} persistor={persistor}>
-            <NavigationContainer>
-              <MainNavigator />
-            </NavigationContainer>
+            <OneSignalProvider>
+              <NavigationContainer>
+                <MainNavigator />
+              </NavigationContainer>
+            </OneSignalProvider>
           </PersistGate>
         </Provider>
       </React.Fragment>
