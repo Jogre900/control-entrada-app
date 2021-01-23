@@ -1,17 +1,66 @@
+import { Model } from "sequelize";
 import { encrypt, makeid } from "@utils/security";
 
-export default (sequelize, { BOOLEAN, STRING, UUID, UUIDV4, ENUM }) => {
-  const User = sequelize.define(
-    "User",
+module.exports = (sequelize, DataTypes) => {
+  class User extends Model {
+    static associate = models => {
+      /*    User.belongsTo(models.Provider, {
+        foreignKey: {
+          name: "providerId",
+          field: "provider_id"
+        },
+        as: "provider",
+        onDelete: "CASCADE",
+        onUpdate: "CASCADE"
+      });*/
+      this.hasOne(models.Employee, {
+        foreignKey: {
+          name: "userId",
+          field: "user_id"
+        },
+        as: "Employee",
+        onDelete: "CASCADE",
+        onUpdate: "CASCADE"
+      });
+      this.hasMany(models.UserCompany, {
+        foreignKey: {
+          name: "userId",
+          field: "user_id"
+        },
+        as: "UserCompany",
+        onDelete: "CASCADE",
+        onUpdate: "CASCADE"
+      });
+      this.hasMany(models.NotificationRead, {
+        foreignKey: {
+          name: "userId",
+          field: "user_id"
+        },
+        as: "notificationUsers",
+        onDelete: "CASCADE",
+        onUpdate: "CASCADE"
+      });
+      this.hasMany(models.UserZone, {
+        foreignKey: {
+          name: "UserId",
+          field: "user_id"
+        },
+        as: "userZone",
+        onDelete: "CASCADE",
+        onUpdate: "CASCADE"
+      });
+    };
+  }
+  User.init(
     {
       id: {
         primaryKey: true,
         allowNull: false,
-        type: UUID,
-        defaultValue: UUIDV4()
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4()
       },
       email: {
-        type: STRING,
+        type: DataTypes.STRING,
         allowNull: false,
         unique: true,
         validate: {
@@ -22,20 +71,20 @@ export default (sequelize, { BOOLEAN, STRING, UUID, UUIDV4, ENUM }) => {
         }
       },
       password: {
-        type: STRING,
+        type: DataTypes.STRING,
         allowNull: false
       },
       pin: {
-        type: STRING,
+        type: DataTypes.STRING,
         allowNull: false,
         defaultValue: makeid(4)
       },
       tokenActivation: {
-        type: STRING,
+        type: DataTypes.STRING,
         allowNull: false,
         defaultValue: makeid(6)
       }
-    }
+    },
     // {
     //   hooks: {
     //     beforeCreate: user => {
@@ -43,55 +92,10 @@ export default (sequelize, { BOOLEAN, STRING, UUID, UUIDV4, ENUM }) => {
     //     }
     //   }
     // }
-  );
-
-  User.associate = models => {
-    /*    User.belongsTo(models.Provider, {
-      foreignKey: {
-        name: "providerId",
-        field: "provider_id"
-      },
-      as: "provider",
-      onDelete: "CASCADE",
-      onUpdate: "CASCADE"
-    });*/
-    User.hasOne(models.employee, {
-      foreignKey: {
-        name: "userId",
-        field: "user_id"
-      },
-      as: "Employee",
-      onDelete: "CASCADE",
-      onUpdate: "CASCADE"
-    });
-    User.hasMany(models.userCompany, {
-      foreignKey: {
-        name: "userId",
-        field: "user_id"
-      },
-      as: "UserCompany",
-      onDelete: "CASCADE",
-      onUpdate: "CASCADE"
-    });
-    User.hasMany(models.NotificationRead, {
-      foreignKey: {
-        name: "userId",
-        field: "user_id"
-      },
-      as: "notificationUsers",
-      onDelete: "CASCADE",
-      onUpdate: "CASCADE"
-    });
-    User.hasMany(models.userZone, {
-      foreignKey: {
-        name: "UserId",
-        field: "user_id"
-      },
-      as: "userZone",
-      onDelete: "CASCADE",
-      onUpdate: "CASCADE"
-    });
-  };
+  {
+    sequelize,
+    modelName: 'User'
+  });
 
   return User;
 };

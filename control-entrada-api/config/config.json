@@ -4,8 +4,8 @@
     "host": "localhost",
     "dialect": "postgres",
     "database": "control_entrada",
-    "username": "control_user",
-    "password": "develop",
+    "username": "postgres",
+    "password": "12345",
     "logging": false
   },
   "security": {

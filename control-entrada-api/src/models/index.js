@@ -1,46 +1,38 @@
-// Dependencies
-import Sequelize from "sequelize";
+'use strict';
 
-// Configuration
-import { $db } from "@config";
+const fs = require('fs');
+const path = require('path');
+const Sequelize = require('sequelize');
+const basename = path.basename(__filename);
+const env = process.env.NODE_ENV || 'development';
+const config = require('../../config/config.json');
+const db = {};
 
-// Db Connection
-const { database, username, password, dialect, logging } = $db();
+let sequelize;
+if (config.use_env_variable) {
+  sequelize = new Sequelize(process.env[config.use_env_variable], config);
+} else {
+  sequelize = new Sequelize(config.db.database, config.db.username, config.db.password, config.db);
+}
 
-//ENV CONST
-const DB = process.env.DB_DATABASE;
-//console.log("ENV DATABASE: ", DB);
+fs
+  .readdirSync(__dirname)
+  .filter(file => {
+    return (file.indexOf('.') !== 0) && (file !== basename) && (file.slice(-3) === '.js');
+  })
+  .forEach(file => {
+    const model = require(path.join(__dirname, file))(sequelize, Sequelize.DataTypes);
+    db[model.name] = model;
+  });
 
-const sequelize = new Sequelize(database, username, password, {
-  dialect,
-  define: {
-    underscored: true
+Object.keys(db).forEach(modelName => {
+  if (db[modelName].associate) {
+    db[modelName].associate(db);
   }
 });
 
-// Models
-const models = {
-  User: sequelize.import("./User"),
-  //SIN EDITAR O REVISAR
-  Notification: sequelize.import("./Notification"),
-  NotificationRead: sequelize.import("./NotificationRead"),
-  company: sequelize.import("./company.js"),
-  employee: sequelize.import("./employee.js"),
-  userCompany: sequelize.import("./userCompany.js"),
-  zone: sequelize.import("./zone.js"),
-  destination: sequelize.import("./destination.js"),
-  userZone: sequelize.import("./userZone.js"),
-  citizen: sequelize.import("./citizen.js"),
-  visits: sequelize.import("./visits.js"),
-  picture: sequelize.import("./picture.js")
-};
+db.sequelize = sequelize;
+db.Sequelize = Sequelize;
 
-Object.keys(models).forEach(modelName => {
-  if ("associate" in models[modelName]) {
-    models[modelName].associate(models);
-  }
-});
+export default db;
 
-models.sequelize = sequelize;
-
-export default models;

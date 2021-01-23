@@ -1,78 +1,83 @@
-export default (sequelize, { UUID, UUIDV4, STRING, BOOLEAN }) => {
-  const Company = sequelize.define("Company", {
+const {Model} = require('sequelize')
+module.exports = (sequelize, DataTypes) => {
+  class Company extends Model {
+    static associate = models => {
+      // Company.hasMany(models.employee, {
+      //   foreignKey: {
+      //     name: "companyId",
+      //     field: "company_id",
+      //   },
+      //   as: "Empleado",
+      //   onDelete: "CASCADE",
+      //   onUpdate: "CASCADE",
+      // });
+      this.hasMany(models.Zone, {
+        foreignKey: {
+          name: "companyId",
+          field: "company_id"
+        },
+        as: "companyZone",
+        onDelete: "CASCADE",
+        onUpdate: "CASCADE"
+      });
+      this.hasMany(models.UserCompany, {
+        foreignKey: {
+          name: "companyId",
+          field: "company_id"
+        },
+        as: "UserCompany",
+        onDelete: "CASCADE",
+        onUpdate: "CASCADE"
+      });
+    };
+  }
+  Company.init({
     id: {
       primaryKey: true,
       allowNull: false,
-      type: UUID,
-      defaultValue: UUIDV4()
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4()
     },
     companyName: {
       allowNull: true,
-      type: STRING
+      type: DataTypes.STRING
     },
     businessName: {
       allowNull: true,
-      type: STRING
+      type: DataTypes.STRING
     },
     nic: {
       allowNull: true,
-      type: STRING
+      type: DataTypes.STRING
     },
     city: {
       allowNull: true,
-      type: STRING
+      type: DataTypes.STRING
     },
     address: {
       allowNull: true,
-      type: STRING
+      type: DataTypes.STRING
     },
     phoneNumber: {
       allowNull: true,
-      type: STRING
+      type: DataTypes.STRING
     },
     phoneNumberOther: {
       allowNull: true,
-      type: STRING
+      type: DataTypes.STRING
     },
     logo: {
       allowNull: true,
-      type: STRING
+      type: DataTypes.STRING
     },
     active: {
-      type: BOOLEAN,
+      type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: true
     }
-  });
-
-  Company.associate = models => {
-    // Company.hasMany(models.employee, {
-    //   foreignKey: {
-    //     name: "companyId",
-    //     field: "company_id",
-    //   },
-    //   as: "Empleado",
-    //   onDelete: "CASCADE",
-    //   onUpdate: "CASCADE",
-    // });
-    Company.hasMany(models.zone, {
-      foreignKey: {
-        name: "companyId",
-        field: "company_id"
-      },
-      as: "companyZone",
-      onDelete: "CASCADE",
-      onUpdate: "CASCADE"
-    });
-    Company.hasMany(models.userCompany, {
-      foreignKey: {
-        name: "companyId",
-        field: "company_id"
-      },
-      as: "UserCompany",
-      onDelete: "CASCADE",
-      onUpdate: "CASCADE"
-    });
-  };
+  }, {
+    sequelize,
+    modelName: 'Company'
+  });  
   return Company;
 };

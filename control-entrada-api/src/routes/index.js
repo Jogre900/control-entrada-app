@@ -1,5 +1,5 @@
 import { Router } from "express";
-import Methods from "@methods";
+import Controllers from "@controllers";
 import multer from "multer";
 import path from "path";
 import { v4 as uuidv4 } from "uuid";
@@ -52,53 +52,53 @@ const router = Router();
 router.post(
   "/createUser/:privilege",
   uploadImg.single("file"),
-  Methods.createUser
+  Controllers.createUser
 );
-router.put("/updatePass/:id", Methods.updatePass);
-router.put("/updateAdmin/:companyId", Methods.updateAdminId);
-router.post("/login", Methods.login);
-router.get("/findUsers/:companyId", Methods.findUsers);
-router.get("/findAvailableUsers/:companyId", Methods.findAvailableUsers);
-router.delete("/deleteUser/:id", Methods.deleteUser);
-router.get("/findCompany/:id", Methods.findCompany);
-router.post("/createZone/:id", Methods.createZone);
-router.get("/findZones/:companyId", Methods.findZones);
-router.delete("/deleteZone", Methods.deleteZone);
-router.post("/createDestiny/:id", Methods.createDestiny);
-router.get("/findDestiny/:id", Methods.findDestinyByZone);
-router.delete("/deleteDestiny/:id", Methods.deleteDestiny);
-router.post("/createEmployee", Methods.createEmployee);
-router.get("/findEmployees", Methods.findEmployees);
-router.post("/createUserZone", Methods.createUserZone);
-//router.post("/uploadImage", uploadImg.single('file'), Methods.uploadImage)
-router.get("/displayPicture", Methods.displayPicture);
-router.get("/profile", Methods.getProfile);
-router.get("/findUserZone/:id", Methods.findUserZone);
-router.get("/verifyToken", Methods.verifyExpToken);
+router.put("/updatePass/:id", Controllers.updatePass);
+router.put("/updateAdmin/:companyId", Controllers.updateAdminId);
+router.post("/login", Controllers.login);
+router.get("/findUsers/:companyId", Controllers.findUsers);
+router.get("/findAvailableUsers/:companyId", Controllers.findAvailableUsers);
+router.delete("/deleteUser/:id", Controllers.deleteUser);
+router.get("/findCompany/:id", Controllers.findCompany);
+router.post("/createZone/:id", Controllers.createZone);
+router.get("/findZones/:companyId", Controllers.findZones);
+router.delete("/deleteZone", Controllers.deleteZone);
+router.post("/createDestiny/:id", Controllers.createDestiny);
+router.get("/findDestiny/:id", Controllers.findDestinyByZone);
+router.delete("/deleteDestiny/:id", Controllers.deleteDestiny);
+router.post("/createEmployee", Controllers.createEmployee);
+router.get("/findEmployees", Controllers.findEmployees);
+router.post("/createUserZone", Controllers.createUserZone);
+//router.post("/uploadImage", uploadImg.single('file'), Controllers.uploadImage)
+router.get("/displayPicture", Controllers.displayPicture);
+router.get("/profile", Controllers.getProfile);
+router.get("/findUserZone/:id", Controllers.findUserZone);
+router.get("/verifyToken", Controllers.verifyExpToken);
 router.post(
   "/createVisit/:id",
   middleware.verifyToken,
   uploadImg.array("file"),
-  Methods.createVisits
+  Controllers.createVisits
 );
-router.delete("/deleteVisit/:id", Methods.deleteVisit);
-router.get("/findVisit/:id", Methods.findVisit);
-router.get("/findVisitId/:id", Methods.findVisitId);
-router.put("/updateVisit/:id", middleware.verifyToken, Methods.updateVisit);
-router.get("/findTodayVisits/:companyId", Methods.findTodayVisits);
-router.get("/findTodayVisitsByUser/:id", Methods.findTodayVisitsByUser);
-router.get("/findWeekVisits/", Methods.findWeekVisits);
+router.delete("/deleteVisit/:id", Controllers.deleteVisit);
+router.get("/findVisit/:id", Controllers.findVisit);
+router.get("/findVisitId/:id", Controllers.findVisitId);
+router.put("/updateVisit/:id", middleware.verifyToken, Controllers.updateVisit);
+router.get("/findTodayVisits/:companyId", Controllers.findTodayVisits);
+router.get("/findTodayVisitsByUser/:id", Controllers.findTodayVisitsByUser);
+router.get("/findWeekVisits/", Controllers.findWeekVisits);
 // NUEVAS RUTA AJUSTE SISTEMA
-router.post("/createCompany", Methods.createCompany);
+router.post("/createCompany", Controllers.createCompany);
 router.post(
   "/createUserSupervisor",
   uploadImg.single("file"),
-  Methods.createUserSupervisor
+  Controllers.createUserSupervisor
 );
 router.post(
   "/createUserWatchman",
   uploadImg.single("file"),
-  Methods.createUserWatchman
+  Controllers.createUserWatchman
 );
 //PRUEBAS
 router.get("/test", (req, res) => {

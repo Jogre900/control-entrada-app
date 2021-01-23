@@ -1,39 +1,48 @@
-export default (sequelize, { UUID, UUIDV4, STRING }) => {
-  const Citizen = sequelize.define("Citizen", {
+const {
+  Model
+} = require('sequelize');
+module.exports = (sequelize, DataTypes, UUIDV4) => {
+  class Citizen extends Model {
+    static associate = models => {
+      this.hasMany(models.Visits, {
+        foreignKey: {
+          name: "citizenId",
+          field: "citizen_id"
+        },
+        as: "Visitas",
+        onDelete: "CASCADE",
+        onUpdate: "CASCADE"
+      });
+    };
+  }
+  Citizen.init({
     id: {
       primaryKey: true,
       allowNull: false,
-      type: UUID,
-      defaultValue: UUIDV4()
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4()
     },
     dni: {
-      type: STRING,
+      type: DataTypes.STRING,
       allowNull: false,
       unique: true
     },
     name: {
-      type: STRING,
+      type: DataTypes.STRING,
       allowNull: false
     },
     lastName: {
-      type: STRING,
+      type: DataTypes.STRING,
       allowNull: false
     },
     picture: {
-      type: STRING,
+      type: DataTypes.STRING,
       allowNull: false
     }
-  });
-  Citizen.associate = models => {
-    Citizen.hasMany(models.visits, {
-      foreignKey: {
-        name: "citizenId",
-        field: "citizen_id"
-      },
-      as: "Visitas",
-      onDelete: "CASCADE",
-      onUpdate: "CASCADE"
-    });
-  };
+  }, {
+    sequelize,
+    modelName: 'Citizen'
+  })
+  
   return Citizen;
 };

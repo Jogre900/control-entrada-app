@@ -1,22 +1,31 @@
-export default (sequelize, { UUID, UUIDV4, STRING }) => {
-  const Picture = sequelize.define("Picture", {
-    id: {
-      primaryKey: true,
-      allowNull: false,
-      type: UUID,
-      defaultValue: UUIDV4()
-    },
-    picture: {
-      type: STRING,
-      allowNull: false,
-    },
-    entry: {
-      type: STRING,
-      allowNull: false,
-    },
-  })
-  Picture.associate = models => {
-    Picture.belongsTo(models.visits)
+import { Model } from "sequelize";
+module.exports = (sequelize, DataTypes) => {
+  class Picture extends Model {
+    static associate = models => {
+      this.belongsTo(models.Visits);
+    };
   }
+  Picture.init(
+    {
+      id: {
+        primaryKey: true,
+        allowNull: false,
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4()
+      },
+      picture: {
+        type: DataTypes.STRING,
+        allowNull: false
+      },
+      entry: {
+        type: DataTypes.STRING,
+        allowNull: false
+      }
+    },
+    {
+      sequelize,
+      modelName: "Picture"
+    }
+  );
   return Picture;
 };

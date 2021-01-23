@@ -1,39 +1,47 @@
-export default (sequelize, { BOOLEAN, STRING, UUID, UUIDV4 }) => {
-  const UserCompany = sequelize.define("UserCompany", {
-    id: {
-      primaryKey: true,
-      allowNull: false,
-      type: UUID,
-      defaultValue: UUIDV4()
+import { Model } from "sequelize";
+module.exports = (sequelize, DataTypes) => {
+  class UserCompany extends Model {
+    static associate = models => {
+      this.belongsTo(models.User, {
+        foreignKey: {
+          name: "userId",
+          field: "user_id"
+        },
+        as: "User"
+      });
+      this.belongsTo(models.Company, {
+        foreignKey: {
+          name: "companyId",
+          field: "company_id"
+        },
+        as: "Company"
+      });
+    };
+  }
+  UserCompany.init(
+    {
+      id: {
+        primaryKey: true,
+        allowNull: false,
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4()
+      },
+      privilege: {
+        type: DataTypes.STRING,
+        allowNull: false
+        // values: ["Root","Admin", "Supervisor", "Watchmen"],
+      },
+      active: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: true
+      }
     },
-    privilege: {
-      type: STRING,
-      allowNull: false
-      // values: ["Root","Admin", "Supervisor", "Watchmen"],
-    },
-    active: {
-      type: BOOLEAN,
-      allowNull: false,
-      defaultValue: true
+    {
+      sequelize,
+      modelName: "UserCompany"
     }
-  });
-
-  UserCompany.associate = models => {
-    UserCompany.belongsTo(models.User, {
-      foreignKey: {
-        name: "userId",
-        field: "user_id"
-      },
-      as: "User"
-    });
-    UserCompany.belongsTo(models.company, {
-      foreignKey: {
-        name: "companyId",
-        field: "company_id"
-      },
-      as: "Company"
-    });
-  };
+  );
 
   return UserCompany;
 };

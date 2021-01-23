@@ -1,32 +1,40 @@
-export default (sequelize, { UUID, UUIDV4, STRING }) => {
-  const Notification = sequelize.define("Notification", {
-    id: {
-      primaryKey: true,
-      allowNull: false,
-      type: UUID,
-      defaultValue: UUIDV4()
-    },
-    notificationType: {
-      type: STRING,
-      allowNull: false
-    },
-    notification: {
-      type: STRING,
-      allowNull: false
-    }
-  });
-
-  Notification.associate = models => {
-    Notification.hasMany(models.NotificationRead, {
-      foreignKey: {
-        name: "notificationId",
-        field: "notification_id"
+import { Model } from "sequelize";
+module.exports = (sequelize, DataTypes) => {
+  class Notification extends Model {
+    static associate = models => {
+      this.hasMany(models.NotificationRead, {
+        foreignKey: {
+          name: "notificationId",
+          field: "notification_id"
+        },
+        as: "notificationRead",
+        onDelete: "CASCADE",
+        onUpdate: "CASCADE"
+      });
+    };
+  }
+  Notification.init(
+    {
+      id: {
+        primaryKey: true,
+        allowNull: false,
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4()
       },
-      as: "notificationRead",
-      onDelete: "CASCADE",
-      onUpdate: "CASCADE"
-    });
-  };
+      notificationType: {
+        type: DataTypes.STRING,
+        allowNull: false
+      },
+      notification: {
+        type: DataTypes.STRING,
+        allowNull: false
+      }
+    },
+    {
+      sequelize,
+      modelName: "Notification"
+    }
+  );
 
   return Notification;
 };

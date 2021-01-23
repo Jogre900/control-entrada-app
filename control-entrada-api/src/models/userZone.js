@@ -1,30 +1,40 @@
-export default (sequelize, { UUID, UUIDV4, DATE }) => {
-  const UserZone = sequelize.define("UserZone", {
-    id: {
-      primaryKey: true,
-      allowNull: false,
-      type: UUID,
-      defaultValue: UUIDV4()
-    },
-    assignationDate: {
-      type: DATE,
-      allowNull: true
-    },
-    changeTurnDate: {
-      type: DATE,
-      allowNull: true
-    }
-  });
-  UserZone.associate = models => {
-    UserZone.hasMany(models.visits, {
-      foreigKey: {
-        field: "userZoneId",
-        name: "user_zone_id"
+import { Model } from "sequelize";
+module.exports = (sequelize, DataTypes) => {
+  class UserZone extends Model {
+    static associate = models => {
+      this.hasMany(models.Visits, {
+        foreigKey: {
+          field: "userZoneId",
+          name: "user_zone_id"
+        }
+      });
+      this.belongsTo(models.Employee);
+      this.belongsTo(models.Zone);
+      this.belongsTo(models.User);
+    };
+  }
+  UserZone.init(
+    {
+      id: {
+        primaryKey: true,
+        allowNull: false,
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4()
+      },
+      assignationDate: {
+        type: DataTypes.DATE,
+        allowNull: true
+      },
+      changeTurnDate: {
+        type: DataTypes.DATE,
+        allowNull: true
       }
-    });
-    UserZone.belongsTo(models.employee);
-    UserZone.belongsTo(models.zone);
-    UserZone.belongsTo(models.User);
-  };
+    },
+    {
+      sequelize,
+      modelName: "UserZone"
+    }
+  );
+
   return UserZone;
 };

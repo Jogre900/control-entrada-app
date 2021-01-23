@@ -8,7 +8,7 @@ import moment from "moment";
 import { Op } from "sequelize";
 const SECRETKEY = process.env.SECRETKEY || $security().secretKey;
 
-const Methods = {
+const Controllers = {
   createAdmin: async function(req, res) {
     let RESPONSE = {
       error: true,
@@ -137,7 +137,7 @@ password: "123456,
         { ...inputUser },
         {
           include: {
-            model: models.employee,
+            model: models.Employee,
             as: "Employee"
           }
         }
@@ -157,7 +157,7 @@ password: "123456,
         inputCompany.phoneNumberOther = phoneNumberOther;
       }
 
-      let newCompany = await models.company.create({ ...inputCompany });
+      let newCompany = await models.Company.create({ ...inputCompany });
 
       let inputUserCompany = {
         companyId: newCompany.id,
@@ -166,7 +166,7 @@ password: "123456,
       };
 
       if (NewUser && newCompany) {
-        let userCompany = await models.userCompany.create({
+        let userCompany = await models.UserCompany.create({
           ...inputUserCompany
         });
 
@@ -1679,4 +1679,4 @@ password: "123456,
   }
 };
 
-module.exports = Methods;
+export default Controllers;

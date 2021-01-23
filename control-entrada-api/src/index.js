@@ -49,6 +49,7 @@ const uploadImg = multer({
 
 //Init sequelize
 import models from "@models";
+//import sequelize from './models/index'
 
 //Running Express Server
 const app = express();
@@ -139,9 +140,17 @@ console.log("port: ", PORT);
 //Running Server sequelize config
 const alter = false;
 const force = false;
+//const logging = console.log
 
-models.sequelize.sync({ alter, force }).then(() => {
-  app.listen(PORT, function() {
-    console.log("Running!!! Port: ", PORT);
-  });
+import db from "./models/index";
+
+db.sequelize.sync({ force, alter }).then(() => {
+  app.listen(PORT, () => console.log(`Server Runing on port: ${PORT}`));
 });
+
+// models.sequelize.sync({ alter, force }).then(() => {
+//   console.log("paso laog!!!!!")
+//   app.listen(PORT, function() {
+//     console.log("Running!!! Port: ", PORT);
+//   });
+// });

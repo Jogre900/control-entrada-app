@@ -2,6 +2,12 @@
   "presets": ["@babel/preset-env"],
   "plugins": [
     [
+      "@babel/plugin-proposal-class-properties",
+      {
+        "loose": true
+      }
+    ],
+    [
       "module-resolver",
       {
         "root": ["./"],
@@ -10,7 +16,7 @@
           "@public": "./public",
           "@utils": "./src/utils",
           "@models": "./src/models",
-          "@methods": "./src/methods",
+          "@controllers": "./src/controllers",
           "@routes": "./src/routes"
         }
       }

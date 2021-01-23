@@ -1,41 +1,50 @@
-export default (sequelize, { UUID, UUIDV4, STRING, DATE }) => {
-  const Visits = sequelize.define("Visits", {
-    id: {
-      primaryKey: true,
-      allowNull: false,
-      type: UUID,
-      defaultValue: UUIDV4()
-    },
-    entryDate: {
-      type: DATE,
-      allowNull: false
-    },
-    descriptionEntry: {
-      type: STRING,
-      allowNull: true
-    },
-    departureDate: {
-      type: DATE,
-      allowNull: false
-    },
-    descriptionDeparture: {
-      type: STRING,
-      allowNull: true
-    }
-  });
-  Visits.associate = models => {
-    Visits.hasMany(models.picture, {
-      foreignKey: {
-        name: "visitsId",
-        field: "visits_id"
+import { Model } from "sequelize";
+module.exports = (sequelize, DataTypes) => {
+  class Visits extends Model {
+    static associate = models => {
+      this.hasMany(models.Picture, {
+        foreignKey: {
+          name: "visitsId",
+          field: "visits_id"
+        },
+        as: "Fotos",
+        onDelete: "CASCADE",
+        onUpdate: "CASCADE"
+      });
+      this.belongsTo(models.Destination);
+      this.belongsTo(models.Citizen);
+      this.belongsTo(models.UserZone);
+    };
+  }
+  Visits.init(
+    {
+      id: {
+        primaryKey: true,
+        allowNull: false,
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4()
       },
-      as: "Fotos",
-      onDelete: "CASCADE",
-      onUpdate: "CASCADE"
-    })
-    Visits.belongsTo(models.destination)
-    Visits.belongsTo(models.citizen)
-    Visits.belongsTo(models.userZone)
-  };
+      entryDate: {
+        type: DataTypes.DATE,
+        allowNull: false
+      },
+      descriptionEntry: {
+        type: DataTypes.STRING,
+        allowNull: true
+      },
+      departureDate: {
+        type: DataTypes.DATE,
+        allowNull: false
+      },
+      descriptionDeparture: {
+        type: DataTypes.STRING,
+        allowNull: true
+      }
+    },
+    {
+      sequelize,
+      modelName: "Visits"
+    }
+  );
   return Visits;
 };
