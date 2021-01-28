@@ -14,6 +14,7 @@ import { DrawerAction, Notifications } from "../../helpers/ui/ui";
 const companyId = "9a28095a-9029-40ec-88c2-30e3fac69bc5";
 
 const HomeAdminScreen = ({ navigation, company, saveEmployee, saveTodayVisits, saveAvailable, saveZones }) => {
+  console.log("company", company)
   const [object, setObject] = useState({});
   const [loading, setLoading] = useState(true);
   const [visits, setVisits] = useState([]);
@@ -38,11 +39,10 @@ const HomeAdminScreen = ({ navigation, company, saveEmployee, saveTodayVisits, s
   //REQUEST ZONES
   const requestZone = async () => {
     try {
-      /* let res = await axios.get(`${API_PORT()}/api/findZones/${company.id}`);
+       let res = await axios.get(`${API_PORT()}/api/findZones/${company.id}`);
       if (!res.data.error && res.data.data.length > 0) {
         saveZones(res.data.data);
-      }*/
-      saveZones([]);
+      }
     } catch (error) {
       alert(error.message);
     }

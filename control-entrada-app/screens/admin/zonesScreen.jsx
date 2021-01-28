@@ -39,6 +39,7 @@ const ZonasScreen = ({
 }) => {
   //console.log("company REdux  ", companyRedux);
   console.log("zonas desde REdux  ", zonesRedux);
+  console.log("Company from redux", companyRedux[0].id)
   const [selectItem, setSeletedItem] = useState([]);
   const [changeStyle, setChangeStyle] = useState(false);
   const [deleted, setDeleted] = useState(false);
@@ -84,7 +85,7 @@ const ZonasScreen = ({
   const Splash = () => {
     return (
       <View>
-        <ActivityIndicator size="large" color="#ff7e00" />
+        <ActivityIndicator size="large" color="red" />
       </View>
     );
   };
@@ -147,15 +148,18 @@ const ZonasScreen = ({
   };
 
   const createZone = async () => {
+    console.log("hora 1", moment(entranceTime).format("HH:mm:ss").toString())
+    console.log("hora 2", moment(departureTime).format("HH:mm:ss").toString())
     try {
       let res = await axios.post(
-        `${API_PORT()}/api/createZone/${companyRedux.id}`,
+        `${API_PORT()}/api/createZone/${companyRedux[0].id}`,
         {
           zone: zoneName,
-          firsEntryTime: entranceTime.toString(),
-          firsDepartureTime: departureTime.toString(),
+          firsEntryTime: moment(entranceTime).format("HH:mm:ss").toString(),
+          firsDepartureTime: moment(departureTime).format("HH:mm:ss").toString(),
         }
       );
+      console.log("res crear zonas--", res.data)
       if (!res.data.error) {
         addZones(res.data.data);
         alert("Creacion con exito!");
@@ -291,10 +295,10 @@ const ZonasScreen = ({
                       ) : null} */}
                     </View>
                     <Text>
-                      Entrada: {moment(item.firsEntryTime).format("HH: mm a")}
+                      Entrada: {item.firsEntryTime}
                     </Text>
                     <Text>
-                      Salida: {moment(item.firsDepartureTime).format("HH:mm a")}
+                      Salida: {item.firsDepartureTime}
                     </Text>
                     <Ionicons name="md-pin" size={28} color="grey" />
                   </TouchableOpacity>
@@ -308,10 +312,10 @@ const ZonasScreen = ({
                   alignItems: "center",
                 }}
               >
-                <ActivityIndicator size="small" color={MainColor} />
+                <Text>No hay zonas creadas!</Text>
               </View>
             )}
-          </View>
+          </View> 
           <Text>Crear Zona</Text>
 
           <Input
@@ -380,8 +384,8 @@ const ZonasScreen = ({
 };
 
 const stateToProps = (state) => ({
-  companyRedux: state.profileReducer.company,
-  zonesRedux: state.zonesReducer.zones,
+  companyRedux: state.profile.company,
+  zonesRedux: state.zones.zones,
 });
 
 const mapDispatchToProps = (dispatch) => ({

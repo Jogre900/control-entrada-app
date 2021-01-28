@@ -197,13 +197,13 @@ password: "123456,
 
     const { id } = req.params;
     try {
-      let company = await models.userCompany.findOne({
+      let company = await models.UserCompany.findOne({
         where: {
           userId: id
         },
         include: [
           {
-            model: models.company,
+            model: models.Company,
             as: "Company",
           }
         ]
@@ -236,6 +236,7 @@ password: "123456,
     } = req.body;
     const { id } = req.params;
     console.log(req.body);
+    console.log(req.params);
     try {
       let inputZone = {
         zone,
@@ -258,7 +259,7 @@ password: "123456,
         inputZone.SecondDepartureTime = SecondDepartureTime;
       }
 
-      let zoneC = await models.zone.create({
+      let zoneC = await models.Zone.create({
         ...inputZone
       });
 
@@ -280,14 +281,14 @@ password: "123456,
     };
     const { companyId } = req.params;
     try {
-      let zones = await models.zone.findAll({
+      let zones = await models.Zone.findAll({
         where: {
           companyId
         },
         include: [
-          { model: models.destination, as: "Destinos" },
+          { model: models.Destination, as: "Destinos" },
           {
-            model: models.userZone,
+            model: models.UserZone,
             as: "encargado_zona",
             include: [models.User]
           }
@@ -313,7 +314,7 @@ password: "123456,
     console.log("body de delete--", req.body);
     console.log(zonesId);
     try {
-      let userZones = await models.userZone.findAll({
+      let userZones = await models.UserZone.findAll({
         where: {
           ZoneId: zonesId
         },
@@ -323,7 +324,7 @@ password: "123456,
           }
         ]
       });
-      let zones = await models.zone.findAll({
+      let zones = await models.Zone.findAll({
         where: {
           id: zonesId
         }
@@ -368,7 +369,7 @@ password: "123456,
     const { name } = req.body;
     const { id } = req.params;
     try {
-      let destiny = await models.destination.create({
+      let destiny = await models.Destination.create({
         name,
         zoneId: id
       });
@@ -390,11 +391,11 @@ password: "123456,
     };
     const { id } = req.params;
     try {
-      let destinys = await models.destination.findAll({
+      let destinys = await models.Destination.findAll({
         where: {
           zoneId: id
         },
-        include: [{ model: models.zone, as: "Zone" }]
+        include: [{ model: models.Zone, as: "Zone" }]
       });
       RESPONSE.error = false;
       RESPONSE.msg = "Busqueda Exitosa!";
@@ -413,7 +414,7 @@ password: "123456,
     };
     const { id } = req.params;
     try {
-      let destiny = await models.destination.findOne({
+      let destiny = await models.Destination.findOne({
         where: {
           id
         }
@@ -462,14 +463,14 @@ password: "123456,
       ZoneId
     };
     try {
-      let employee = await models.employee.create(
+      let employee = await models.Employee.create(
         {
           ...employeeData,
           Horario: {
             ...userZoneData
           }
         },
-        { include: [{ model: models.userZone, as: "Horario" }] }
+        { include: [{ model: models.UserZone, as: "Horario" }] }
       );
       RESPONSE.error = false;
       RESPONSE.msg = "Creacion de Empleado Exitosa!";
@@ -506,7 +507,7 @@ password: "123456,
         console.log(userA);
         userA.privilege = privilege;
         await userA.save();
-        let userZone = await models.userZone.create({
+        let userZone = await models.UserZone.create({
           assignationDate,
           changeTurnDate,
           ZoneId: zoneId,
@@ -530,8 +531,8 @@ password: "123456,
       token: null
     };
     try {
-      let employees = await models.employee.findAll({
-        include: [{ model: models.userZone, as: "Horario" }]
+      let employees = await models.Employee.findAll({
+        include: [{ model: models.UserZone, as: "Horario" }]
       });
       RESPONSE.error = false;
       RESPONSE.msg = "Busqueda Exitosa!";
@@ -562,7 +563,7 @@ password: "123456,
     return file;
   },
   displayPicture: async function(req, res) {
-    let data = await models.picture.findAll();
+    let data = await models.Picture.findAll();
     res.send({ msg: data });
   },
   createUserWatchman: async function(req, res) {
@@ -593,7 +594,7 @@ password: "123456,
           email: email
         },
         include: {
-          model: models.employee,
+          model: models.Employee,
           as: "Employee"
         }
       });
@@ -631,15 +632,15 @@ password: "123456,
           {
             include: [
               {
-                model: models.userZone,
+                model: models.UserZone,
                 as: "userZone"
               },
               {
-                model: models.employee,
+                model: models.Employee,
                 as: "Employee"
               },
               {
-                model: models.userCompany,
+                model: models.UserCompany,
                 as: "UserCompany"
               }
             ]
@@ -711,7 +712,7 @@ password: "123456,
           email: email
         },
         include: {
-          model: models.employee,
+          model: models.Employee,
           as: "Employee"
         }
       });
@@ -747,15 +748,15 @@ password: "123456,
           {
             include: [
               {
-                model: models.userZone,
+                model: models.UserZone,
                 as: "userZone"
               },
               {
-                model: models.employee,
+                model: models.Employee,
                 as: "Employee"
               },
               {
-                model: models.userCompany,
+                model: models.UserCompany,
                 as: "UserCompany"
               }
             ]
@@ -876,7 +877,7 @@ password: "123456,
             },
             {
               include: {
-                model: models.userZone,
+                model: models.UserZone,
                 as: "userZone"
               }
             }
@@ -942,25 +943,25 @@ password: "123456,
             include: { model: models.Notification, as: "notification" }
           },
           {
-            model: models.userZone,
+            model: models.UserZone,
             as: "userZone",
             include: {
-              model: models.zone,
-              include: { model: models.destination, as: "Destinos" }
+              model: models.Zone,
+              include: { model: models.Destination, as: "Destinos" }
             }
           },
           {
-            model: models.employee,
+            model: models.Employee,
             as: "Employee"
           },
           {
-            model: models.userCompany,
+            model: models.UserCompany,
             as: "UserCompany",
             where: {
               active: true
             },
             include: {
-              model: models.company,
+              model: models.Company,
               as: "Company",
               where: {
                 active: true
@@ -1014,11 +1015,11 @@ password: "123456,
             include: { model: models.Notification, as: "notification" }
           },
           {
-            model: models.userZone,
+            model: models.UserZone,
             as: "userZone",
             include: {
-              model: models.zone,
-              include: { model: models.destination, as: "Destinos" }
+              model: models.Zone,
+              include: { model: models.Destination, as: "Destinos" }
             }
           }
         ]
@@ -1104,16 +1105,16 @@ password: "123456,
     };
     const { id } = req.params;
     try {
-      let userZone = await models.userZone.findOne({
+      let userZone = await models.UserZone.findOne({
         where: {
           UserId: id
         },
 
         include: [
           {
-            model: models.zone,
+            model: models.Zone,
             include: {
-              model: models.destination,
+              model: models.Destination,
               as: "Destinos"
             }
           }
@@ -1165,7 +1166,7 @@ password: "123456,
     };
     const { companyId } = req.params;
     try {
-      let user = await models.userCompany.findAll({
+      let user = await models.UserCompany.findAll({
         where: {
           companyId
         },
@@ -1174,8 +1175,8 @@ password: "123456,
             model: models.User,
             as: "User",
             include: [
-              { model: models.employee, as: "Employee" },
-              {model: models.userZone, as: "userZone"}
+              { model: models.Employee, as: "Employee" },
+              {model: models.UserZone, as: "userZone"}
             ]
           },
         ]
@@ -1263,13 +1264,13 @@ password: "123456,
     } = req.body;
     const { id } = req.params;
     try {
-      let person = await models.citizen.findOne({
+      let person = await models.Citizen.findOne({
         where: {
           dni
         }
       });
       if (person) {
-        let visit = await models.visits.create(
+        let visit = await models.Visits.create(
           {
             entryDate,
             descriptionEntry,
@@ -1285,7 +1286,7 @@ password: "123456,
           },
           {
             include: {
-              model: models.picture,
+              model: models.Picture,
               as: "Fotos"
             }
           }
@@ -1295,7 +1296,7 @@ password: "123456,
         RESPONSE.data = visit;
         res.status(200).json(RESPONSE);
       } else {
-        let visits = await models.citizen.create(
+        let visits = await models.Citizen.create(
           {
             dni,
             name,
@@ -1317,9 +1318,9 @@ password: "123456,
           {
             include: [
               {
-                model: models.visits,
+                model: models.Visits,
                 as: "Visitas",
-                include: { model: models.picture, as: "Fotos" }
+                include: { model: models.Picture, as: "Fotos" }
               }
             ]
           }
@@ -1344,7 +1345,7 @@ password: "123456,
     };
     const { id } = req.params;
     try {
-      let visit = await models.visits.findOne({
+      let visit = await models.Visits.findOne({
         where: {
           id
         }
@@ -1372,7 +1373,7 @@ password: "123456,
     const { id } = req.params;
     console.log(req.body, req.params);
     try {
-      let visit = await models.visits.findOne({
+      let visit = await models.Visits.findOne({
         where: {
           id
         }
@@ -1403,7 +1404,7 @@ password: "123456,
     };
     const { id } = req.params;
     try {
-      let visit = await models.visits.findOne({
+      let visit = await models.Visits.findOne({
         where: {
           id
         },
@@ -1436,18 +1437,18 @@ password: "123456,
     const { id } = req.params;
 
     try {
-      let visit = await models.citizen.findOne({
+      let visit = await models.Citizen.findOne({
         where: { dni: id },
         include: [
           {
-            model: models.visits,
+            model: models.Visits,
             as: "Visitas",
             include: [
-              { model: models.destination },
-              { model: models.picture, as: "Fotos" },
+              { model: models.Destination },
+              { model: models.Picture, as: "Fotos" },
               {
-                model: models.userZone,
-                include: [{ model: models.zone }, { model: models.User }]
+                model: models.UserZone,
+                include: [{ model: models.Zone }, { model: models.User }]
               }
             ]
           }
@@ -1480,7 +1481,7 @@ password: "123456,
 
     console.log(req.params);
     try {
-      let visits = await models.visits.findAll({
+      let visits = await models.Visits.findAll({
         where: {
           entryDate: {
             [Op.between]: [
@@ -1490,15 +1491,15 @@ password: "123456,
           }
         },
         include: [
-          { model: models.citizen },
-          { model: models.picture, as: "Fotos" },
-          { model: models.destination, attributes: ["id", "name"] },
+          { model: models.Citizen },
+          { model: models.Picture, as: "Fotos" },
+          { model: models.Destination, attributes: ["id", "name"] },
           {
-            model: models.userZone,
+            model: models.UserZone,
             attributes: ["id", "changeTurnDate", "assignationDate"],
             include: [
               {
-                model: models.zone,
+                model: models.Zone,
                 where: { companyId },
                 attributes: ["id", "zone"]
               },
@@ -1538,7 +1539,7 @@ password: "123456,
     const { id } = req.params;
     console.log(req.params);
     try {
-      let visits = await models.visits.findAll({
+      let visits = await models.Visits.findAll({
         where: {
           UserZoneId: id,
           entryDate: {
@@ -1549,14 +1550,14 @@ password: "123456,
           }
         },
         include: [
-          { model: models.citizen },
-          { model: models.picture, as: "Fotos" },
-          { model: models.destination, attributes: ["id", "name"] },
+          { model: models.Citizen },
+          { model: models.Picture, as: "Fotos" },
+          { model: models.Destination, attributes: ["id", "name"] },
           {
-            model: models.userZone,
+            model: models.UserZone,
             attributes: ["id", "changeTurnDate", "assignationDate"],
             include: [
-              { model: models.zone, attributes: ["id", "zone"] },
+              { model: models.Zone, attributes: ["id", "zone"] },
               {
                 model: models.User,
                 attributes: [
@@ -1597,7 +1598,7 @@ password: "123456,
     };
 
     try {
-      let visits = await models.visits.findAll({
+      let visits = await models.Visits.findAll({
         where: {
           entryDate: {
             [Op.between]: [
@@ -1609,14 +1610,14 @@ password: "123456,
           }
         },
         include: [
-          { model: models.citizen },
-          { model: models.picture, as: "Fotos" },
-          { model: models.destination, attributes: ["id", "name"] },
+          { model: models.Citizen },
+          { model: models.Picture, as: "Fotos" },
+          { model: models.Destination, attributes: ["id", "name"] },
           {
-            model: models.userZone,
+            model: models.UserZone,
             attributes: ["id", "changeTurnDate", "assignationDate"],
             include: [
-              { model: models.zone, attributes: ["id", "zone"] },
+              { model: models.Zone, attributes: ["id", "zone"] },
               {
                 model: models.User,
                 attributes: [

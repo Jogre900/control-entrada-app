@@ -42,7 +42,7 @@ const backAction = () => {
   return true;
 };
 
-const MainScreen = ({ navigation, saveProfile, saveCompany, isToken, token, privilege }) => {
+const MainScreen = ({ navigation, saveProfile, saveCompany, saveLogin, isToken, token, privilege }) => {
   const [email, setEmail] = useState("");
   const [pass, setPass] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
@@ -83,70 +83,60 @@ const MainScreen = ({ navigation, saveProfile, saveCompany, isToken, token, priv
   };
 
   const signInStatus = async () => {
-    /*let token = await storage.getItem("userToken");
-    if (Token) {
+    const token = await storage.getItem("userToken")
+    if (token) {
+      alert("Hay token en!!!")
+      console.log("token----",token)
+      console.log("isToken--------",isToken)
       setModalVisible(true);
       try {
+        //TODO verificar esta ruta en la api para que de la estructura nueva
         let res = await axios.get(`${API_PORT()}/api/verifyToken`, {
           headers: {
             Authorization: `bearer ${token}`,
           },
         });
-        console.log(res.data);
+        console.log("RES DE TOKEN----", res.data.data.UserCompany[0].privilege)
         if (res.data.error && res.data.msg === "jwt expired") {
           alert("token expiro!");
           setModalVisible(false);
           return;
         }
         if (!res.data.error) {
-          let profile = res.data.data;
-          let company = res.data.data.Company
-          await saveCompany(company)
-          await saveProfile(profile)
-          console.log(profile);
+          let slogin = {
+            token: res.data.token,
+            userId: res.data.data.id,
+          };
+          let sprofile = {
+            id: res.data.data.Employee.id,
+            dni: res.data.data.Employee.dni,
+            name: res.data.data.Employee.name,
+            lastName: res.data.data.Employee.lastName,
+            picture: res.data.data.Employee.picture,
+            email: res.data.data.email,
+          };
+          let company = [];
+          res.data.data.UserCompany.map((comp) => {
+            company.push({
+              id: comp.Company.id,
+              companyName: comp.Company.companyName,
+              businessName: comp.Company.businessName,
+              nic: comp.Company.nic,
+              city: comp.Company.city,
+              address: comp.Company.address,
+              phoneNumber: comp.Company.phoneNumber,
+              phoneNumberOther: comp.Company.phoneNumberOther,
+              logo: comp.Company.logo,
+              privilege: comp.privilege,
+              select: true,
+            });
+          });
+  
+          saveLogin(slogin);
+          saveProfile(sprofile);
+          saveCompany(company);
           setModalVisible(false);
-          switch (res.data.data.privilege) {
-            case "Admin":
-              navigation.navigate("admin", { screen: "admin-home" });
-              break;
-            case "Supervisor":
-              navigation.navigate("super");
-              break;
-            case "Watchman":
-              navigation.navigate("watch", {screen: "watch-home"});
-              break;
-            default:
-              break;
-          }
-        }
-      } catch (error) {
-        setModalVisible(false);
-        alert(error.message);
-      }
-    }else alert("No hay token almacenado")
-    */
-    if (isToken) {
-      setModalVisible(true);
-      try {
-        //TODO verificar esta ruta en la api para que de la estructura nueva
-        /* let res = await axios.get(`${API_PORT()}/api/verifyToken`, {
-          headers: {
-            Authorization: `bearer ${token}`,
-          },
-        });
-        if (res.data.error && res.data.msg === "jwt expired") {
-          alert("token expiro!");
-          setModalVisible(false);
-          return;
-        }
-        if (!res.data.error) {
-          //let profile = res.data.data;
-          // let company = res.data.data.Company;
-          // await saveCompany(company);
-          //await saveProfile(profile);
-          //console.log(profile);
-          setModalVisible(false);
-          switch (res.data.data.privilege) {
+          switch (res.data.data.UserCompany[0].privilege) {
             case "Admin":
               navigation.navigate("admin", { screen: "admin-home" });
               break;
@@ -159,19 +149,6 @@ const MainScreen = ({ navigation, saveProfile, saveCompany, isToken, token, priv
             default:
               break;
           }
-        }*/
-        switch (privilege) {
-          case "Admin":
-            navigation.navigate("admin", { screen: "admin-home" });
-            break;
-          case "Supervisor":
-            navigation.navigate("super");
-            break;
-          case "Watchman":
-            navigation.navigate("watch", { screen: "watch-home" });
-            break;
-          default:
-            break;
         }
       } catch (error) {
         setModalVisible(false);
@@ -267,9 +244,9 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = (state) => {
   return {
-    isToken: state.profile.login.token == "" ? false : true,
-    token: state.profile.login.token,
-    privilege: state.profile.login.privilege,
+    isToken: state.profile,
+    //token: state.profile?.login.token,
+    //privilege: state.profile.login.privilege,
   };
 };
 
@@ -286,5 +263,11 @@ const mapDispatchToProps = (dispatch) => ({
       payload: company,
     });
   },
+  saveLogin(login){
+    dispatch({
+      type: 'SET_LOGIN',
+      payload: login
+    })
+  }
 });
 export default connect(mapStateToProps, mapDispatchToProps)(MainScreen);

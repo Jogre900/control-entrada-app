@@ -41,19 +41,19 @@ export default (state = initialState, action = {}) => {
       return {
         ...state,
         login: action.payload,
-        companySelect: companySelect(state),
+        //companySelect: companySelect(state),
       };
     case "setProfile":
       return {
         ...state,
         profile: action.payload,
-        companySelect: companySelect(state),
+        //companySelect: companySelect(state),
       };
     case "setCompany":
       return {
         ...state,
-        company: action.payload,
-        companySelect: companySelect(state),
+        company: action.payload
+        //companySelect: companySelect(state),
       };
     case "setCompanySelect":
       let setComapny = state.company.map((c) => {
@@ -73,6 +73,10 @@ export default (state = initialState, action = {}) => {
         ...state,
         login: { ...state.login, privilege: action.payload },
         companySelect: companySelect(state),
+      };
+      case "LOG_OUT":
+      return {
+        state: initialState,
       };
     default:
       return state;

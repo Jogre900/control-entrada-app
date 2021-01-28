@@ -95,11 +95,11 @@ export default function App(props) {
       <React.Fragment>
         <Provider store={store}>
           <PersistGate loading={null} persistor={persistor}>
-            <OneSignalProvider>
+            {/* <OneSignalProvider> */}
               <NavigationContainer>
                 <MainNavigator />
               </NavigationContainer>
-            </OneSignalProvider>
+            {/* </OneSignalProvider> */}
           </PersistGate>
         </Provider>
       </React.Fragment>

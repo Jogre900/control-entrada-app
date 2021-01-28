@@ -4,7 +4,10 @@ import {
   DrawerContentScrollView,
   DrawerItem,
 } from "@react-navigation/drawer";
-import { createStackNavigator, CardStyleInterpolators } from "@react-navigation/stack";
+import {
+  createStackNavigator,
+  CardStyleInterpolators,
+} from "@react-navigation/stack";
 import {
   View,
   Text,
@@ -13,6 +16,7 @@ import {
   StyleSheet,
   Alert,
 } from "react-native";
+import { useDispatch } from "react-redux";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-community/async-storage";
 import DrawerHeader from "./drawerHeader";
@@ -23,13 +27,13 @@ import HomeAdminScreen from "../screens/admin/homeAdminScreen";
 import { DetailViewScreen } from "../screens/admin/detailViewScreen";
 import ZonasScreen from "../screens/admin/zonesScreen";
 import ZoneDetailScreen from "../screens/admin/zoneDetailScreen";
-import AsignEmployee from '../screens/admin/asignEmployeeScreen'
+import AsignEmployee from "../screens/admin/asignEmployeeScreen";
 import { NotificationScreen } from "../screens/admin/notificationScreen";
 import CompanyScreen from "../screens/admin/createCompanyScreen";
 import { DestinyScreen } from "../screens/admin/destinyScreen";
 import { HistorialScreen } from "../screens/admin/historialScreen";
 import PerfilScreen from "../screens/admin/perfilScreen";
-import {EditProfileScreen} from '../screens/admin/editProfileScreen'
+import { EditProfileScreen } from "../screens/admin/editProfileScreen";
 import EmployeeScreen from "../screens/admin/employeeScreen";
 import CreateEmployeScreen from "../screens/admin/createEmployeeScreen";
 import { EmployeeDetailScreen } from "../screens/admin/employeeDetailScreen";
@@ -38,20 +42,36 @@ const Stack = createStackNavigator();
 
 const options = {
   gestureEnabled: true,
-  gestureDirection: 'horizontal',
-  cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS
-}
+  gestureDirection: "horizontal",
+  cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+};
 
 function AdminNav() {
   return (
     <Stack.Navigator headerMode="none" initialRouteName="admin-home">
       <Stack.Screen name="admin-home" component={HomeAdminScreen} />
-      <Stack.Screen name="detail-view" component={DetailViewScreen} options={options}/>
+      <Stack.Screen
+        name="detail-view"
+        component={DetailViewScreen}
+        options={options}
+      />
       <Stack.Screen name="notification" component={NotificationScreen} />
-      <Stack.Screen name="edit_profile" component={EditProfileScreen} options={options}/>
-      <Stack.Screen name="zone_detail" component={ZoneDetailScreen} options={options}/>
+      <Stack.Screen
+        name="edit_profile"
+        component={EditProfileScreen}
+        options={options}
+      />
+      <Stack.Screen
+        name="zone_detail"
+        component={ZoneDetailScreen}
+        options={options}
+      />
       <Stack.Screen name="asign_employee" component={AsignEmployee} />
-      <Stack.Screen name="employee_detail" component={EmployeeDetailScreen} options={options}/>
+      <Stack.Screen
+        name="employee_detail"
+        component={EmployeeDetailScreen}
+        options={options}
+      />
     </Stack.Navigator>
   );
 }
@@ -70,6 +90,7 @@ const drawerData = [
   { label: "Destinos", route: "Destiny", icon: "ios-pin" },
 ];
 const DrawerContent = (props) => {
+  const logOutDispatch = useDispatch();
   return (
     <View
       style={{

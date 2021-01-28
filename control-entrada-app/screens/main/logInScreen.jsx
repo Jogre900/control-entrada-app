@@ -12,6 +12,7 @@ import AsyncStorage from "@react-native-community/async-storage";
 import { Ionicons } from "@expo/vector-icons";
 import { MainColor } from "../../assets/colors";
 import { BackAction } from "../../helpers/ui/ui";
+import { storage } from "../../helpers/asyncStorage";
 
 const LoginScreen = ({ navigation, saveProfile, saveCompany, saveLogin, savePrivilege }) => {
   const [email, setEmail] = useState("");
@@ -84,7 +85,7 @@ const LoginScreen = ({ navigation, saveProfile, saveCompany, saveLogin, savePriv
       });
       console.log("res----------", res.data);
       if (!res.data.error) {
-        await storeData(res.data.token);
+        await storage.setItem("userToken", res.data.token);
         let slogin = {
           token: res.data.token,
           userId: res.data.data.id,
