@@ -10,6 +10,7 @@ import {
   Alert,
 } from "react-native";
 import { Picker } from "@react-native-community/picker";
+import {connect } from 'react-redux'
 
 import axios from "axios";
 import { API_PORT } from "../../config/index.js";
@@ -19,8 +20,10 @@ import { MainButton } from "../../components/mainButton.component";
 import { Ionicons } from "@expo/vector-icons";
 
 const DEVICE_WIDTH = Dimensions.get("window").width;
-const companyId = '9a28095a-9029-40ec-88c2-30e3fac69bc5'
-export const DestinyScreen = (props) => {
+
+export const DestinyScreen = ({navigation, zones, company, saveDestiny}) => {
+  console.log("zones from redux---",zones)
+  console.log("company from redux---",company)
   const [zones, setZones] = useState([]);
   const [zoneId, setZoneId] = useState();
   const [create, setCreate] = useState(false);
@@ -36,7 +39,7 @@ export const DestinyScreen = (props) => {
       <View>
         <TouchableOpacity
           onPress={() => {
-            props.navigation.goBack();
+            navigation.goBack();
           }}
         >
           <Ionicons name="ios-arrow-back" size={28} color="white" />
@@ -97,7 +100,7 @@ export const DestinyScreen = (props) => {
       </View>
     );
   };
-
+//CREATE DESTINY
   const createDestiny = async () => {
     setSaving(true);
     setCreate(false);
@@ -106,19 +109,20 @@ export const DestinyScreen = (props) => {
       let res = await axios.post(`${API_PORT()}/api/createDestiny/${zoneId}`, {
         name: destinyName,
       });
-      if (res) {
+      if (!res.data.error) {
         setCreate(true);
         setDestinyName("");
+        saveDestiny(res.data.data)
         setSaving(false);
         setSuccess(true);
       }
     } catch (error) {
-      console.log("error: ", error);
+      console.log(error.message);
     }
   };
-  useEffect(() => {
-    requestZone();
-  }, []);
+  // useEffect(() => {
+  //   requestZone();
+  // }, []);
   useEffect(() => {
     requestDestiny();
   }, [zoneId, create]);
@@ -193,6 +197,15 @@ export const DestinyScreen = (props) => {
     </View>
   );
 };
+
+const mapStateToProps = state => ({
+  zones: state.zones.zones,
+  company: state.profile.companySelect
+})
+
+const mapDispatchToProps = dispatch => ({})
+
+export default connect(mapStateToProps, mapDispatchToProps)(DestinyScreen)
 
 const styles = StyleSheet.create({
   destiny: {
