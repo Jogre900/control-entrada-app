@@ -171,7 +171,7 @@ const MainScreen = ({ navigation, saveProfile, saveCompany, saveLogin, isToken, 
 
   useFocusEffect(() => {
     return console.log("is Focused");
-  }, []);
+  });
 
   if (isSplash) {
     return <SplashScreen />;
@@ -253,13 +253,13 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => ({
   saveProfile(profile) {
     dispatch({
-      type: "setProfile",
+      type: "SAVE_PROFILE",
       payload: profile,
     });
   },
   saveCompany(company) {
     dispatch({
-      type: "setCompany",
+      type: "SAVE_COMPANY",
       payload: company,
     });
   },

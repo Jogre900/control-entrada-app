@@ -26,7 +26,9 @@ import { Divider } from "../../components/Divider";
 import {connect} from 'react-redux'
 const companyId = "9a28095a-9029-40ec-88c2-30e3fac69bc5";
 
-const CreateEmployeScreen = ({navigation, zonesRedux, addEmployee}) => {
+const CreateEmployeScreen = ({navigation, zonesRedux, companyRedux, addEmployee}) => {
+  console.log("zonesRedux---",zonesRedux)
+  console.log("company Redux-----", companyRedux)
   const [zones, setZones] = useState([]);
   const [zoneId, setZoneId] = useState("");
   const [name, setName] = useState("");
@@ -381,7 +383,8 @@ const CreateEmployeScreen = ({navigation, zonesRedux, addEmployee}) => {
 };
 
 const mapStateToProps = state => ({
-  zonesRedux: state.zonesReducer.zones,
+  zonesRedux: state.zones.zones,
+  companyRedux: state.profile.company
 })
 
 const mapDispatchToProps = dispatch => ({

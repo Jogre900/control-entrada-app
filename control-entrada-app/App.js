@@ -14,7 +14,7 @@ import BottomTabNavigator from "./navigation/BottomTabNavigator";
 import useLinking from "./navigation/useLinking";
 import { Provider } from "react-redux";
 import { store, persistor } from "./store";
-import OneSignalProvider from "./lib/OneSignal";
+//import OneSignalProvider from "./lib/OneSignal";
 
 const Stack = createStackNavigator();
 

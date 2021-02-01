@@ -31,7 +31,7 @@ import {connect} from 'react-redux'
 const { width } = Dimensions.get("window");
 
 const VisitScreen = ({navigation, profile}) => {
-  
+  console.log("profile----", profile)
   const [findIt, setFindIt] = useState(false);
   const [citizen, setCitizen] = useState();
   const [showList, setShowList] = useState(false);
@@ -86,7 +86,7 @@ const VisitScreen = ({navigation, profile}) => {
     } else {
       try {
         let res = await axios.get(`${API_PORT()}/api/findVisit/${dni}`);
-        if (res) {
+        if (!res.data.error) {
           console.log("busqueda por dni:----- ", res.data.data);
           setCitizen(res.data.data);
           setvisitsDni(res.data.data.Visitas);
@@ -107,7 +107,7 @@ const VisitScreen = ({navigation, profile}) => {
           //console.log("Visitas//----", res.data.data.Visitas[0]);
         }
       } catch (error) {
-        console.log("error: ", error);
+        console.log(error.message);
       }
     }
   };

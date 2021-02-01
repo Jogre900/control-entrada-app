@@ -1,5 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, Alert, TouchableOpacity, TouchableHighlight, ActivityIndicator, Image } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Alert,
+  TouchableOpacity,
+  TouchableHighlight,
+  ActivityIndicator,
+  Image,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 //components
 import { TopNavigation } from "../../components/TopNavigation.component";
@@ -13,8 +22,15 @@ import Avatar from "../../components/avatar.component";
 import { DrawerAction, Notifications } from "../../helpers/ui/ui";
 const companyId = "9a28095a-9029-40ec-88c2-30e3fac69bc5";
 
-const HomeAdminScreen = ({ navigation, company, saveEmployee, saveTodayVisits, saveAvailable, saveZones }) => {
-  console.log("company", company)
+const HomeAdminScreen = ({
+  navigation,
+  company,
+  saveEmployee,
+  saveTodayVisits,
+  saveAvailable,
+  saveZones,
+}) => {
+  //console.log("company---------------", company)
   const [object, setObject] = useState({});
   const [loading, setLoading] = useState(true);
   const [visits, setVisits] = useState([]);
@@ -23,11 +39,14 @@ const HomeAdminScreen = ({ navigation, company, saveEmployee, saveTodayVisits, s
   //LOADING
   const LoadingModal = () => {
     return (
-      <Modal isVisible={modalVisible} onBackdropPress={() => setModalVisible(!modalVisible)}>
+      <Modal
+        isVisible={modalVisible}
+        //onBackdropPress={() => setModalVisible(!modalVisible)}
+      >
         <View
           style={{
             flex: 1,
-            backgroundColor: "transparent",
+            backgroundColor: "#f09",
             justifyContent: "center",
           }}
         >
@@ -38,10 +57,14 @@ const HomeAdminScreen = ({ navigation, company, saveEmployee, saveTodayVisits, s
   };
   //REQUEST ZONES
   const requestZone = async () => {
+    setModalVisible(true);
+
     try {
-       let res = await axios.get(`${API_PORT()}/api/findZones/${company.id}`);
+      let res = await axios.get(`${API_PORT()}/api/findZones/${company.id}`);
+
       if (!res.data.error && res.data.data.length > 0) {
         saveZones(res.data.data);
+        setModalVisible(false);
       }
     } catch (error) {
       alert(error.message);
@@ -52,17 +75,19 @@ const HomeAdminScreen = ({ navigation, company, saveEmployee, saveTodayVisits, s
     if (company) {
       setModalVisible(true);
       try {
-        /*let res = await axios.get(`${API_PORT()}/api/findTodayVisits/${company.id}`);
-        console.log(res.data.data);
+        let res = await axios.get(
+          `${API_PORT()}/api/findTodayVisits/${company.id}`
+        );
+        console.log("VISITS-----", res.data);
         if (res.data.data.length === 0) {
           setModalVisible(false);
-          alert("No hay registros");
+          
         } else if (!res.data.error) {
           console.log(res.data.data);
           saveTodayVisits(res.data.data);
           setVisits(res.data.data);
           setModalVisible(false);
-        }*/
+        }
         setVisits([]);
         setModalVisible(false);
       } catch (error) {
@@ -125,34 +150,50 @@ const HomeAdminScreen = ({ navigation, company, saveEmployee, saveTodayVisits, s
 
   return (
     <View>
-      <TopNavigation title="Entradas del Dia" leftControl={DrawerAction(navigation)} rightControl={Notifications(navigation)} />
-
+      <TopNavigation
+        title="Entradas del Dia"
+        leftControl={DrawerAction(navigation)}
+        rightControl={Notifications(navigation)}
+      />
       <LoadingModal />
 
       <View style={styles.listEntry}>
-        {visits.map((elem, i) => {
-          return (
-            <TouchableOpacity style={styles.entryBox} key={i} onPress={() => navigation.navigate("detail-view", elem)}>
-              <View style={styles.dataContainerView}>
-                <Avatar.Picture size={50} uri={`${API_PORT()}/public/imgs/${elem.Citizen.picture}`} />
-              </View>
-              <View style={styles.dataContainerView}>
-                <Text>DNI</Text>
-                <Text style={styles.dataText}>{elem.Citizen.dni}</Text>
-              </View>
-              <View style={styles.dataContainerView}>
-                <Text>Nombre</Text>
-                <Text style={styles.dataText}>
-                  {elem.Citizen.name} {elem.Citizen.lastName}
-                </Text>
-              </View>
-              <View style={styles.dataContainerView}>
-                <Text>Entrada</Text>
-                <Text style={styles.dataText}>{moment(elem.ntryDate).format("HH:mm a")}</Text>
-              </View>
-            </TouchableOpacity>
-          );
-        })}
+        {visits.length > 0 ? (
+          visits.map((elem, i) => {
+            return (
+              <TouchableOpacity
+                style={styles.entryBox}
+                key={i}
+                onPress={() => navigation.navigate("detail-view", elem)}
+              >
+                <View style={styles.dataContainerView}>
+                  <Avatar.Picture
+                    size={50}
+                    uri={`${API_PORT()}/public/imgs/${elem.Citizen.picture}`}
+                  />
+                </View>
+                <View style={styles.dataContainerView}>
+                  <Text>DNI</Text>
+                  <Text style={styles.dataText}>{elem.Citizen.dni}</Text>
+                </View>
+                <View style={styles.dataContainerView}>
+                  <Text>Nombre</Text>
+                  <Text style={styles.dataText}>
+                    {elem.Citizen.name} {elem.Citizen.lastName}
+                  </Text>
+                </View>
+                <View style={styles.dataContainerView}>
+                  <Text>Entrada</Text>
+                  <Text style={styles.dataText}>
+                    {moment(elem.ntryDate).format("HH:mm a")}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            );
+          })
+        ) : (
+          <Text>No hay Visitas Registradas</Text>
+        )}
       </View>
     </View>
   );

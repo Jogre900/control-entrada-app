@@ -161,7 +161,7 @@ const EmployeeScreen = ({ navigation, employee, removeEmployee }) => {
   );
 };
 const mapStateToProps = (state) => ({
-  employee: state.employeeReducer.employee,
+  employee: state.employee.employee,
 });
 
 const mapDispatchToProps = dispatch => ({

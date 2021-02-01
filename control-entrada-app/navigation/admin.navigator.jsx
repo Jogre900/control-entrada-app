@@ -30,7 +30,7 @@ import ZoneDetailScreen from "../screens/admin/zoneDetailScreen";
 import AsignEmployee from "../screens/admin/asignEmployeeScreen";
 import { NotificationScreen } from "../screens/admin/notificationScreen";
 import CompanyScreen from "../screens/admin/createCompanyScreen";
-import { DestinyScreen } from "../screens/admin/destinyScreen";
+import DestinyScreen from "../screens/admin/destinyScreen";
 import { HistorialScreen } from "../screens/admin/historialScreen";
 import PerfilScreen from "../screens/admin/perfilScreen";
 import { EditProfileScreen } from "../screens/admin/editProfileScreen";

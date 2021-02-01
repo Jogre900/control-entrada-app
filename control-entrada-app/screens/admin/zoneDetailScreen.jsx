@@ -234,8 +234,8 @@ const ZoneDetailScreen = ({
         <Text>Zona:</Text>
         <View>
           <Text>{zone}</Text>
-          <Text>{moment(entryTime).format("HH:mm a")}</Text>
-          <Text>{moment(departureTime).format("HH:mm a")}</Text>
+          <Text>{entryTime}</Text>
+          <Text>{departureTime}</Text>
         </View>
         <View style={styles.dataContainer}>
           <Text style={styles.containerTitle}>Destinos</Text>
@@ -289,8 +289,8 @@ const ZoneDetailScreen = ({
 };
 
 const mapStateToProps = (state) => ({
-  zoneRedux: state.zonesReducer,
-  availableU: state.employeeReducer.available,
+  zoneRedux: state.zones.zones,
+  availableU: state.employee.available,
 });
 
 const mapDispatchToProps = (dispatch) => ({

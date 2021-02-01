@@ -10,7 +10,7 @@ import {
   Alert,
 } from "react-native";
 import { Picker } from "@react-native-community/picker";
-import {connect } from 'react-redux'
+import { connect } from "react-redux";
 
 import axios from "axios";
 import { API_PORT } from "../../config/index.js";
@@ -21,9 +21,9 @@ import { Ionicons } from "@expo/vector-icons";
 
 const DEVICE_WIDTH = Dimensions.get("window").width;
 
-export const DestinyScreen = ({navigation, zones, company, saveDestiny}) => {
-  console.log("zones from redux---",zones)
-  console.log("company from redux---",company)
+const DestinyScreen = ({ navigation, zonesRedux, company, saveDestiny }) => {
+  console.log("zones in Destiny from redux---", zonesRedux);
+  console.log("company from redux---", company);
   const [zones, setZones] = useState([]);
   const [zoneId, setZoneId] = useState();
   const [create, setCreate] = useState(false);
@@ -65,12 +65,12 @@ export const DestinyScreen = ({navigation, zones, company, saveDestiny}) => {
 
   const requestZone = async () => {
     setLoading(true);
-    setNotFound(false)
+    setNotFound(false);
     try {
       let res = await axios.get(`${API_PORT()}/api/findZones/${companyId}`);
       if (!res.data.error) {
         setZones(res.data.data);
-        setZoneId(res.data.data[0].id)
+        setZoneId(res.data.data[0].id);
         setLoading(false);
       }
     } catch (error) {
@@ -100,7 +100,7 @@ export const DestinyScreen = ({navigation, zones, company, saveDestiny}) => {
       </View>
     );
   };
-//CREATE DESTINY
+  //CREATE DESTINY
   const createDestiny = async () => {
     setSaving(true);
     setCreate(false);
@@ -112,7 +112,7 @@ export const DestinyScreen = ({navigation, zones, company, saveDestiny}) => {
       if (!res.data.error) {
         setCreate(true);
         setDestinyName("");
-        saveDestiny(res.data.data)
+        saveDestiny(res.data.data);
         setSaving(false);
         setSuccess(true);
       }
@@ -135,7 +135,7 @@ export const DestinyScreen = ({navigation, zones, company, saveDestiny}) => {
         {loading ? (
           <Splash />
         ) : (
-          zones && (
+          zonesRedux && (
             <Picker
               mode="dropdown"
               selectedValue={zoneId}
@@ -143,7 +143,7 @@ export const DestinyScreen = ({navigation, zones, company, saveDestiny}) => {
                 setZoneId(value);
               }}
             >
-              {zones.map((item, index) => {
+              {zonesRedux.map((item, index) => {
                 return (
                   <Picker.Item label={item.zone} value={item.id} key={index} />
                 );
@@ -153,19 +153,16 @@ export const DestinyScreen = ({navigation, zones, company, saveDestiny}) => {
         )}
       </View>
       <View>
-            <Text>zone id: {zoneId}</Text>
+        <Text>zone id: {zoneId}</Text>
         <Text>Destinos</Text>
         {destinys && (
           <FlatList data={destinys} renderItem={renderItem} numColumns={3} />
-        )  
-          
-        }
-        {
-          notFound &&
+        )}
+        {notFound && (
           <View>
             <Text>No hay Destinos disponibles</Text>
           </View>
-        }
+        )}
       </View>
       <View>
         <Text>Crear Destino</Text>
@@ -189,23 +186,19 @@ export const DestinyScreen = ({navigation, zones, company, saveDestiny}) => {
             createDestiny();
           }}
         />
-        <View>
-          {saving ? <Splash /> : null}
-          {succes && saveSuccess()}
-        </View>
       </View>
     </View>
   );
 };
 
-const mapStateToProps = state => ({
-  zones: state.zones.zones,
-  company: state.profile.companySelect
-})
+const mapStateToProps = (state) => ({
+  zonesRedux: state.zones.zones,
+  company: state.profile.companySelect,
+});
 
-const mapDispatchToProps = dispatch => ({})
+const mapDispatchToProps = (dispatch) => ({});
 
-export default connect(mapStateToProps, mapDispatchToProps)(DestinyScreen)
+export default connect(mapStateToProps, mapDispatchToProps)(DestinyScreen);
 
 const styles = StyleSheet.create({
   destiny: {

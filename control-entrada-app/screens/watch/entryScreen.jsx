@@ -26,15 +26,15 @@ import { API_PORT } from "../../config/index";
 import { Divider } from "../../components/Divider";
 import { MainColor, ligthColor } from "../../assets/colors";
 import Modal from "react-native-modal";
-import AsyncStorage from "@react-native-community/async-storage";
-import {connect} from 'react-redux'
-import {storage} from '../../helpers/asyncStorage'
+import { connect } from "react-redux";
+import { storage } from "../../helpers/asyncStorage";
 
-const EntryScreen = ({navigation, profile, saveVisit}) => {
-  //const profile = props.route.params.profile;
-  const destinys = profile.userZone[0].Zone.Destinos;
+const EntryScreen = ({ navigation, profile, saveVisit }) => {
+  console.log("profile from redux---", profile);
 
-  const userZoneId = profile.userZone[0].id;
+  //const destinys = profile.userZone[0].Zone.Destinos;
+
+  //const userZoneId = profile.userZone[0].id;
 
   const [saveImg, setSaveImg] = useState();
   const [changeImg, setChangeImg] = useState(false);
@@ -60,14 +60,26 @@ const EntryScreen = ({navigation, profile, saveVisit}) => {
   const dniRef = useRef();
   const destinyRef = useRef();
 
-  
+  //REQUEST USERZONE
+  const requestUserZone = async () => {
+    if (userId) {
+      try {
+        const res = await axios.get(
+          `${API_PORT()}/api//findUserZone/${userId}`
+        );
+        if (!res.data.error) {
+          setDestiny(res.data.data);
+        }
+      } catch (error) {
+        console.log(error.message);
+      }
+    }
+  };
 
-  
-  
   //CREATE VISIT
   const createVisit = async () => {
     console.log("destiny id---------------", destinyId);
-    let token = await storage.getItem('userToken')
+    let token = storage.getItem("userToken");
     if (!name || !lastName || !dni) {
       setProfileCaption("Debe ingresar todos los datos");
       return;
@@ -77,10 +89,7 @@ const EntryScreen = ({navigation, profile, saveVisit}) => {
       data.append("name", name);
       data.append("lastName", lastName);
       data.append("dni", dni);
-      data.append("file", { uri: imgUrl, 
-        name: fileName, 
-        type: fileType 
-      });
+      data.append("file", { uri: imgUrl, name: fileName, type: fileType });
       data.append("file", { uri: visitImg, name: fileName2, type: fileType2 });
       data.append("entryDate", moment().toString());
       data.append("departureDate", moment().toString());
@@ -94,13 +103,13 @@ const EntryScreen = ({navigation, profile, saveVisit}) => {
           {
             headers: {
               "content-type": "multipart/form-data",
-              Authorization: `bearer ${token}` 
+              Authorization: `bearer ${token}`,
             },
           }
         );
         if (!res.data.error) {
           console.log(res.data);
-          saveVisit(res.data.data)
+          saveVisit(res.data.data);
           setModalVisibility(false);
           alert("Registro exitoso!");
           clearInputs();
@@ -223,6 +232,12 @@ const EntryScreen = ({navigation, profile, saveVisit}) => {
   };
 
   useEffect(() => {
+    effect;
+    return () => {
+      cleanup;
+    };
+  }, [input]);
+  useEffect(() => {
     (async () => {
       if (Platform.OS !== "web") {
         const {
@@ -335,7 +350,10 @@ const EntryScreen = ({navigation, profile, saveVisit}) => {
                 <Ionicons name="ios-camera" size={48} color="grey" />
               </TouchableOpacity>
               <View>
-                <Image source={{ uri: visitImg }} style={{width: 100, height: 100}} />
+                <Image
+                  source={{ uri: visitImg }}
+                  style={{ width: 100, height: 100 }}
+                />
               </View>
             </View>
             <Input
@@ -364,20 +382,20 @@ const EntryScreen = ({navigation, profile, saveVisit}) => {
   );
 };
 
-const mapStateToProps = state => ({
-  profile: state.profileReducer.profile,
-})
+const mapStateToProps = (state) => ({
+  profile: state.profile.profile
+});
 
-const mapDispatchToProps = dispatch => ({
-  saveVisit(visit){
+const mapDispatchToProps = (dispatch) => ({
+  saveVisit(visit) {
     dispatch({
       type: "SAVE_VISIT",
-      payload: visit
-    })
-  }
-})
+      payload: visit,
+    });
+  },
+});
 
-export default connect(mapStateToProps, mapDispatchToProps)(EntryScreen)
+export default connect(mapStateToProps, mapDispatchToProps)(EntryScreen);
 
 const styles = StyleSheet.create({
   containerKeyboard: {

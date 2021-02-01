@@ -1505,14 +1505,10 @@ password: "123456,
               },
               {
                 model: models.User,
-                attributes: [
-                  "id",
-                  "name",
-                  "lastName",
-                  "dni",
-                  "email",
-                  "picture"
-                ]
+                include : {
+                  model: models.Employee,
+                  as: "Employee"
+                }
               }
             ]
           }

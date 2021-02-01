@@ -30,7 +30,6 @@ const LoginScreen = ({ navigation, saveProfile, saveCompany, saveLogin, savePriv
           onPress={() => {
             navigation.goBack();
           }}
-          style={{ backgroundColor: "blue" }}
         >
           <Ionicons name="ios-arrow-back" size={28} color="white" />
         </TouchableOpacity>
@@ -53,14 +52,6 @@ const LoginScreen = ({ navigation, saveProfile, saveCompany, saveLogin, savePriv
         </View>
       </Modal>
     );
-  };
-  //STORE TOKEN
-  const storeData = async (value) => {
-    try {
-      await AsyncStorage.setItem("userToken", value);
-    } catch (e) {
-      console.log("Error al Guardar", e);
-    }
   };
   //SIGN IN
   const signIn = async () => {
@@ -85,7 +76,7 @@ const LoginScreen = ({ navigation, saveProfile, saveCompany, saveLogin, savePriv
       });
       console.log("res----------", res.data);
       if (!res.data.error) {
-        await storage.setItem("userToken", res.data.token);
+        storage.setItem("userToken", res.data.token);
         let slogin = {
           token: res.data.token,
           userId: res.data.data.id,
@@ -260,13 +251,13 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => ({
   saveProfile(profile) {
     dispatch({
-      type: "setProfile",
+      type: "SAVE_PROFILE",
       payload: profile,
     });
   },
   saveCompany(company) {
     dispatch({
-      type: "setCompany",
+      type: "SAVE_COMPANY",
       payload: company,
     });
   },
@@ -278,7 +269,7 @@ const mapDispatchToProps = (dispatch) => ({
   },
   savePrivilege(privilege) {
     dispatch({
-      type: "setPrivilege",
+      type: "SAVE_PRIVILEGE",
       payload: privilege,
     });
   },

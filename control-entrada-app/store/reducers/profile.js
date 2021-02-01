@@ -41,15 +41,15 @@ export default (state = initialState, action = {}) => {
       return {
         ...state,
         login: action.payload,
-        //companySelect: companySelect(state),
+        company: companySelect(state),
       };
-    case "setProfile":
+    case "SAVE_PROFILE":
       return {
         ...state,
         profile: action.payload,
         //companySelect: companySelect(state),
       };
-    case "setCompany":
+    case "SAVE_COMPANY":
       return {
         ...state,
         company: action.payload
@@ -68,7 +68,7 @@ export default (state = initialState, action = {}) => {
         company: setComapny,
         companySelect: companySelect(state),
       };
-    case "setPrivilege":
+    case "SAVE_PRIVILEGE":
       return {
         ...state,
         login: { ...state.login, privilege: action.payload },

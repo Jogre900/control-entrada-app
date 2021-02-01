@@ -148,15 +148,15 @@ const ZonasScreen = ({
   };
 
   const createZone = async () => {
-    console.log("hora 1", moment(entranceTime).format("HH:mm:ss").toString())
-    console.log("hora 2", moment(departureTime).format("HH:mm:ss").toString())
+    console.log("hora 1", moment(entranceTime).format("HH:mm a").toString())
+    console.log("hora 2", moment(departureTime).format("HH:mm a").toString())
     try {
       let res = await axios.post(
         `${API_PORT()}/api/createZone/${companyRedux[0].id}`,
         {
           zone: zoneName,
-          firsEntryTime: moment(entranceTime).format("HH:mm:ss").toString(),
-          firsDepartureTime: moment(departureTime).format("HH:mm:ss").toString(),
+          firsEntryTime: moment(entranceTime).format("HH:mm a").toString(),
+          firsDepartureTime: moment(departureTime).format("HH:mm a").toString(),
         }
       );
       console.log("res crear zonas--", res.data)
