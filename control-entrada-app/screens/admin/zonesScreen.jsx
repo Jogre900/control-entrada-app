@@ -155,8 +155,8 @@ const ZonasScreen = ({
         `${API_PORT()}/api/createZone/${companyRedux[0].id}`,
         {
           zone: zoneName,
-          firsEntryTime: moment(entranceTime).format("HH:mm a").toString(),
-          firsDepartureTime: moment(departureTime).format("HH:mm a").toString(),
+          firsEntryTime: moment(entranceTime).format("HH:mm").toString(),
+          firsDepartureTime: moment(departureTime).format("HH:mm").toString(),
         }
       );
       console.log("res crear zonas--", res.data)

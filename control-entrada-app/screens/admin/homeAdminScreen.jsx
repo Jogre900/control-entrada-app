@@ -101,13 +101,13 @@ const HomeAdminScreen = ({
     if (company) {
       setModalVisible(true);
       try {
-        /*let res = await axios.get(`${API_PORT()}/api/findUsers/${company.id}`);
+        let res = await axios.get(`${API_PORT()}/api/findUsers/${company.id}`);
+        console.log("employee from API----",res.data.data);
         if (!res.data.error) {
-          console.log(res.data.data);
           saveEmployee(res.data.data);
           setLoading(false);
-        }*/
-        saveEmployee([]);
+        }
+        // saveEmployee([]);
         setLoading(false);
       } catch (error) {
         setLoading(false);

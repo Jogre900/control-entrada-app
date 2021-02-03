@@ -20,11 +20,12 @@ import Input from "../../components/input.component";
 import { TopNavigation } from "../../components/TopNavigation.component";
 import { MainButton } from "../../components/mainButton.component";
 import { Ionicons } from "@expo/vector-icons";
+import Avatar from '../../components/avatar.component'
 import { connect } from "react-redux";
 const companyId = "9a28095a-9029-40ec-88c2-30e3fac69bc5";
 
 const EmployeeScreen = ({ navigation, employee, removeEmployee }) => {
-  console.log("employee from redux:--", employee)
+  console.log("EMPLOYEE FROM REDUX-----", employee)
   //const [employee, setEmployee] = useState([]);
   const [employeeId, setEmployeeId] = useState("");
   const [refreshing, setRefreshing] = useState(false);
@@ -120,9 +121,13 @@ const EmployeeScreen = ({ navigation, employee, removeEmployee }) => {
                   onPress={() => navigation.navigate("employee_detail", item)}
                   key={i}
                 >
-                  <TouchableOpacity onPress={() => deleteEmployee(item.id)}>
+                  {/* ARREGLAR BORRADO EN LISTA POR LONGPRESS */}
+                  {/* <TouchableOpacity onPress={() => deleteEmployee(item.id)}>
                     <Ionicons name="ios-trash" size={22} color="grey" />
-                  </TouchableOpacity>
+                  </TouchableOpacity> */}
+                  <View>
+                    <Avatar.Picture size={60} uri={`${API_PORT()}/public/imgs/${item.Employee.picture}`}/>
+                  </View>
                   <View>
                     <View style={styles.privilegeBox}>
                       {item.privilege == "Supervisor" ? (
@@ -136,7 +141,7 @@ const EmployeeScreen = ({ navigation, employee, removeEmployee }) => {
                   </View>
                   <View style={styles.itemDataBox}>
                     <Text style={styles.itemDataText}>
-                      {item.name} {item.lastName}
+                      {item.Employee.name} {item.Employee.lastName}
                     </Text>
                     <Text style={styles.itemDataText}>{item.email}</Text>
                   </View>

@@ -63,6 +63,7 @@ router.delete("/deleteUser/:id", Controllers.deleteUser);
 router.get("/findCompany/:id", Controllers.findCompany);
 router.post("/createZone/:id", Controllers.createZone);
 router.get("/findZones/:companyId", Controllers.findZones);
+router.get("/findZone/:zoneId", Controllers.findZone);
 router.delete("/deleteZone", Controllers.deleteZone);
 router.post("/createDestiny/:id", Controllers.createDestiny);
 router.get("/findDestiny/:id", Controllers.findDestinyByZone);

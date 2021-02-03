@@ -86,8 +86,8 @@ const MainScreen = ({ navigation, saveProfile, saveCompany, saveLogin, isToken, 
     const token = await storage.getItem("userToken")
     if (token) {
       alert("Hay token en!!!")
-      console.log("token----",token)
-      console.log("isToken--------",isToken)
+      //console.log("token----",token)
+      //console.log("isToken--------",isToken)
       setModalVisible(true);
       try {
         //TODO verificar esta ruta en la api para que de la estructura nueva
@@ -96,7 +96,8 @@ const MainScreen = ({ navigation, saveProfile, saveCompany, saveLogin, isToken, 
             Authorization: `bearer ${token}`,
           },
         });
-        console.log("RES DE TOKEN----", res.data.data.UserCompany[0].privilege)
+        console.log(res.data)
+        //console.log("RES DE TOKEN----", res.data.data.UserCompany[0].privilege)
         if (res.data.error && res.data.msg === "jwt expired") {
           alert("token expiro!");
           setModalVisible(false);

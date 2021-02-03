@@ -204,7 +204,7 @@ password: "123456,
         include: [
           {
             model: models.Company,
-            as: "Company",
+            as: "Company"
           }
         ]
       });
@@ -269,6 +269,37 @@ password: "123456,
       res.json(RESPONSE);
     } catch (error) {
       RESPONSE.msg = error.message;
+      res.json(RESPONSE);
+    }
+  },
+  findZone: async function(req, res) {
+    let RESPONSE = {
+      error: true,
+      msg: "",
+      data: null,
+      token: null
+    };
+    const { zoneId } = req.params;
+    try {
+      let zones = await models.Zone.findOne({
+        where: {
+          id: zoneId
+        },
+        include: [
+          { model: models.Destination, as: "Destinos" },
+          {
+            model: models.UserZone,
+            as: "encargado_zona",
+            include: [models.User]
+          }
+        ]
+      });
+      RESPONSE.error = false;
+      RESPONSE.msg = "Busqueda Exitosa!";
+      RESPONSE.data = zones;
+      res.json(RESPONSE);
+    } catch (error) {
+      RESPONSE.error = error;
       res.json(RESPONSE);
     }
   },
@@ -611,7 +642,8 @@ password: "123456,
             name,
             lastName,
             dni,
-            picture: req.file.filename,
+            picture: "foto de prueba",
+            //picture: req.file.filename,
             status: "Active"
           },
           userZone: {
@@ -701,8 +733,8 @@ password: "123456,
       data: null,
       token: null
     };
-    console.log("SOY ALL", req.body);
-    let { name, lastName, dni, email, password, companyId, zoneId } = req.body;
+    console.log("SOY SUPERVISOR", req.body);
+    let { name, lastName, dni, email, password, companyId, zoneId, } = req.body;
     const privilege = "Supervisor";
 
     console.log(req.file);
@@ -729,11 +761,12 @@ password: "123456,
             name,
             lastName,
             dni,
-            picture: req.file.filename,
+            //picture: req.file.filename,
+            picture: "foto de prueba",
             status: "Active"
           },
           userZone: {
-            ZoneId: zoneId
+            ZoneId: zoneId,
           },
           UserCompany: {
             companyId,
@@ -748,12 +781,12 @@ password: "123456,
           {
             include: [
               {
-                model: models.UserZone,
-                as: "userZone"
-              },
-              {
                 model: models.Employee,
                 as: "Employee"
+              },
+              {
+                model: models.UserZone,
+                as: "userZone"
               },
               {
                 model: models.UserCompany,
@@ -930,7 +963,7 @@ password: "123456,
       token: null
     };
     const { email, password } = req.body;
-    console.log(req.body)
+    console.log(req.body);
     try {
       let user = await models.User.findOne({
         where: {
@@ -978,7 +1011,7 @@ password: "123456,
           RESPONSE.msg = "Inicio Exitoso";
           RESPONSE.data = user;
           RESPONSE.token = token;
-          res.json(RESPONSE)
+          res.json(RESPONSE);
         } else {
           RESPONSE.msg = "Clave Invalida";
           res.json(RESPONSE);
@@ -1166,19 +1199,27 @@ password: "123456,
     };
     const { companyId } = req.params;
     try {
-      let user = await models.UserCompany.findAll({
-        where: {
-          companyId
-        },
+      let user = await models.User.findAll({
         include: [
           {
-            model: models.User,
-            as: "User",
-            include: [
-              { model: models.Employee, as: "Employee" },
-              {model: models.UserZone, as: "userZone"}
-            ]
+            model: models.Employee,
+            as: "Employee",
           },
+          {
+            model: models.UserCompany,
+            as: "UserCompany",
+            where: {
+              [Op.and]: [{companyId}, {privilege: {[Op.not]: 'Admin'}}
+            ]
+            }
+          },
+          {
+            model: models.UserZone,
+            as: "userZone",
+            include: {
+              model: models.Zone
+            }
+          }
         ]
       });
       (RESPONSE.error = false), (RESPONSE.msg = "Busqueda Exitosa");
@@ -1505,7 +1546,7 @@ password: "123456,
               },
               {
                 model: models.User,
-                include : {
+                include: {
                   model: models.Employee,
                   as: "Employee"
                 }

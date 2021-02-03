@@ -29,7 +29,7 @@ const companyId = "9a28095a-9029-40ec-88c2-30e3fac69bc5";
 const CreateEmployeScreen = ({navigation, zonesRedux, companyRedux, addEmployee}) => {
   console.log("zonesRedux---",zonesRedux)
   console.log("company Redux-----", companyRedux)
-  const [zones, setZones] = useState([]);
+  
   const [zoneId, setZoneId] = useState("");
   const [name, setName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -120,28 +120,50 @@ const CreateEmployeScreen = ({navigation, zonesRedux, companyRedux, addEmployee}
     data.append("email", email);
     data.append("password", "12345");
     data.append("zoneId", zoneId);
+    data.append("privilege", privilege)
     data.append("assignationDate", date.toString());
     data.append("changeTurnDate", changeTurn.toString());
-    data.append("companyId", companyId);
+    data.append("companyId", companyRedux.id);
 
     try {
-      let res = await axios.post(
-        `${API_PORT()}/api/createUser/${privilege}`,
-        data,
-        {
-          headers: {
-            "content-type": "multipart/form-data",
-          },
+      if(privilege === "Supervisor"){
+        const res = await axios.post(
+          `${API_PORT()}/api/createUserSupervisor/`,
+          data,
+          {
+            headers: {
+              "content-type": "multipart/form-data",
+            },
+          }
+        );
+        if (!res.data.error) {
+          console.log(res.data.data);
+          addEmployee(res.data.data)
+          setCreate(true);
+          setSaving(false);
+          setSuccess(true);
         }
-      );
-
-      if (!res.data.error) {
-        console.log(res.data.data);
-        addEmployee(res.data.data)
-        setCreate(true);
-        setSaving(false);
-        setSuccess(true);
+      }else{
+        const res = await axios.post(
+          `${API_PORT()}/api/createUserWatchman`,
+          data,
+          {
+            headers: {
+              "content-type": "multipart/form-data",
+            },
+          }
+        );
+        if (!res.data.error) {
+          console.log(res.data.data);
+          addEmployee(res.data.data)
+          setCreate(true);
+          setSaving(false);
+          setSuccess(true);
+        }
       }
+      
+
+     
     } catch (error) {
       console.log("error-----: ", error.message);
       alert(error.message);
@@ -201,9 +223,9 @@ const CreateEmployeScreen = ({navigation, zonesRedux, companyRedux, addEmployee}
     }
   };
 
-  useEffect(() => {
-    requestZone();
-  }, []);
+  // useEffect(() => {
+  //   requestZone();
+  // }, []);
   return (
     <View style={{ flex: 1 }}>
       <TopNavigation title="Crear Empleado" leftControl={goBackAction()} />

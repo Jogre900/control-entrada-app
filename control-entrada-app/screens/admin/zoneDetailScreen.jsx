@@ -34,19 +34,10 @@ const ZoneDetailScreen = ({
   availableU,
   setNewEmployee,
 }) => {
-  //console.log("redux----", zoneRedux)
-  console.log(availableU);
-  const {
-    id,
-    zone,
-    entryTime,
-    departureTime,
-    destinys,
-    watchmen,
-    companyId,
-  } = route.params;
+  const { id } = route.params;
 
-  //const [destiny, setDestiny] = useState(destinys);
+  const [destiny, setDestiny] = useState();
+  const [zoneEmployee, setZoneEmployee] = useState()
   //const [availableU, setAvailableU] = useState([]);
   const [user, setUser] = useState();
   const [modalVisible, setModalVisible] = useState(false);
@@ -54,6 +45,7 @@ const ZoneDetailScreen = ({
   const [changeTurn, setChangeTurn] = useState(new Date());
   const [listVisible, setListVisible] = useState(false);
   const [check, setCheck] = useState(false);
+  const [zoneApi, setZoneApi] = useState();
   const zoneId = id;
   const goBackAction = () => {
     return (
@@ -107,10 +99,25 @@ const ZoneDetailScreen = ({
   //     </Modal>
   //   );
   // };
+
+  //REQUEST ZONE
+  const requestZone = async () => {
+    try {
+      const res = await axios.get(`${API_PORT()}/api/findZone/${zoneId}`);
+      console.log("zone by Id from api---", res.data);
+      if (!res.data.error) {
+        setZoneApi(res.data.data);
+        setDestiny(res.data.data.Destinos)
+        setZoneEmployee(res.data.data.encargado_zona)
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
   const renderAvailable = ({ item }) => (
     <TouchableOpacity
       onPress={() => {
-        navigation.push("asign_employee", {item, id, zone});
+        navigation.push("asign_employee", { item, id, zone });
       }}
     >
       <View style={styles.listEmployeBox}>
@@ -227,6 +234,10 @@ const ZoneDetailScreen = ({
   //     console.log(error.message);
   //   }
   // };
+
+  useEffect(() => {
+    requestZone();
+  }, []);
   return (
     <View style={{ flex: 1 }}>
       <TopNavigation title={zone} leftControl={goBackAction()} />
@@ -241,7 +252,7 @@ const ZoneDetailScreen = ({
           <Text style={styles.containerTitle}>Destinos</Text>
           <Divider size="small" />
           {destinys.length > 0 ? (
-            <FlatList data={destinys} renderItem={renderDestiny} />
+            <FlatList data={destiny} renderItem={renderDestiny} />
           ) : (
             <Text>no hay datos</Text>
           )}
@@ -249,8 +260,8 @@ const ZoneDetailScreen = ({
         <View style={styles.dataContainer}>
           <Text style={styles.containerTitle}>Encargados</Text>
           <Divider size="small" />
-          {watchmen.length >= 1 ? (
-            <FlatList data={watchmen} renderItem={renderWatchman} />
+          {/* {watchmen.length >= 1 ? (
+            <FlatList data={zoneEmployee} renderItem={renderWatchman} />
           ) : (
             <View>
               <Text>La zona no posea Personal Asignado</Text>
@@ -263,7 +274,7 @@ const ZoneDetailScreen = ({
                   color="#4f4f4f"
                 />
               </View>
-              
+
               {listVisible && (
                 <View>
                   {availableU.length > 0 ? (
@@ -281,7 +292,7 @@ const ZoneDetailScreen = ({
                 </View>
               )}
             </View>
-          )}
+          )} */}
         </View>
       </ScrollView>
     </View>
