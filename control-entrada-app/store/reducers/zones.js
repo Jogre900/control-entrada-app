@@ -8,7 +8,7 @@ export default (state = initialState, action = {}) => {
     case "setZones":
       return {
         ...state,
-        zones: action.payload,
+        zones: action.payload
       };
     case "addZones":
       return {
@@ -18,12 +18,16 @@ export default (state = initialState, action = {}) => {
     case "REMOVE_ZONES":
       console.log("payload: ", action.payload);
       console.log("zonesState: ", state.zones);
-      let newZone = state.zones.filter((z) => !action.payload.includes(z.id));
+      let newZone = state.zones.filter(({id}) => !action.payload.includes(id));
       console.log("nueva zona: ", newZone);
       return {
         ...state,
         zones: newZone,
       };
+    case "CLEAR_STORAGE":
+      return {
+        zones: []
+      }  
     default:
       return state;
   }

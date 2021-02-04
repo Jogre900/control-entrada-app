@@ -123,7 +123,7 @@ const CreateEmployeScreen = ({navigation, zonesRedux, companyRedux, addEmployee}
     data.append("privilege", privilege)
     data.append("assignationDate", date.toString());
     data.append("changeTurnDate", changeTurn.toString());
-    data.append("companyId", companyRedux.id);
+    data.append("companyId", companyRedux[0].id);
 
     try {
       if(privilege === "Supervisor"){
@@ -136,12 +136,16 @@ const CreateEmployeScreen = ({navigation, zonesRedux, companyRedux, addEmployee}
             },
           }
         );
+        console.log(res.data)
         if (!res.data.error) {
           console.log(res.data.data);
           addEmployee(res.data.data)
           setCreate(true);
           setSaving(false);
           setSuccess(true);
+        }else{
+          alert(res.data.msg)
+          setSaving(false);
         }
       }else{
         const res = await axios.post(
@@ -159,14 +163,17 @@ const CreateEmployeScreen = ({navigation, zonesRedux, companyRedux, addEmployee}
           setCreate(true);
           setSaving(false);
           setSuccess(true);
+        }else{
+          alert(res.data.msg)
+          setSaving(false);
         }
       }
       
 
      
     } catch (error) {
-      console.log("error-----: ", error.message);
-      alert(error.message);
+      console.log("error-----: ", error);
+      alert(error);
     }
   };
 

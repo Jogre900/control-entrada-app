@@ -20,7 +20,6 @@ import Modal from "react-native-modal";
 import { connect } from "react-redux";
 import Avatar from "../../components/avatar.component";
 import { DrawerAction, Notifications } from "../../helpers/ui/ui";
-const companyId = "9a28095a-9029-40ec-88c2-30e3fac69bc5";
 
 const HomeAdminScreen = ({
   navigation,
@@ -78,17 +77,13 @@ const HomeAdminScreen = ({
         let res = await axios.get(
           `${API_PORT()}/api/findTodayVisits/${company.id}`
         );
-        console.log("VISITS-----", res.data);
-        if (res.data.data.length === 0) {
-          setModalVisible(false);
-          
-        } else if (!res.data.error) {
-          console.log(res.data.data);
+        console.log("VISITS FROM API-----", res.data);
+        if (!res.data.error && res.data.data.length > 0) {
           saveTodayVisits(res.data.data);
           setVisits(res.data.data);
           setModalVisible(false);
         }
-        setVisits([]);
+        //setVisits([]);
         setModalVisible(false);
       } catch (error) {
         setModalVisible(false);
@@ -103,7 +98,7 @@ const HomeAdminScreen = ({
       try {
         let res = await axios.get(`${API_PORT()}/api/findUsers/${company.id}`);
         console.log("employee from API----",res.data.data);
-        if (!res.data.error) {
+        if (!res.data.error && res.data.data.length > 0) {
           saveEmployee(res.data.data);
           setLoading(false);
         }
@@ -134,9 +129,9 @@ const HomeAdminScreen = ({
       }
     }
   };
-  useEffect(() => {
-    findAvailableUsers();
-  }, []);
+  // useEffect(() => {
+  //   findAvailableUsers();
+  // }, []);
   useEffect(() => {
     requestZone();
   }, []);

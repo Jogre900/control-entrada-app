@@ -9,9 +9,11 @@ import {
   TouchableOpacity,
   Alert,
   Image,
+  ActivityIndicator,
 } from "react-native";
 import axios from "axios";
 import { connect } from "react-redux";
+import { useFocusEffect } from "@react-navigation/native";
 
 //componentes
 import { API_PORT } from "../../config/index.js";
@@ -34,10 +36,11 @@ const ZoneDetailScreen = ({
   availableU,
   setNewEmployee,
 }) => {
-  const { id } = route.params;
+  console.log("params-----------",route)
+  const { zoneId } = route.params;
 
   const [destiny, setDestiny] = useState();
-  const [zoneEmployee, setZoneEmployee] = useState()
+  const [zoneEmployee, setZoneEmployee] = useState();
   //const [availableU, setAvailableU] = useState([]);
   const [user, setUser] = useState();
   const [modalVisible, setModalVisible] = useState(false);
@@ -46,7 +49,7 @@ const ZoneDetailScreen = ({
   const [listVisible, setListVisible] = useState(false);
   const [check, setCheck] = useState(false);
   const [zoneApi, setZoneApi] = useState();
-  const zoneId = id;
+  // const zoneId = id;
   const goBackAction = () => {
     return (
       <View>
@@ -104,49 +107,49 @@ const ZoneDetailScreen = ({
   const requestZone = async () => {
     try {
       const res = await axios.get(`${API_PORT()}/api/findZone/${zoneId}`);
-      console.log("zone by Id from api---", res.data);
+      console.log("zone by Id from api---", res.data.data);
       if (!res.data.error) {
         setZoneApi(res.data.data);
-        setDestiny(res.data.data.Destinos)
-        setZoneEmployee(res.data.data.encargado_zona)
+        setDestiny(res.data.data.Destinos);
+        setZoneEmployee(res.data.data.encargado_zona);
       }
     } catch (error) {
       console.error(error);
     }
   };
-  const renderAvailable = ({ item }) => (
-    <TouchableOpacity
-      onPress={() => {
-        navigation.push("asign_employee", { item, id, zone });
-      }}
-    >
-      <View style={styles.listEmployeBox}>
-        <Avatar.Picture
-          size={50}
-          uri={`${API_PORT()}/public/imgs/${item.picture}`}
-        />
-        <View style={styles.listSubItemBox}>
-          <View style={{ alignItems: "center" }}>
-            <View style={styles.privilegeBox}>
-              <Text
-                style={{
-                  color: "#fff",
-                  fontSize: 16,
-                  lineHeight: 16,
-                }}
-              >
-                {item.privilege}
-              </Text>
-            </View>
-            <Text>
-              {item.name} {item.lastName}
-            </Text>
-          </View>
-          {/* <Text>Cambio de Turno: {moment(item.changeTurnDate).format('D MMM YYYY')}</Text> */}
-        </View>
-      </View>
-    </TouchableOpacity>
-  );
+  // const renderAvailable = ({ item }) => (
+  //   <TouchableOpacity
+  //     onPress={() => {
+  //       navigation.push("asign_employee", { item, id, zone });
+  //     }}
+  //   >
+  //     <View style={styles.listEmployeBox}>
+  //       <Avatar.Picture
+  //         size={50}
+  //         uri={`${API_PORT()}/public/imgs/${item.picture}`}
+  //       />
+  //       <View style={styles.listSubItemBox}>
+  //         <View style={{ alignItems: "center" }}>
+  //           <View style={styles.privilegeBox}>
+  //             <Text
+  //               style={{
+  //                 color: "#fff",
+  //                 fontSize: 16,
+  //                 lineHeight: 16,
+  //               }}
+  //             >
+  //               {item.privilege}
+  //             </Text>
+  //           </View>
+  //           <Text>
+  //             {item.name} {item.lastName}
+  //           </Text>
+  //         </View>
+  //         {/* <Text>Cambio de Turno: {moment(item.changeTurnDate).format('D MMM YYYY')}</Text> */}
+  //       </View>
+  //     </View>
+  //   </TouchableOpacity>
+  // );
   const renderDestiny = ({ item }) => (
     <View
       style={{
@@ -235,33 +238,42 @@ const ZoneDetailScreen = ({
   //   }
   // };
 
-  useEffect(() => {
-    requestZone();
-  }, []);
+  useFocusEffect(
+    React.useCallback(() => {
+      //setZone([]);
+      requestZone();;
+    }, [])
+  );
+  // useEffect(() => {
+  //   requestZone();
+  // }, []);
+
   return (
     <View style={{ flex: 1 }}>
-      <TopNavigation title={zone} leftControl={goBackAction()} />
+      <TopNavigation title='algo' leftControl={goBackAction()} />
       <ScrollView style={{ flex: 1 }}>
-        <Text>Zona:</Text>
-        <View>
-          <Text>{zone}</Text>
-          <Text>{entryTime}</Text>
-          <Text>{departureTime}</Text>
-        </View>
-        <View style={styles.dataContainer}>
-          <Text style={styles.containerTitle}>Destinos</Text>
-          <Divider size="small" />
-          {destinys.length > 0 ? (
-            <FlatList data={destiny} renderItem={renderDestiny} />
-          ) : (
-            <Text>no hay datos</Text>
-          )}
-        </View>
-        <View style={styles.dataContainer}>
-          <Text style={styles.containerTitle}>Encargados</Text>
-          <Divider size="small" />
-          {/* {watchmen.length >= 1 ? (
-            <FlatList data={zoneEmployee} renderItem={renderWatchman} />
+        {/* <Text>Zona:</Text> */}
+        {zoneApi ? (
+          <View>
+            <View>
+              <Text>{zoneApi.zone}</Text>
+              <Text>{zoneApi.firsEntryTime}</Text>
+              <Text>{zoneApi.firsDepartureTime}</Text>
+            </View>
+            <View style={styles.dataContainer}>
+              <Text style={styles.containerTitle}>Destinos</Text>
+              <Divider size="small" />
+              {zoneApi.Destinos.length > 0 ? (
+                <FlatList data={zoneApi.Destinos} renderItem={renderDestiny} />
+              ) : (
+                <Text>La zona no posee destinos creados</Text>
+              )}
+            </View>
+            <View style={styles.dataContainer}>
+              <Text style={styles.containerTitle}>Encargados</Text>
+              <Divider size="small" />
+              {zoneApi.encargado_zona.length > 0 ? (
+            <FlatList data={zoneApi.encargado_zona} renderItem={renderWatchman} />
           ) : (
             <View>
               <Text>La zona no posea Personal Asignado</Text>
@@ -275,7 +287,7 @@ const ZoneDetailScreen = ({
                 />
               </View>
 
-              {listVisible && (
+              {/* {listVisible && (
                 <View>
                   {availableU.length > 0 ? (
                     <FlatList
@@ -290,10 +302,14 @@ const ZoneDetailScreen = ({
                     </Text>
                   )}
                 </View>
-              )}
+              )} */}
             </View>
-          )} */}
-        </View>
+          )} 
+            </View>
+          </View>
+        ) : (
+          <ActivityIndicator size="large" color="#f09" />
+        )}
       </ScrollView>
     </View>
   );

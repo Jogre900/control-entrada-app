@@ -249,18 +249,10 @@ const ZonasScreen = ({
                 <View key={i}>
                   <TouchableOpacity
                     onPress={
-                      selectItem.length >= 1
+                      selectItem.length > 0
                         ? () => onLong(item.id)
                         : () =>
-                            navigation.navigate("zone_detail", {
-                              id: item.id,
-                              zone: item.zone,
-                              destinys: item.Destinos,
-                              watchmen: item.encargado_zona,
-                              entryTime: item.firsEntryTime,
-                              departureTime: item.firsDepartureTime,
-                              companyId: item.companyId,
-                            })
+                            navigation.navigate("zone_detail", {zoneId: item.id})
                     }
                     onLongPress={() => onLong(item.id)}
                     delayLongPress={200}

@@ -642,8 +642,8 @@ password: "123456,
             name,
             lastName,
             dni,
-            picture: "foto de prueba",
-            //picture: req.file.filename,
+            //picture: "foto de prueba",
+            picture: req.file.filename,
             status: "Active"
           },
           userZone: {
@@ -734,7 +734,17 @@ password: "123456,
       token: null
     };
     console.log("SOY SUPERVISOR", req.body);
-    let { name, lastName, dni, email, password, companyId, zoneId, } = req.body;
+    let {
+      name,
+      lastName,
+      dni,
+      email,
+      password,
+      companyId,
+      zoneId,
+      assignationDate,
+      changeTurnDate
+    } = req.body;
     const privilege = "Supervisor";
 
     console.log(req.file);
@@ -761,12 +771,14 @@ password: "123456,
             name,
             lastName,
             dni,
-            //picture: req.file.filename,
-            picture: "foto de prueba",
+            picture: req.file.filename,
+            //picture: "foto de prueba",
             status: "Active"
           },
           userZone: {
             ZoneId: zoneId,
+            assignationDate,
+            changeTurnDate
           },
           UserCompany: {
             companyId,
@@ -806,7 +818,7 @@ password: "123456,
           res.json(RESPONSE);
         }
       } else {
-        RESPONSE.error = false;
+        RESPONSE.error = true;
         RESPONSE.msg = "usuario ya existe";
         RESPONSE.data = user;
         res.json(RESPONSE);
@@ -1203,14 +1215,13 @@ password: "123456,
         include: [
           {
             model: models.Employee,
-            as: "Employee",
+            as: "Employee"
           },
           {
             model: models.UserCompany,
             as: "UserCompany",
             where: {
-              [Op.and]: [{companyId}, {privilege: {[Op.not]: 'Admin'}}
-            ]
+              [Op.and]: [{ companyId }, { privilege: { [Op.not]: "Admin" } }]
             }
           },
           {

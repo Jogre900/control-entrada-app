@@ -25,7 +25,7 @@ const DestinyScreen = ({ navigation, zonesRedux, company, saveDestiny }) => {
   console.log("zones in Destiny from redux---", zonesRedux);
   console.log("company from redux---", company);
   const [zones, setZones] = useState([]);
-  const [zoneId, setZoneId] = useState();
+  const [zoneId, setZoneId] = useState(zonesRedux[0].id);
   const [create, setCreate] = useState(false);
   const [destinys, setDestinys] = useState([]);
   const [notFound, setNotFound] = useState(false);

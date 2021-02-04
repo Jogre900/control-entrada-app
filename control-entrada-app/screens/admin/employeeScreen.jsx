@@ -20,12 +20,12 @@ import Input from "../../components/input.component";
 import { TopNavigation } from "../../components/TopNavigation.component";
 import { MainButton } from "../../components/mainButton.component";
 import { Ionicons } from "@expo/vector-icons";
-import Avatar from '../../components/avatar.component'
+import Avatar from "../../components/avatar.component";
 import { connect } from "react-redux";
 const companyId = "9a28095a-9029-40ec-88c2-30e3fac69bc5";
 
 const EmployeeScreen = ({ navigation, employee, removeEmployee }) => {
-  console.log("EMPLOYEE FROM REDUX-----", employee)
+  console.log("EMPLOYEE FROM REDUX-----", employee);
   //const [employee, setEmployee] = useState([]);
   const [employeeId, setEmployeeId] = useState("");
   const [refreshing, setRefreshing] = useState(false);
@@ -72,7 +72,7 @@ const EmployeeScreen = ({ navigation, employee, removeEmployee }) => {
       let res = await axios.delete(`${API_PORT()}/api/deleteUser/${id}`);
       if (!res.data.error) {
         console.log(res.data.data);
-        removeEmployee(res.data.data)
+        removeEmployee(res.data.data);
         alert("Borrado con exito");
       }
     } catch (error) {
@@ -114,7 +114,7 @@ const EmployeeScreen = ({ navigation, employee, removeEmployee }) => {
           splash()
         ) : (
           <View>
-            {employee &&
+            {employee.length > 0 ? (
               employee.map((item, i) => (
                 <TouchableOpacity
                   style={styles.listItemBox}
@@ -126,7 +126,10 @@ const EmployeeScreen = ({ navigation, employee, removeEmployee }) => {
                     <Ionicons name="ios-trash" size={22} color="grey" />
                   </TouchableOpacity> */}
                   <View>
-                    <Avatar.Picture size={60} uri={`${API_PORT()}/public/imgs/${item.Employee.picture}`}/>
+                    <Avatar.Picture
+                      size={60}
+                      uri={`${API_PORT()}/public/imgs/${item.Employee.picture}`}
+                    />
                   </View>
                   <View>
                     <View style={styles.privilegeBox}>
@@ -158,7 +161,10 @@ const EmployeeScreen = ({ navigation, employee, removeEmployee }) => {
                     <Text style={styles.itemDataText}></Text>
                   </View> */}
                 </TouchableOpacity>
-              ))}
+              ))
+            ) : (
+              <Text>No hay empleados</Text>
+            )}
           </View>
         )}
       </ScrollView>
@@ -169,14 +175,14 @@ const mapStateToProps = (state) => ({
   employee: state.employee.employee,
 });
 
-const mapDispatchToProps = dispatch => ({
-  removeEmployee(employee){
+const mapDispatchToProps = (dispatch) => ({
+  removeEmployee(employee) {
     dispatch({
-      type: 'REMOVE_EMPLOYEE',
-      payload: employee
-    })
-  }
-})
+      type: "REMOVE_EMPLOYEE",
+      payload: employee,
+    });
+  },
+});
 export default connect(mapStateToProps, mapDispatchToProps)(EmployeeScreen);
 const styles = StyleSheet.create({
   container: {
