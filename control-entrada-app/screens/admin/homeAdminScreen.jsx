@@ -60,8 +60,9 @@ const HomeAdminScreen = ({
 
     try {
       let res = await axios.get(`${API_PORT()}/api/findZones/${company.id}`);
-
+      console.log(res.data)
       if (!res.data.error && res.data.data.length > 0) {
+        console.log("ZONES FROM API------", res.data.data)
         saveZones(res.data.data);
         setModalVisible(false);
       }
@@ -97,7 +98,7 @@ const HomeAdminScreen = ({
       setModalVisible(true);
       try {
         let res = await axios.get(`${API_PORT()}/api/findUsers/${company.id}`);
-        console.log("employee from API----",res.data.data);
+        //console.log("employee from API----",res.data.data);
         if (!res.data.error && res.data.data.length > 0) {
           saveEmployee(res.data.data);
           setLoading(false);

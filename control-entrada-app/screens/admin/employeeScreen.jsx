@@ -132,7 +132,7 @@ const EmployeeScreen = ({ navigation, employee, removeEmployee }) => {
                     />
                   </View>
                   <View>
-                    <View style={styles.privilegeBox}>
+                    {/* <View style={styles.privilegeBox}>
                       {item.privilege == "Supervisor" ? (
                         <Text style={styles.privilegeText}>S</Text>
                       ) : item.privilege == "Watchman" ? (
@@ -140,7 +140,7 @@ const EmployeeScreen = ({ navigation, employee, removeEmployee }) => {
                       ) : (
                         <Text style={styles.privilegeText}>--</Text>
                       )}
-                    </View>
+                    </View> */}
                   </View>
                   <View style={styles.itemDataBox}>
                     <Text style={styles.itemDataText}>

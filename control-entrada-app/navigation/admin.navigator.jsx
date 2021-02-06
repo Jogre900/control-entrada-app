@@ -90,7 +90,12 @@ const drawerData = [
   { label: "Destinos", route: "Destiny", icon: "ios-pin" },
 ];
 const DrawerContent = (props) => {
-  const logOutDispatch = useDispatch();
+  const dispatch = useDispatch();
+  const logOut = () => {
+    return new Promise((resolve, reject) => {
+      resolve(dispatch({ type: "CLEAR_STORAGE" }));
+    });
+  };
   return (
     <View
       style={{
@@ -130,7 +135,8 @@ const DrawerContent = (props) => {
             <Ionicons name="ios-log-out" size={size} color={color} />
           )}
           onPress={() => {
-            deleteToken().then(() => props.navigation.navigate("Main"));
+            logOut().then(() => alert("SE BORRO EL STORE DE REDUX!!!"));
+            // logOut().then(() => props.navigation.navigate("Main"));
           }}
         />
       </View>

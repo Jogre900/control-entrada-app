@@ -36,9 +36,11 @@ const ZoneDetailScreen = ({
   availableU,
   setNewEmployee,
 }) => {
-  console.log("params-----------",route)
-  const { zoneId } = route.params;
-
+  console.log("ZONE DETAILS-----------",route.params.zoneId)
+  const  {zoneId}  = route.params;
+  
+  //const [zoneId, setZoneId] = useState(route.params.zoneId)
+  //const [params, setParams] = useState()
   const [destiny, setDestiny] = useState();
   const [zoneEmployee, setZoneEmployee] = useState();
   //const [availableU, setAvailableU] = useState([]);
@@ -106,7 +108,7 @@ const ZoneDetailScreen = ({
   //REQUEST ZONE
   const requestZone = async () => {
     try {
-      const res = await axios.get(`${API_PORT()}/api/findZone/${zoneId}`);
+      const res = await axios.get(`${API_PORT()}/api/findZone/${route.params.zoneId}`);
       console.log("zone by Id from api---", res.data.data);
       if (!res.data.error) {
         setZoneApi(res.data.data);
@@ -172,17 +174,17 @@ const ZoneDetailScreen = ({
     <View style={styles.listEmployeBox}>
       <Image
         style={styles.avatar}
-        source={{ uri: `${API_PORT()}/public/imgs/${item.User.picture}` }}
+        source={{ uri: `${API_PORT()}/public/imgs/${item.User.Employee.picture}` }}
       />
       <View style={styles.listSubItemBox}>
         <View style={{ alignItems: "center" }}>
           <View style={styles.privilegeBox}>
             <Text style={{ color: "#fff", fontSize: 16, lineHeight: 16 }}>
-              {item.User.privilege}
+              {item.User.UserCompany[0].privilege}
             </Text>
           </View>
           <Text>
-            {item.User.name} {item.User.lastName}
+            {item.User.Employee.name} {item.User.Employee.lastName}
           </Text>
         </View>
         <View style={{ alignItems: "center" }}>
@@ -238,21 +240,23 @@ const ZoneDetailScreen = ({
   //   }
   // };
 
+  // useFocusEffect(
+  //   React.useCallback(() => {
+  //     setZoneId(route.params.zoneId)
+  //   }, [])
+  // );
   useFocusEffect(
     React.useCallback(() => {
-      //setZone([]);
-      requestZone();;
+      requestZone()
     }, [])
   );
-  // useEffect(() => {
-  //   requestZone();
-  // }, []);
+ 
 
   return (
     <View style={{ flex: 1 }}>
       <TopNavigation title='algo' leftControl={goBackAction()} />
-      <ScrollView style={{ flex: 1 }}>
-        {/* <Text>Zona:</Text> */}
+      {/* <ScrollView style={{ flex: 1 }}>
+     
         {zoneApi ? (
           <View>
             <View>
@@ -302,7 +306,7 @@ const ZoneDetailScreen = ({
                     </Text>
                   )}
                 </View>
-              )} */}
+              )} 
             </View>
           )} 
             </View>
@@ -310,7 +314,7 @@ const ZoneDetailScreen = ({
         ) : (
           <ActivityIndicator size="large" color="#f09" />
         )}
-      </ScrollView>
+      </ScrollView> */}
     </View>
   );
 };

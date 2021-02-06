@@ -12,10 +12,7 @@ export const NotificationScreen = () => {
             <View style={styles.notificationBox}>
                 <Text style={styles.notificationTitle}>Titulo</Text>
                 <Text style={styles.notificationSub} >Descripcion de la Notificacion</Text>
-                <Button title="delete Employee" onPress={() => dispatch({type: 'CLEAR_STORAGE'})}/> 
-                <Button title="delete Zone" onPress={() => dispatch({type: 'CLEAR_STORAGE'})}/>
-                
-                
+                <Button title="delete Employee" onPress={() => dispatch({type: 'CLEAR_STORAGE'})}/>             
             </View>
         </View>
     )

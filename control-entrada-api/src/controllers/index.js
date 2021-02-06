@@ -299,7 +299,7 @@ password: "123456,
       RESPONSE.data = zones;
       res.json(RESPONSE);
     } catch (error) {
-      RESPONSE.error = error;
+      RESPONSE.msg = error.message;
       res.json(RESPONSE);
     }
   },
@@ -321,7 +321,13 @@ password: "123456,
           {
             model: models.UserZone,
             as: "encargado_zona",
-            include: [models.User]
+            include: {
+              model: models.User,
+              include: [
+                { model: models.Employee, as: "Employee" },
+                { model: models.UserCompany, as: "UserCompany" }
+              ]
+            }
           }
         ]
       });
@@ -330,7 +336,7 @@ password: "123456,
       RESPONSE.data = zones;
       res.json(RESPONSE);
     } catch (error) {
-      RESPONSE.error = error;
+      RESPONSE.msg = error.message;
       res.json(RESPONSE);
     }
   },
@@ -604,7 +610,7 @@ password: "123456,
       data: null,
       token: null
     };
-    console.log("SOY ALL", req.body);
+    console.log("SOY WATCHMAN", req.body);
     let {
       name,
       lastName,
@@ -684,12 +690,9 @@ password: "123456,
           RESPONSE.msg = "Registro Exitoso!";
           RESPONSE.data = employee;
           res.status(200).json(RESPONSE);
-        } else {
-          RESPONSE.msg = "Error al registrar";
-          res.json(RESPONSE);
+          console.log(RESPONSE.data);
         }
       } else {
-        RESPONSE.error = false;
         RESPONSE.msg = "usuario ya existe";
         RESPONSE.data = user;
         res.json(RESPONSE);

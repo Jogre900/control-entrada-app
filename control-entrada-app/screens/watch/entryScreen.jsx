@@ -125,7 +125,7 @@ const EntryScreen = ({ navigation, profile, saveVisit }) => {
     try {
       let res = await axios.get(`${API_PORT()}/api/findVisit/${dni}`);
       console.log(res.data);
-      if (res.data.data !== null) {
+      if (!res.data.error) {
         console.log(res.data);
         let citizen = res.data.data;
         //console.log(citizen)
@@ -133,12 +133,11 @@ const EntryScreen = ({ navigation, profile, saveVisit }) => {
         setLastName(citizen.lastName);
         setImgUrl(citizen.picture);
         setEditable(false);
+      }else{
+        console.log(res.data.msg)
       }
     } catch (error) {
       console.log("error:---", error.message);
-      if (error.response.status === 404) {
-        alert(error.response.data.msg);
-      }
     }
   };
   //PICK IMAGE

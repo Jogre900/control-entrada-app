@@ -8,7 +8,7 @@ import {
   ActivityIndicator,
   Alert,
   TouchableOpacity,
-  TouchableWithoutFeedback
+  TouchableWithoutFeedback,
 } from "react-native";
 
 import axios from "axios";
@@ -23,13 +23,18 @@ import { Picker } from "@react-native-community/picker";
 import * as ImagePicker from "expo-image-picker";
 import moment from "moment";
 import { Divider } from "../../components/Divider";
-import {connect} from 'react-redux'
+import { connect } from "react-redux";
 const companyId = "9a28095a-9029-40ec-88c2-30e3fac69bc5";
 
-const CreateEmployeScreen = ({navigation, zonesRedux, companyRedux, addEmployee}) => {
-  console.log("zonesRedux---",zonesRedux)
-  console.log("company Redux-----", companyRedux)
-  
+const CreateEmployeScreen = ({
+  navigation,
+  zonesRedux,
+  companyRedux,
+  addEmployee,
+}) => {
+  console.log("zonesRedux---", zonesRedux);
+  console.log("company Redux-----", companyRedux);
+
   const [zoneId, setZoneId] = useState("");
   const [name, setName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -120,13 +125,13 @@ const CreateEmployeScreen = ({navigation, zonesRedux, companyRedux, addEmployee}
     data.append("email", email);
     data.append("password", "12345");
     data.append("zoneId", zoneId);
-    data.append("privilege", privilege)
+    data.append("privilege", privilege);
     data.append("assignationDate", date.toString());
     data.append("changeTurnDate", changeTurn.toString());
     data.append("companyId", companyRedux[0].id);
 
     try {
-      if(privilege === "Supervisor"){
+      if (privilege === "Supervisor") {
         const res = await axios.post(
           `${API_PORT()}/api/createUserSupervisor/`,
           data,
@@ -136,18 +141,18 @@ const CreateEmployeScreen = ({navigation, zonesRedux, companyRedux, addEmployee}
             },
           }
         );
-        console.log(res.data)
+        console.log(res.data);
         if (!res.data.error) {
           console.log(res.data.data);
-          addEmployee(res.data.data)
+          addEmployee(res.data.data);
           setCreate(true);
           setSaving(false);
           setSuccess(true);
-        }else{
-          alert(res.data.msg)
+        } else {
+          alert(res.data.msg);
           setSaving(false);
         }
-      }else{
+      } else {
         const res = await axios.post(
           `${API_PORT()}/api/createUserWatchman`,
           data,
@@ -159,18 +164,15 @@ const CreateEmployeScreen = ({navigation, zonesRedux, companyRedux, addEmployee}
         );
         if (!res.data.error) {
           console.log(res.data.data);
-          addEmployee(res.data.data)
+          addEmployee(res.data.data);
           setCreate(true);
           setSaving(false);
           setSuccess(true);
-        }else{
-          alert(res.data.msg)
+        } else {
+          alert(res.data.msg);
           setSaving(false);
         }
       }
-      
-
-     
     } catch (error) {
       console.log("error-----: ", error);
       alert(error);
@@ -354,17 +356,15 @@ const CreateEmployeScreen = ({navigation, zonesRedux, companyRedux, addEmployee}
 
           <View style={styles.dataContainer}>
             <Text style={styles.containerTitle}>Horario</Text>
-            <Divider size="small"/>
+            <Divider size="small" />
             <View>
               <TouchableOpacity onPress={() => showDatepicker()}>
                 <Text>Fecha de Asignacion</Text>
-                
               </TouchableOpacity>
             </View>
             <View>
               <TouchableOpacity onPress={() => showDatepicker2()}>
                 <Text>Cambio de Turno</Text>
-                
               </TouchableOpacity>
             </View>
             {show && (
@@ -394,7 +394,7 @@ const CreateEmployeScreen = ({navigation, zonesRedux, companyRedux, addEmployee}
             <Text>{moment(date).format("D MMM YYYY")}</Text>
           </View>
           <View>
-            <Text>{moment(changeTurn).format('D MMM YYYY')}</Text>
+            <Text>{moment(changeTurn).format("D MMM YYYY")}</Text>
           </View>
           <MainButton
             title="Crear Empleado"
@@ -411,20 +411,23 @@ const CreateEmployeScreen = ({navigation, zonesRedux, companyRedux, addEmployee}
   );
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   zonesRedux: state.zones.zones,
-  companyRedux: state.profile.company
-})
+  companyRedux: state.profile.company,
+});
 
-const mapDispatchToProps = dispatch => ({
-  addEmployee(employee){
+const mapDispatchToProps = (dispatch) => ({
+  addEmployee(employee) {
     dispatch({
-      type: 'ADD_EMPLOYEE',
-      payload: employee
-    })
-  }
-})
-export default connect(mapStateToProps, mapDispatchToProps)(CreateEmployeScreen)
+      type: "ADD_EMPLOYEE",
+      payload: employee,
+    });
+  },
+});
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(CreateEmployeScreen);
 const styles = StyleSheet.create({
   container: {
     alignItems: "center",
@@ -453,7 +456,6 @@ const styles = StyleSheet.create({
     // borderStyle: "dotted",
   },
   imageBox: {
-    
     justifyContent: "center",
     alignItems: "center",
     //height: 150

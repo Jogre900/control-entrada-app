@@ -45,7 +45,7 @@ export const DepartureScreen = (props) => {
   const findVisitId = async () => {
     try {
       let res = await axios.get(`${API_PORT()}/api/findVisitId/${id}`);
-      if (res) {
+      if (!res.data.error) {
         console.log(res.data);
         setVisit(res.data.data);
       }
@@ -66,7 +66,7 @@ export const DepartureScreen = (props) => {
           Authorization: `bearer ${token}`,
         },
       });
-      if (res) {
+      if (!res.data.error) {
         console.log(res.data);
         setEntryCheck(true);
         setUpdateVisit(res.data.data);

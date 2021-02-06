@@ -7,16 +7,12 @@ const initialState = {
 export default (state = initialState, action) => {
   switch (action.type) {
     case "SAVE_EMPLOYEE":
-      console.log("new employee payload:--",action.payload)
-      console.log("STATE.EMPLOYEE-----",state)  
     return {
-        
+        ...state,
         employee: state.employee.concat(action.payload)
       };
     //ADD NEW EMPLOYEE
     case "ADD_EMPLOYEE":
-      console.log("new employee payload:--",action.payload)
-      console.log("STATE.EMPLOYEE-----",state.employee.employee)
       return {
         ...state,
         employee: state.employee.concat(action.payload),
@@ -44,8 +40,8 @@ export default (state = initialState, action) => {
     case "CLEAR_STORAGE":
       console.log("CLEAR_STORAGE----",action.payload)  
       return {
-        ...state,
-        employee: initialState
+        employee: [],
+        available: []
       };
     default:
       return state;

@@ -37,9 +37,9 @@ const ZonasScreen = ({
   zonesRedux,
   setAvailable
 }) => {
-  //console.log("company REdux  ", companyRedux);
-  console.log("zonas desde REdux  ", zonesRedux);
-  console.log("Company from redux", companyRedux[0].id)
+  
+  //console.log("zonas desde REdux  ", zonesRedux);
+  //console.log("Company from redux", companyRedux[0].id)
   const [selectItem, setSeletedItem] = useState([]);
   const [changeStyle, setChangeStyle] = useState(false);
   const [deleted, setDeleted] = useState(false);
@@ -148,8 +148,6 @@ const ZonasScreen = ({
   };
 
   const createZone = async () => {
-    console.log("hora 1", moment(entranceTime).format("HH:mm a").toString())
-    console.log("hora 2", moment(departureTime).format("HH:mm a").toString())
     try {
       let res = await axios.post(
         `${API_PORT()}/api/createZone/${companyRedux[0].id}`,
@@ -168,14 +166,6 @@ const ZonasScreen = ({
       alert(error.message);
     }
   };
-
-  const getUserZone = (selectedItem) => {
-    let userZone = []
-    console.log("zona selec---", selectItem)
-      //zonesRedux.encargado_zona.map(e => console.log("encargado_zona---",e))
-    
-    return userZone
-  }
   
   const deleteZones = async (zonesId) => {
     setDeleted(false);
@@ -189,8 +179,8 @@ const ZonasScreen = ({
       });
       console.log(res.data)
       if (!res.data.error) {
-        await setAvailable(res.data.data)
-        await removeZones(zonesId);
+        setAvailable(res.data.data)
+        removeZones(zonesId);
         setSeletedItem([]);
         alert("Borrado!!");
         setDeleted(true);
@@ -203,7 +193,6 @@ const ZonasScreen = ({
     setSeletedItem([]);
   };
 
-  
   const onLong = (id) => {
     if (selectItem.includes(id)) {
       setSeletedItem((value) => value.filter((elem) => elem !== id));
@@ -231,7 +220,7 @@ const ZonasScreen = ({
 
   return (
     <View style={{ flex: 1 }}>
-      {selectItem.length >= 1 ? (
+      {selectItem.length > 0 ? (
         <Header
           value={selectItem.length}
           clearAction={() => clearSelect()}

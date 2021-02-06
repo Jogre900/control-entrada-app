@@ -69,7 +69,7 @@ const VisitScreen = ({navigation, profile}) => {
       let res = await axios.get(
         `${API_PORT()}/api/findTodayVisitsByUser/${profile.userZone[0].id}`
       );
-      if (res) {
+      if (!res.data.error) {
         console.log("today Visits:", res.data.data);
         setVisits(res.data.data);
         setModalVisible(false);
