@@ -26,7 +26,7 @@ import Modal from "react-native-modal";
 import { Divider } from "../../components/Divider";
 
 const WatchProfileScreen = ({navigation, profile}) => {
-  //console.log("redux:----", profileRedux)
+  console.log("redux:----", profile)
   const destiny = profile.userZone[0].Zone.Destinos
   const [editVisibility, setEditVisibility] = useState(false);
   const [passChange, setPassChange] = useState("");
@@ -126,7 +126,7 @@ const WatchProfileScreen = ({navigation, profile}) => {
   //RENDER DESTINY LIST
   const DestinyList = ({destiny}) => {
     return (
-      <React.Fragment>
+      <>
         {destiny.map((elem) => (
           <View
             key={elem.id}
@@ -141,7 +141,7 @@ const WatchProfileScreen = ({navigation, profile}) => {
             <Text>{elem.name}</Text>
           </View>
         ))}
-      </React.Fragment>
+      </>
     );
   };
   // useEffect(() => {
@@ -316,7 +316,7 @@ const WatchProfileScreen = ({navigation, profile}) => {
 };
 
 const mapStateToPRops = state => ({
-  profile: state.profileReducer.profile
+  profile: state.profile.profile
 })
 
 export default connect(mapStateToPRops, {})(WatchProfileScreen)

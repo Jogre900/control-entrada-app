@@ -116,6 +116,9 @@ const MainScreen = ({ navigation, saveProfile, saveCompany, saveLogin, isToken, 
             picture: res.data.data.Employee.picture,
             email: res.data.data.email,
           };
+          if(res.data.data.userZone.length > 0){
+            sprofile.userZone = res.data.data.userZone
+          }
           let company = [];
           res.data.data.UserCompany.map((comp) => {
             company.push({

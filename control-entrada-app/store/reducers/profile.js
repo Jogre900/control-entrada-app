@@ -13,6 +13,7 @@ const initialState = {
     lastName: "",
     picture: "",
     email: "",
+    userZone: []
   },
   company: [
     {
@@ -44,7 +45,8 @@ export default (state = initialState, action = {}) => {
         company: companySelect(state),
       };
     case "SAVE_PROFILE":
-      return {
+    console.log("SAVE PROF----",action.payload)  
+    return {
         ...state,
         profile: action.payload,
         //companySelect: companySelect(state),
@@ -74,9 +76,11 @@ export default (state = initialState, action = {}) => {
         login: { ...state.login, privilege: action.payload },
         companySelect: companySelect(state),
       };
-      case "LOG_OUT":
+      case "CLEAR_STORAGE":
       return {
-        state: initialState,
+        company: [],
+        profile: [],
+        login: []
       };
     default:
       return state;

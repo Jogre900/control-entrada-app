@@ -18,7 +18,7 @@ import {
 } from "react-native";
 import { useDispatch } from "react-redux";
 import { Ionicons } from "@expo/vector-icons";
-import AsyncStorage from "@react-native-community/async-storage";
+import { storage } from '../helpers/asyncStorage'
 import DrawerHeader from "./drawerHeader";
 import { MainColor, lightColor } from "../assets/colors";
 
@@ -76,10 +76,6 @@ function AdminNav() {
   );
 }
 
-const deleteToken = async () => {
-  await AsyncStorage.removeItem("userToken");
-};
-
 const drawerData = [
   { label: "Inicio", route: "admin-home", icon: "ios-home" },
   { label: "Empresa", route: "Company", icon: "ios-business" },
@@ -95,6 +91,9 @@ const DrawerContent = (props) => {
     return new Promise((resolve, reject) => {
       resolve(dispatch({ type: "CLEAR_STORAGE" }));
     });
+  };
+  const deleteToken = async () => {
+    logOut().then(() => storage.removeItem("userToken"));
   };
   return (
     <View
@@ -135,8 +134,8 @@ const DrawerContent = (props) => {
             <Ionicons name="ios-log-out" size={size} color={color} />
           )}
           onPress={() => {
-            logOut().then(() => alert("SE BORRO EL STORE DE REDUX!!!"));
-            // logOut().then(() => props.navigation.navigate("Main"));
+            //logOut().then(() => alert("SE BORRO EL STORE DE REDUX!!!"));
+            deleteToken().then(() => props.navigation.navigate("Main"));
           }}
         />
       </View>

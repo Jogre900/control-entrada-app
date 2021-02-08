@@ -6,17 +6,15 @@ import {
   Dimensions,
   TouchableOpacity,
 } from "react-native";
-import axios from 'axios'
-import { API_PORT } from '../../config/index'
+import axios from "axios";
+import { API_PORT } from "../../config/index";
 import { Ionicons } from "@expo/vector-icons";
-import AsyncStorage from '@react-native-community/async-storage'
-import {connect} from 'react-redux'
-import {storage} from '../../helpers/asyncStorage'
+import { connect, useDispatch } from "react-redux";
+import { storage } from "../../helpers/asyncStorage";
 
 //components
 import { TopNavigation } from "../../components/TopNavigation.component";
 import { MainButton } from "../../components/mainButton.component";
-
 
 //constants
 import { mainColor } from "../../constants/Colors";
@@ -26,7 +24,17 @@ const cover = require("../../assets/images/background.jpg");
 const { width, height } = Dimensions.get("window");
 
 export const HomeScreen = (props) => {
-
+  const dispatch = useDispatch();
+  const logOut = () => {
+    return new Promise((resolve, reject) => {
+      resolve(dispatch({ type: "CLEAR_STORAGE" }));
+    });
+  };
+  const deleteToken = async () => {
+    logOut()
+      .then(() => storage.removeItem("userToken"))
+      .then(() => props.navigation.navigate("Main"));
+  };
   const goBackAction = () => {
     return (
       <View>
@@ -40,22 +48,17 @@ export const HomeScreen = (props) => {
       </View>
     );
   };
-
-  const signOut = async () => {
-    storage.removeItem('userToken')
-      .then(() => props.navigation.navigate("Main"))
-  }
+  
   const rightControls = () => {
     return (
       <View>
-        <TouchableOpacity onPress={() => signOut()}>
+        <TouchableOpacity onPress={() => deleteToken()}>
           <Ionicons name="ios-log-out" size={28} color="white" />
         </TouchableOpacity>
       </View>
     );
   };
 
-  
   return (
     <View style={styles.container}>
       <TopNavigation
@@ -88,7 +91,6 @@ export const HomeScreen = (props) => {
     </View>
   );
 };
-
 
 const styles = StyleSheet.create({
   container: {

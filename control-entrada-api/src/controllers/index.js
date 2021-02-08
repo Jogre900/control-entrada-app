@@ -628,7 +628,7 @@ password: "123456,
     try {
       let user = await models.User.findOne({
         where: {
-          email: email
+          email: email.toLowerCase()
         },
         include: {
           model: models.Employee,
@@ -642,7 +642,7 @@ password: "123456,
         password = hash;
 
         let inputUser = {
-          email,
+          email: email.toLowerCase(),
           password: hash,
           Employee: {
             name,
@@ -754,7 +754,7 @@ password: "123456,
     try {
       let user = await models.User.findOne({
         where: {
-          email: email
+          email: email.toLowerCase()
         },
         include: {
           model: models.Employee,
@@ -768,7 +768,7 @@ password: "123456,
         password = hash;
 
         let inputUser = {
-          email,
+          email: email.toLowerCase(),
           password: hash,
           Employee: {
             name,
@@ -1018,7 +1018,7 @@ password: "123456,
           }
         ]
       });
-
+      console.log("USER LOGIN----",user)
       if (user) {
         if (bcrypt.compareSync(password, user.password)) {
           let token = jwt.sign(user.dataValues, SECRETKEY, { expiresIn: "1d" });
@@ -1212,6 +1212,7 @@ password: "123456,
       data: null,
       token: null
     };
+    console.log("FIND USERS ENDPOINT", req.params)
     const { companyId } = req.params;
     try {
       let user = await models.User.findAll({
@@ -1239,6 +1240,7 @@ password: "123456,
       (RESPONSE.error = false), (RESPONSE.msg = "Busqueda Exitosa");
       RESPONSE.data = user;
       res.status(200).json(RESPONSE);
+      console.log(user)
     } catch (error) {
       RESPONSE.msg = error.message;
       res.json(RESPONSE);

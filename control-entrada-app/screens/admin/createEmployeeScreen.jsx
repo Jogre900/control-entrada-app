@@ -35,7 +35,7 @@ const CreateEmployeScreen = ({
   console.log("zonesRedux---", zonesRedux);
   console.log("company Redux-----", companyRedux);
 
-  const [zoneId, setZoneId] = useState("");
+  const [zoneId, setZoneId] = useState(zonesRedux[0].id);
   const [name, setName] = useState("");
   const [lastName, setLastName] = useState("");
   const [dni, setDni] = useState("");
