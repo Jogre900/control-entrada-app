@@ -36,6 +36,7 @@ const middleware = {
     if (!req.headers["authorization"])
       return next(createError(401, "Usuario no Autorizado"));
     const headerToken = req.headers["authorization"];
+    console.log("CABECERA-----",headerToken)
     const token = headerToken.split(" ")[1];
     jwt.verify(token, SECRETKEY, (err, payload) => {
       console.log(payload);

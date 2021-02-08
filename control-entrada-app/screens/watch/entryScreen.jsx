@@ -32,9 +32,8 @@ import { storage } from "../../helpers/asyncStorage";
 const EntryScreen = ({ navigation, profile, saveVisit }) => {
   console.log("profile from redux---", profile);
 
-  //const destinys = profile.userZone[0].Zone.Destinos;
-
-  //const userZoneId = profile.userZone[0].id;
+  const destinys = profile.userZone[0].Zone.Destinos;
+  const userZoneId = profile.userZone[0].id;
 
   const [saveImg, setSaveImg] = useState();
   const [changeImg, setChangeImg] = useState(false);
@@ -78,8 +77,9 @@ const EntryScreen = ({ navigation, profile, saveVisit }) => {
 
   //CREATE VISIT
   const createVisit = async () => {
-    console.log("destiny id---------------", destinyId);
-    let token = storage.getItem("userToken");
+    //console.log("destiny id---------------", destinyId);
+    let token = await storage.getItem("userToken");
+    console.log("TOKEN FROM STORAGE-----",token)
     if (!name || !lastName || !dni) {
       setProfileCaption("Debe ingresar todos los datos");
       return;
@@ -229,13 +229,6 @@ const EntryScreen = ({ navigation, profile, saveVisit }) => {
     setSaveImg("");
     setImgUrl("");
   };
-
-  useEffect(() => {
-    effect;
-    return () => {
-      cleanup;
-    };
-  }, [input]);
   useEffect(() => {
     (async () => {
       if (Platform.OS !== "web") {

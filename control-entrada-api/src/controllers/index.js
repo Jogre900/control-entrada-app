@@ -1305,8 +1305,8 @@ password: "123456,
       data: null,
       tokn: null
     };
-    console.log(req.body);
-    console.log(req.params);
+    console.log("BODY--",req.body);
+    console.log("PARAMS---",req.params);
     console.log("1 foto:---", req.file);
     console.log("varias fotos----", req.files);
     const {
@@ -1337,7 +1337,7 @@ password: "123456,
             UserZoneId: userZoneId,
             citizenId: person.id,
             Fotos: {
-              picture: req.file.filename,
+              picture: req.files[0].filename,
               entry: "algo"
             }
           },
@@ -1388,7 +1388,7 @@ password: "123456,
         res.status(200).json(RESPONSE);
       }
     } catch (error) {
-      RESPONSE.msg = error.message;
+      RESPONSE.msg = error;
       res.json(RESPONSE);
     }
   },
