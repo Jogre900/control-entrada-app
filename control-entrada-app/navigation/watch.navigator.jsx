@@ -1,5 +1,5 @@
 import React from "react";
-import { createStackNavigator } from "@react-navigation/stack";
+import { createStackNavigator, CardStyleInterpolators, } from "@react-navigation/stack";
 
 //screen
 import { HomeScreen } from "../screens/watch/homeScreen";
@@ -9,6 +9,12 @@ import VisitScreen from "../screens/watch/visitScreen";
 import { DepartureScreen } from "../screens/watch/departureScreen";
 const Stack = createStackNavigator();
 
+const options = {
+  gestureEnabled: true,
+  gestureDirection: "horizontal",
+  cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+};
+
 export const WatchNavigator = () => {
   return (
     <Stack.Navigator headerMode="none" initialRouteName="watch-home">
@@ -17,7 +23,7 @@ export const WatchNavigator = () => {
       <Stack.Screen name="entrada" component={EntryScreen} />
       <Stack.Screen name="salida" component={VisitScreen} />
       <Stack.Screen
-        options={{ gestureEnable: true, gestureDirection: 'horizontal'}}
+        options={options}
         name="departure"
         component={DepartureScreen}
       />

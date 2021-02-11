@@ -61,8 +61,8 @@ const HomeAdminScreen = ({
     try {
       let res = await axios.get(`${API_PORT()}/api/findZones/${company.id}`);
       
+      //console.log("ZONES FROM API------", res.data)
       if (!res.data.error && res.data.data.length > 0) {
-        //console.log("ZONES FROM API------", res.data.data)
         saveZones(res.data.data);
         setModalVisible(false);
       }
@@ -98,7 +98,7 @@ const HomeAdminScreen = ({
       setModalVisible(true);
       try {
         let res = await axios.get(`${API_PORT()}/api/findUsers/${company.id}`);
-        console.log("employee from API----",res.data);
+        //console.log("employee from API----",res.data);
         if (!res.data.error && res.data.data.length > 0) {
           saveEmployee(res.data.data);
           setLoading(false);
@@ -165,17 +165,17 @@ const HomeAdminScreen = ({
                 <View style={styles.dataContainerView}>
                   <Avatar.Picture
                     size={50}
-                    uri={`${API_PORT()}/public/imgs/${elem.Citizen.picture}`}
+                    uri={`${API_PORT()}/public/imgs/${elem.Fotos[0].picture}`}
                   />
                 </View>
                 <View style={styles.dataContainerView}>
                   <Text>DNI</Text>
-                  <Text style={styles.dataText}>{elem.Citizen.dni}</Text>
+                  <Text style={styles.dataText}>{elem.Visitante.dni}</Text>
                 </View>
                 <View style={styles.dataContainerView}>
                   <Text>Nombre</Text>
                   <Text style={styles.dataText}>
-                    {elem.Citizen.name} {elem.Citizen.lastName}
+                    {elem.Visitante.name} {elem.Visitante.lastName}
                   </Text>
                 </View>
                 <View style={styles.dataContainerView}>

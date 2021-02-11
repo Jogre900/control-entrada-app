@@ -9,7 +9,13 @@ module.exports = (sequelize, DataTypes) => {
         },
         as: "Destino"
       });
-      Destination.belongsTo(models.Zone);
+      Destination.belongsTo(models.Zone, {
+        foreignKey: {
+          name: "zoneId",
+          field: "zone_id"
+        },
+        as: "Zona",
+      });
     };
   }
   Destination.init(

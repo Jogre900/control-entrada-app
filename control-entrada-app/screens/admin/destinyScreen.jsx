@@ -80,6 +80,7 @@ const DestinyScreen = ({ navigation, zonesRedux, company, saveDestiny }) => {
   const requestDestiny = async () => {
     try {
       let res = await axios.get(`${API_PORT()}/api/findDestiny/${zoneId}`);
+      console.log("DESTINY FORM API----",res.data)
       if (res.data.data.length >= 1) {
         setDestinys(res.data.data);
         setNotFound(false);

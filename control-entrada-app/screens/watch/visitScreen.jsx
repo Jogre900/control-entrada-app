@@ -69,6 +69,7 @@ const VisitScreen = ({navigation, profile}) => {
       let res = await axios.get(
         `${API_PORT()}/api/findTodayVisitsByUser/${profile.userZone[0].id}`
       );
+      console.log(res.data)
       if (!res.data.error) {
         console.log("today Visits:", res.data.data);
         setVisits(res.data.data);
@@ -86,8 +87,8 @@ const VisitScreen = ({navigation, profile}) => {
     } else {
       try {
         let res = await axios.get(`${API_PORT()}/api/findVisit/${dni}`);
+        console.log("busqueda por dni:----- ", res.data);
         if (!res.data.error) {
-          console.log("busqueda por dni:----- ", res.data.data);
           setCitizen(res.data.data);
           setvisitsDni(res.data.data.Visitas);
           setFindIt(true);
@@ -105,6 +106,8 @@ const VisitScreen = ({navigation, profile}) => {
 
           setVisitId(res.data.data.Visitas[0].id);
           //console.log("Visitas//----", res.data.data.Visitas[0]);
+        }else{
+          alert(res.data.msg)
         }
       } catch (error) {
         console.log(error.message);
@@ -144,12 +147,12 @@ const VisitScreen = ({navigation, profile}) => {
       <View style={styles.subItemBox}>
         <Text style={styles.subItemTitle}>Nombre:</Text>
         <Text style={styles.dataText}>
-          {item.Citizen.name} {item.Citizen.lastName}
+          {item.Visitante.name} {item.Visitante.lastName}
         </Text>
       </View>
       <View style={styles.subItemBox}>
         <Text style={styles.subItemTitle}>Destino: </Text>
-        <Text style={styles.dataText}>{item.Destination.name}</Text>
+        <Text style={styles.dataText}>{item.Destino.name}</Text>
       </View>
       <View style={styles.subItemBox}>
         <Text style={styles.subItemTitle}>Entrada:</Text>
@@ -232,7 +235,7 @@ const VisitScreen = ({navigation, profile}) => {
               </View>
               <View style={styles.subItemBox}>
                 <Ionicons name="ios-pin" size={22} color="grey" />
-                <Text style={styles.dataText}>{elem.Destination.name}</Text>
+                <Text style={styles.dataText}>{elem.Destino.name}</Text>
               </View>
               <View style={styles.subItemBox}>
                 <Text style={styles.labelText}>Entrada:</Text>
@@ -287,7 +290,7 @@ const VisitScreen = ({navigation, profile}) => {
   );
 };
 const mapStateToProps = state => ({
-  profile: state.profileReducer.profile
+  profile: state.profile.profile
 })
 
 export default connect(mapStateToProps, {})(VisitScreen)

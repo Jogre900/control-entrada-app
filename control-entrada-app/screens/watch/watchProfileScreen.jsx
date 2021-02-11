@@ -27,7 +27,7 @@ import { Divider } from "../../components/Divider";
 
 const WatchProfileScreen = ({navigation, profile}) => {
   console.log("redux:----", profile)
-  const destiny = profile.userZone[0].Zone.Destinos
+  const destiny = profile.userZone[0].Zona.Destinos
   const [editVisibility, setEditVisibility] = useState(false);
   const [passChange, setPassChange] = useState("");
   const [repeatPass, setRepeatPass] = useState("");
@@ -209,7 +209,7 @@ const WatchProfileScreen = ({navigation, profile}) => {
                     />
                   </View>
                   <Text style={styles.dataText}>
-                    {profile.userZone[0].Zone.zone}
+                    {profile.userZone[0].Zona.zone}
                   </Text>
                 </View>
                 <View

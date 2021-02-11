@@ -75,7 +75,7 @@ export const EmployeeDetailScreen = (props) => {
           <Ionicons name="ios-business" size={28} color={ThirdColor} />
           <Divider size="small" />
           {profile.userZone.length > 0 ? (
-            <Text>Asignado: {profile.userZone[0].Zone.zone}</Text>
+            <Text>Asignado: {profile.userZone[0].Zona.zone}</Text>
           ) : (
             <Text>El usuario no posea zona asignada.</Text>
           )}

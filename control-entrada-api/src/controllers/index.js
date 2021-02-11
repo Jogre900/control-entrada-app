@@ -290,7 +290,7 @@ password: "123456,
           {
             model: models.UserZone,
             as: "encargado_zona",
-            include: [models.User]
+            include: { model: models.User, as: "User" }
           }
         ]
       });
@@ -323,6 +323,7 @@ password: "123456,
             as: "encargado_zona",
             include: {
               model: models.User,
+              as: "User",
               include: [
                 { model: models.Employee, as: "Employee" },
                 { model: models.UserCompany, as: "UserCompany" }
@@ -427,19 +428,22 @@ password: "123456,
       token: null
     };
     const { id } = req.params;
+    console.log(req.params);
     try {
       let destinys = await models.Destination.findAll({
         where: {
           zoneId: id
         },
-        include: [{ model: models.Zone, as: "Zone" }]
+        include: [{ model: models.Zone, as: "Zona" }]
       });
+
       RESPONSE.error = false;
       RESPONSE.msg = "Busqueda Exitosa!";
       RESPONSE.data = destinys;
       res.json(RESPONSE);
     } catch (error) {
-      RESPONSE.msg = error;
+      console.log(error);
+      RESPONSE.msg = error.message;
     }
   },
   deleteDestiny: async function(req, res) {
@@ -995,6 +999,7 @@ password: "123456,
             as: "userZone",
             include: {
               model: models.Zone,
+              as: "Zona",
               include: { model: models.Destination, as: "Destinos" }
             }
           },
@@ -1018,7 +1023,7 @@ password: "123456,
           }
         ]
       });
-      console.log("USER LOGIN----",user)
+      console.log("USER LOGIN----", user);
       if (user) {
         if (bcrypt.compareSync(password, user.password)) {
           let token = jwt.sign(user.dataValues, SECRETKEY, { expiresIn: "1d" });
@@ -1212,7 +1217,7 @@ password: "123456,
       data: null,
       token: null
     };
-    console.log("FIND USERS ENDPOINT", req.params)
+    console.log("FIND USERS ENDPOINT", req.params);
     const { companyId } = req.params;
     try {
       let user = await models.User.findAll({
@@ -1232,7 +1237,8 @@ password: "123456,
             model: models.UserZone,
             as: "userZone",
             include: {
-              model: models.Zone
+              model: models.Zone,
+              as: "Zona"
             }
           }
         ]
@@ -1240,7 +1246,7 @@ password: "123456,
       (RESPONSE.error = false), (RESPONSE.msg = "Busqueda Exitosa");
       RESPONSE.data = user;
       res.status(200).json(RESPONSE);
-      console.log(user)
+      console.log(user);
     } catch (error) {
       RESPONSE.msg = error.message;
       res.json(RESPONSE);
@@ -1305,8 +1311,8 @@ password: "123456,
       data: null,
       tokn: null
     };
-    console.log("BODY--",req.body);
-    console.log("PARAMS---",req.params);
+    console.log("BODY--", req.body);
+    console.log("PARAMS---", req.params);
     console.log("1 foto:---", req.file);
     console.log("varias fotos----", req.files);
     const {
@@ -1388,7 +1394,8 @@ password: "123456,
         res.status(200).json(RESPONSE);
       }
     } catch (error) {
-      RESPONSE.msg = error;
+      RESPONSE.msg = error.message;
+      console.log(error.message);
       res.json(RESPONSE);
     }
   },
@@ -1466,20 +1473,24 @@ password: "123456,
           id
         },
         include: [
-          { model: models.citizen },
-          { model: models.picture, as: "Fotos" },
-          { model: models.destination, attributes: ["id", "name"] }
+          { model: models.Citizen, as: "Visitante" },
+          { model: models.Picture, as: "Fotos" },
+          {
+            model: models.Destination,
+            as: "Destino",
+            attributes: ["id", "name"]
+          }
         ]
       });
       if (visit) {
         RESPONSE.error = false;
         RESPONSE.msg = "Busqueda Exitosa!";
         RESPONSE.data = visit;
-        res.status(200).json(RESPONSE);
+        res.json(RESPONSE);
       }
     } catch (error) {
       RESPONSE.msg = error.message;
-      res.status(error.respone.status).json(RESPONSE);
+      res.json(RESPONSE);
     }
   },
   //FIND BY DNI
@@ -1492,6 +1503,7 @@ password: "123456,
     };
 
     const { id } = req.params;
+    console.log("VISIT BY DNI----", req.params)
 
     try {
       let visit = await models.Citizen.findOne({
@@ -1501,11 +1513,14 @@ password: "123456,
             model: models.Visits,
             as: "Visitas",
             include: [
-              { model: models.Destination },
+              { model: models.Destination, as: "Destino" },
               { model: models.Picture, as: "Fotos" },
               {
                 model: models.UserZone,
-                include: [{ model: models.Zone }, { model: models.User }]
+                include: [
+                  { model: models.Zone, as: "Zona" },
+                  { model: models.User, as: "User" }
+                ]
               }
             ]
           }
@@ -1520,7 +1535,7 @@ password: "123456,
         res.json(RESPONSE);
       } else {
         RESPONSE.msg = "Dni no registrado";
-        res.status(404).json(RESPONSE);
+        res.json(RESPONSE);
       }
     } catch (error) {
       RESPONSE.msg = error.message;
@@ -1548,26 +1563,30 @@ password: "123456,
           }
         },
         include: [
-          { model: models.Citizen },
+          { model: models.Citizen, as: "Visitante" },
           { model: models.Picture, as: "Fotos" },
-          { model: models.Destination, attributes: ["id", "name"] },
+          {
+            model: models.Destination,
+            as: "Destino",
+            attributes: ["id", "name"],
+            include: {
+              model: models.Zone,
+              as: "Zona",
+              where: { companyId },
+              attributes: ["id", "zone"]
+            }
+          },
           {
             model: models.UserZone,
             attributes: ["id", "changeTurnDate", "assignationDate"],
-            include: [
-              {
-                model: models.Zone,
-                where: { companyId },
-                attributes: ["id", "zone"]
-              },
-              {
-                model: models.User,
-                include: {
-                  model: models.Employee,
-                  as: "Employee"
-                }
+            include: {
+              model: models.User,
+              as: "User",
+              include: {
+                model: models.Employee,
+                as: "Employee"
               }
-            ]
+            }
           }
         ]
       });
@@ -1594,33 +1613,31 @@ password: "123456,
     try {
       let visits = await models.Visits.findAll({
         where: {
-          UserZoneId: id,
-          entryDate: {
-            [Op.between]: [
-              `${moment().format("YYYY-MM-DD")} 00:00:00`,
-              `${moment().format("YYYY-MM-DD")} 23:59:00`
-            ]
-          }
+          UserZoneId: id
+          // entryDate: {
+          //   [Op.between]: [
+          //     `${moment().format("YYYY MM D, HH:mm:ss")} 00:00:00`,
+          //     `${moment().format("YYYY MM D, HH:mm:ss")} 23:59:00`
+          //   ]
+          // }
         },
         include: [
-          { model: models.Citizen },
+          { model: models.Citizen, as: "Visitante" },
+          { model: models.Destination, as: "Destino" },
           { model: models.Picture, as: "Fotos" },
-          { model: models.Destination, attributes: ["id", "name"] },
           {
             model: models.UserZone,
             attributes: ["id", "changeTurnDate", "assignationDate"],
             include: [
-              { model: models.Zone, attributes: ["id", "zone"] },
+              { model: models.Zone, as: "Zona", attributes: ["id", "zone"] },
               {
                 model: models.User,
-                attributes: [
-                  "id",
-                  "name",
-                  "lastName",
-                  "dni",
-                  "email",
-                  "picture"
-                ]
+                attributes: ["email"],
+                as: "User",
+                include: {
+                  model: models.Employee,
+                  as: "Employee"
+                }
               }
             ]
           }
@@ -1631,15 +1648,15 @@ password: "123456,
         RESPONSE.error = false;
         RESPONSE.msg = "Busqueda Exitosa!";
         RESPONSE.data = visits;
-        res.status(200).json(RESPONSE);
+        res.json(RESPONSE);
       } else {
         RESPONSE.error = false;
         RESPONSE.msg = "No hay Resultados!";
-        res.status(404).json(RESPONSE);
+        res.json(RESPONSE);
       }
     } catch (error) {
-      RESPONSE.msg = error;
-      res.status(error.respone.status).json(RESPONSE);
+      RESPONSE.msg = error.message;
+      res.json(RESPONSE);
     }
   },
   findWeekVisits: async function(req, res) {
@@ -1663,16 +1680,17 @@ password: "123456,
           }
         },
         include: [
-          { model: models.Citizen },
+          { model: models.Citizen, as: "Visitante" },
           { model: models.Picture, as: "Fotos" },
           { model: models.Destination, attributes: ["id", "name"] },
           {
             model: models.UserZone,
             attributes: ["id", "changeTurnDate", "assignationDate"],
             include: [
-              { model: models.Zone, attributes: ["id", "zone"] },
+              { model: models.Zone, as: "Zona", attributes: ["id", "zone"] },
               {
                 model: models.User,
+                as: "User",
                 attributes: [
                   "id",
                   "name",

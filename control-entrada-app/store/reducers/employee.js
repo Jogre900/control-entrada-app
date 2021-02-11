@@ -9,17 +9,17 @@ export default (state = initialState, action) => {
     case "SAVE_EMPLOYEE":
     //console.log("PAYLOAD---",action.payload)
     let allEmployees = state.employee.concat(action.payload)
-    console.log("CONCAT EMPLOY----", allEmployees)
+    //console.log("CONCAT EMPLOY----", allEmployees)
     let filterEmployee = allEmployees.reduce((acum, emp) => {
       if(!acum.find(({id}) => id === emp.id)){
         acum.push(emp)
       }
       return acum
     }, [])
-    console.log("PAYLOAD SAVED---",filterEmployee) 
+    //console.log("PAYLOAD SAVED---",filterEmployee) 
     return {
         ...state,
-        employee: filterEmployee
+        employee: action.payload
       };
       
     //ADD NEW EMPLOYEE

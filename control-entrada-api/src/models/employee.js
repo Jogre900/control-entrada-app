@@ -8,8 +8,6 @@ module.exports = (sequelize, DataTypes) => {
           field: "user_id"
         },
         as: "User",
-        onDelete: "CASCADE",
-        onUpdate: "CASCADE"
       });
     };
   }

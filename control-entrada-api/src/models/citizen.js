@@ -1,7 +1,7 @@
 const {
   Model
 } = require('sequelize');
-module.exports = (sequelize, DataTypes, UUIDV4) => {
+module.exports = (sequelize, DataTypes) => {
   class Citizen extends Model {
     static associate = models => {
       this.hasMany(models.Visits, {

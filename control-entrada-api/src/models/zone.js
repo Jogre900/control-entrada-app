@@ -17,10 +17,14 @@ module.exports = (sequelize, DataTypes) => {
           field: "zone_id"
         },
         as: "encargado_zona",
-        onDelete: "CASCADE",
-        onUpdate: "CASCADE"
       });
-      this.belongsTo(models.Company);
+      this.belongsTo(models.Company, {
+        foreignKey: {
+          name: "companyId",
+          field: "company_id"
+        },
+        as: "companyZone",
+      });
     };
   }
   Zone.init(

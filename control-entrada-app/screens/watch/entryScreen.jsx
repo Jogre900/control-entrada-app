@@ -32,7 +32,7 @@ import { storage } from "../../helpers/asyncStorage";
 const EntryScreen = ({ navigation, profile, saveVisit }) => {
   console.log("profile from redux---", profile);
 
-  const destinys = profile.userZone[0].Zone.Destinos;
+  const destinys = profile.userZone[0].Zona.Destinos;
   const userZoneId = profile.userZone[0].id;
 
   const [saveImg, setSaveImg] = useState();
@@ -107,6 +107,7 @@ const EntryScreen = ({ navigation, profile, saveVisit }) => {
             },
           }
         );
+        console.log(res.data)
         if (!res.data.error) {
           console.log(res.data);
           saveVisit(res.data.data);

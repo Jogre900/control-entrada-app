@@ -2,7 +2,13 @@ import { Model } from "sequelize";
 module.exports = (sequelize, DataTypes) => {
   class Picture extends Model {
     static associate = models => {
-      this.belongsTo(models.Visits);
+      this.belongsTo(models.Visits, {
+        foreignKey: {
+          name: "visitsId",
+          field: "visits_id"
+        },
+        as: "Fotos",
+      });
     };
   }
   Picture.init(

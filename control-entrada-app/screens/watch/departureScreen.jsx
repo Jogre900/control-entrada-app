@@ -45,6 +45,7 @@ export const DepartureScreen = (props) => {
   const findVisitId = async () => {
     try {
       let res = await axios.get(`${API_PORT()}/api/findVisitId/${id}`);
+      console.log(res.data)
       if (!res.data.error) {
         console.log(res.data);
         setVisit(res.data.data);
@@ -100,7 +101,7 @@ export const DepartureScreen = (props) => {
             <Image
               style={styles.profilePic}
               source={{
-                uri: `${API_PORT()}/public/imgs/${visit.Citizen.picture}`,
+                uri: `${API_PORT()}/public/imgs/${visit.Visitante.picture}`,
               }}
             />
           </View>
@@ -108,13 +109,13 @@ export const DepartureScreen = (props) => {
             <Text>Datos de Ingreso</Text>
             <Divider size="small" />
             <Text>
-              Nombre {visit.Citizen.name}
-              {visit.Citizen.lastName}
+              Nombre {visit.Visitante.name}
+              {visit.Visitante.lastName}
             </Text>
-            <Text>DNI{visit.Citizen.dni}</Text>
+            <Text>DNI{visit.Visitante.dni}</Text>
             <Text>Visita</Text>
             <Divider size="small" />
-            <Text>Destino{visit.Destination.name}</Text>
+            <Text>Destino{visit.Destino.name}</Text>
             <Text>
               Hora de entrada{moment(visit.entryDate).format("MMM Do, HH:mm a")}
             </Text>

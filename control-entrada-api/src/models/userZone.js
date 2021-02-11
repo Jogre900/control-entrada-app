@@ -8,9 +8,20 @@ module.exports = (sequelize, DataTypes) => {
           name: "user_zone_id"
         }
       });
-      this.belongsTo(models.Employee);
-      this.belongsTo(models.Zone);
-      this.belongsTo(models.User);
+      this.belongsTo(models.Zone, {
+        foreignKey: {
+          name: "ZoneId",
+          field: "zone_id"
+        },
+        as: "Zona",
+      });
+      this.belongsTo(models.User, {
+        foreignKey: {
+          name: "UserId",
+          field: "user_id"
+        },
+        as: "User",
+      });
     };
   }
   UserZone.init(

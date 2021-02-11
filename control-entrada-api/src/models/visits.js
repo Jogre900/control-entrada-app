@@ -11,9 +11,26 @@ module.exports = (sequelize, DataTypes) => {
         onDelete: "CASCADE",
         onUpdate: "CASCADE"
       });
-      this.belongsTo(models.Destination);
-      this.belongsTo(models.Citizen);
-      this.belongsTo(models.UserZone);
+      this.belongsTo(models.Destination, {
+        foreignKey: {
+          name: "destinationId",
+          field: "destination_id"
+        },
+        as: "Destino"
+      });
+      this.belongsTo(models.Citizen, {
+        foreignKey: {
+          name: "citizenId",
+          field: "citizen_id"
+        },
+        as: "Visitante",
+      });
+      this.belongsTo(models.UserZone, {
+        foreigKey: {
+          field: "userZoneId",
+          name: "user_zone_id"
+        }
+      });
     };
   }
   Visits.init(

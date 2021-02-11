@@ -140,11 +140,11 @@ console.log("port: ", PORT);
 //Running Server sequelize config
 const alter = false;
 const force = false;
-//const logging = console.log
+const logging = console.log
 
 import db from "./models/index";
 
-db.sequelize.sync({ force, alter }).then(() => {
+db.sequelize.sync({ logging, force, alter }).then(() => {
   app.listen(PORT, () => console.log(`Server Runing on port: ${PORT}`));
 });
 
