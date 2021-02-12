@@ -1458,7 +1458,7 @@ password: "123456,
         RESPONSE.error = false;
         RESPONSE.msg = "Actualizacion Existosa";
         RESPONSE.data = visit;
-        res.status(200).json(RESPONSE);
+        res.json(RESPONSE);
       }
     } catch (error) {
       RESPONSE.msg = error.message;

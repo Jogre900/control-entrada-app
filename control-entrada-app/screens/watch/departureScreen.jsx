@@ -6,7 +6,7 @@ import {
   ScrollView,
   TouchableWithoutFeedback,
   Image,
-  ActivityIndicator
+  ActivityIndicator,
 } from "react-native";
 
 import { TopNavigation } from "../../components/TopNavigation.component";
@@ -18,7 +18,7 @@ import { MainColor } from "../../assets/colors";
 import { Divider } from "../../components/Divider";
 import { MainButton } from "../../components/mainButton.component";
 import Input from "../../components/input.component";
-import AsyncStorage from "@react-native-community/async-storage";
+import { storage } from '../../helpers/asyncStorage'
 
 export const DepartureScreen = (props) => {
   console.log("PARAMETROS----", props.route.params);
@@ -46,7 +46,7 @@ export const DepartureScreen = (props) => {
   const findVisitId = async () => {
     try {
       let res = await axios.get(`${API_PORT()}/api/findVisitId/${id}`);
-      console.log(res.data)
+      console.log(res.data);
       if (!res.data.error) {
         setVisit(res.data.data);
       }
@@ -60,41 +60,34 @@ export const DepartureScreen = (props) => {
       departureDate: moment(),
       descriptionDeparture: departureText,
     };
-    let token = await getToken();
+    const token = await storage.getItem('userToken');
     try {
       let res = await axios.put(`${API_PORT()}/api/updateVisit/${id}`, data, {
         headers: {
           Authorization: `bearer ${token}`,
         },
       });
+      console.log("UPDATE ENTRY-----",res.data)
       if (!res.data.error) {
         console.log(res.data);
         setEntryCheck(true);
         setUpdateVisit(res.data.data);
-        alert("salida registrada!")
+        alert("salida registrada!");
       }
     } catch (error) {
       console.log("error: ", error.message);
-      alert(error.message)
+      alert(error.message);
     }
   };
 
-  //GET TOKEN
-  const getToken = async () => {
-    const token = await AsyncStorage.getItem("watchToken");
-    if (token) {
-      console.log("token------", token);
-      return token;
-    }
-  };
   useEffect(() => {
     findVisitId();
-  }, [id]);
+  }, [id, entryCheck]);
 
   return (
     // <>
     // {console.log("render"),
-    //   visit ? 
+    //   visit ?
     //   <Text>{visit.Visitante.name}</Text>
     //   :
     //   <ActivityIndicator size="large" color={MainColor}/>
@@ -114,19 +107,23 @@ export const DepartureScreen = (props) => {
               }}
             />
           </View>
+          <View style={{alignItems: 'center'}}>
+
+          
           <View style={styles.dateContainer}>
-            <Text>Datos de Ingreso</Text>
+            <Text style={styles.containerTitle}>Datos</Text>
             <Divider size="small" />
             <Text>
-              Nombre {visit.Visitante.name}
-              {visit.Visitante.lastName}
+              Nombre: {visit.Visitante.name} {visit.Visitante.lastName}
             </Text>
-            <Text>DNI{visit.Visitante.dni}</Text>
-            <Text>Visita</Text>
+            <Text>DNI: {visit.Visitante.dni}</Text>
+            <Text>Destino: {visit.Destino.name}</Text>
+          </View>
+          <View style={styles.dateContainer}>
+            <Text style={styles.containerTitle}>Ingreso</Text>
             <Divider size="small" />
-            <Text>Destino{visit.Destino.name}</Text>
             <Text>
-              Hora de entrada{moment(visit.entryDate).format("MMM Do, HH:mm a")}
+              Hora de entrada: {moment(visit.entryDate).format("MMM Do, HH:mm a")}
             </Text>
             <Image
               style={{ width: 100, height: 100 }}
@@ -134,34 +131,41 @@ export const DepartureScreen = (props) => {
                 uri: `${API_PORT()}/public/imgs/${visit.Fotos[0].picture}`,
               }}
             />
-            <Text>Observacion entrada {visit.descriptionEntry}</Text>
-
-            <View>
-              <Text>
-                Hora de salida
-                {moment(visit.departureDate).format("D, HH:mm a")}
-              </Text>
-              <Text>Observacion salida {visit.descriptionDeparture}</Text>
-            </View>
-
-            {
-              <Input
-                title="Descripcion Salida (Opcional)"
-                value={departureText}
-                onChangeText={(value) => setDepartureText(value)}
-                shape="flat"
-              />
-            }
+            <Text>Observacion: {visit.descriptionEntry}</Text>
           </View>
-          <View>
-            <MainButton
-              title="Registrar Salida"
-              onPress={() => updateEntry()}
-            />
+          <View style={styles.dateContainer}>
+            <Text style={styles.containerTitle}>Salida</Text>
+            <Divider size="small" />
+            {visit.entryDate !== visit.departureDate ? (
+              <>
+                <Text>
+                  Hora de salida
+                  {moment(visit.departureDate).format("D, HH:mm a")}
+                </Text>
+                <Text>Observacion: {visit.descriptionDeparture}</Text>
+              </>
+            ) : (
+              <>
+                <Input
+                  title="Descripcion Salida (Opcional)"
+                  value={departureText}
+                  onChangeText={(value) => setDepartureText(value)}
+                  shape="flat"
+                />
+                <View>
+                  <MainButton
+                    title="Registrar Salida"
+                    onPress={() => updateEntry()}
+                  />
+                </View>
+              </>
+            )}
+          </View>
           </View>
         </ScrollView>
-      ) : <ActivityIndicator size="large" color={MainColor}/>
-      }
+      ) : (
+        <ActivityIndicator size="large" color={MainColor} />
+      )}
     </View>
   );
 };
@@ -179,6 +183,11 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 250,
     //borderRadius: 70,
+  },
+  containerTitle: {
+    fontSize: 16,
+    fontWeight: "normal",
+    color: MainColor,
   },
   dateContainer: {
     backgroundColor: "#fff",
