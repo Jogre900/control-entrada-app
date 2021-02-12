@@ -6,6 +6,7 @@ import {
   ScrollView,
   TouchableWithoutFeedback,
   Image,
+  ActivityIndicator
 } from "react-native";
 
 import { TopNavigation } from "../../components/TopNavigation.component";
@@ -47,7 +48,6 @@ export const DepartureScreen = (props) => {
       let res = await axios.get(`${API_PORT()}/api/findVisitId/${id}`);
       console.log(res.data)
       if (!res.data.error) {
-        console.log(res.data);
         setVisit(res.data.data);
       }
     } catch (error) {
@@ -92,6 +92,15 @@ export const DepartureScreen = (props) => {
   }, [id]);
 
   return (
+    // <>
+    // {console.log("render"),
+    //   visit ? 
+    //   <Text>{visit.Visitante.name}</Text>
+    //   :
+    //   <ActivityIndicator size="large" color={MainColor}/>
+    // }
+    // </>
+
     <View style={{ flex: 1 }}>
       <TopNavigation title="Marcar Salida" leftControl={goBackAction()} />
 
@@ -151,7 +160,8 @@ export const DepartureScreen = (props) => {
             />
           </View>
         </ScrollView>
-      ) : null}
+      ) : <ActivityIndicator size="large" color={MainColor}/>
+      }
     </View>
   );
 };

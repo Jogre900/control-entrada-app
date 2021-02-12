@@ -107,8 +107,9 @@ const ZoneDetailScreen = ({
 
   //REQUEST ZONE
   const requestZone = async () => {
+    setZoneApi();
     try {
-      const res = await axios.get(`${API_PORT()}/api/findZone/${route.params.zoneId}`);
+      const res = await axios.get(`${API_PORT()}/api/findZone/${zoneId}`);
       console.log("zone by Id from api---", res.data.data);
       if (!res.data.error) {
         setZoneApi(res.data.data);
@@ -245,17 +246,18 @@ const ZoneDetailScreen = ({
   //     setZoneId(route.params.zoneId)
   //   }, [])
   // );
-  useFocusEffect(
-    React.useCallback(() => {
-      requestZone()
-    }, [])
-  );
+  useEffect(() => {
+    requestZone()
+  }, [zoneId])
  
 
   return (
+      
+    
+ 
     <View style={{ flex: 1 }}>
-      <TopNavigation title='algo' leftControl={goBackAction()} />
-      {/* <ScrollView style={{ flex: 1 }}>
+      <TopNavigation title={zoneApi ? zoneApi.zone : null} leftControl={goBackAction()} />
+      <ScrollView style={{ flex: 1 }}>
      
         {zoneApi ? (
           <View>
@@ -291,7 +293,7 @@ const ZoneDetailScreen = ({
                 />
               </View>
 
-              {/* {listVisible && (
+              {/* { listVisible && (
                 <View>
                   {availableU.length > 0 ? (
                     <FlatList
@@ -306,7 +308,7 @@ const ZoneDetailScreen = ({
                     </Text>
                   )}
                 </View>
-              )} 
+              )} */}
             </View>
           )} 
             </View>
@@ -314,8 +316,9 @@ const ZoneDetailScreen = ({
         ) : (
           <ActivityIndicator size="large" color="#f09" />
         )}
-      </ScrollView> */}
-    </View>
+      </ScrollView> 
+      </View>
+    
   );
 };
 

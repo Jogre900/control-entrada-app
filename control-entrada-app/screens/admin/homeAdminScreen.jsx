@@ -78,7 +78,7 @@ const HomeAdminScreen = ({
         let res = await axios.get(
           `${API_PORT()}/api/findTodayVisits/${company.id}`
         );
-        //console.log("VISITS FROM API-----", res.data);
+        console.log("VISITS FROM API-----", res.data);
         if (!res.data.error && res.data.data.length > 0) {
           saveTodayVisits(res.data.data);
           setVisits(res.data.data);

@@ -290,7 +290,14 @@ password: "123456,
           {
             model: models.UserZone,
             as: "encargado_zona",
-            include: { model: models.User, as: "User" }
+            include: {
+              model: models.User,
+              as: "User",
+              include: [
+                { model: models.Employee, as: "Employee" },
+                { model: models.UserCompany, as: "UserCompany" }
+              ]
+            }
           }
         ]
       });
@@ -1503,7 +1510,7 @@ password: "123456,
     };
 
     const { id } = req.params;
-    console.log("VISIT BY DNI----", req.params)
+    console.log("VISIT BY DNI----", req.params);
 
     try {
       let visit = await models.Citizen.findOne({
