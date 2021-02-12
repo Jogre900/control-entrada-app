@@ -6,7 +6,6 @@ import {
   Image,
   TextInput,
   Alert,
-  TouchableHighlight,
   ActivityIndicator,
   ScrollView,
   TouchableOpacity,
@@ -93,13 +92,13 @@ const WatchProfileScreen = ({navigation, profile}) => {
   const goBackAction = () => {
     return (
       <View>
-        <TouchableHighlight
+        <TouchableOpacity
           onPress={() => {
             navigation.goBack();
           }}
         >
           <Ionicons name="ios-arrow-back" size={28} color="white" />
-        </TouchableHighlight>
+        </TouchableOpacity>
       </View>
     );
   };

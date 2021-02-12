@@ -4,7 +4,7 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  TouchableWithoutFeedback,
+  TouchableOpacity,
   Image,
   ActivityIndicator,
 } from "react-native";
@@ -32,13 +32,13 @@ export const DepartureScreen = (props) => {
   const goBackAction = () => {
     return (
       <View>
-        <TouchableWithoutFeedback
+        <TouchableOpacity
           onPress={() => {
             props.navigation.goBack();
           }}
         >
           <Ionicons name="ios-arrow-back" size={28} color="white" />
-        </TouchableWithoutFeedback>
+        </TouchableOpacity>
       </View>
     );
   };

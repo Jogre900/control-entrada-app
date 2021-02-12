@@ -5,12 +5,15 @@ import {
   ImageBackground,
   Dimensions,
   TouchableOpacity,
+  BackHandler,
+  Alert
 } from "react-native";
 import axios from "axios";
 import { API_PORT } from "../../config/index";
 import { Ionicons } from "@expo/vector-icons";
 import { connect, useDispatch } from "react-redux";
 import { storage } from "../../helpers/asyncStorage";
+import { useFocusEffect } from "@react-navigation/native";
 
 //components
 import { TopNavigation } from "../../components/TopNavigation.component";
@@ -35,6 +38,19 @@ export const HomeScreen = (props) => {
       .then(() => storage.removeItem("userToken"))
       .then(() => props.navigation.navigate("Main"));
   };
+
+  const backAction = () => {
+    Alert.alert("", "Cerrar Sesion?", [
+      {
+        text: "No",
+        onPress: () => null,
+        style: "cancel",
+      },
+      { text: "Si", onPress: () => deleteToken() },
+    ]);
+    return true;
+  };
+
   const goBackAction = () => {
     return (
       <View>
@@ -48,7 +64,7 @@ export const HomeScreen = (props) => {
       </View>
     );
   };
-  
+
   const rightControls = () => {
     return (
       <View>
@@ -58,7 +74,14 @@ export const HomeScreen = (props) => {
       </View>
     );
   };
-
+  useFocusEffect(
+    React.useCallback(() => {
+      BackHandler.addEventListener("hardwareBackPress", backAction);
+      return () => {
+        BackHandler.removeEventListener("hardwareBackPress", backAction);
+      };
+    }, [])
+  );
   return (
     <View style={styles.container}>
       <TopNavigation
