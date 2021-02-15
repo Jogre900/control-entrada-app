@@ -1,23 +1,26 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   TouchableOpacity,
   Image,
   Text,
   StyleSheet,
+  ActivityIndicator,
 } from "react-native";
 
 //COMPONENT
 import { TopNavigation } from "../../components/TopNavigation.component";
 import { API_PORT } from "../../config/index";
 import { Ionicons } from "@expo/vector-icons";
-import {Divider} from '../../components/Divider'
-import {MainColor, ThirdColor} from '../../assets/colors'
-import moment from 'moment'
+import { Divider } from "../../components/Divider";
+import { MainColor, ThirdColor } from "../../assets/colors";
+import axios from "axios";
+import moment from "moment";
 
 export const EmployeeDetailScreen = (props) => {
-  console.log("DETAIL EMPLOYEE-----",props.route.params);
-  const profile = props.route.params;
+  const [user, setUser] = useState();
+  console.log("DETAIL EMPLOYEE-----", props.route.params);
+  const { id } = props.route.params;
   const goBackAction = () => {
     return (
       <View>
@@ -31,56 +34,91 @@ export const EmployeeDetailScreen = (props) => {
       </View>
     );
   };
+
+  const requestUser = async () => {
+    setUser();
+    try {
+      const res = await axios.get(`${API_PORT()}/api/findUser/${id}`);
+      if (!res.data.error) {
+        setUser(res.data.data);
+      }
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+  useEffect(() => {
+    requestUser();
+  }, [id]);
   return (
     <View style={{ flex: 1 }}>
       <TopNavigation title="Perfil" leftControl={goBackAction()} />
-      <View style={styles.section1}>
-        <Image
-          style={{
-            width: 120,
-            height: 120,
-            borderRadius: 60,
-            resizeMode: "cover",
-          }}
-          source={{ uri: `${API_PORT()}/public/imgs/${profile.Employee.picture}` }}
-        />
-        <Text style={styles.profileName}>
-          {profile.Employee.name} {profile.Employee.lastName}
-        </Text>
-        <Text>{profile.email}</Text>
-        <View style={styles.privilegeBox}>
-          <Text style={styles.privilegeText}>{profile.UserCompany[0].privilege}</Text>
-        </View>
-      </View>
-      <View style={styles.section2}>
-        <Text>Datos Personales</Text>
-        <Divider size="small" />
+      {user ? (
         <View>
-          <Text>DNI: {profile.Employee.dni}</Text>
-
-          {profile.userZone.length > 0 ? (
-             <View>
-              <Text>Contratado el: {moment(profile.userZone[0].assignationDate).format("D MM YYYY")}</Text>
-              <Text>Cambio de Turno: {moment(profile.userZone[0].changeTurnDate).format("d MM YYYY")}</Text>
-            </View> 
-          ) : (
-            <Text>
-              Registrado el: {moment(profile.createdAt).format("D MMM YYYY")}
+          <View style={styles.section1}>
+            <Image
+              style={{
+                width: 120,
+                height: 120,
+                borderRadius: 60,
+                resizeMode: "cover",
+              }}
+              source={{
+                uri: `${API_PORT()}/public/imgs/${user.Employee.picture}`,
+              }}
+            />
+            <Text style={styles.profileName}>
+              {user.Employee.name} {user.Employee.lastName}
             </Text>
-          )} 
-        </View>
+            <Text>{user.email}</Text>
+            <View style={styles.privilegeBox}>
+              <Text style={styles.privilegeText}>
+                {user.UserCompany[0].privilege}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.section2}>
+            <Text>Datos Personales</Text>
+            <Divider size="small" />
+            <View>
+              <Text>DNI: {user.Employee.dni}</Text>
 
-        <View style={styles.dataContainer}>
-          <Text style={styles.containerTitle}>Area de Trabajo</Text>
-          <Ionicons name="ios-business" size={28} color={ThirdColor} />
-          <Divider size="small" />
-          {profile.userZone.length > 0 ? (
-            <Text>Asignado: {profile.userZone[0].Zona.zone}</Text>
-          ) : (
-            <Text>El usuario no posea zona asignada.</Text>
-          )}
+              {user.userZone.length > 0 ? (
+                <View>
+                  <Text>
+                    Contratado el:{" "}
+                    {moment(user.userZone[0].assignationDate).format(
+                      "D MM YYYY"
+                    )}
+                  </Text>
+                  <Text>
+                    Cambio de Turno:{" "}
+                    {moment(user.userZone[0].changeTurnDate).format(
+                      "d MM YYYY"
+                    )}
+                  </Text>
+                </View>
+              ) : (
+                <Text>
+                  Registrado el: {moment(user.createdAt).format("D MMM YYYY")}
+                </Text>
+              )}
+            </View>
+
+            <View style={styles.dataContainer}>
+              <Text style={styles.containerTitle}>Area de Trabajo</Text>
+              <Ionicons name="ios-business" size={28} color={ThirdColor} />
+              <Divider size="small" />
+              {user.userZone.length > 0 ? (
+                <Text>Asignado: {user.userZone[0].Zona.zone}</Text>
+              ) : (
+                <Text>El usuario no posea zona asignada.</Text>
+              )}
+            </View>
+          </View>
         </View>
-      </View>
+      ) : (
+        <ActivityIndicator size="small" color={MainColor} />
+      )}
     </View>
   );
 };

@@ -58,6 +58,7 @@ router.post(
 router.put("/updatePass/:id", Controllers.updatePass);
 router.put("/updateAdmin/:companyId", Controllers.updateAdminId);
 router.post("/login", Controllers.login);
+router.get("/findUser/:id", Controllers.findUser)
 router.get("/findUsers/:companyId", Controllers.findUsers);
 router.get("/findAvailableUsers/:companyId", Controllers.findAvailableUsers);
 router.delete("/deleteUser/:id", Controllers.deleteUser);

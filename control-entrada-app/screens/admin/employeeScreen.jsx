@@ -118,7 +118,7 @@ const EmployeeScreen = ({ navigation, employee, removeEmployee }) => {
               employee.map((item, i) => (
                 <TouchableOpacity
                   style={styles.listItemBox}
-                  onPress={() => navigation.navigate("employee_detail", item)}
+                  onPress={() => navigation.navigate("employee_detail", { id: item.id })}
                   key={i}
                 >
                   {/* ARREGLAR BORRADO EN LISTA POR LONGPRESS */}

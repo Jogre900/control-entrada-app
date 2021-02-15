@@ -24,7 +24,8 @@ export default (state = initialState, action) => {
       
     //ADD NEW EMPLOYEE
     case "ADD_EMPLOYEE":
-      return {
+    console.log("NEW USER------",action.payload)  
+    return {
         ...state,
         employee: state.employee.concat(action.payload),
       };

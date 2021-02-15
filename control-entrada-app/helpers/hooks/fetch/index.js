@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import axios from 'axios'
 import { API_PORT } from "../../../config/index";
 
-export default function useCreateDestiny({destinyName, zoneId}) {
+export function useCreateDestiny({destinyName, zoneId}) {
     const [data, setData] = useState()
     
     const createDestiny = async (destinyName) => {
@@ -23,4 +23,8 @@ export default function useCreateDestiny({destinyName, zoneId}) {
     return (
         data
     )
+}
+
+export function name() {
+    return null
 }

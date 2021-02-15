@@ -1217,6 +1217,49 @@ password: "123456,
       res.json(RESPONSE);
     }
   },
+  findUser: async function(req, res) {
+    let RESPONSE = {
+      error: true,
+      msg: "",
+      data: null,
+      token: null
+    };
+    console.log("FIND USER ENDPOINT", req.params);
+    const { id } = req.params;
+    try {
+      let user = await models.User.findOne({
+        where: {
+          id
+        },
+        include: [
+          {
+            model: models.Employee,
+            as: "Employee"
+          },
+          {
+            model: models.UserCompany,
+            as: "UserCompany"
+          },
+          {
+            model: models.UserZone,
+            as: "userZone",
+            include: {
+              model: models.Zone,
+              as: "Zona"
+            }
+          }
+        ]
+      });
+      RESPONSE.error = false;
+      RESPONSE.msg = "Busqueda Exitosa";
+      RESPONSE.data = user;
+      res.json(RESPONSE);
+      console.log(user);
+    } catch (error) {
+      RESPONSE.msg = error.message;
+      res.json(RESPONSE);
+    }
+  },
   findUsers: async function(req, res) {
     let RESPONSE = {
       error: true,

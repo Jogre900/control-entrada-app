@@ -141,7 +141,7 @@ const CreateEmployeScreen = ({
             },
           }
         );
-        console.log(res.data);
+        console.log("CREATE EMPLOYEE----",res.data);
         if (!res.data.error) {
           console.log(res.data.data);
           addEmployee(res.data.data);
@@ -175,7 +175,7 @@ const CreateEmployeScreen = ({
       }
     } catch (error) {
       console.log("error-----: ", error);
-      alert(error);
+      alert(error.message);
     }
   };
 
