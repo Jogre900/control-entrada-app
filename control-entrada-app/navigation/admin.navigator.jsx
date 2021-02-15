@@ -16,9 +16,9 @@ import {
   StyleSheet,
   Alert,
 } from "react-native";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Ionicons } from "@expo/vector-icons";
-import { storage } from '../helpers/asyncStorage'
+import { storage } from "../helpers/asyncStorage";
 import DrawerHeader from "./drawerHeader";
 import { MainColor, lightColor } from "../assets/colors";
 
@@ -76,17 +76,25 @@ function AdminNav() {
   );
 }
 
-const drawerData = [
+const adminDrawerData = [
   { label: "Inicio", route: "admin-home", icon: "ios-home" },
-  { label: "Empresa", route: "Company", icon: "ios-business" },
+  //{ label: "Empresa", route: "Company", icon: "ios-business" },
   { label: "Historial", route: "Historial", icon: "ios-calendar" },
   { label: "Empleados", route: "Employee", icon: "ios-people" },
   { label: "Crear Empleado", route: "CreateEmployee", icon: "ios-person-add" },
   { label: "Zonas", route: "Zones", icon: "md-globe" },
   { label: "Destinos", route: "Destiny", icon: "ios-pin" },
 ];
+const superDrawerData = [
+  { label: "Inicio", route: "admin-home", icon: "ios-home" },
+  { label: "Historial", route: "Historial", icon: "ios-calendar" },
+  { label: "Empleados", route: "Employee", icon: "ios-people" },
+  { label: "Zona", route: "Zones", icon: "md-globe" },
+  { label: "Destinos", route: "Destiny", icon: "ios-pin" },
+];
 const DrawerContent = (props) => {
   const dispatch = useDispatch();
+  const privilege = useSelector((state) => state.profile.login.privilege);
   const logOut = () => {
     return new Promise((resolve, reject) => {
       resolve(dispatch({ type: "CLEAR_STORAGE" }));
@@ -113,17 +121,29 @@ const DrawerContent = (props) => {
             flex: 1,
           }}
         >
-          {drawerData.map((data, i) => (
-            <DrawerItem
-              label={data.label}
-              labelStyle={{ fontSize: 15 }}
-              icon={({ size, color }) => (
-                <Ionicons name={data.icon} size={size} color={color} />
-              )}
-              onPress={() => props.navigation.navigate(data.route)}
-              key={i}
-            />
-          ))}
+          {privilege === "Admin"
+            ? adminDrawerData.map((data, i) => (
+                <DrawerItem
+                  label={data.label}
+                  labelStyle={{ fontSize: 15 }}
+                  icon={({ size, color }) => (
+                    <Ionicons name={data.icon} size={size} color={color} />
+                  )}
+                  onPress={() => props.navigation.navigate(data.route)}
+                  key={i}
+                />
+              ))
+            : superDrawerData.map((data, i) => (
+                <DrawerItem
+                  label={data.label}
+                  labelStyle={{ fontSize: 15 }}
+                  icon={({ size, color }) => (
+                    <Ionicons name={data.icon} size={size} color={color} />
+                  )}
+                  onPress={() => props.navigation.navigate(data.route)}
+                  key={i}
+                />
+              ))}
         </View>
       </DrawerContentScrollView>
       <View style={{}}>
@@ -144,13 +164,17 @@ const DrawerContent = (props) => {
 };
 
 const AdminNavigator = () => {
+  const privilege = useSelector((state) => state.profile.login.privilege);
   return (
     <drawer.Navigator drawerContent={(props) => <DrawerContent {...props} />}>
       <drawer.Screen name="Home" component={AdminNav} />
       <drawer.Screen name="Profile" component={PerfilScreen} />
-      <drawer.Screen name="Company" component={CompanyScreen} />
+      {/* <drawer.Screen name="Company" component={CompanyScreen} /> */}
       <drawer.Screen name="Historial" component={HistorialScreen} />
-      <drawer.Screen name="CreateEmployee" component={CreateEmployeScreen} />
+      {
+        privilege === 'Admin' && 
+        <drawer.Screen name="CreateEmployee" component={CreateEmployeScreen} />
+      }
       <drawer.Screen name="Employee" component={EmployeeScreen} />
       <drawer.Screen name="Zones" component={ZonasScreen} />
       <drawer.Screen name="Destiny" component={DestinyScreen} />

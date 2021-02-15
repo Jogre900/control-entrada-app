@@ -42,7 +42,7 @@ export default (state = initialState, action = {}) => {
       return {
         ...state,
         login: action.payload,
-        company: companySelect(state),
+        //company: companySelect(state),
       };
     case "SAVE_PROFILE":
     console.log("SAVE PROF----",action.payload)  
@@ -54,7 +54,7 @@ export default (state = initialState, action = {}) => {
     case "SAVE_COMPANY":
       return {
         ...state,
-        company: action.payload
+        company: action.payload,
         //companySelect: companySelect(state),
       };
     case "setCompanySelect":

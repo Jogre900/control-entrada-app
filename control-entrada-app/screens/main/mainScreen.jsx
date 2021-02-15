@@ -107,6 +107,7 @@ const MainScreen = ({ navigation, saveProfile, saveCompany, saveLogin, isToken, 
           let slogin = {
             token: res.data.token,
             userId: res.data.data.id,
+            privilege: res.data.data.UserCompany[0].privilege
           };
           let sprofile = {
             id: res.data.data.Employee.id,
