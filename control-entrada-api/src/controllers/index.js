@@ -1302,6 +1302,50 @@ password: "123456,
       res.json(RESPONSE);
     }
   },
+  findUsersByZone: async function(req, res) {
+    let RESPONSE = {
+      error: true,
+      msg: "",
+      data: null,
+      token: null
+    };
+    console.log("FIND USERS ENDPOINT", req.params);
+    const { zoneId } = req.params;
+    try {
+      let user = await models.User.findAll({
+        include: [
+          {
+            model: models.Employee,
+            as: "Employee"
+          },
+          {
+            model: models.UserCompany,
+            as: "UserCompany",
+            where: {
+              [Op.not]: [{[Op.or]: [{privilege: 'Admin'},{privilege:'Supervisor'}]}]
+            }
+          },
+          {
+            model: models.UserZone,
+            as: "userZone",
+            where: { ZoneId: zoneId },
+            include: {
+              model: models.Zone,
+              as: "Zona"
+              
+            }
+          }
+        ]
+      });
+      (RESPONSE.error = false), (RESPONSE.msg = "Busqueda Exitosa");
+      RESPONSE.data = user;
+      res.status(200).json(RESPONSE);
+      console.log(user);
+    } catch (error) {
+      RESPONSE.msg = error.message;
+      res.json(RESPONSE);
+    }
+  },
   findAvailableUsers: async function(req, res) {
     let RESPONSE = {
       error: true,
@@ -1441,7 +1485,7 @@ password: "123456,
         RESPONSE.error = false;
         RESPONSE.msg = "Registro Exitoso";
         RESPONSE.data = visits;
-        res.status(200).json(RESPONSE);
+        res.json(RESPONSE);
       }
     } catch (error) {
       RESPONSE.msg = error.message;
@@ -1680,6 +1724,70 @@ password: "123456,
             attributes: ["id", "changeTurnDate", "assignationDate"],
             include: [
               { model: models.Zone, as: "Zona", attributes: ["id", "zone"] },
+              {
+                model: models.User,
+                attributes: ["email"],
+                as: "User",
+                include: {
+                  model: models.Employee,
+                  as: "Employee"
+                }
+              }
+            ]
+          }
+        ]
+      });
+      if (visits) {
+        console.log("visits", visits);
+        RESPONSE.error = false;
+        RESPONSE.msg = "Busqueda Exitosa!";
+        RESPONSE.data = visits;
+        res.json(RESPONSE);
+      } else {
+        RESPONSE.error = false;
+        RESPONSE.msg = "No hay Resultados!";
+        res.json(RESPONSE);
+      }
+    } catch (error) {
+      RESPONSE.msg = error.message;
+      res.json(RESPONSE);
+    }
+  },
+  findTodayVisitsByZone: async function(req, res) {
+    let RESPONSE = {
+      error: true,
+      msg: "",
+      data: null,
+      tokn: null
+    };
+    const { zoneId } = req.params;
+    console.log("zoneId-----", req.params);
+    try {
+      let visits = await models.Visits.findAll({
+        //where: {
+
+        //UserZoneId: id
+        // entryDate: {
+        //   [Op.between]: [
+        //     `${moment().format("YYYY MM D, HH:mm:ss")} 00:00:00`,
+        //     `${moment().format("YYYY MM D, HH:mm:ss")} 23:59:00`
+        //   ]
+        // }
+        //},
+        include: [
+          { model: models.Citizen, as: "Visitante" },
+          { model: models.Destination, as: "Destino" },
+          { model: models.Picture, as: "Fotos" },
+          {
+            model: models.UserZone,
+            attributes: ["id", "changeTurnDate", "assignationDate"],
+            include: [
+              {
+                model: models.Zone,
+                as: "Zona",
+                attributes: ["id", "zone"],
+                where: { id: zoneId }
+              },
               {
                 model: models.User,
                 attributes: ["email"],

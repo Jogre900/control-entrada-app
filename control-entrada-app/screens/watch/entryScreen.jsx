@@ -30,7 +30,7 @@ import { connect } from "react-redux";
 import { storage } from "../../helpers/asyncStorage";
 
 const EntryScreen = ({ navigation, profile, saveVisit }) => {
-  console.log("profile from redux---", profile);
+  //console.log("profile from redux---", profile);
 
   const destinys = profile.userZone[0].Zona.Destinos;
   const userZoneId = profile.userZone[0].id;
@@ -49,7 +49,7 @@ const EntryScreen = ({ navigation, profile, saveVisit }) => {
   const [fileType, setFileType] = useState("");
   const [fileName2, setFileName2] = useState("");
   const [fileType2, setFileType2] = useState("");
-  const [destinyId, setDestinyId] = useState("");
+  const [destinyId, setDestinyId] = useState(destinys[0].id);
   const [modalVisibility, setModalVisibility] = useState(false);
   const [profileCaption, setProfileCaption] = useState("");
   const [destinyCaption, setDestinyCaption] = useState("");
@@ -95,7 +95,8 @@ const EntryScreen = ({ navigation, profile, saveVisit }) => {
       data.append("departureDate", moment().toString());
       data.append("descriptionEntry", entry);
       data.append("userZoneId", userZoneId);
-
+      console.log("ME ESTOY EJECUTANDO!!!!!", data)
+      console.log("DESTINY ID-------", destinyId)
       try {
         let res = await axios.post(
           `${API_PORT()}/api/createVisit/${destinyId}`,
@@ -107,7 +108,7 @@ const EntryScreen = ({ navigation, profile, saveVisit }) => {
             },
           }
         );
-        console.log(res.data)
+        console.log("RES DE CREACION DE VISITA-----",res.data)
         if (!res.data.error) {
           console.log(res.data);
           saveVisit(res.data.data);
@@ -118,6 +119,7 @@ const EntryScreen = ({ navigation, profile, saveVisit }) => {
       } catch (error) {
         setModalVisibility(false);
         alert(error.message);
+        console.log(error.message)
       }
     }
   };

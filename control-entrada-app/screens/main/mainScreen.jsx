@@ -143,9 +143,8 @@ const MainScreen = ({ navigation, saveProfile, saveCompany, saveLogin, isToken, 
           switch (res.data.data.UserCompany[0].privilege) {
             case "Admin":
               navigation.navigate("admin", { screen: "admin-home" });
-              break;
             case "Supervisor":
-              navigation.navigate("super");
+              navigation.navigate("admin", { screen: "admin-home" });
               break;
             case "Watchman":
               navigation.navigate("watch", { screen: "watch-home" });

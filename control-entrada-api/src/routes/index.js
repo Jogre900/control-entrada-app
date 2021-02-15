@@ -60,6 +60,7 @@ router.put("/updateAdmin/:companyId", Controllers.updateAdminId);
 router.post("/login", Controllers.login);
 router.get("/findUser/:id", Controllers.findUser)
 router.get("/findUsers/:companyId", Controllers.findUsers);
+router.get("/findUsersByZone/:zoneId", Controllers.findUsersByZone);
 router.get("/findAvailableUsers/:companyId", Controllers.findAvailableUsers);
 router.delete("/deleteUser/:id", Controllers.deleteUser);
 router.get("/findCompany/:id", Controllers.findCompany);
@@ -89,6 +90,7 @@ router.get("/findVisit/:id", Controllers.findVisit);
 router.get("/findVisitId/:id", Controllers.findVisitId);
 router.put("/updateVisit/:id", middleware.verifyToken, Controllers.updateVisit);
 router.get("/findTodayVisits/:companyId", Controllers.findTodayVisits);
+router.get("/findTodayVisitsByZone/:zoneId", Controllers.findTodayVisitsByZone);
 router.get("/findTodayVisitsByUser/:id", Controllers.findTodayVisitsByUser);
 router.get("/findWeekVisits/", Controllers.findWeekVisits);
 // NUEVAS RUTA AJUSTE SISTEMA
