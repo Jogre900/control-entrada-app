@@ -21,11 +21,11 @@ import { Ionicons } from "@expo/vector-icons";
 
 const DEVICE_WIDTH = Dimensions.get("window").width;
 
-const DestinyScreen = ({ navigation, zonesRedux, company, saveDestiny }) => {
+const SuperDestinyScreen = ({ navigation, zonesRedux, company, saveDestiny }) => {
   console.log("zones in Destiny from redux---", zonesRedux);
   //console.log("company from redux---", company);
   const [zones, setZones] = useState([]);
-  const [zoneId, setZoneId] = useState(zonesRedux[0].id);
+  const [zoneId, setZoneId] = useState(zonesRedux.id);
   const [create, setCreate] = useState(false);
   const [destinys, setDestinys] = useState([]);
   const [notFound, setNotFound] = useState(false);
@@ -80,7 +80,7 @@ const DestinyScreen = ({ navigation, zonesRedux, company, saveDestiny }) => {
   const requestDestiny = async () => {
     try {
       let res = await axios.get(`${API_PORT()}/api/findDestiny/${zoneId}`);
-      console.log("DESTINY FORM API----",res.data)
+      console.log("DESTINY FORM API----", res.data);
       if (res.data.data.length >= 1) {
         setDestinys(res.data.data);
         setNotFound(false);
@@ -135,23 +135,21 @@ const DestinyScreen = ({ navigation, zonesRedux, company, saveDestiny }) => {
         <Text>Selecione la Zona:</Text>
         {loading ? (
           <Splash />
-        ) : (
-          zonesRedux && (
-            <Picker
-              mode="dropdown"
-              selectedValue={zoneId}
-              onValueChange={(value) => {
-                setZoneId(value);
-              }}
-            >
-              {zonesRedux.map((item, index) => {
-                return (
-                  <Picker.Item label={item.zone} value={item.id} key={index} />
-                );
-              })}
-            </Picker>
-          )
-        )}
+        ) : //   zonesRedux && (
+        //     <Picker
+        //       mode="dropdown"
+        //       selectedValue={zoneId}
+        //       onValueChange={(value) => {
+        //         setZoneId(value);
+        //       }}
+        //     >
+        //       {zonesRedux.map((item, index) => {
+        //         return (
+        //           <Picker.Item label={item.zone} value={item.id} key={index} />
+        //         );
+        //       })}
+        //     </Picker>
+        null}
       </View>
       <View>
         <Text>zone id: {zoneId}</Text>
@@ -199,7 +197,7 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = (dispatch) => ({});
 
-export default connect(mapStateToProps, mapDispatchToProps)(DestinyScreen);
+export default connect(mapStateToProps, mapDispatchToProps)(SuperDestinyScreen);
 
 const styles = StyleSheet.create({
   destiny: {

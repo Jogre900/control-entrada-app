@@ -15,7 +15,7 @@ import {
   Keyboard,
   ActivityIndicator,
 } from "react-native";
-import { connect } from "react-redux";
+import { connect, useDispatch } from "react-redux";
 import axios from "axios";
 import AsyncStorage from "@react-native-community/async-storage";
 import { useFocusEffect } from "@react-navigation/native";
@@ -42,7 +42,8 @@ const backAction = () => {
   return true;
 };
 
-const MainScreen = ({ navigation, saveProfile, saveCompany, saveLogin, isToken, token, privilege }) => {
+const MainScreen = ({ navigation, saveProfile, saveCompany, saveLogin, route, isToken, token, privilege }) => {
+  const dispatch = useDispatch()
   const [email, setEmail] = useState("");
   const [pass, setPass] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
@@ -173,9 +174,11 @@ const MainScreen = ({ navigation, saveProfile, saveCompany, saveLogin, isToken, 
     signInStatus();
   }, []);
 
-  useFocusEffect(() => {
-    return console.log("is Focused");
-  });
+  useEffect(() => {
+    if(route.params?.logOut){
+      dispatch({type: 'CLEAR_STORAGE'})
+    }
+  }, [route.params?.logOut])
 
   if (isSplash) {
     return <SplashScreen />;

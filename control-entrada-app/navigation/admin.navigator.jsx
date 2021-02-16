@@ -27,10 +27,12 @@ import HomeAdminScreen from "../screens/admin/homeAdminScreen";
 import { DetailViewScreen } from "../screens/admin/detailViewScreen";
 import ZonasScreen from "../screens/admin/zonesScreen";
 import ZoneDetailScreen from "../screens/admin/zoneDetailScreen";
+import SuperZoneDetailScreen from "../screens/admin/superZoneDetailScreen";
 import AsignEmployee from "../screens/admin/asignEmployeeScreen";
 import { NotificationScreen } from "../screens/admin/notificationScreen";
 import CompanyScreen from "../screens/admin/createCompanyScreen";
 import DestinyScreen from "../screens/admin/destinyScreen";
+import SuperDestinyScreen from "../screens/admin/superDestinyScreen";
 import { HistorialScreen } from "../screens/admin/historialScreen";
 import PerfilScreen from "../screens/admin/perfilScreen";
 import { EditProfileScreen } from "../screens/admin/editProfileScreen";
@@ -100,9 +102,7 @@ const DrawerContent = (props) => {
       resolve(dispatch({ type: "CLEAR_STORAGE" }));
     });
   };
-  const deleteToken = async () => {
-    logOut().then(() => storage.removeItem("userToken"));
-  };
+  const deleteToken = async () => await storage.removeItem("userToken");
   return (
     <View
       style={{
@@ -148,10 +148,13 @@ const DrawerContent = (props) => {
               ))}
         </View>
       </DrawerContentScrollView>
-      <View style={{
-        //backgroundColor: 'lightblue',
-        
-      }}>
+      <View
+        style={
+          {
+            //backgroundColor: 'lightblue',
+          }
+        }
+      >
         <DrawerItem
           label="Cerrar Sesion"
           labelStyle={{ fontSize: 15 }}
@@ -160,7 +163,9 @@ const DrawerContent = (props) => {
           )}
           onPress={() => {
             //logOut().then(() => alert("SE BORRO EL STORE DE REDUX!!!"));
-            deleteToken().then(() => props.navigation.navigate("Main"));
+            deleteToken().then(() =>
+              props.navigation.navigate("Main", { logOut: true })
+            );
           }}
         />
       </View>
@@ -176,18 +181,20 @@ const AdminNavigator = () => {
       <drawer.Screen name="Profile" component={PerfilScreen} />
       {/* <drawer.Screen name="Company" component={CompanyScreen} /> */}
       <drawer.Screen name="Historial" component={HistorialScreen} />
-      {
-        privilege === 'Admin' && 
+      {privilege === "Admin" && (
         <drawer.Screen name="CreateEmployee" component={CreateEmployeScreen} />
-      }
+      )}
       <drawer.Screen name="Employee" component={EmployeeScreen} />
-      {
-        privilege === 'Admin' ?
+      {privilege === "Admin" ? (
         <drawer.Screen name="Zones" component={ZonasScreen} />
-        :
-        <drawer.Screen name="Zones" component={ZoneDetailScreen} />
-      }
-      <drawer.Screen name="Destiny" component={DestinyScreen} />
+      ) : (
+        <drawer.Screen name="Zones" component={SuperZoneDetailScreen} />
+      )}
+      {privilege === "Admin" ? (
+        <drawer.Screen name="Destiny" component={DestinyScreen} />
+      ) : (
+        <drawer.Screen name="Destiny" component={SuperDestinyScreen} />
+      )}
     </drawer.Navigator>
   );
 };

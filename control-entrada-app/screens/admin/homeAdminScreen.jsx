@@ -57,8 +57,25 @@ const HomeAdminScreen = ({
       </Modal>
     );
   };
-  //REQUEST ZONES
+  //REQUEST ZONE BY ID
   const requestZone = async () => {
+    setModalVisible(true);
+    try {
+      const res = await axios.get(
+        `${API_PORT()}/api/findZone/${profile.userZone[0].ZoneId}`
+      );
+      console.log("zone by Id from api---", res.data.data);
+      if (!res.data.error) {
+        setModalVisible(false);
+        saveZones(res.data.data);
+      }
+    } catch (error) {
+      setModalVisible(false);
+      console.error(error.message);
+    }
+  };
+  //REQUEST ZONES
+  const requestZones = async () => {
     setModalVisible(true);
 
     try {
@@ -70,6 +87,7 @@ const HomeAdminScreen = ({
         setModalVisible(false);
       }
     } catch (error) {
+      setModalVisible(false);
       alert(error.message);
     }
   };
@@ -153,7 +171,7 @@ const HomeAdminScreen = ({
   //   findAvailableUsers();
   // }, []);
   useEffect(() => {
-    requestZone();
+    privilege === "Admin" ? requestZones() : requestZone();
   }, []);
   useEffect(() => {
     if (privilege === "Admin") {
