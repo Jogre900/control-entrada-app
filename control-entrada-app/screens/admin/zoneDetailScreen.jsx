@@ -32,12 +32,14 @@ import Modal from "react-native-modal";
 const ZoneDetailScreen = ({
   route,
   navigation,
+  privilege,
+  userZone,
   zoneRedux,
   availableU,
   setNewEmployee,
 }) => {
   console.log("ZONE DETAILS-----------",route.params.zoneId)
-  const  {zoneId}  = route.params;
+  const  {zoneId}  = route?.params;
   
   //const [zoneId, setZoneId] = useState(route.params.zoneId)
   //const [params, setParams] = useState()
@@ -109,7 +111,7 @@ const ZoneDetailScreen = ({
   const requestZone = async () => {
     setZoneApi();
     try {
-      const res = await axios.get(`${API_PORT()}/api/findZone/${zoneId}`);
+      const res = await axios.get(`${API_PORT()}/api/findZone/${privilege === 'Admin' ? zoneId : userZone[0].ZoneId}`);
       console.log("zone by Id from api---", res.data.data);
       if (!res.data.error) {
         setZoneApi(res.data.data);
@@ -117,7 +119,7 @@ const ZoneDetailScreen = ({
         setZoneEmployee(res.data.data.encargado_zona);
       }
     } catch (error) {
-      console.error(error);
+      console.error(error.message);
     }
   };
   // const renderAvailable = ({ item }) => (
@@ -325,6 +327,8 @@ const ZoneDetailScreen = ({
 const mapStateToProps = (state) => ({
   zoneRedux: state.zones.zones,
   availableU: state.employee.available,
+  userZone: state.profile.profile.userZone,
+  privilege: state.profile.login.privilege
 });
 
 const mapDispatchToProps = (dispatch) => ({

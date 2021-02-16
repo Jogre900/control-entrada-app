@@ -28,8 +28,11 @@ const HomeAdminScreen = ({
   saveTodayVisits,
   saveAvailable,
   saveZones,
+  profile,
+  privilege,
 }) => {
   //console.log("company---------------", company)
+  //console.log("<one----",zoneId)
   const [object, setObject] = useState({});
   const [loading, setLoading] = useState(true);
   const [visits, setVisits] = useState([]);
@@ -60,7 +63,7 @@ const HomeAdminScreen = ({
 
     try {
       let res = await axios.get(`${API_PORT()}/api/findZones/${company.id}`);
-      
+
       //console.log("ZONES FROM API------", res.data)
       if (!res.data.error && res.data.data.length > 0) {
         saveZones(res.data.data);
@@ -92,7 +95,7 @@ const HomeAdminScreen = ({
       }
     }
   };
-  //REQUEST EMPLOYEE
+  //REQUEST ALL EMPLOYEE FROM COMPANY
   const requestEmployee = async () => {
     if (company) {
       setModalVisible(true);
@@ -109,6 +112,22 @@ const HomeAdminScreen = ({
         setLoading(false);
         console.log("error: ", error.message);
       }
+    }
+  };
+  //REQUEST ALL EMPLOYEES FORM ONE ZONE
+  const requestEmployeeByZone = async () => {
+    setModalVisible(true);
+    try {
+      const res = await axios.get(
+        `${API_PORT()}/api/findUsersByZone/${profile.userZone[0].ZoneId}`
+      );
+      if (!res.data.error && res.data.data.length > 0) {
+        setModalVisible(false);
+        saveEmployee(res.data.data);
+      }
+    } catch (error) {
+      setModalVisible(false);
+      alert(error.message);
     }
   };
   //REQUEST AVAILABLE
@@ -137,7 +156,11 @@ const HomeAdminScreen = ({
     requestZone();
   }, []);
   useEffect(() => {
-    requestEmployee();
+    if (privilege === "Admin") {
+      requestEmployee();
+    } else {
+      requestEmployeeByZone();
+    }
   }, []);
 
   useEffect(() => {
@@ -197,6 +220,8 @@ const HomeAdminScreen = ({
 
 const mapStateToProps = (state) => ({
   company: state.profile.companySelect,
+  profile: state.profile.profile,
+  privilege: state.profile.login.privilege,
 });
 
 const mapDispatchToProps = (dispatch) => ({

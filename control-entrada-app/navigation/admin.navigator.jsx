@@ -114,11 +114,13 @@ const DrawerContent = (props) => {
         conte
         contentContainerStyle={{
           flex: 1,
+          //backgroundColor: 'red'
         }}
       >
         <View
           style={{
             flex: 1,
+            //backgroundColor: 'beige'
           }}
         >
           {privilege === "Admin"
@@ -146,7 +148,10 @@ const DrawerContent = (props) => {
               ))}
         </View>
       </DrawerContentScrollView>
-      <View style={{}}>
+      <View style={{
+        //backgroundColor: 'lightblue',
+        
+      }}>
         <DrawerItem
           label="Cerrar Sesion"
           labelStyle={{ fontSize: 15 }}
@@ -176,7 +181,12 @@ const AdminNavigator = () => {
         <drawer.Screen name="CreateEmployee" component={CreateEmployeScreen} />
       }
       <drawer.Screen name="Employee" component={EmployeeScreen} />
-      <drawer.Screen name="Zones" component={ZonasScreen} />
+      {
+        privilege === 'Admin' ?
+        <drawer.Screen name="Zones" component={ZonasScreen} />
+        :
+        <drawer.Screen name="Zones" component={ZoneDetailScreen} />
+      }
       <drawer.Screen name="Destiny" component={DestinyScreen} />
     </drawer.Navigator>
   );
