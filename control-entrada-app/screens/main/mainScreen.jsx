@@ -86,9 +86,6 @@ const MainScreen = ({ navigation, saveProfile, saveCompany, saveLogin, route, is
   const signInStatus = async () => {
     const token = await storage.getItem("userToken")
     if (token) {
-      alert("Hay token en!!!")
-      //console.log("token----",token)
-      //console.log("isToken--------",isToken)
       setModalVisible(true);
       try {
         //TODO verificar esta ruta en la api para que de la estructura nueva
@@ -100,7 +97,6 @@ const MainScreen = ({ navigation, saveProfile, saveCompany, saveLogin, route, is
         console.log(res.data)
         //console.log("RES DE TOKEN----", res.data.data.UserCompany[0].privilege)
         if (res.data.error && res.data.msg === "jwt expired") {
-          alert("token expiro!");
           setModalVisible(false);
           return;
         }
@@ -159,30 +155,21 @@ const MainScreen = ({ navigation, saveProfile, saveCompany, saveLogin, route, is
         setModalVisible(false);
         alert(error.message);
       }
-    } else alert("No hay token almacenado");
+    }
   };
 
-  useEffect(() => {
-    activeSplash();
-    // backHandler.current = BackHandler.addEventListener("hardwareBackPress", backAction);
-    // return () => {
-    //   backHandler.current.remove()
-    //BackHandler.removeEventListener("hardwareBackPress", backAction);
-  }, []);
 
-  useEffect(() => {
-    signInStatus();
-  }, []);
+  // useEffect(() => {
+  //   signInStatus();
+  // }, []);
 
   useEffect(() => {
     if(route.params?.logOut){
-      dispatch({type: 'CLEAR_STORAGE'})
+      setTimeout(() => {
+        dispatch({type: 'CLEAR_STORAGE'})
+      }, 2000);
     }
   }, [route.params?.logOut])
-
-  if (isSplash) {
-    return <SplashScreen />;
-  }
 
   return (
     <View style={styles.container}>

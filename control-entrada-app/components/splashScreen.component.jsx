@@ -18,10 +18,12 @@ export const SplashScreen = (props) => {
         Animated.timing(scaleUp, {
           toValue: 1.1,
           duration: 1000,
+          useNativeDriver: true
         }),
         Animated.timing(scaleUp, {
           toValue: 1,
           duration: 1000,
+          useNativeDriver: true
         }),
       ])
     ).start();

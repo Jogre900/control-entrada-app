@@ -6,8 +6,8 @@ export const storage = {
         if(item) return true
     },
     getItem: async function(key){
-        let item = await AsyncStorage.getItem(key)
-        if(item) return item
+        const item = await AsyncStorage.getItem(key)
+        return item
     },
     removeItem: async function(key){
         let item = await AsyncStorage.removeItem(key)

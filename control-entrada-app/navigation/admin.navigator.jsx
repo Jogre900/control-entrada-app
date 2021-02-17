@@ -163,7 +163,7 @@ const DrawerContent = (props) => {
           )}
           onPress={() => {
             //logOut().then(() => alert("SE BORRO EL STORE DE REDUX!!!"));
-            deleteToken().then(() =>
+            storage.removeItem('userToken').then(() =>
               props.navigation.navigate("Main", { logOut: true })
             );
           }}
