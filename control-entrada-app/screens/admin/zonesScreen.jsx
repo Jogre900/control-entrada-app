@@ -27,6 +27,7 @@ import Input from "../../components/input.component.jsx";
 import { MainButton } from "../../components/mainButton.component";
 import moment from "moment";
 import { MainColor } from "../../assets/colors";
+import { useOnLongPress } from '../../helpers/hooks/useOnLongPress'
 
 const ZonasScreen = ({
   navigation,
@@ -40,8 +41,9 @@ const ZonasScreen = ({
   
   //console.log("zonas desde REdux  ", zonesRedux);
   //console.log("Company from redux", companyRedux[0].id)
-  const [selectItem, setSeletedItem] = useState([]);
-  const [changeStyle, setChangeStyle] = useState(false);
+  const { selectItem, setSeletedItem } = useOnLongPress('')
+  //const [selectItem, setSeletedItem] = useState([]);
+  //const [changeStyle, setChangeStyle] = useState(false);
   const [deleted, setDeleted] = useState(false);
   const [zone, setZone] = useState([]);
   const [zoneName, setZoneName] = useState("");
@@ -193,17 +195,17 @@ const ZonasScreen = ({
     setSeletedItem([]);
   };
 
-  const onLong = (id) => {
-    if (selectItem.includes(id)) {
-      setSeletedItem((value) => value.filter((elem) => elem !== id));
-      hideCheckMark();
-      return;
-    }
-    Vibration.vibrate(100),
-      setSeletedItem(selectItem.concat(id)),
-      showCheckMark();
-    setChangeStyle(!changeStyle);
-  };
+  // const onLong = (id) => {
+  //   if (selectItem.includes(id)) {
+  //     setSeletedItem((value) => value.filter((elem) => elem !== id));
+  //     hideCheckMark();
+  //     return;
+  //   }
+  //   Vibration.vibrate(100),
+  //     setSeletedItem(selectItem.concat(id)),
+  //     showCheckMark();
+  //   setChangeStyle(!changeStyle);
+  // };
   // useEffect(() => {
   //   requestCompany();
   // }, []);
@@ -239,11 +241,11 @@ const ZonasScreen = ({
                   <TouchableOpacity
                     onPress={
                       selectItem.length > 0
-                        ? () => onLong(item.id)
+                        ? () => useOnLongPress(item.id)
                         : () =>
                             navigation.navigate("zone_detail", {zoneId: item.id})
                     }
-                    onLongPress={() => onLong(item.id)}
+                    onLongPress={() => useOnLongPress(item.id)}
                     delayLongPress={200}
                     style={[
                       selectItem.includes(item.id)
