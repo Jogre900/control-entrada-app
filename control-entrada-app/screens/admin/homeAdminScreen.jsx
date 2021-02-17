@@ -8,6 +8,7 @@ import {
   TouchableHighlight,
   ActivityIndicator,
   Image,
+  ScrollView,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 //components
@@ -15,11 +16,13 @@ import { TopNavigation } from "../../components/TopNavigation.component";
 import axios from "axios";
 import { API_PORT } from "../../config/index";
 import moment from "moment";
-import { MainColor } from "../../assets/colors";
+import { MainColor, ThirdColor } from "../../assets/colors";
 import Modal from "react-native-modal";
 import { connect } from "react-redux";
-import Avatar from "../../components/avatar.component";
+import { Spinner } from "../../components/spinner";
+import { NotFound } from "../../components/NotFound";
 import { DrawerAction, Notifications } from "../../helpers/ui/ui";
+import { VisitCard } from "../../components/visitCard";
 
 const HomeAdminScreen = ({
   navigation,
@@ -31,52 +34,31 @@ const HomeAdminScreen = ({
   profile,
   privilege,
 }) => {
-  //console.log("company---------------", company)
-  //console.log("<one----",zoneId)
   const [object, setObject] = useState({});
   const [loading, setLoading] = useState(true);
   const [visits, setVisits] = useState([]);
-  const [modalVisible, setModalVisible] = useState(false);
+  const [visitCaption, setVisitCaption] = useState("");
 
-  //LOADING
-  const LoadingModal = () => {
-    return (
-      <Modal
-        isVisible={modalVisible}
-        //onBackdropPress={() => setModalVisible(!modalVisible)}
-      >
-        <View
-          style={{
-            flex: 1,
-            backgroundColor: "#f09",
-            justifyContent: "center",
-          }}
-        >
-          <ActivityIndicator size="large" color={MainColor} />
-        </View>
-      </Modal>
-    );
-  };
   //REQUEST ZONE BY ID
   const requestZone = async () => {
-    setModalVisible(true);
+    setLoading(true);
     try {
       const res = await axios.get(
         `${API_PORT()}/api/findZone/${profile.userZone[0].ZoneId}`
       );
       console.log("zone by Id from api---", res.data.data);
       if (!res.data.error) {
-        setModalVisible(false);
+        setLoading(false);
         saveZones(res.data.data);
       }
     } catch (error) {
-      setModalVisible(false);
+      setLoading(false);
       console.error(error.message);
     }
   };
   //REQUEST ZONES
   const requestZones = async () => {
-    setModalVisible(true);
+    setLoading(true);
 
     try {
       let res = await axios.get(`${API_PORT()}/api/findZones/${company.id}`);
@@ -84,17 +66,18 @@ const HomeAdminScreen = ({
       //console.log("ZONES FROM API------", res.data)
       if (!res.data.error && res.data.data.length > 0) {
         saveZones(res.data.data);
-        setModalVisible(false);
+        setLoading(false);
       }
     } catch (error) {
-      setModalVisible(false);
+      setLoading(false);
       alert(error.message);
     }
   };
   //VISITS
   const requestVisits = async () => {
     if (company) {
-      setModalVisible(true);
+      setVisitCaption("");
+      setLoading(true);
       try {
         let res = await axios.get(
           `${API_PORT()}/api/findTodayVisits/${company.id}`
@@ -103,12 +86,14 @@ const HomeAdminScreen = ({
         if (!res.data.error && res.data.data.length > 0) {
           saveTodayVisits(res.data.data);
           setVisits(res.data.data);
-          setModalVisible(false);
+          setLoading(false);
+        } else {
+          setVisitCaption("No Hay Visitas!");
         }
         //setVisits([]);
-        setModalVisible(false);
+        setLoading(false);
       } catch (error) {
-        setModalVisible(false);
+        setLoading(false);
         alert(error.message);
       }
     }
@@ -116,7 +101,7 @@ const HomeAdminScreen = ({
   //REQUEST ALL EMPLOYEE FROM COMPANY
   const requestEmployee = async () => {
     if (company) {
-      setModalVisible(true);
+      setLoading(true);
       try {
         let res = await axios.get(`${API_PORT()}/api/findUsers/${company.id}`);
         //console.log("employee from API----",res.data);
@@ -134,24 +119,24 @@ const HomeAdminScreen = ({
   };
   //REQUEST ALL EMPLOYEES FORM ONE ZONE
   const requestEmployeeByZone = async () => {
-    setModalVisible(true);
+    setLoading(true);
     try {
       const res = await axios.get(
         `${API_PORT()}/api/findUsersByZone/${profile.userZone[0].ZoneId}`
       );
       if (!res.data.error && res.data.data.length > 0) {
-        setModalVisible(false);
+        setLoading(false);
         saveEmployee(res.data.data);
       }
     } catch (error) {
-      setModalVisible(false);
+      setLoading(false);
       alert(error.message);
     }
   };
   //REQUEST AVAILABLE
   const findAvailableUsers = async () => {
     if (company) {
-      setModalVisible(true);
+      setLoading(true);
       try {
         /*let res = await axios.get(`${API_PORT()}/api/findAvailableUsers/${company.id}`);
         console.log("User Avai--", res.data);
@@ -160,9 +145,9 @@ const HomeAdminScreen = ({
           setModalVisible(false);
         }*/
         saveAvailable([]);
-        setModalVisible(false);
+        setLoading(false);
       } catch (error) {
-        setModalVisible(false);
+        setLoading(false);
         console.log(error.message);
       }
     }
@@ -186,52 +171,27 @@ const HomeAdminScreen = ({
   }, []);
 
   return (
-    <View>
+    <View style={{ flex: 1 }}>
       <TopNavigation
         title="Entradas del Dia"
         leftControl={DrawerAction(navigation)}
         rightControl={Notifications(navigation)}
       />
-      <LoadingModal />
-
-      <View style={styles.listEntry}>
+      <ScrollView contentContainerStyle={styles.listEntry}>
+        {loading && <Spinner />}
         {visits.length > 0 ? (
-          visits.map((elem, i) => {
-            return (
-              <TouchableOpacity
-                style={styles.entryBox}
-                key={i}
-                onPress={() => navigation.navigate("detail-view", elem)}
-              >
-                <View style={styles.dataContainerView}>
-                  <Avatar.Picture
-                    size={50}
-                    uri={`${API_PORT()}/public/imgs/${elem.Fotos[0].picture}`}
-                  />
-                </View>
-                <View style={styles.dataContainerView}>
-                  <Text>DNI</Text>
-                  <Text style={styles.dataText}>{elem.Visitante.dni}</Text>
-                </View>
-                <View style={styles.dataContainerView}>
-                  <Text>Nombre</Text>
-                  <Text style={styles.dataText}>
-                    {elem.Visitante.name} {elem.Visitante.lastName}
-                  </Text>
-                </View>
-                <View style={styles.dataContainerView}>
-                  <Text>Entrada</Text>
-                  <Text style={styles.dataText}>
-                    {moment(elem.ntryDate).format("HH:mm a")}
-                  </Text>
-                </View>
-              </TouchableOpacity>
-            );
-          })
+          visits.map((elem, i) => (
+            <TouchableOpacity
+              key={i}
+              onPress={() => navigation.navigate("detail-view", elem)}
+            >
+              <VisitCard data={elem} />
+            </TouchableOpacity>
+          ))
         ) : (
-          <Text>No hay Visitas Registradas</Text>
+          <NotFound message={visitCaption} />
         )}
-      </View>
+      </ScrollView>
     </View>
   );
 };
@@ -274,25 +234,36 @@ export default connect(mapStateToProps, mapDispatchToProps)(HomeAdminScreen);
 const styles = StyleSheet.create({
   listEntry: {
     paddingHorizontal: 5,
+    //backgroundColor: 'blue',
+    flex: 1,
   },
   entryBox: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    //justifyContent: "center",
     alignItems: "center",
     paddingVertical: 10,
     paddingHorizontal: 5,
     borderBottomWidth: 0.5,
     borderColor: "grey",
-    marginVertical: 5,
+    marginVertical: 2.5,
     borderRadius: 20,
+    backgroundColor: ThirdColor,
+  },
+  nameContainer: {
+    marginLeft: 3,
+    justifyContent: "flex-start",
   },
   dataContainerView: {
     justifyContent: "center",
     alignItems: "center",
-    width: "33%",
-    maxWidth: "33%",
+    //width: "33%",
+    //maxWidth: "33%",
+  },
+  icon: {
+    marginRight: 3,
   },
   dataText: {
-    fontSize: 15,
+    fontSize: 14,
+    fontWeight: "700",
   },
 });

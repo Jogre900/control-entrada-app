@@ -1648,13 +1648,13 @@ password: "123456,
     console.log(req.params);
     try {
       let visits = await models.Visits.findAll({
-        where: {
-          entryDate: {
-            [Op.between]: [
-              `${moment().format("YYYY-MM-DD")} 00:00:00`,
-              `${moment().format("YYYY-MM-DD")} 23:59:00`
-            ]
-          }
+         where: {
+        //   entryDate: {
+        //     [Op.between]: [
+        //       `${moment().format("YYYY-MM-DD")} 00:00:00`,
+        //       `${moment().format("YYYY-MM-DD")} 23:59:00`
+        //     ]
+          // }
         },
         include: [
           { model: models.Citizen, as: "Visitante" },
