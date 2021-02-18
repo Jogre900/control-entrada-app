@@ -27,7 +27,8 @@ import Input from "../../components/input.component.jsx";
 import { MainButton } from "../../components/mainButton.component";
 import moment from "moment";
 import { MainColor } from "../../assets/colors";
-import { ZoneCard } from '../../components/zoneCard' 
+import { ZoneCard } from "../../components/zoneCard";
+import { FloatingBotton } from "../../components/floatingBotton";
 
 const ZonasScreen = ({
   navigation,
@@ -36,9 +37,8 @@ const ZonasScreen = ({
   addZones,
   removeZones,
   zonesRedux,
-  setAvailable
+  setAvailable,
 }) => {
-  
   //console.log("zonas desde REdux  ", zonesRedux);
   //console.log("Company from redux", companyRedux[0].id)
   //const { selectItem, setSeletedItem } = OnLongPress('')
@@ -159,7 +159,7 @@ const ZonasScreen = ({
           firsDepartureTime: moment(departureTime).format("HH:mm").toString(),
         }
       );
-      console.log("res crear zonas--", res.data)
+      console.log("res crear zonas--", res.data);
       if (!res.data.error) {
         addZones(res.data.data);
         alert("Creacion con exito!");
@@ -168,7 +168,7 @@ const ZonasScreen = ({
       alert(error.message);
     }
   };
-  
+
   const deleteZones = async (zonesId) => {
     setDeleted(false);
     try {
@@ -179,9 +179,9 @@ const ZonasScreen = ({
           zonesId,
         },
       });
-      console.log(res.data)
+      console.log(res.data);
       if (!res.data.error) {
-        setAvailable(res.data.data)
+        setAvailable(res.data.data);
         removeZones(zonesId);
         setSeletedItem([]);
         alert("Borrado!!");
@@ -198,12 +198,11 @@ const ZonasScreen = ({
   const onLong = (id) => {
     if (selectItem.includes(id)) {
       setSeletedItem((value) => value.filter((elem) => elem !== id));
-    //  hideCheckMark();
+      //  hideCheckMark();
       return;
     }
-    Vibration.vibrate(100),
-      setSeletedItem(selectItem.concat(id))
-      //showCheckMark();
+    Vibration.vibrate(100), setSeletedItem(selectItem.concat(id));
+    //showCheckMark();
     //setChangeStyle(!changeStyle);
   };
   const clearList = () => setSeletedItem([]);
@@ -234,7 +233,7 @@ const ZonasScreen = ({
         <Header
           value={selectItem.length}
           clearAction={clearList}
-           //deleteAction={() => deleteZones(selectItem)}
+          //deleteAction={() => deleteZones(selectItem)}
           selectAction={selectAll}
         />
       ) : (
@@ -251,12 +250,17 @@ const ZonasScreen = ({
                       selectItem.length > 0
                         ? () => onLong(item.id)
                         : () =>
-                            navigation.navigate("zone_detail", {zoneId: item.id})
+                            navigation.navigate("zone_detail", {
+                              zoneId: item.id,
+                            })
                     }
                     onLongPress={() => onLong(item.id)}
                     delayLongPress={200}
                   >
-                    <ZoneCard data={item} selected={selectItem.includes(item.id) ? true : false}/>
+                    <ZoneCard
+                      data={item}
+                      selected={selectItem.includes(item.id) ? true : false}
+                    />
                   </TouchableOpacity>
                 </View>
               ))
@@ -271,10 +275,11 @@ const ZonasScreen = ({
                 <Text>No hay zonas creadas!</Text>
               </View>
             )}
-          </View> 
+          </View>
+
           <Text>Crear Zona</Text>
 
-          <Input
+          {/* <Input
             style={{ borderColor: "black", marginBottom: 10 }}
             styleInput={{ color: "black" }}
             title="NombreZona"
@@ -303,8 +308,8 @@ const ZonasScreen = ({
                 onChange={onChange}
               />
             )}
-          </View>
-          <View>
+          </View> */}
+          {/* <View>
             <TouchableOpacity onPress={() => displayTimePicker2()}>
               <Text>Hora de Salida</Text>
             </TouchableOpacity>
@@ -330,11 +335,12 @@ const ZonasScreen = ({
             onPress={() => {
               createZone();
             }}
-          />
+          /> */}
         </View>
         {saving ? <Splash /> : null}
         {success && saveSuccess()}
       </ScrollView>
+      <FloatingBotton />
     </View>
   );
 };
@@ -363,12 +369,12 @@ const mapDispatchToProps = (dispatch) => ({
       payload: zonesId,
     });
   },
-  setAvailable(users){
+  setAvailable(users) {
     dispatch({
-      type: 'SET_AVAILABLE',
-      payload: users
-    })
-  }
+      type: "SET_AVAILABLE",
+      payload: users,
+    });
+  },
 });
 
 export default connect(stateToProps, mapDispatchToProps)(ZonasScreen);
