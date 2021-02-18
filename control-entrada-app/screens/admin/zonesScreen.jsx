@@ -27,7 +27,7 @@ import Input from "../../components/input.component.jsx";
 import { MainButton } from "../../components/mainButton.component";
 import moment from "moment";
 import { MainColor } from "../../assets/colors";
-import { OnLongPress } from '../../helpers/hooks/useOnLongPress'
+import { ZoneCard } from '../../components/zoneCard' 
 
 const ZonasScreen = ({
   navigation,
@@ -41,8 +41,8 @@ const ZonasScreen = ({
   
   //console.log("zonas desde REdux  ", zonesRedux);
   //console.log("Company from redux", companyRedux[0].id)
-  const { selectItem, setSeletedItem } = OnLongPress('')
-  //const [selectItem, setSeletedItem] = useState([]);
+  //const { selectItem, setSeletedItem } = OnLongPress('')
+  const [selectItem, setSeletedItem] = useState([]);
   //const [changeStyle, setChangeStyle] = useState(false);
   const [deleted, setDeleted] = useState(false);
   const [zone, setZone] = useState([]);
@@ -195,17 +195,25 @@ const ZonasScreen = ({
     setSeletedItem([]);
   };
 
-  // const onLong = (id) => {
-  //   if (selectItem.includes(id)) {
-  //     setSeletedItem((value) => value.filter((elem) => elem !== id));
-  //     hideCheckMark();
-  //     return;
-  //   }
-  //   Vibration.vibrate(100),
-  //     setSeletedItem(selectItem.concat(id)),
-  //     showCheckMark();
-  //   setChangeStyle(!changeStyle);
-  // };
+  const onLong = (id) => {
+    if (selectItem.includes(id)) {
+      setSeletedItem((value) => value.filter((elem) => elem !== id));
+    //  hideCheckMark();
+      return;
+    }
+    Vibration.vibrate(100),
+      setSeletedItem(selectItem.concat(id))
+      //showCheckMark();
+    //setChangeStyle(!changeStyle);
+  };
+  const clearList = () => setSeletedItem([]);
+
+  const selectAll = () => {
+    let array = [];
+    zonesRedux.map(({ id }) => array.push(id));
+    console.log(array);
+    setSeletedItem(array);
+  };
   // useEffect(() => {
   //   requestCompany();
   // }, []);
@@ -225,9 +233,9 @@ const ZonasScreen = ({
       {selectItem.length > 0 ? (
         <Header
           value={selectItem.length}
-          clearAction={() => clearSelect()}
-           deleteAction={() => deleteZones(selectItem)}
-          //deleteAction={() => getUserZone(selectItem)}
+          clearAction={clearList}
+           //deleteAction={() => deleteZones(selectItem)}
+          selectAction={selectAll}
         />
       ) : (
         <TopNavigation title="Zonas" leftControl={goBackAction()} />
@@ -241,49 +249,14 @@ const ZonasScreen = ({
                   <TouchableOpacity
                     onPress={
                       selectItem.length > 0
-                        ? () => OnLongPress(item.id)
+                        ? () => onLong(item.id)
                         : () =>
                             navigation.navigate("zone_detail", {zoneId: item.id})
                     }
-                    onLongPress={() => OnLongPress(item.id)}
+                    onLongPress={() => onLong(item.id)}
                     delayLongPress={200}
-                    style={[
-                      selectItem.includes(item.id)
-                        ? { backgroundColor: "rgba(20, 144, 150, 0.4)" }
-                        : { backgroundColor: "#fff" },
-                      styles.listItemBox,
-                    ]}
                   >
-                    <View>
-                      <Text>{item.zone}</Text>
-                      {/* {selectItem.includes(item.id) ? (
-                        <Animated.View
-                          style={{
-                            justifyContent: "center",
-                            alignItems: "center",
-                            height: 22,
-                            width: 22,
-                            borderRadius: 22 / 2,
-                            borderColor: "#fff",
-                            borderWidth: 0.5,
-                            transform: [{ scale: scaleUp }],
-                          }}
-                        >
-                          <Ionicons
-                            name="md-checkmark-circle"
-                            size={22}
-                            color="#09f"
-                          />
-                        </Animated.View>
-                      ) : null} */}
-                    </View>
-                    <Text>
-                      Entrada: {item.firsEntryTime}
-                    </Text>
-                    <Text>
-                      Salida: {item.firsDepartureTime}
-                    </Text>
-                    <Ionicons name="md-pin" size={28} color="grey" />
+                    <ZoneCard data={item} selected={selectItem.includes(item.id) ? true : false}/>
                   </TouchableOpacity>
                 </View>
               ))
