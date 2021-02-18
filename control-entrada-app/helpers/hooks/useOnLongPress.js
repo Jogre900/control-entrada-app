@@ -1,7 +1,7 @@
 import {useState, useEffect} from 'react'
 import { Vibration } from 'react-native'
 
-export const useOnLongPress = ({id}) => {
+export const OnLongPress = ({id}) => {
     console.log("HOOKS------",id)
     const [selectItem, setSeletedItem] = useState([]);
   const [changeStyle, setChangeStyle] = useState(false);

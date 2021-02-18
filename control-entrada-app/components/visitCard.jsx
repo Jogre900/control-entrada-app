@@ -13,11 +13,11 @@ const iconProps = {
   },
 };
 
-export const VisitCard = ({ data }) => {
+export const VisitCard = ({ data, selected }) => {
   //console.log("Props-----",props)
   const { Fotos, Visitante, Destino } = data;
   return (
-    <View style={styles.visitContainer}>
+    <View style={[styles.visitContainer, {backgroundColor: selected ? '#ddd' : '#fff'}]}>
       <View style={styles.dataContainer}>
         <View style={styles.dataContainerView}>
           <Avatar.Picture
@@ -75,8 +75,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 5,
     //borderBottomWidth: 0.5,
     borderColor: "grey",
-    marginVertical: 2.5,
-    borderRadius: 5,
+    marginVertical: 4,
+    //borderRadius: 5,
     backgroundColor: "#fff",
   },
   dataContainer: {

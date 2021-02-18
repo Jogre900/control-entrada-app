@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
   Image,
   ScrollView,
+  Vibration,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 //components
@@ -23,6 +24,7 @@ import { Spinner } from "../../components/spinner";
 import { NotFound } from "../../components/NotFound";
 import { DrawerAction, Notifications } from "../../helpers/ui/ui";
 import { VisitCard } from "../../components/visitCard";
+import { Header } from "../../components/header.component";
 
 const HomeAdminScreen = ({
   navigation,
@@ -34,6 +36,7 @@ const HomeAdminScreen = ({
   profile,
   privilege,
 }) => {
+  const [selectItem, setSeletedItem] = useState([]);
   const [object, setObject] = useState({});
   const [loading, setLoading] = useState(true);
   const [visits, setVisits] = useState([]);
@@ -152,6 +155,27 @@ const HomeAdminScreen = ({
       }
     }
   };
+  //ONLONGPRESS
+  const onLong = (id) => {
+    if (selectItem.includes(id)) {
+      setSeletedItem((value) => value.filter((elem) => elem !== id));
+      //hideCheckMark();
+      return;
+    }
+    Vibration.vibrate(100), setSeletedItem(selectItem.concat(id));
+    //showCheckMark();
+    //setChangeStyle(!changeStyle);
+  };
+
+  const clearList = () => setSeletedItem([]);
+
+  const selectAll = () => {
+    let array = [];
+    visits.map(({ id }) => array.push(id));
+    console.log(array);
+    setSeletedItem(array);
+  };
+
   // useEffect(() => {
   //   findAvailableUsers();
   // }, []);
@@ -172,20 +196,39 @@ const HomeAdminScreen = ({
 
   return (
     <View style={{ flex: 1 }}>
-      <TopNavigation
-        title="Entradas del Dia"
-        leftControl={DrawerAction(navigation)}
-        rightControl={Notifications(navigation)}
-      />
+      {selectItem.length > 0 ? (
+        <Header
+          value={selectItem.length}
+          clearAction={clearList}
+          //deleteAction={() => deleteZones(selectItem)}
+          selectAction={selectAll}
+        />
+      ) : (
+        <TopNavigation
+          title="Entradas del Dia"
+          leftControl={DrawerAction(navigation)}
+          rightControl={Notifications(navigation)}
+        />
+      )}
       <ScrollView contentContainerStyle={styles.listEntry}>
         {loading && <Spinner />}
         {visits.length > 0 ? (
           visits.map((elem, i) => (
             <TouchableOpacity
               key={i}
-              onPress={() => navigation.navigate("detail-view", elem)}
+              onPress={
+                selectItem.length > 0
+                  ? () => onLong(elem.id)
+                  : () => navigation.navigate("detail-view", elem)
+              }
+              onLongPress={() => onLong(elem.id)}
+              delayLongPress={200}
             >
-              <VisitCard data={elem} />
+              {/* <Text>algodon!!!</Text> */}
+              <VisitCard
+                data={elem}
+                selected={selectItem.includes(elem.id) ? true : false}
+              />
             </TouchableOpacity>
           ))
         ) : (
@@ -233,7 +276,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(HomeAdminScreen);
 
 const styles = StyleSheet.create({
   listEntry: {
-    paddingHorizontal: 5,
+    //paddingHorizontal: 5,
     //backgroundColor: 'blue',
     flex: 1,
   },

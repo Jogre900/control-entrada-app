@@ -7,7 +7,7 @@ import { MainColor } from "../assets/colors.js";
 import Modal from "react-native-modal";
 
 const ICON_SIZE = 28
-export const Header = ({ value, clearAction, deleteAction }) => {
+export const Header = ({ value, clearAction, deleteAction, selectAction }) => {
   const [modalVisible, setModalVisible] = useState(false)
   
   const LoadingModal = () => {
@@ -32,30 +32,9 @@ export const Header = ({ value, clearAction, deleteAction }) => {
             borderRadius: 2
           }}
         >
-          <Text style={{
-            fontWeight: '700',
-            letterSpacing: 2,
-            //alignSelf: 'center',
-            fontSize: 16
-          }}>Seleccionar Todos</Text>
-          <Text style={{
-            fontWeight: '700',
-            letterSpacing: 2,
-            //alignSelf: 'center',
-            fontSize: 14
-          }}>Seleccionar Todos</Text>
-          <Text style={{
-            fontWeight: '700',
-            letterSpacing: 2,
-            //alignSelf: 'center',
-            fontSize: 14
-          }}>Seleccionar Todos</Text>
-          <Text style={{
-            fontWeight: '700',
-            letterSpacing: 2,
-            //alignSelf: 'center',
-            fontSize: 14
-          }}>Seleccionar Todos</Text>
+          <TouchableOpacity onPress={() => {selectAction(), setModalVisible(false)}}>
+            <Text>Seleccionar Todos</Text>
+          </TouchableOpacity>
         </View>
       </Modal>
     );
@@ -67,14 +46,14 @@ export const Header = ({ value, clearAction, deleteAction }) => {
         <Ionicons name="ios-arrow-round-back" size={ICON_SIZE} color="#fff"/>
       </TouchableOpacity>
       <View>
-        <Text style={styles.selectText}>Sel: {value}</Text>
+        <Text style={styles.selectText}>Selec: {value}</Text>
       </View>
       <View style={{flexDirection: 'row', alignItems: 'center'}}>
       <TouchableOpacity style={styles.buttons} onPress={deleteAction}>
         <Ionicons name="ios-trash" size={ICON_SIZE} color="#fff"/>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.buttons} onPress={() => setModalVisible(!modalVisible)}>
-        <Ionicons name="ios-more" size={ICON_SIZE} color="#fff" style={styles.moreIcon}/>
+      <TouchableOpacity style={styles.buttons} onPress={selectAction}>
+        <Ionicons name="ios-list" size={ICON_SIZE} color="#fff" style={styles.moreIcon}/>
       </TouchableOpacity>
       </View>
     </View>
@@ -103,6 +82,6 @@ const styles = StyleSheet.create({
     color: '#fff'
   },
   moreIcon: {
-    transform: [{ rotate: '-90deg' }],
+    //transform: [{ rotate: '-90deg' }],
   },
 });
