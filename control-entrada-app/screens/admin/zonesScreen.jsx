@@ -16,7 +16,6 @@ import { connect } from "react-redux";
 import axios from "axios";
 import { Ionicons } from "@expo/vector-icons";
 
-import DateTimePicker from "@react-native-community/datetimepicker";
 import { useFocusEffect } from "@react-navigation/native";
 
 //componentes
@@ -39,9 +38,7 @@ const ZonasScreen = ({
   zonesRedux,
   setAvailable,
 }) => {
-  //console.log("zonas desde REdux  ", zonesRedux);
-  //console.log("Company from redux", companyRedux[0].id)
-  //const { selectItem, setSeletedItem } = OnLongPress('')
+ 
   const [selectItem, setSeletedItem] = useState([]);
   //const [changeStyle, setChangeStyle] = useState(false);
   const [deleted, setDeleted] = useState(false);
@@ -50,10 +47,7 @@ const ZonasScreen = ({
 
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [entranceTime, setEntranceTime] = useState(new Date());
-  const [departureTime, setDepartureTime] = useState(new Date());
-  const [show1, setShow1] = useState(false);
-  const [show2, setShow2] = useState(false);
+
   const [scaleUp, setScaleUp] = useState(new Animated.Value(0));
   // const opacityInterpolate = scaleUp.interpolate({
   //   inputRange: [0, 1],
@@ -83,57 +77,7 @@ const ZonasScreen = ({
     );
   };
 
-  //LOADING
-  const Splash = () => {
-    return (
-      <View>
-        <ActivityIndicator size="large" color="red" />
-      </View>
-    );
-  };
-
-  //REGISTER
-  const saveSuccess = () => {
-    Alert.alert("Registro Exitoso!");
-    setSuccess(false);
-  };
-
-  //CLEAR INPUTS
-  const clearInputs = () => setZoneName("");
-
-  //TIMEPICKER
-  const displayTimePicker = () => {
-    setShow1(true);
-  };
-
-  const showMode = (currentMode) => {
-    setShow1(true);
-    //setMode(currentMode);
-  };
-
-  const onChange = (event, selectedDate) => {
-    const currentDate = selectedDate || entranceTime;
-    setShow1(false);
-    setEntranceTime(currentDate);
-  };
-
-  const displayTimePicker2 = () => {
-    showMode2("date");
-  };
-
-  const showMode2 = (currentMode) => {
-    setShow2(true);
-    //setMode(currentMode);
-  };
-
-  const onChange2 = (event, selectedDate) => {
-    const currentDate = selectedDate || departureTime;
-    setShow2(Platform.OS === "ios");
-    setDepartureTime(currentDate);
-  };
-
   //ZONE API
-
   const requestZone = async () => {
     try {
       let res = await axios.get(
@@ -143,26 +87,6 @@ const ZonasScreen = ({
         setZone(res.data.data);
         await saveZones(res.data.data);
       } else {
-      }
-    } catch (error) {
-      alert(error.message);
-    }
-  };
-
-  const createZone = async () => {
-    try {
-      let res = await axios.post(
-        `${API_PORT()}/api/createZone/${companyRedux[0].id}`,
-        {
-          zone: zoneName,
-          firsEntryTime: moment(entranceTime).format("HH:mm").toString(),
-          firsDepartureTime: moment(departureTime).format("HH:mm").toString(),
-        }
-      );
-      console.log("res crear zonas--", res.data);
-      if (!res.data.error) {
-        addZones(res.data.data);
-        alert("Creacion con exito!");
       }
     } catch (error) {
       alert(error.message);
@@ -190,9 +114,6 @@ const ZonasScreen = ({
     } catch (error) {
       alert(error.message);
     }
-  };
-  const clearSelect = () => {
-    setSeletedItem([]);
   };
 
   const onLong = (id) => {
@@ -276,71 +197,9 @@ const ZonasScreen = ({
               </View>
             )}
           </View>
-
-          <Text>Crear Zona</Text>
-
-          {/* <Input
-            style={{ borderColor: "black", marginBottom: 10 }}
-            styleInput={{ color: "black" }}
-            title="NombreZona"
-            textColor="black"
-            shape="square"
-            alignText="center"
-            returnKeyType="next"
-            onChangeText={(nombre) => {
-              setZoneName(nombre);
-            }}
-            value={zoneName}
-          />
-          <View>
-            <TouchableOpacity onPress={() => displayTimePicker()}>
-              <Text>Hora de Entrada</Text>
-            </TouchableOpacity>
-            <Text>
-              hora de entrada: {moment(entranceTime).format("HH:mm a")}
-            </Text>
-            {show1 && (
-              <DateTimePicker
-                value={entranceTime}
-                mode={"time"}
-                is24Hour={false}
-                display="default"
-                onChange={onChange}
-              />
-            )}
-          </View> */}
-          {/* <View>
-            <TouchableOpacity onPress={() => displayTimePicker2()}>
-              <Text>Hora de Salida</Text>
-            </TouchableOpacity>
-            <Text>
-              hora de salida: {moment(departureTime).format("HH:mm a")}
-            </Text>
-            {show2 && (
-              <DateTimePicker
-                value={departureTime}
-                mode={"time"}
-                is24Hour={false}
-                display="default"
-                onChange={onChange2}
-              />
-            )}
-          </View>
-          {entranceTime > departureTime
-            ? console.log("Es mayor!!!")
-            : console.log("Es menor.!!")}
-
-          <MainButton
-            title="Registrar Zona"
-            onPress={() => {
-              createZone();
-            }}
-          /> */}
         </View>
-        {saving ? <Splash /> : null}
-        {success && saveSuccess()}
       </ScrollView>
-      <FloatingBotton />
+      <FloatingBotton onPress={() => navigation.navigate("CREATE_ZONE")} />
     </View>
   );
 };

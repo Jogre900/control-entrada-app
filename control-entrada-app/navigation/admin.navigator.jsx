@@ -39,6 +39,7 @@ import { EditProfileScreen } from "../screens/admin/editProfileScreen";
 import EmployeeScreen from "../screens/admin/employeeScreen";
 import CreateEmployeScreen from "../screens/admin/createEmployeeScreen";
 import { EmployeeDetailScreen } from "../screens/admin/employeeDetailScreen";
+import CreateZoneScreen from '../screens/admin/createZoneScreen'
 const drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
 
@@ -68,6 +69,7 @@ function AdminNav() {
         component={ZoneDetailScreen}
         options={options}
       />
+      <Stack.Screen name="CREATE_ZONE" component={CreateZoneScreen} />
       <Stack.Screen name="asign_employee" component={AsignEmployee} />
       <Stack.Screen
         name="employee_detail"

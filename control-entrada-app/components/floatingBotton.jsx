@@ -6,11 +6,11 @@ import { MainColor } from "../assets/colors";
 const { height, width } = Dimensions.get('screen')
 
 const SIZE = 50;
-export const FloatingBotton = () => {
+export const FloatingBotton = ({onPress}) => {
   return (
-    <TouchableOpacity 
+    <TouchableOpacity
     style={styles.container} 
-    onPress={() => console.log("HOLA FROM BOTTON")}>
+    onPress={onPress}>
       <Avatar.Icon name="ios-add" size={SIZE} color="#fff" />
     </TouchableOpacity>
   );
