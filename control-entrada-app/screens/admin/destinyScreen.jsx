@@ -8,9 +8,12 @@ import {
   Dimensions,
   ActivityIndicator,
   Alert,
+  ScrollView,
+  Vibration,
 } from "react-native";
 import { Picker } from "@react-native-community/picker";
 import { connect } from "react-redux";
+import { useFocusEffect } from "@react-navigation/native";
 
 import axios from "axios";
 import { API_PORT } from "../../config/index.js";
@@ -18,6 +21,10 @@ import Input from "../../components/input.component";
 import { TopNavigation } from "../../components/TopNavigation.component";
 import { MainButton } from "../../components/mainButton.component";
 import { Ionicons } from "@expo/vector-icons";
+import { FloatingBotton } from "../../components/floatingBotton";
+import { FormContainer } from "../../components/formContainer";
+import { DestinyCard } from "../../components/destinyCard";
+import { Header } from "../../components/header.component";
 
 const DEVICE_WIDTH = Dimensions.get("window").width;
 
@@ -31,8 +38,7 @@ const DestinyScreen = ({ navigation, zonesRedux, company, saveDestiny }) => {
   const [notFound, setNotFound] = useState(false);
   const [destinyName, setDestinyName] = useState();
   const [loading, setLoading] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [succes, setSuccess] = useState(false);
+  const [selectItem, setSeletedItem] = useState([]);
 
   const goBackAction = () => {
     return (
@@ -78,9 +84,10 @@ const DestinyScreen = ({ navigation, zonesRedux, company, saveDestiny }) => {
     }
   };
   const requestDestiny = async () => {
+    setSeletedItem([]);
     try {
       let res = await axios.get(`${API_PORT()}/api/findDestiny/${zoneId}`);
-      console.log("DESTINY FORM API----",res.data)
+      console.log("DESTINY FORM API----", res.data);
       if (res.data.data.length >= 1) {
         setDestinys(res.data.data);
         setNotFound(false);
@@ -93,14 +100,6 @@ const DestinyScreen = ({ navigation, zonesRedux, company, saveDestiny }) => {
     }
   };
 
-  const renderItem = ({ item }) => {
-    return (
-      <View style={styles.destiny}>
-        <Text>{item.name}</Text>
-        <Ionicons name="md-pin" size={28} color="grey" />
-      </View>
-    );
-  };
   //CREATE DESTINY
   const createDestiny = async () => {
     setSaving(true);
@@ -121,6 +120,24 @@ const DestinyScreen = ({ navigation, zonesRedux, company, saveDestiny }) => {
       console.log(error.message);
     }
   };
+  const onLong = (id) => {
+    if (selectItem.includes(id)) {
+      setSeletedItem((value) => value.filter((elem) => elem !== id));
+      //  hideCheckMark();
+      return;
+    }
+    Vibration.vibrate(100), setSeletedItem(selectItem.concat(id));
+    //showCheckMark();
+    //setChangeStyle(!changeStyle);
+  };
+  const clearList = () => setSeletedItem([]);
+
+  const selectAll = () => {
+    let array = [];
+    destinys.map(({ id }) => array.push(id));
+    console.log(array);
+    setSeletedItem(array);
+  };
   // useEffect(() => {
   //   requestZone();
   // }, []);
@@ -128,44 +145,73 @@ const DestinyScreen = ({ navigation, zonesRedux, company, saveDestiny }) => {
     requestDestiny();
   }, [zoneId, create]);
 
+  useFocusEffect(
+    React.useCallback(() => {
+      //setZone([]);
+      setSeletedItem([]);
+    }, [])
+  );
+
   return (
-    <View>
-      <TopNavigation title="Destinos" leftControl={goBackAction()} />
-      <View>
-        <Text>Selecione la Zona:</Text>
+    <View style={{ flex: 1}}>
+      {selectItem.length > 0 ? (
+        <Header
+          value={selectItem.length}
+          clearAction={clearList}
+          //deleteAction={() => deleteZones(selectItem)}
+          selectAction={selectAll}
+        />
+      ) : (
+        <TopNavigation title="Destinos" leftControl={goBackAction()} />
+      )}
+      <ScrollView contentContainerStyle={{alignItems:'center'}}>
         {loading ? (
           <Splash />
         ) : (
-          zonesRedux && (
-            <Picker
-              mode="dropdown"
-              selectedValue={zoneId}
-              onValueChange={(value) => {
-                setZoneId(value);
-              }}
-            >
-              {zonesRedux.map((item, index) => {
-                return (
-                  <Picker.Item label={item.zone} value={item.id} key={index} />
-                );
-              })}
-            </Picker>
-          )
+          <FormContainer title="Seleccione la Zona">
+            {zonesRedux && (
+              <Picker
+                mode="dropdown"
+                selectedValue={zoneId}
+                onValueChange={(value) => {
+                  setZoneId(value);
+                }}
+              >
+                {zonesRedux.map((item, index) => {
+                  return (
+                    <Picker.Item
+                      label={item.zone}
+                      value={item.id}
+                      key={index}
+                    />
+                  );
+                })}
+              </Picker>
+            )}
+          </FormContainer>
         )}
-      </View>
-      <View>
-        <Text>zone id: {zoneId}</Text>
-        <Text>Destinos</Text>
-        {destinys && (
-          <FlatList data={destinys} renderItem={renderItem} numColumns={3} />
-        )}
-        {notFound && (
-          <View>
-            <Text>No hay Destinos disponibles</Text>
-          </View>
-        )}
-      </View>
-      <View>
+        <View>
+          {destinys &&
+            destinys.map((item, i) => (
+              <TouchableOpacity
+                key={i}
+                onPress={selectItem.length > 0 ? () => onLong(item.id) : null}
+                onLongPress={() => onLong(item.id)}
+                delayLongPress={200}
+              >
+                <DestinyCard
+                  data={item}
+                  selected={selectItem.includes(item.id) ? true : false}
+                />
+              </TouchableOpacity>
+            ))}
+          {notFound && (
+            <View>
+              <Text>No hay Destinos disponibles</Text>
+            </View>
+          )}
+        </View>
+        {/* <View>
         <Text>Crear Destino</Text>
 
         <Input
@@ -187,7 +233,9 @@ const DestinyScreen = ({ navigation, zonesRedux, company, saveDestiny }) => {
             createDestiny();
           }}
         />
-      </View>
+      </View> */}
+      </ScrollView>
+      <FloatingBotton />
     </View>
   );
 };

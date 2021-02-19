@@ -38,7 +38,6 @@ const ZonasScreen = ({
   zonesRedux,
   setAvailable,
 }) => {
- 
   const [selectItem, setSeletedItem] = useState([]);
   //const [changeStyle, setChangeStyle] = useState(false);
   const [deleted, setDeleted] = useState(false);
@@ -162,41 +161,39 @@ const ZonasScreen = ({
       )}
       <ScrollView>
         <View>
-          <View>
-            {zonesRedux.length > 0 ? (
-              zonesRedux.map((item, i) => (
-                <View key={i}>
-                  <TouchableOpacity
-                    onPress={
-                      selectItem.length > 0
-                        ? () => onLong(item.id)
-                        : () =>
-                            navigation.navigate("zone_detail", {
-                              zoneId: item.id,
-                            })
-                    }
-                    onLongPress={() => onLong(item.id)}
-                    delayLongPress={200}
-                  >
-                    <ZoneCard
-                      data={item}
-                      selected={selectItem.includes(item.id) ? true : false}
-                    />
-                  </TouchableOpacity>
-                </View>
-              ))
-            ) : (
-              <View
-                style={{
-                  flex: 1,
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                <Text>No hay zonas creadas!</Text>
+          {zonesRedux.length > 0 ? (
+            zonesRedux.map((item, i) => (
+              <View key={i}>
+                <TouchableOpacity
+                  onPress={
+                    selectItem.length > 0
+                      ? () => onLong(item.id)
+                      : () =>
+                          navigation.navigate("zone_detail", {
+                            zoneId: item.id,
+                          })
+                  }
+                  onLongPress={() => onLong(item.id)}
+                  delayLongPress={200}
+                >
+                  <ZoneCard
+                    data={item}
+                    selected={selectItem.includes(item.id) ? true : false}
+                  />
+                </TouchableOpacity>
               </View>
-            )}
-          </View>
+            ))
+          ) : (
+            <View
+              style={{
+                flex: 1,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Text>No hay zonas creadas!</Text>
+            </View>
+          )}
         </View>
       </ScrollView>
       <FloatingBotton onPress={() => navigation.navigate("CREATE_ZONE")} />
