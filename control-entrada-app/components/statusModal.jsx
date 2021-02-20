@@ -25,7 +25,7 @@ export const StatusModal = ({ status, onClose }) => {
       deviceWidth={width}
       onBackdropPress={onClose}
       animationOut="fadeOutDown"
-      onModalShow={() => setTimeout(() => {onClose()}, 1000)}
+      onModalShow={() => setTimeout(() => {onClose()}, 2000)}
       style={
         {
           //flex: 1,

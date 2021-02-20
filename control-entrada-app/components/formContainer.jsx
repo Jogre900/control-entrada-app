@@ -2,10 +2,10 @@ import React from 'react'
 import {View, Text, StyleSheet} from 'react-native'
 import {Divider} from './Divider'
 import {MainColor} from '../assets/colors'
-export const FormContainer = ({children, title}) => {
+export const FormContainer = ({children, title, style}) => {
     //console.log("PROPS FORM CONTAINER-----",props.children)
     return (
-        <View style={styles.formContainer}>
+        <View style={[styles.formContainer, style]}>
             <Text style={styles.labelTitle}>{title}</Text>
             <Divider size='small' color={MainColor}/>
             {children}

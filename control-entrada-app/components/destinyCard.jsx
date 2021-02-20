@@ -23,12 +23,18 @@ export const DestinyCard = ({ data, selected }) => {
         style={{
           flexDirection: "row",
           alignItems: "center",
+          
         }}
       >
         <Ionicons name="ios-pin" size={28} color="grey" />
         <View
           style={{
             marginLeft: 15,
+            //backgroundColor: 'red',
+            //width: '100%',
+            //overflow: 'hidden'            
+
+
           }}
         >
           <Text
@@ -82,10 +88,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingVertical: 5,
     paddingHorizontal: 10,
-    //borderBottomWidth: 0.5,
+    borderBottomWidth: 0.5,
     borderColor: "grey",
     marginVertical: 4,
     //borderRadius: 5,
-    backgroundColor: "#fff",
+    backgroundColor: "#09f",
+    
   },
 });
