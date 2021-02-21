@@ -21,12 +21,13 @@ import { TopNavigation } from "../../components/TopNavigation.component";
 import { MainButton } from "../../components/mainButton.component";
 import { Ionicons } from "@expo/vector-icons";
 import Avatar from "../../components/avatar.component";
+import { EmployeeCard } from "../../components/employeeCard";
+import { Spinner } from "../../components/spinner";
+import { NotFound } from "../../components/NotFound";
 import { connect } from "react-redux";
 const companyId = "9a28095a-9029-40ec-88c2-30e3fac69bc5";
 
 const EmployeeScreen = ({ navigation, employee, removeEmployee }) => {
-  console.log("EMPLOYEE FROM REDUX-----", employee);
-  //const [employee, setEmployee] = useState([]);
   const [employeeId, setEmployeeId] = useState("");
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -110,63 +111,24 @@ const EmployeeScreen = ({ navigation, employee, removeEmployee }) => {
           />
         }
       >
-        {loading ? (
-          splash()
-        ) : (
-          <View>
-            {employee.length > 0 ? (
-              employee.map((item, i) => (
-                <TouchableOpacity
-                  style={styles.listItemBox}
-                  onPress={() => navigation.navigate("employee_detail", { id: item.id })}
-                  key={i}
-                >
-                  {/* ARREGLAR BORRADO EN LISTA POR LONGPRESS */}
-                  {/* <TouchableOpacity onPress={() => deleteEmployee(item.id)}>
-                    <Ionicons name="ios-trash" size={22} color="grey" />
-                  </TouchableOpacity> */}
-                  <View>
-                    <Avatar.Picture
-                      size={60}
-                      uri={`${API_PORT()}/public/imgs/${item.Employee.picture}`}
-                    />
-                  </View>
-                  <View>
-                    {/* <View style={styles.privilegeBox}>
-                      {item.privilege == "Supervisor" ? (
-                        <Text style={styles.privilegeText}>S</Text>
-                      ) : item.privilege == "Watchman" ? (
-                        <Text style={styles.privilegeText}>V</Text>
-                      ) : (
-                        <Text style={styles.privilegeText}>--</Text>
-                      )}
-                    </View> */}
-                  </View>
-                  <View style={styles.itemDataBox}>
-                    <Text style={styles.itemDataText}>
-                      {item.Employee.name} {item.Employee.lastName}
-                    </Text>
-                    <Text style={styles.itemDataText}>{item.email}</Text>
-                  </View>
-                  {/* <View style={styles.itemDataBox}>
-                    <Text style={styles.itemDataText}>Zona</Text>
-                    {item.userZone.length > 0 ? (
-                      <Text style={styles.itemDataText}>
-                        
-                        {item.userZone[0].Zone.zone}
-                      </Text>
-                    ) : (
-                      <Text style={styles.itemDataText}>-------</Text>
-                    )}
-                    <Text style={styles.itemDataText}></Text>
-                  </View> */}
-                </TouchableOpacity>
-              ))
-            ) : (
-              <Text>No hay empleados</Text>
-            )}
-          </View>
-        )}
+        <View>
+          {employee.length > 0 ? (
+            employee.map((item) => (
+              <TouchableOpacity
+                style={styles.listItemBox}
+                onPress={() =>
+                  navigation.navigate("employee_detail", { id: item.id })
+                }
+                key={item.id}
+              >
+                <EmployeeCard data={item} />
+              </TouchableOpacity>
+            ))
+          ) : (
+            <Spinner />
+          )}
+          {employee.length === 0 && <NotFound />}
+        </View>
       </ScrollView>
     </View>
   );

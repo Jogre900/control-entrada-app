@@ -23,7 +23,6 @@ import { StatusModal } from "../../components/statusModal";
 import { Spinner } from "../../components/spinner";
 
 const DestinyScreen = ({ navigation, zonesRedux, company, saveDestiny }) => {
-  console.log("zones in Destiny from redux---", zonesRedux);
 
   const [visible, setVisible] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -70,7 +69,6 @@ const DestinyScreen = ({ navigation, zonesRedux, company, saveDestiny }) => {
     setSeletedItem([]);
     try {
       let res = await axios.get(`${API_PORT()}/api/findDestiny/${zoneId}`);
-      console.log("DESTINY FORM API----", res.data);
       if (res.data.data.length >= 1) {
         setDestinys(res.data.data);
         setNotFound(false);
@@ -158,9 +156,9 @@ const DestinyScreen = ({ navigation, zonesRedux, company, saveDestiny }) => {
           >
             {loading && <Spinner />}
             {destinys &&
-              destinys.map((item, i) => (
+              destinys.map((item) => (
                 <TouchableOpacity
-                  key={i}
+                  key={item.id}
                   onPress={selectItem.length > 0 ? () => onLong(item.id) : null}
                   onLongPress={() => onLong(item.id)}
                   delayLongPress={200}

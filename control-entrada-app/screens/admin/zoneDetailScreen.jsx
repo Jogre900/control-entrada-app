@@ -10,6 +10,7 @@ import {
   Alert,
   Image,
   ActivityIndicator,
+  Vibration,
 } from "react-native";
 import axios from "axios";
 import { connect } from "react-redux";
@@ -28,6 +29,10 @@ import CheckBox from "@react-native-community/checkbox";
 import Avatar from "../../components/avatar.component";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import Modal from "react-native-modal";
+import { EmployeeCard } from "../../components/employeeCard";
+import { DestinyCard } from "../../components/destinyCard";
+import { FormContainer } from "../../components/formContainer";
+import { Header } from "../../components/header.component";
 
 const ZoneDetailScreen = ({
   route,
@@ -38,9 +43,8 @@ const ZoneDetailScreen = ({
   availableU,
   setNewEmployee,
 }) => {
-  console.log("ZONE DETAILS-----------",route.params.zoneId)
-  const  {zoneId}  = route?.params;
-  
+  const { zoneId } = route?.params;
+  const [selectItem, setSeletedItem] = useState([]);
   //const [zoneId, setZoneId] = useState(route.params.zoneId)
   //const [params, setParams] = useState()
   const [destiny, setDestiny] = useState();
@@ -111,7 +115,11 @@ const ZoneDetailScreen = ({
   const requestZone = async () => {
     setZoneApi();
     try {
-      const res = await axios.get(`${API_PORT()}/api/findZone/${privilege === 'Admin' ? zoneId : userZone[0].ZoneId}`);
+      const res = await axios.get(
+        `${API_PORT()}/api/findZone/${
+          privilege === "Admin" ? zoneId : userZone[0].ZoneId
+        }`
+      );
       console.log("zone by Id from api---", res.data.data);
       if (!res.data.error) {
         setZoneApi(res.data.data);
@@ -155,49 +163,6 @@ const ZoneDetailScreen = ({
   //     </View>
   //   </TouchableOpacity>
   // );
-  const renderDestiny = ({ item }) => (
-    <View
-      style={{
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "space-between",
-        marginVertical: 5,
-      }}
-    >
-      <View style={{ flexDirection: "row", backgroundColor: "skyblue" }}>
-        <Ionicons name="ios-checkmark" size={22} color={lightColor} />
-        <Text>{item.name}</Text>
-      </View>
-      <TouchableOpacity onPress={() => deleteDestiny(item.id)}>
-        <Ionicons name="ios-trash" size={28} color="#ccc" />
-      </TouchableOpacity>
-    </View>
-  );
-  const renderWatchman = ({ item }) => (
-    <View style={styles.listEmployeBox}>
-      <Image
-        style={styles.avatar}
-        source={{ uri: `${API_PORT()}/public/imgs/${item.User.Employee.picture}` }}
-      />
-      <View style={styles.listSubItemBox}>
-        <View style={{ alignItems: "center" }}>
-          <View style={styles.privilegeBox}>
-            <Text style={{ color: "#fff", fontSize: 16, lineHeight: 16 }}>
-              {item.User.UserCompany[0].privilege}
-            </Text>
-          </View>
-          <Text>
-            {item.User.Employee.name} {item.User.Employee.lastName}
-          </Text>
-        </View>
-        <View style={{ alignItems: "center" }}>
-          <Text>Asignado:</Text>
-          <Text>{moment(item.assignationDate).format("D MMM YYYY")}</Text>
-        </View>
-        {/* <Text>Cambio de Turno: {moment(item.changeTurnDate).format('D MMM YYYY')}</Text> */}
-      </View>
-    </View>
-  );
 
   // const deleteWarning = (id) => {
   //   Alert.alert("Seguro que desea borrar este destino?", [
@@ -248,19 +213,45 @@ const ZoneDetailScreen = ({
   //     setZoneId(route.params.zoneId)
   //   }, [])
   // );
+
+  const onLong = (id) => {
+    if (selectItem.includes(id)) {
+      setSeletedItem((value) => value.filter((elem) => elem !== id));
+      //  hideCheckMark();
+      return;
+    }
+    Vibration.vibrate(100), setSeletedItem(selectItem.concat(id));
+    //showCheckMark();
+    //setChangeStyle(!changeStyle);
+  };
+  const clearList = () => setSeletedItem([]);
+
+  const selectAll = () => {
+    let array = [];
+    destinys.map(({ id }) => array.push(id));
+    setSeletedItem(array);
+  };
+
   useEffect(() => {
-    requestZone()
-  }, [zoneId])
- 
+    requestZone();
+  }, [zoneId]);
 
   return (
-      
-    
- 
     <View style={{ flex: 1 }}>
-      <TopNavigation title={zoneApi ? zoneApi.zone : null} leftControl={goBackAction()} />
+      {selectItem.length > 0 ? (
+        <Header
+          value={selectItem.length}
+          clearAction={clearList}
+          //deleteAction={() => deleteZones(selectItem)}
+          selectAction={selectAll}
+        />
+      ) : (
+        <TopNavigation
+          title={zoneApi ? zoneApi.zone : null}
+          leftControl={goBackAction()}
+        />
+      )}
       <ScrollView style={{ flex: 1 }}>
-     
         {zoneApi ? (
           <View>
             <View>
@@ -268,34 +259,43 @@ const ZoneDetailScreen = ({
               <Text>{zoneApi.firsEntryTime}</Text>
               <Text>{zoneApi.firsDepartureTime}</Text>
             </View>
-            <View style={styles.dataContainer}>
-              <Text style={styles.containerTitle}>Destinos</Text>
-              <Divider size="small" />
+            <FormContainer title="Destinos">
               {zoneApi.Destinos.length > 0 ? (
-                <FlatList data={zoneApi.Destinos} renderItem={renderDestiny} />
+                zoneApi.Destinos.map((elem) => (
+                  <TouchableOpacity
+                    key={item.id}
+                    onPress={
+                      selectItem.length > 0 ? () => onLong(item.id) : null
+                    }
+                    onLongPress={() => onLong(item.id)}
+                    delayLongPress={200}
+                  >
+                    <DestinyCard data={elem} />
+                  </TouchableOpacity>
+                ))
               ) : (
                 <Text>La zona no posee destinos creados</Text>
               )}
-            </View>
-            <View style={styles.dataContainer}>
-              <Text style={styles.containerTitle}>Encargados</Text>
-              <Divider size="small" />
+            </FormContainer>
+            <FormContainer title="Encargados">
               {zoneApi.encargado_zona.length > 0 ? (
-            <FlatList data={zoneApi.encargado_zona} renderItem={renderWatchman} />
-          ) : (
-            <View>
-              <Text>La zona no posea Personal Asignado</Text>
-              <View>
-                <Text>Agregar Personal</Text>
-                <MainButton.Icon
-                  onPress={() => setListVisible(!listVisible)}
-                  name={listVisible ? "ios-arrow-up" : "ios-arrow-down"}
-                  size={22}
-                  color="#4f4f4f"
-                />
-              </View>
+                zoneApi.encargado_zona.map((elem) => (
+                  <EmployeeCard key={elem.id} data={elem} />
+                ))
+              ) : (
+                <View>
+                  <Text>La zona no posea Personal Asignado</Text>
+                  <View>
+                    <Text>Agregar Personal</Text>
+                    <MainButton.Icon
+                      onPress={() => setListVisible(!listVisible)}
+                      name={listVisible ? "ios-arrow-up" : "ios-arrow-down"}
+                      size={22}
+                      color="#4f4f4f"
+                    />
+                  </View>
 
-              {/* { listVisible && (
+                  {/* { listVisible && (
                 <View>
                   {availableU.length > 0 ? (
                     <FlatList
@@ -311,16 +311,15 @@ const ZoneDetailScreen = ({
                   )}
                 </View>
               )} */}
-            </View>
-          )} 
-            </View>
+                </View>
+              )}
+            </FormContainer>
           </View>
         ) : (
           <ActivityIndicator size="large" color="#f09" />
         )}
-      </ScrollView> 
-      </View>
-    
+      </ScrollView>
+    </View>
   );
 };
 
@@ -328,7 +327,7 @@ const mapStateToProps = (state) => ({
   zoneRedux: state.zones.zones,
   availableU: state.employee.available,
   userZone: state.profile.profile.userZone,
-  privilege: state.profile.login.privilege
+  privilege: state.profile.login.privilege,
 });
 
 const mapDispatchToProps = (dispatch) => ({
