@@ -10,8 +10,10 @@ import {
   Image,
   ScrollView,
   Vibration,
+  BackHandler
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useFocusEffect } from "@react-navigation/native";
 //components
 import { TopNavigation } from "../../components/TopNavigation.component";
 import axios from "axios";
@@ -25,6 +27,7 @@ import { NotFound } from "../../components/NotFound";
 import { DrawerAction, Notifications } from "../../helpers/ui/ui";
 import { VisitCard } from "../../components/visitCard";
 import { Header } from "../../components/header.component";
+import { LogOutModal } from '../../components/logOutModal'
 
 const HomeAdminScreen = ({
   navigation,
@@ -36,6 +39,7 @@ const HomeAdminScreen = ({
   profile,
   privilege,
 }) => {
+  const [visible, setVisible] = useState(false)
   const [selectItem, setSeletedItem] = useState([]);
   const [object, setObject] = useState({});
   const [loading, setLoading] = useState(true);
@@ -175,7 +179,10 @@ const HomeAdminScreen = ({
     console.log(array);
     setSeletedItem(array);
   };
-
+  const backAction = () => {
+    setVisible(true)
+    return true
+  }
   // useEffect(() => {
   //   findAvailableUsers();
   // }, []);
@@ -193,6 +200,14 @@ const HomeAdminScreen = ({
   useEffect(() => {
     requestVisits();
   }, []);
+  useFocusEffect(
+    React.useCallback(() => {
+      BackHandler.addEventListener("hardwareBackPress", backAction);
+      return () => {
+        BackHandler.removeEventListener("hardwareBackPress", backAction);
+      };
+    }, [])
+  );
 
   return (
     <View style={{ flex: 1 }}>
@@ -235,6 +250,7 @@ const HomeAdminScreen = ({
           <NotFound message={visitCaption} />
         )}
       </ScrollView>
+      <LogOutModal status={visible} navigation={navigation} onClose={() => setVisible(false)}/>
     </View>
   );
 };

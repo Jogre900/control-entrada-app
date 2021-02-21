@@ -263,11 +263,11 @@ const ZoneDetailScreen = ({
               {zoneApi.Destinos.length > 0 ? (
                 zoneApi.Destinos.map((elem) => (
                   <TouchableOpacity
-                    key={item.id}
+                    key={elem.id}
                     onPress={
-                      selectItem.length > 0 ? () => onLong(item.id) : null
+                      selectItem.length > 0 ? () => onLong(elem.id) : null
                     }
-                    onLongPress={() => onLong(item.id)}
+                    onLongPress={() => onLong(elem.id)}
                     delayLongPress={200}
                   >
                     <DestinyCard data={elem} />
