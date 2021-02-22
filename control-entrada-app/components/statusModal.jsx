@@ -25,7 +25,13 @@ export const StatusModal = ({ status, onClose }) => {
       deviceWidth={width}
       onBackdropPress={onClose}
       animationOut="fadeOutDown"
-      onModalShow={() => setTimeout(() => {onClose()}, 2000)}
+      animationOutTiming={500}
+      swipeDirection={["down"]}
+      onModalShow={() =>
+        setTimeout(() => {
+          onClose();
+        }, 2500)
+      }
       style={
         {
           //flex: 1,
@@ -47,7 +53,7 @@ export const StatusModal = ({ status, onClose }) => {
             //position: 'absolute',
             //bottom: 0,
             padding: 10,
-            marginTop: Math.floor(height - 150)
+            marginTop: Math.floor(height - 150),
           }}
         >
           {/* <TouchableOpacity onPress={onClose}>
@@ -56,9 +62,9 @@ export const StatusModal = ({ status, onClose }) => {
           <Text
             style={{
               color: "#fff",
-              alignSelf: 'center',
+              alignSelf: "center",
               fontSize: 16,
-              letterSpacing: .8
+              letterSpacing: 0.8,
             }}
           >
             Registro Exitoso!

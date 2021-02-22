@@ -229,7 +229,7 @@ const ZoneDetailScreen = ({
 
   const selectAll = () => {
     let array = [];
-    destinys.map(({ id }) => array.push(id));
+    zoneApi.Destinos.map(({ id }) => array.push(id));
     setSeletedItem(array);
   };
 
@@ -238,7 +238,11 @@ const ZoneDetailScreen = ({
   }, [zoneId]);
 
   return (
-    <View style={{ flex: 1 }}>
+    <View
+      style={{
+        flex: 1,
+      }}
+    >
       {selectItem.length > 0 ? (
         <Header
           value={selectItem.length}
@@ -252,47 +256,51 @@ const ZoneDetailScreen = ({
           leftControl={goBackAction()}
         />
       )}
-      <ScrollView style={{ flex: 1 }}>
-        {zoneApi ? (
-          <View>
-            <ZoneDetailCard data={zoneApi} />
-            <FormContainer title="Destinos">
-              {zoneApi.Destinos.length > 0 ? (
-                zoneApi.Destinos.map((elem) => (
-                  <TouchableOpacity
-                    key={elem.id}
-                    onPress={
-                      selectItem.length > 0 ? () => onLong(elem.id) : null
-                    }
-                    onLongPress={() => onLong(elem.id)}
-                    delayLongPress={200}
-                  >
-                    <DestinyCard data={elem} />
-                  </TouchableOpacity>
-                ))
-              ) : (
-                <Text>La zona no posee destinos creados</Text>
-              )}
-            </FormContainer>
-            <FormContainer title="Encargados">
-              {zoneApi.encargado_zona.length > 0 ? (
-                zoneApi.encargado_zona.map((elem) => (
-                  <EmployeeCard key={elem.id} data={elem} />
-                ))
-              ) : (
-                <View>
-                  <Text>La zona no posea Personal Asignado</Text>
+      <ScrollView>
+        <View style={{ flex: 1}}>
+          {zoneApi && (
+            <View style={{ alignItems: "center" }}>
+              <ZoneDetailCard data={zoneApi} />
+              <FormContainer title="Destinos">
+                {zoneApi.Destinos.length > 0 ? (
+                  zoneApi.Destinos.map((elem) => (
+                    <TouchableOpacity
+                      key={elem.id}
+                      onPress={
+                        selectItem.length > 0 ? () => onLong(elem.id) : null
+                      }
+                      onLongPress={() => onLong(elem.id)}
+                      delayLongPress={200}
+                    >
+                      <DestinyCard
+                        data={elem}
+                        selected={selectItem.includes(elem.id) ? true : false}
+                      />
+                    </TouchableOpacity>
+                  ))
+                ) : (
+                  <Text>La zona no posee destinos creados</Text>
+                )}
+              </FormContainer>
+              <FormContainer title="Encargados">
+                {zoneApi.encargado_zona.length > 0 ? (
+                  zoneApi.encargado_zona.map((elem) => (
+                    <EmployeeCard key={elem.id} data={elem} />
+                  ))
+                ) : (
                   <View>
-                    <Text>Agregar Personal</Text>
-                    <MainButton.Icon
-                      onPress={() => setListVisible(!listVisible)}
-                      name={listVisible ? "ios-arrow-up" : "ios-arrow-down"}
-                      size={22}
-                      color="#4f4f4f"
-                    />
-                  </View>
+                    <Text>La zona no posea Personal Asignado</Text>
+                    <View>
+                      <Text>Agregar Personal</Text>
+                      <MainButton.Icon
+                        onPress={() => setListVisible(!listVisible)}
+                        name={listVisible ? "ios-arrow-up" : "ios-arrow-down"}
+                        size={22}
+                        color="#4f4f4f"
+                      />
+                    </View>
 
-                  {/* { listVisible && (
+                    {/* { listVisible && (
                 <View>
                   {availableU.length > 0 ? (
                     <FlatList
@@ -308,13 +316,13 @@ const ZoneDetailScreen = ({
                   )}
                 </View>
               )} */}
-                </View>
-              )}
-            </FormContainer>
-          </View>
-        ) : (
-          <Spinner />
-        )}
+                  </View>
+                )}
+              </FormContainer>
+            </View>
+          )}
+          {!zoneApi && <Spinner />}
+        </View>
       </ScrollView>
     </View>
   );

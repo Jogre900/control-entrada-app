@@ -99,7 +99,7 @@ const EmployeeScreen = ({ navigation, employee, removeEmployee }) => {
   //   requestEmployee();
   // }, []);
   return (
-    <View>
+    <View style={{flex:1}}>
       <TopNavigation title="Empleados" leftControl={goBackAction()} />
       <ScrollView
         contentContainerStyle={styles.scrollView}
@@ -154,15 +154,15 @@ const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
   },
-  listItemBox: {
-    //flexDirection: "row",
-    paddingHorizontal: 12,
-    paddingVertical: 5,
-    justifyContent: "space-between",
-    alignItems: "center",
-    backgroundColor: "#fff",
-    marginVertical: 10,
-  },
+  // listItemBox: {
+  //   //flexDirection: "row",
+  //   paddingHorizontal: 12,
+  //   paddingVertical: 5,
+  //   justifyContent: "space-between",
+  //   alignItems: "center",
+  //   backgroundColor: "#fff",
+  //   marginVertical: 10,
+  // },
   privilegeBox: {
     backgroundColor: "orange",
     width: 50,

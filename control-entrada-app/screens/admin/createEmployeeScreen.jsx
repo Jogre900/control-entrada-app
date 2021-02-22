@@ -22,7 +22,10 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import { Picker } from "@react-native-community/picker";
 import * as ImagePicker from "expo-image-picker";
 import moment from "moment";
-import { Divider } from "../../components/Divider";
+
+import { FormContainer } from "../../components/formContainer";
+import { LoadingModal } from '../../components/loadingModal'
+import { StatusModal } from '../../components/statusModal'
 import { connect } from "react-redux";
 const companyId = "9a28095a-9029-40ec-88c2-30e3fac69bc5";
 
@@ -43,7 +46,9 @@ const CreateEmployeScreen = ({
   const [picture, setPicture] = useState("");
   const [privilege, setPrivilege] = useState("Supervisor");
   const [date, setDate] = useState(new Date());
+  const [entryHolder, setEntryHolder] = useState(false)
   const [changeTurn, setChangeTurn] = useState(new Date());
+  const [departureHolder, setDepartureHolder] = useState(false)
   const [mode, setMode] = useState("date");
   const [mode2, setMode2] = useState("date");
   const [show, setShow] = useState(false);
@@ -52,8 +57,9 @@ const CreateEmployeScreen = ({
   const [image, setImage] = useState();
   const [fileName, setFileName] = useState("");
   const [fileType, setFileType] = useState("");
-  const [saving, setSaving] = useState(false);
+  const [visible, setVisible] = useState(false)
   const [success, setSuccess] = useState(false);
+  const [saving, setSaving] = useState(false);
   const goBackAction = () => {
     return (
       <View>
@@ -64,15 +70,6 @@ const CreateEmployeScreen = ({
         >
           <Ionicons name="ios-arrow-back" size={28} color="white" />
         </TouchableOpacity>
-      </View>
-    );
-  };
-
-  //LOADING
-  const Splash = () => {
-    return (
-      <View>
-        <ActivityIndicator size="large" color="#ff7e00" />
       </View>
     );
   };
@@ -88,12 +85,14 @@ const CreateEmployeScreen = ({
     const currentDate = selectedDate || date;
     setShow(Platform.OS === "ios");
     setDate(currentDate);
+    setEntryHolder(true)
   };
 
   const onChange2 = (event, selectedDate) => {
     const currentDate = selectedDate || changeTurn;
     setShow2(Platform.OS === "ios");
     setChangeTurn(currentDate);
+    setDepartureHolder(true)
   };
 
   const showMode = (currentMode) => {
@@ -114,9 +113,7 @@ const CreateEmployeScreen = ({
   };
 
   const createEmploye = async () => {
-    setSaving(true);
-    setSuccess(false);
-    setCreate(false);
+    setVisible(true)
     let data = new FormData();
     data.append("file", { uri: image, name: fileName, type: fileType });
     data.append("name", name);
@@ -141,16 +138,17 @@ const CreateEmployeScreen = ({
             },
           }
         );
-        console.log("CREATE EMPLOYEE----",res.data);
+        console.log("CREATE EMPLOYEE----", res.data);
         if (!res.data.error) {
           console.log(res.data.data);
           addEmployee(res.data.data);
-          setCreate(true);
-          setSaving(false);
+          setVisible(false)
           setSuccess(true);
+          //setCreate(true);
+          //setSaving(false);
         } else {
           alert(res.data.msg);
-          setSaving(false);
+          setVisible(false);
         }
       } else {
         const res = await axios.post(
@@ -166,11 +164,12 @@ const CreateEmployeScreen = ({
           console.log(res.data.data);
           addEmployee(res.data.data);
           setCreate(true);
-          setSaving(false);
+          setVisible(false)
           setSuccess(true);
+          //setSaving(false);
         } else {
           alert(res.data.msg);
-          setSaving(false);
+          setVisible(false)
         }
       }
     } catch (error) {
@@ -265,9 +264,7 @@ const CreateEmployeScreen = ({
             </View> */}
           </View>
 
-          <View style={styles.dataContainer}>
-            <Text style={styles.containerTitle}>Datos Personales</Text>
-            <Divider size="small" />
+          <FormContainer title="Datos Personales">
             <Input
               style={{ borderColor: "black", marginBottom: 10 }}
               styleInput={{ color: "black" }}
@@ -324,12 +321,10 @@ const CreateEmployeScreen = ({
               }}
               value={email}
             />
-          </View>
+          </FormContainer>
 
           {/* ----ROLL---- */}
-          <View style={styles.dataContainer}>
-            <Text style={styles.containerTitle}>Tipo Usuario</Text>
-            <Divider size="small" />
+          <FormContainer title="Tipo Usuario">
             <Picker
               mode="dropdown"
               selectedValue={privilege}
@@ -352,20 +347,31 @@ const CreateEmployeScreen = ({
                 </Picker>
               )}
             </View>
-          </View>
+          </FormContainer>
 
-          <View style={styles.dataContainer}>
-            <Text style={styles.containerTitle}>Horario</Text>
-            <Divider size="small" />
-            <View>
-              <TouchableOpacity onPress={() => showDatepicker()}>
-                <Text>Fecha de Asignacion</Text>
-              </TouchableOpacity>
-            </View>
-            <View>
-              <TouchableOpacity onPress={() => showDatepicker2()}>
-                <Text>Cambio de Turno</Text>
-              </TouchableOpacity>
+          <FormContainer title="Horario">
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-around",
+              }}
+            >
+              <View>
+                <MainButton
+                  title="Inicio Contrato"
+                  outlined
+                  onPress={() => showDatepicker()}
+                />
+                <Text>{entryHolder ? moment(date).format("D MMM YYYY") : '----'}</Text>
+              </View>
+              <View>
+                <MainButton
+                  title="Fin Contrato"
+                  outlined
+                  onPress={() => showDatepicker2()}
+                />
+                <Text>{departureHolder ? moment(changeTurn).format("D MMM YYYY") : '----'}</Text>
+              </View>
             </View>
             {show && (
               <View>
@@ -389,13 +395,8 @@ const CreateEmployeScreen = ({
                 onChange={onChange2}
               />
             )}
-          </View>
-          <View>
-            <Text>{moment(date).format("D MMM YYYY")}</Text>
-          </View>
-          <View>
-            <Text>{moment(changeTurn).format("D MMM YYYY")}</Text>
-          </View>
+          </FormContainer>
+
           <MainButton
             title="Crear Empleado"
             outlined
@@ -403,10 +404,11 @@ const CreateEmployeScreen = ({
               createEmploye();
             }}
           />
-          {saving ? <Splash /> : null}
-          {success && saveSuccess()}
+          
         </View>
       </ScrollView>
+      <LoadingModal status={visible}/>
+      <StatusModal status={success} onClose={() => setSuccess(false)}/>
     </View>
   );
 };

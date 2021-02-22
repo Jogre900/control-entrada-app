@@ -6,7 +6,6 @@ import { MainColor, ThirdColor, lightColor } from '../assets/colors'
 import moment from "moment";
 
 export const EmployeeCard = ({ data, key }) => {
-  console.log("DATA EMPLO CARD---",data)
     return (
     <View style={styles.listEmployeBox} key={key}>
       <Avatar.Picture
@@ -38,10 +37,11 @@ const styles = StyleSheet.create({
   listEmployeBox: {
     flexDirection: "row",
     alignItems: "center",
-    marginVertical: 5,
+    marginVertical: 4,
     backgroundColor: "#fff",
     justifyContent: "space-between",
-    //padding: 5,
+    paddingHorizontal: 12,
+    paddingVertical: 5,
   },
   listSubItemBox: {
     borderBottomWidth: 0.5,
