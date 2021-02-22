@@ -17,12 +17,11 @@ export const EmployeeCard = ({ data, key }) => {
         <View style={{ alignItems: "center" }}>
           <View style={styles.privilegeBox}>
             <Text style={{ color: "#fff", fontSize: 16, lineHeight: 16 }}>
-              {data.UserCompany[0].privilege}
+              {data.User?.UserCompany[0].privilege || data.UserCompany[0].privilege}
             </Text>
           </View>
           <Text>
-            {data.User?.Employee.name || data.Employee.name} 
-            {data.User?.Employee.lastName || data.Employee.lastName}
+            {data.User?.Employee.name || data.Employee.name} {data.User?.Employee.lastName || data.Employee.lastName}
           </Text>
         </View>
         <View style={{ alignItems: "center" }}>
@@ -57,9 +56,9 @@ const styles = StyleSheet.create({
   },
   privilegeBox: {
     backgroundColor: ThirdColor,
-    borderRadius: 25,
-    padding: 5,
-    height: 32,
+    borderRadius: 5,
+    padding: 8,
+    //height: 32,
     alignItems: "center",
     justifyContent: "center",
   },

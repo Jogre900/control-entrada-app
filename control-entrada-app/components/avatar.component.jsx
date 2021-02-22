@@ -2,9 +2,11 @@ import React from "react";
 import { View, Image, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
+const SMALL = 24
+const MEDIUN = 32
+const LARGE = 56
+
 const Avatar = (props) => {
-  
-  console.log("avatar props", props)
     return (
     <View style={{ justifyContent: "center", alignItems: "center" }}>
       {props.children}

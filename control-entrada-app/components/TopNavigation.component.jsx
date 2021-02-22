@@ -64,9 +64,10 @@ const styles = StyleSheet.create({
     paddingTop: Constants.statusBarHeight,
     backgroundColor: MainColor,
     //paddingTop: Constants.statusBarHeight,
-    marginBottom: 0,
+    marginBottom: 2.5,
     //maxHeight: 60,
     //height: 60
+    elevation: 5
   },
   controlBox: function(size){
     return {

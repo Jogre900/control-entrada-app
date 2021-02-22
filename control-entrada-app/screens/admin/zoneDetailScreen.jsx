@@ -31,8 +31,10 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import Modal from "react-native-modal";
 import { EmployeeCard } from "../../components/employeeCard";
 import { DestinyCard } from "../../components/destinyCard";
+import { ZoneDetailCard } from "../../components/zoneDetailCard";
 import { FormContainer } from "../../components/formContainer";
 import { Header } from "../../components/header.component";
+import { Spinner } from "../../components/spinner";
 
 const ZoneDetailScreen = ({
   route,
@@ -120,7 +122,6 @@ const ZoneDetailScreen = ({
           privilege === "Admin" ? zoneId : userZone[0].ZoneId
         }`
       );
-      console.log("zone by Id from api---", res.data.data);
       if (!res.data.error) {
         setZoneApi(res.data.data);
         setDestiny(res.data.data.Destinos);
@@ -254,11 +255,7 @@ const ZoneDetailScreen = ({
       <ScrollView style={{ flex: 1 }}>
         {zoneApi ? (
           <View>
-            <View>
-              <Text>{zoneApi.zone}</Text>
-              <Text>{zoneApi.firsEntryTime}</Text>
-              <Text>{zoneApi.firsDepartureTime}</Text>
-            </View>
+            <ZoneDetailCard data={zoneApi} />
             <FormContainer title="Destinos">
               {zoneApi.Destinos.length > 0 ? (
                 zoneApi.Destinos.map((elem) => (
@@ -316,7 +313,7 @@ const ZoneDetailScreen = ({
             </FormContainer>
           </View>
         ) : (
-          <ActivityIndicator size="large" color="#f09" />
+          <Spinner />
         )}
       </ScrollView>
     </View>
