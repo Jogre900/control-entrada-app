@@ -4,20 +4,26 @@ import { Ionicons } from "@expo/vector-icons";
 import Avatar from "../components/avatar.component";
 import { MainColor, ThirdColor } from "../assets/colors";
 import { API_PORT } from "../config/index";
+import moment from "moment";
 
 const iconProps = {
   size: 22,
-  color: "grey",
+  color: ThirdColor,
   style: {
-    marginRight: 10,
+    marginRight: 4,
   },
 };
 
 export const VisitCard = ({ data, selected }) => {
-  //console.log("Props-----",props)
+  console.log("Props-----", data);
   const { Fotos, Visitante, Destino } = data;
   return (
-    <View style={[styles.visitContainer, {backgroundColor: selected ? '#ddd' : '#fff'}]}>
+    <View
+      style={[
+        styles.visitContainer,
+        { backgroundColor: selected ? "#ddd" : "#fff" },
+      ]}
+    >
       <View style={styles.dataContainer}>
         <View style={styles.dataContainerView}>
           <Avatar.Picture
@@ -26,30 +32,64 @@ export const VisitCard = ({ data, selected }) => {
           />
         </View>
         <View style={styles.nameContainer}>
-          <Text style={{ color: "black" }}>Nombre</Text>
-          <Text style={styles.dataText} numberOfLines={1}>
-            {Visitante.name} {Visitante.lastName}
-          </Text>
+          <View
+            style={{
+              //backgroundColor: "blue",
+              alignItems: "center",
+              flexDirection: "row",
+              justifyContent: 'space-between',
+              //width: '100%'
+            }}
+          >
+            <Text style={styles.contentText} numberOfLines={1}>
+              {Visitante.name} {Visitante.lastName}
+            </Text>
+            <View
+              style={{
+                //backgroundColor: "pink",
+                alignItems: "center",
+                flexDirection: "row",
+                marginLeft: 10
+              }}
+            >
+              <Text style={styles.dataText} numberOfLines={1}>Entrada: </Text>
+              <Text style={styles.contentText} numberOfLines={1}>
+                {moment(data.entryDate).format("D MMM YYYY")}
+              </Text>
+            </View>
+          </View>
+          <View style={{ 
+            flexDirection: "row", 
+          //backgroundColor: "red" 
+          }}>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+              }}
+            >
+              <Ionicons name="md-globe" {...iconProps} />
+              <Text style={styles.dataText} numberOfLines={1}>
+                {Destino.Zona.zone} - 
+              </Text>
+            </View>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                marginLeft: 0,
+              }}
+            >
+              {/* <Ionicons name="ios-pin" {...iconProps} /> */}
+              <Text style={styles.dataText} numberOfLines={1}> {Destino.name}</Text>
+            </View>
+          </View>
         </View>
       </View>
-      <View style={styles.locationContainer}>
-        <View style={styles.iconContainer}>
-          <Ionicons
-            name="md-globe"
-            size={iconProps.size}
-            color={iconProps.color}
-          />
-          <Ionicons
-            name="ios-pin"
-            size={iconProps.size}
-            color={iconProps.color}
-          />
-        </View>
-        <View style={{}}>
-          <Text style={styles.dataText} numberOfLines={1}>{Destino.Zona.zone}</Text>
-          <Text style={styles.dataText} numberOfLines={1}>{Destino.name}</Text>
-        </View>
-      </View>
+      {/* <View style={styles.locationContainer}>
+        <View style={styles.iconContainer}></View>
+        <View style={{}}></View>
+      </View> */}
 
       {/* <View style={styles.dataContainerView}>
                   <Text>Entrada</Text>
@@ -64,7 +104,7 @@ export const VisitCard = ({ data, selected }) => {
 const styles = StyleSheet.create({
   listEntry: {
     paddingHorizontal: 5,
-    //backgroundColor: 'blue',
+    //backgroundColor: 'tomato',
     flex: 1,
   },
   visitContainer: {
@@ -88,14 +128,16 @@ const styles = StyleSheet.create({
   nameContainer: {
     marginLeft: 8,
     justifyContent: "flex-start",
+    //backgroundColor: "green",
+    flex: 1
   },
   locationContainer: {
-    //backgroundColor: 'green',
-    flex: 1,
+    backgroundColor: "green",
+    //flex: 1,
     flexDirection: "row",
     alignItems: "center",
     //marginRight: 5,
-    marginLeft: 10
+    marginLeft: 10,
   },
   dataContainerView: {
     justifyContent: "center",
@@ -107,8 +149,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginRight: 5,
   },
+  contentText: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#262626",
+  },
   dataText: {
     fontSize: 14,
-    fontWeight: "700",
+    color: "#8e8e8e",
   },
 });

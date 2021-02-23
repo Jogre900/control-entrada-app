@@ -1,7 +1,8 @@
 import React from "react";
 import { View } from "react-native";
 import { Spinner } from "./spinner";
-export const LoadingModal = ({ status }) => {
+import Modal from 'react-native-modal'
+export const LoadingModal = ({ status, message }) => {
   return (
     <Modal
       isVisible={status}
@@ -14,7 +15,7 @@ export const LoadingModal = ({ status }) => {
           justifyContent: "center",
         }}
       >
-        <Spinner />
+        <Spinner message={message}/>
       </View>
     </Modal>
   );

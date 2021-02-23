@@ -13,7 +13,7 @@ import {
 
 import axios from "axios";
 import { API_PORT } from "../../config/index.js";
-import { MainColor, lightColor } from "../../assets/colors.js";
+import { MainColor, ThirdColor, lightColor } from "../../assets/colors.js";
 import Input from "../../components/input.component";
 import { TopNavigation } from "../../components/TopNavigation.component";
 import { MainButton } from "../../components/mainButton.component";
@@ -24,8 +24,8 @@ import * as ImagePicker from "expo-image-picker";
 import moment from "moment";
 
 import { FormContainer } from "../../components/formContainer";
-import { LoadingModal } from '../../components/loadingModal'
-import { StatusModal } from '../../components/statusModal'
+import { LoadingModal } from "../../components/loadingModal";
+import { StatusModal } from "../../components/statusModal";
 import { connect } from "react-redux";
 const companyId = "9a28095a-9029-40ec-88c2-30e3fac69bc5";
 
@@ -46,9 +46,9 @@ const CreateEmployeScreen = ({
   const [picture, setPicture] = useState("");
   const [privilege, setPrivilege] = useState("Supervisor");
   const [date, setDate] = useState(new Date());
-  const [entryHolder, setEntryHolder] = useState(false)
+  const [entryHolder, setEntryHolder] = useState(false);
   const [changeTurn, setChangeTurn] = useState(new Date());
-  const [departureHolder, setDepartureHolder] = useState(false)
+  const [departureHolder, setDepartureHolder] = useState(false);
   const [mode, setMode] = useState("date");
   const [mode2, setMode2] = useState("date");
   const [show, setShow] = useState(false);
@@ -57,7 +57,7 @@ const CreateEmployeScreen = ({
   const [image, setImage] = useState();
   const [fileName, setFileName] = useState("");
   const [fileType, setFileType] = useState("");
-  const [visible, setVisible] = useState(false)
+  const [visible, setVisible] = useState(false);
   const [success, setSuccess] = useState(false);
   const [saving, setSaving] = useState(false);
   const goBackAction = () => {
@@ -85,14 +85,14 @@ const CreateEmployeScreen = ({
     const currentDate = selectedDate || date;
     setShow(Platform.OS === "ios");
     setDate(currentDate);
-    setEntryHolder(true)
+    setEntryHolder(true);
   };
 
   const onChange2 = (event, selectedDate) => {
     const currentDate = selectedDate || changeTurn;
     setShow2(Platform.OS === "ios");
     setChangeTurn(currentDate);
-    setDepartureHolder(true)
+    setDepartureHolder(true);
   };
 
   const showMode = (currentMode) => {
@@ -113,7 +113,7 @@ const CreateEmployeScreen = ({
   };
 
   const createEmploye = async () => {
-    setVisible(true)
+    setVisible(true);
     let data = new FormData();
     data.append("file", { uri: image, name: fileName, type: fileType });
     data.append("name", name);
@@ -142,7 +142,7 @@ const CreateEmployeScreen = ({
         if (!res.data.error) {
           console.log(res.data.data);
           addEmployee(res.data.data);
-          setVisible(false)
+          setVisible(false);
           setSuccess(true);
           //setCreate(true);
           //setSaving(false);
@@ -164,15 +164,16 @@ const CreateEmployeScreen = ({
           console.log(res.data.data);
           addEmployee(res.data.data);
           setCreate(true);
-          setVisible(false)
+          setVisible(false);
           setSuccess(true);
           //setSaving(false);
         } else {
           alert(res.data.msg);
-          setVisible(false)
+          setVisible(false);
         }
       }
     } catch (error) {
+      setVisible(false)
       console.log("error-----: ", error);
       alert(error.message);
     }
@@ -238,7 +239,11 @@ const CreateEmployeScreen = ({
     <View style={{ flex: 1 }}>
       <TopNavigation title="Crear Empleado" leftControl={goBackAction()} />
       <ScrollView contentContainerStyle={styles.container}>
-        <View style={styles.mainWrapper}>
+        <View
+          style={{
+            alignItems: "center",
+          }}
+        >
           <View style={image ? styles.imageContainer2 : styles.imageContainer}>
             <View style={styles.imageBox}>
               {image ? (
@@ -356,21 +361,27 @@ const CreateEmployeScreen = ({
                 justifyContent: "space-around",
               }}
             >
-              <View>
+              <View style={styles.pickerButtonContainer}>
                 <MainButton
+                  style={styles.pickerButton}
                   title="Inicio Contrato"
-                  outlined
                   onPress={() => showDatepicker()}
                 />
-                <Text>{entryHolder ? moment(date).format("D MMM YYYY") : '----'}</Text>
+                <Text style={{ alignSelf: "center" }}>
+                  {entryHolder ? moment(date).format("D MMM YYYY") : "----"}
+                </Text>
               </View>
-              <View>
+              <View style={styles.pickerButtonContainer}>
                 <MainButton
+                  style={styles.pickerButton}
                   title="Fin Contrato"
-                  outlined
                   onPress={() => showDatepicker2()}
                 />
-                <Text>{departureHolder ? moment(changeTurn).format("D MMM YYYY") : '----'}</Text>
+                <Text style={{ alignSelf: "center" }}>
+                  {departureHolder
+                    ? moment(changeTurn).format("D MMM YYYY")
+                    : "----"}
+                </Text>
               </View>
             </View>
             {show && (
@@ -396,19 +407,23 @@ const CreateEmployeScreen = ({
               />
             )}
           </FormContainer>
-
-          <MainButton
-            title="Crear Empleado"
-            outlined
-            onPress={() => {
-              createEmploye();
+          <View
+            style={{
+              width: "90%",
             }}
-          />
-          
+          >
+            <MainButton
+              style={{ marginVertical: 5 }}
+              title="Crear Empleado"
+              onPress={() => {
+                createEmploye();
+              }}
+            />
+          </View>
         </View>
       </ScrollView>
-      <LoadingModal status={visible}/>
-      <StatusModal status={success} onClose={() => setSuccess(false)}/>
+      <LoadingModal status={visible} message='Guardando...'/>
+      <StatusModal status={success} onClose={() => setSuccess(false)} />
     </View>
   );
 };
@@ -432,7 +447,9 @@ export default connect(
 )(CreateEmployeScreen);
 const styles = StyleSheet.create({
   container: {
-    alignItems: "center",
+    // alignContent: "center",
+    // justifyContent: 'center',
+    // backgroundColor: 'red',
   },
   mainWrapper: {
     width: "90%",
@@ -477,5 +494,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "normal",
     color: MainColor,
+  },
+  pickerButtonContainer: {
+    width: "45%",
+    justifyContent: "center",
+  },
+  pickerButton: {
+    backgroundColor: ThirdColor,
+    borderColor: ThirdColor,
+    marginVertical: 5,
   },
 });

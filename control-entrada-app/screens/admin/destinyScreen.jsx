@@ -85,7 +85,7 @@ const DestinyScreen = ({ navigation, zonesRedux, company, saveDestiny }) => {
   };
   //CHEKC CREATE
   const checkCreate = (status) => {
-    setCreate(status), setSuccess(true);
+    setCreate(status), status ? setSuccess(true) : null;
   };
 
   const onLong = (id) => {

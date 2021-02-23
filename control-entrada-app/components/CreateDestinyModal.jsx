@@ -5,12 +5,16 @@ import { MainButton } from "./mainButton.component";
 import { API_PORT } from "../config/index";
 import axios from "axios";
 import Modal from "react-native-modal";
+import { LoadingModal } from './loadingModal'
 
 export const CreateDestinyModal = ({ status, create, onClose, zoneId }) => {
   const [destinyName, setDestinyName] = useState();
+  const [loading, setLoading] = useState(false);
 
   //CREATE DESTINY
   const createDestiny = async () => {
+    setLoading(true);
+    create(false);
     try {
       let res = await axios.post(`${API_PORT()}/api/createDestiny/${zoneId}`, {
         name: destinyName,
@@ -18,10 +22,12 @@ export const CreateDestinyModal = ({ status, create, onClose, zoneId }) => {
       if (!res.data.error) {
         console.log(res.data.data);
         setDestinyName("");
+        setLoading(false);
         create(true);
         onClose();
       }
     } catch (error) {
+      setLoading(false);
       console.log(error.message);
     }
   };
@@ -31,12 +37,11 @@ export const CreateDestinyModal = ({ status, create, onClose, zoneId }) => {
       backdropColor="black"
       hasBackdrop={true}
       useNativeDriver={true}
-      //coverScreen={false}
       animationIn="fadeInUp"
-      animationInTiming={500}
-      //deviceWidth={width}
+      animationInTiming={300}
       onBackdropPress={onClose}
       animationOut="fadeOutDown"
+      animationOutTiming={300}
       style={{
         //backgroundColor: '#fff',
         justifyContent: "center",
@@ -65,6 +70,7 @@ export const CreateDestinyModal = ({ status, create, onClose, zoneId }) => {
           }}
         />
       </FormContainer>
+      <LoadingModal status={loading} message="Guardando..." />
     </Modal>
   );
 };

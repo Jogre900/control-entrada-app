@@ -19,52 +19,39 @@ export const StatusModal = ({ status, onClose }) => {
       //backdropColor={Success}
       hasBackdrop={false}
       useNativeDriver={true}
-      //coverScreen={false}
       animationIn="fadeInUp"
       animationInTiming={500}
       deviceWidth={width}
       onBackdropPress={onClose}
       animationOut="fadeOutDown"
       animationOutTiming={500}
-      swipeDirection={["down"]}
       onModalShow={() =>
         setTimeout(() => {
           onClose();
-        }, 2500)
+        }, 1200)
       }
-      style={
-        {
-          //flex: 1,
-          //height: 500
-          //minWidth: width,
-          //position: 'absolute',
-          //bottom: 0,
-          //right: 0,
-          //backgroundColor: Success,
-        }
-      }
+      style={{
+        justifyContent: "flex-end",
+        margin: 0,
+      }}
       children={
         <View
           style={{
             backgroundColor: "rgba(40, 167, 69, 1)",
-            borderRadius: 5,
-            //borderTopRightRadius: 10,
-            //borderTopLeftRadius: 10,
-            //position: 'absolute',
-            //bottom: 0,
-            padding: 10,
-            marginTop: Math.floor(height - 150),
+
+            borderTopRightRadius: 10,
+            borderTopLeftRadius: 10,
+
+            padding: 15,
           }}
         >
-          {/* <TouchableOpacity onPress={onClose}>
-            <Text>X</Text>
-          </TouchableOpacity> */}
           <Text
             style={{
               color: "#fff",
               alignSelf: "center",
-              fontSize: 16,
+              fontSize: 18,
               letterSpacing: 0.8,
+              fontWeight: "600",
             }}
           >
             Registro Exitoso!

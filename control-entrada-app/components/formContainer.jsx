@@ -23,7 +23,8 @@ const styles = StyleSheet.create({
       },
       labelTitle: {
         fontSize: 16,
-        lineHeight: 18,
+        lineHeight: 16,
         color: MainColor,
+        fontWeight: '600'
       },
 })

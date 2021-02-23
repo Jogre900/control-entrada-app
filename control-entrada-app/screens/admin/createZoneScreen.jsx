@@ -159,6 +159,7 @@ const CreateZoneScreen = ({ navigation, addZones, companyRedux }) => {
               )}
             </View>
           </View>
+          
           <MainButton
             title="Registrar Zona"
             onPress={() => {

@@ -1,11 +1,11 @@
 import React from "react";
 import { View, Text, ActivityIndicator, StyleSheet } from "react-native";
 import { MainColor, ThirdColor } from "../assets/colors";
-export const Spinner = () => {
+export const Spinner = ({message}) => {
   return (
     <View style={styles.container}>
-      <Text style={styles.loadingText}>Cargando...</Text>
       <ActivityIndicator size="large" color={MainColor} />
+      <Text style={styles.loadingText}>{message}</Text>
     </View>
   );
 };

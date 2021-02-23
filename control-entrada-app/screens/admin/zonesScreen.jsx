@@ -28,6 +28,8 @@ import moment from "moment";
 import { MainColor } from "../../assets/colors";
 import { ZoneCard } from "../../components/zoneCard";
 import { FloatingBotton } from "../../components/floatingBotton";
+import CreateZoneModal from "../../components/createZoneModal";
+import { StatusModal } from "../../components/statusModal";
 
 const ZonasScreen = ({
   navigation,
@@ -39,6 +41,8 @@ const ZonasScreen = ({
   setAvailable,
 }) => {
   const [selectItem, setSeletedItem] = useState([]);
+  const [visible, setVisible] = useState(false);
+  const [create, setCreate] = useState(false);
   //const [changeStyle, setChangeStyle] = useState(false);
   const [deleted, setDeleted] = useState(false);
   const [zone, setZone] = useState([]);
@@ -139,7 +143,9 @@ const ZonasScreen = ({
   // useEffect(() => {
   //   requestZone();
   // }, [deleted]);
-
+  const checkCreate = (status) => {
+    setCreate(status);
+  };
   useFocusEffect(
     React.useCallback(() => {
       //setZone([]);
@@ -196,7 +202,13 @@ const ZonasScreen = ({
           )}
         </View>
       </ScrollView>
-      <FloatingBotton onPress={() => navigation.navigate("CREATE_ZONE")} />
+      <CreateZoneModal
+        status={visible}
+        create={checkCreate}
+        onClose={() => setVisible(false)}
+      />
+      <StatusModal status={create} onClose={() => setCreate(false)} />
+      <FloatingBotton onPress={() => setVisible(true)} />
     </View>
   );
 };
