@@ -18,12 +18,18 @@ import { MainColor } from "../../assets/colors";
 import { Divider } from "../../components/Divider";
 import { MainButton } from "../../components/mainButton.component";
 import Input from "../../components/input.component";
-import { storage } from '../../helpers/asyncStorage'
+import { storage } from "../../helpers/asyncStorage";
+import { LoadingModal } from "../../components/loadingModal";
+import { StatusModal } from "../../components/statusModal";
+import { FormContainer } from "../../components/formContainer";
+import Avatar from "../../components/avatar.component";
 
 export const DepartureScreen = (props) => {
   console.log("PARAMETROS----", props.route.params);
   const { id } = props.route.params;
 
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
   const [visit, setVisit] = useState();
   const [departureText, setDepartureText] = useState("");
   const [entryCheck, setEntryCheck] = useState(false);
@@ -60,23 +66,26 @@ export const DepartureScreen = (props) => {
       departureDate: moment(),
       descriptionDeparture: departureText,
     };
-    const token = await storage.getItem('userToken');
+    setSuccess(false);
+    setLoading(true);
+    const token = await storage.getItem("userToken");
     try {
       let res = await axios.put(`${API_PORT()}/api/updateVisit/${id}`, data, {
         headers: {
           Authorization: `bearer ${token}`,
         },
       });
-      console.log("UPDATE ENTRY-----",res.data)
+      console.log("UPDATE ENTRY-----", res.data);
       if (!res.data.error) {
         console.log(res.data);
         setEntryCheck(true);
         setUpdateVisit(res.data.data);
-        alert("salida registrada!");
+        setSuccess(true);
+        setLoading(false);
       }
     } catch (error) {
       console.log("error: ", error.message);
-      alert(error.message);
+      setLoading(false);
     }
   };
 
@@ -97,45 +106,73 @@ export const DepartureScreen = (props) => {
     <View style={{ flex: 1 }}>
       <TopNavigation title="Marcar Salida" leftControl={goBackAction()} />
 
-      {visit ? (
-        <ScrollView>
-          <View>
-            <Image
-              style={styles.profilePic}
-              source={{
-                uri: `${API_PORT()}/public/imgs/${visit.Visitante.picture}`,
-              }}
-            />
-          </View>
-          <View style={{alignItems: 'center'}}>
+      {visit && (
+        <ScrollView contentContainerStyle={{ alignItems: "center" }}>
+          <View style={styles.profileContainer}>
+            <View style={{ marginBottom: 10, alignSelf: "center" }}>
+              <Avatar.Picture
+                size={120}
+                uri={`${API_PORT()}/public/imgs/${visit.Visitante.picture}`}
+              />
+            </View>
 
-          
-          <View style={styles.dateContainer}>
-            <Text style={styles.containerTitle}>Datos</Text>
-            <Divider size="small" />
-            <Text>
-              Nombre: {visit.Visitante.name} {visit.Visitante.lastName}
+            <Text style={styles.nameText}>
+              {visit.Visitante.name} {visit.Visitante.lastName}
             </Text>
-            <Text>DNI: {visit.Visitante.dni}</Text>
-            <Text>Destino: {visit.Destino.name}</Text>
+
+            <View style={styles.profileDataContainer}>
+              <View
+                style={{
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Text style={styles.contentText}>{visit.Visitante.dni}</Text>
+                <Text style={styles.labelText}>dni</Text>
+              </View>
+              <View
+                style={{
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Text style={styles.contentText}>
+                  {visit.UserZone.Zona.zone}
+                </Text>
+                <Text style={styles.labelText}>Zona</Text>
+              </View>
+              <View
+                style={{
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Text style={styles.contentText}>{visit.Destino.name}</Text>
+                <Text style={styles.labelText}>Destino</Text>
+              </View>
+            </View>
           </View>
-          <View style={styles.dateContainer}>
-            <Text style={styles.containerTitle}>Ingreso</Text>
-            <Divider size="small" />
+
+          <FormContainer title="Datos">
             <Text>
-              Hora de entrada: {moment(visit.entryDate).format("MMM Do, HH:mm a")}
+              Hora de entrada:
+              {moment(visit.entryDate).format("HH:mm a")}
             </Text>
             <Image
-              style={{ width: 100, height: 100 }}
+              style={{
+                width: "100%",
+                height: 250,
+                borderRadius: 5,
+                marginVertical: 5,
+                overflow: "hidden",
+              }}
               source={{
                 uri: `${API_PORT()}/public/imgs/${visit.Fotos[0].picture}`,
               }}
             />
             <Text>Observacion: {visit.descriptionEntry}</Text>
-          </View>
-          <View style={styles.dateContainer}>
-            <Text style={styles.containerTitle}>Salida</Text>
-            <Divider size="small" />
+          </FormContainer>
+          <FormContainer title="Salida">
             {visit.entryDate !== visit.departureDate ? (
               <>
                 <Text>
@@ -152,42 +189,39 @@ export const DepartureScreen = (props) => {
                   onChangeText={(value) => setDepartureText(value)}
                   shape="flat"
                 />
-                <View>
-                  <MainButton
-                    title="Registrar Salida"
-                    onPress={() => updateEntry()}
-                  />
-                </View>
               </>
             )}
-          </View>
+          </FormContainer>
+          <View>
+            <MainButton
+              title="Registrar Salida"
+              onPress={() => updateEntry()}
+            />
           </View>
         </ScrollView>
-      ) : (
-        <ActivityIndicator size="large" color={MainColor} />
       )}
+      <LoadingModal status={loading} />
+      <StatusModal status={succes} onClose={() => setSuccess(false)} />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  profilePicBox: {
-    borderRadius: 5,
+  profileContainer: {
     backgroundColor: "#fff",
-    //width: '100%',
-    height: 250,
-    justifyContent: "center",
-    alignItems: "center",
+    width: "90%",
+    borderRadius: 5,
+    marginVertical: 5,
+    padding: 8,
+    elevation: 5,
   },
-  profilePic: {
-    width: "100%",
-    height: 250,
-    //borderRadius: 70,
-  },
-  containerTitle: {
-    fontSize: 16,
-    fontWeight: "normal",
-    color: MainColor,
+  profileDataContainer: {
+    flexDirection: "row",
+    //backgroundColor: 'green',
+    justifyContent: "space-between",
+    marginVertical: 15,
+    paddingVertical: 5,
+    paddingHorizontal: 10,
   },
   dateContainer: {
     backgroundColor: "#fff",
@@ -196,10 +230,14 @@ const styles = StyleSheet.create({
     marginVertical: 2.5,
     padding: 8,
   },
-  containerTitle: {
-    fontSize: 16,
-    fontWeight: "normal",
-    color: MainColor,
+  contentText: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#262626",
+  },
+  labelText: {
+    fontSize: 14,
+    color: "#8e8e8e",
   },
   captionText: {
     fontSize: 16,
