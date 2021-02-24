@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -10,38 +10,54 @@ import {
   Animated,
   TouchableOpacity,
 } from "react-native";
-
+import axios from "axios";
 import { Ionicons } from "@expo/vector-icons";
 import { API_PORT } from "../../config/index";
 import moment from "moment";
 import { TopNavigation } from "../../components/TopNavigation.component";
 import { DetailCard } from "../../components/detailCard.component";
 import { ProfileComponent } from "../../components/profile.component";
+import { Spinner } from "../../components/spinner";
+import { FormContainer } from '../../components/formContainer'
 
 const { width } = Dimensions.get("window");
 const cover = require("../../assets/images/background.jpg");
 const watchPic = require("../../assets/images/male-2.jpg");
 
-export const DetailViewScreen = (props) => {
-  const visit = props.route?.params;
-  console.log(visit);
-  const visitante = visit.Visitante;
+export const DetailViewScreen = ({ route, navigation }) => {
+  const { id } = route.params;
+  //console.log(visit);
+  //const visitante = visit.Visitante;
 
   const watchman = visit.UserZone.User;
   //console.log("visitas:-------",visit.Citizen)
   //console.log("DEstino:----",visit.Destino)
   //console.log("Zona: -------",visit.UserZone.Zona)
   //console.log("WATCHMAN:--------", visit.UserZone.User)
-
-  const [activeTab, setActiveTab] = React.useState("0");
-  const [xTabOne, setXTabOne] = React.useState();
-  const [xTabTwo, setXTabTwo] = React.useState();
-  const [hightContent1, setHightContent1] = React.useState(-5000);
-  const [saveImg, setSaveImg] = React.useState();
+  const [visit, setVisit] = useState();
+  const [loading, setLoading] = useState(initialState);
+  const [activeTab, setActiveTab] = useState("0");
+  const [xTabOne, setXTabOne] = useState();
+  const [xTabTwo, setXTabTwo] = useState();
+  const [hightContent1, setHightContent1] = useState(-5000);
+  const [saveImg, setSaveImg] = useState();
   const translateTab = new Animated.Value(0);
   const translateContent1 = new Animated.Value(0);
   const translateContent2 = new Animated.Value(width);
 
+  //REQUEST VISIT BY ID
+  const requestVisitById = async () => {
+    setLoading(true);
+    try {
+      const res = await axios.get(`${API_PORT()}/api/findVisit/${id}`);
+      if (!res.data.error) {
+        setLoading(false);
+        setVisit(res.data.data);
+      }
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
   const animatedOverlay = (tabCoor, tabActive) => {
     //setActiveTab(tabActive)
     Animated.spring(translateTab, {
@@ -91,7 +107,7 @@ export const DetailViewScreen = (props) => {
       <View>
         <TouchableHighlight
           onPress={() => {
-            props.navigation.goBack();
+            navigation.goBack();
           }}
         >
           <Ionicons name="ios-arrow-back" size={28} color="white" />
@@ -100,7 +116,7 @@ export const DetailViewScreen = (props) => {
     );
   };
 
-  const element1 = (visitante, visit) => {
+  const VisitData = () => {
     return (
       <View
         style={{
@@ -112,10 +128,11 @@ export const DetailViewScreen = (props) => {
         <View style={{ width: "95%" }}>
           <View style={styles.dataBox}>
             <Text style={styles.labelText}>DNI:</Text>
-            <Text style={styles.dataText}>{visitante.dni}</Text>
+            <Text style={styles.dataText}>{visit.Visitante.dni}</Text>
           </View>
           <View style={styles.dataBox}>
             <Text style={styles.labelText}>Destino:</Text>
+            <Text style={styles.dataText}>{visit.Destino.Zona.zone}</Text>
             <Text style={styles.dataText}>{visit.Destino.name}</Text>
           </View>
           <View style={styles.dataBox}>
@@ -139,7 +156,7 @@ export const DetailViewScreen = (props) => {
     );
   };
 
-  const element2 = (watchman) => {
+  const SecurityData = () => {
     return (
       <View
         style={{
@@ -158,21 +175,27 @@ export const DetailViewScreen = (props) => {
           <View>
             <View style={styles.dataBox2}>
               <Text style={styles.labelText}>Nombre:</Text>
-              <Text style={styles.dataText}>{watchman.Employee.name}</Text>
+              <Text style={styles.dataText}>
+                {visit.UserZone.User.Employee.name}
+              </Text>
             </View>
             <View style={styles.dataBox2}>
               <Text style={styles.labelText}>DNI</Text>
-              <Text style={styles.dataText}>{watchman.Employee.dni}</Text>
+              <Text style={styles.dataText}>
+                {visit.UserZone.User.Employee.dni}
+              </Text>
             </View>
             <View style={styles.dataBox2}>
-              <Text style={styles.labelText}>Identificaion:</Text>
+              <Text style={styles.labelText}>{visit.UserZone.User.email}</Text>
               <Text style={styles.dataText}>9987654</Text>
             </View>
           </View>
           <View>
             <Image
               source={{
-                uri: `${API_PORT()}/public/imgs/${watchman.Employee.picture}`,
+                uri: `${API_PORT()}/public/imgs/${
+                  visit.UserZone.User.Employee.picture
+                }`,
               }}
               style={{ width: 140, height: 140, borderRadius: 70 }}
             />
@@ -186,9 +209,13 @@ export const DetailViewScreen = (props) => {
     );
   };
 
+  useEffect(() => {
+    requestVisitById();
+  }, [route.params]);
   return (
     <View style={{ flex: 1 }}>
       <TopNavigation title="Vista Detallada" leftControl={goBackAction()} />
+      {loading && <Spinner message="Cargando..." />}
       <View style={{ flex: 1, backgroundColor: "pink" }}>
         <ImageBackground source={cover} style={styles.imgBackground}>
           <View style={styles.cover}>
@@ -201,13 +228,13 @@ export const DetailViewScreen = (props) => {
               <View style={{ marginBottom: 10 }}>
                 <Image
                   source={{
-                    uri: `${API_PORT()}/public/imgs/${visitante.picture}`,
+                    uri: `${API_PORT()}/public/imgs/${visit.Visitante.picture}`,
                   }}
                   style={styles.profilePic}
                 />
               </View>
               <Text style={styles.nameText}>
-                {visitante.name} {visitante.lastName}
+                {visit.Visitante.name} {visit.Visitante.lastName}
               </Text>
             </View>
           </View>
@@ -273,7 +300,7 @@ export const DetailViewScreen = (props) => {
             ],
           }}
         >
-          {element1(visitante, visit)}
+          <VisitData />
         </Animated.View>
         <Animated.View
           style={{
@@ -287,7 +314,7 @@ export const DetailViewScreen = (props) => {
             ],
           }}
         >
-          {element2(watchman)}
+          <SecurityData />
         </Animated.View>
       </View>
     </View>

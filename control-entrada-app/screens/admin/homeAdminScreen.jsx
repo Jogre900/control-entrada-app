@@ -234,7 +234,7 @@ const HomeAdminScreen = ({
               onPress={
                 selectItem.length > 0
                   ? () => onLong(elem.id)
-                  : () => navigation.navigate("detail-view", elem)
+                  : () => navigation.navigate("detail-view", {id: elem.id})
               }
               onLongPress={() => onLong(elem.id)}
               delayLongPress={200}
