@@ -9,6 +9,7 @@ import {
   Dimensions,
   Animated,
   TouchableOpacity,
+  ScrollView
 } from "react-native";
 import axios from "axios";
 import { Ionicons } from "@expo/vector-icons";
@@ -18,7 +19,8 @@ import { TopNavigation } from "../../components/TopNavigation.component";
 import { DetailCard } from "../../components/detailCard.component";
 import { ProfileComponent } from "../../components/profile.component";
 import { Spinner } from "../../components/spinner";
-import { FormContainer } from '../../components/formContainer'
+import { FormContainer } from "../../components/formContainer";
+import Avatar from "../../components/avatar.component";
 
 const { width } = Dimensions.get("window");
 const cover = require("../../assets/images/background.jpg");
@@ -29,13 +31,13 @@ export const DetailViewScreen = ({ route, navigation }) => {
   //console.log(visit);
   //const visitante = visit.Visitante;
 
-  const watchman = visit.UserZone.User;
+  //const watchman = visit.UserZone.User;
   //console.log("visitas:-------",visit.Citizen)
   //console.log("DEstino:----",visit.Destino)
   //console.log("Zona: -------",visit.UserZone.Zona)
   //console.log("WATCHMAN:--------", visit.UserZone.User)
   const [visit, setVisit] = useState();
-  const [loading, setLoading] = useState(initialState);
+  const [loading, setLoading] = useState();
   const [activeTab, setActiveTab] = useState("0");
   const [xTabOne, setXTabOne] = useState();
   const [xTabTwo, setXTabTwo] = useState();
@@ -47,9 +49,11 @@ export const DetailViewScreen = ({ route, navigation }) => {
 
   //REQUEST VISIT BY ID
   const requestVisitById = async () => {
+    console.log(id)
     setLoading(true);
     try {
-      const res = await axios.get(`${API_PORT()}/api/findVisit/${id}`);
+      const res = await axios.get(`${API_PORT()}/api/findVisitId/${id}`);
+      console.log(res.data)
       if (!res.data.error) {
         setLoading(false);
         setVisit(res.data.data);
@@ -116,98 +120,98 @@ export const DetailViewScreen = ({ route, navigation }) => {
     );
   };
 
-  const VisitData = () => {
-    return (
-      <View
-        style={{
-          justifyContent: "center",
-          alignItems: "center",
-          marginTop: 10,
-        }}
-      >
-        <View style={{ width: "95%" }}>
-          <View style={styles.dataBox}>
-            <Text style={styles.labelText}>DNI:</Text>
-            <Text style={styles.dataText}>{visit.Visitante.dni}</Text>
-          </View>
-          <View style={styles.dataBox}>
-            <Text style={styles.labelText}>Destino:</Text>
-            <Text style={styles.dataText}>{visit.Destino.Zona.zone}</Text>
-            <Text style={styles.dataText}>{visit.Destino.name}</Text>
-          </View>
-          <View style={styles.dataBox}>
-            <Text style={styles.labelText}>Hora de Entrada:</Text>
-            <Text style={styles.dataText}>
-              {moment(visit.entryDate).format("HH:mm a")}
-            </Text>
-          </View>
-          <View style={styles.dataBox}>
-            <Text style={styles.labelText}>Hora de Salida:</Text>
-            {visit.departureDate === visit.entryDate ? (
-              <Text style={styles.dataText}>----</Text>
-            ) : (
-              <Text style={styles.dataText}>
-                {moment(visit.departureDate).format("HH:mm a")}
-              </Text>
-            )}
-          </View>
-        </View>
-      </View>
-    );
-  };
+  // const VisitData = () => {
+  //   return (
+  //     <View
+  //       style={{
+  //         justifyContent: "center",
+  //         alignItems: "center",
+  //         marginTop: 10,
+  //       }}
+  //     >
+  //       <View style={{ width: "95%" }}>
+  //         <View style={styles.dataBox}>
+  //           <Text style={styles.labelText}>DNI:</Text>
+  //           <Text style={styles.dataText}>{visit.Visitante.dni}</Text>
+  //         </View>
+  //         <View style={styles.dataBox}>
+  //           <Text style={styles.labelText}>Destino:</Text>
+  //           <Text style={styles.dataText}>{visit.Destino.Zona.zone}</Text>
+  //           <Text style={styles.dataText}>{visit.Destino.name}</Text>
+  //         </View>
+  //         <View style={styles.dataBox}>
+  //           <Text style={styles.labelText}>Hora de Entrada:</Text>
+  //           <Text style={styles.dataText}>
+  //             {moment(visit.entryDate).format("HH:mm a")}
+  //           </Text>
+  //         </View>
+  //         <View style={styles.dataBox}>
+  //           <Text style={styles.labelText}>Hora de Salida:</Text>
+  //           {visit.departureDate === visit.entryDate ? (
+  //             <Text style={styles.dataText}>----</Text>
+  //           ) : (
+  //             <Text style={styles.dataText}>
+  //               {moment(visit.departureDate).format("HH:mm a")}
+  //             </Text>
+  //           )}
+  //         </View>
+  //       </View>
+  //     </View>
+  //   );
+  // };
 
-  const SecurityData = () => {
-    return (
-      <View
-        style={{
-          justifyContent: "center",
-          alignItems: "center",
-          marginTop: 10,
-        }}
-      >
-        <View
-          style={{
-            width: "90%",
-            flexDirection: "row",
-            justifyContent: "space-between",
-          }}
-        >
-          <View>
-            <View style={styles.dataBox2}>
-              <Text style={styles.labelText}>Nombre:</Text>
-              <Text style={styles.dataText}>
-                {visit.UserZone.User.Employee.name}
-              </Text>
-            </View>
-            <View style={styles.dataBox2}>
-              <Text style={styles.labelText}>DNI</Text>
-              <Text style={styles.dataText}>
-                {visit.UserZone.User.Employee.dni}
-              </Text>
-            </View>
-            <View style={styles.dataBox2}>
-              <Text style={styles.labelText}>{visit.UserZone.User.email}</Text>
-              <Text style={styles.dataText}>9987654</Text>
-            </View>
-          </View>
-          <View>
-            <Image
-              source={{
-                uri: `${API_PORT()}/public/imgs/${
-                  visit.UserZone.User.Employee.picture
-                }`,
-              }}
-              style={{ width: 140, height: 140, borderRadius: 70 }}
-            />
-            <Image
-              source={{ uri: saveImg }}
-              style={{ width: 120, height: 120, borderRadius: 70 }}
-            />
-          </View>
-        </View>
-      </View>
-    );
-  };
+  // const SecurityData = () => {
+  //   return (
+  //     <View
+  //       style={{
+  //         justifyContent: "center",
+  //         alignItems: "center",
+  //         marginTop: 10,
+  //       }}
+  //     >
+  //       <View
+  //         style={{
+  //           width: "90%",
+  //           flexDirection: "row",
+  //           justifyContent: "space-between",
+  //         }}
+  //       >
+  //         <View>
+  //           <View style={styles.dataBox2}>
+  //             <Text style={styles.labelText}>Nombre:</Text>
+  //             <Text style={styles.dataText}>
+  //               {visit.UserZone.User.Employee.name}
+  //             </Text>
+  //           </View>
+  //           <View style={styles.dataBox2}>
+  //             <Text style={styles.labelText}>DNI</Text>
+  //             <Text style={styles.dataText}>
+  //               {visit.UserZone.User.Employee.dni}
+  //             </Text>
+  //           </View>
+  //           <View style={styles.dataBox2}>
+  //             <Text style={styles.labelText}>{visit.UserZone.User.email}</Text>
+  //             <Text style={styles.dataText}>9987654</Text>
+  //           </View>
+  //         </View>
+  //         <View>
+  //           <Image
+  //             source={{
+  //               uri: `${API_PORT()}/public/imgs/${
+  //                 visit.UserZone.User.Employee.picture
+  //               }`,
+  //             }}
+  //             style={{ width: 140, height: 140, borderRadius: 70 }}
+  //           />
+  //           <Image
+  //             source={{ uri: saveImg }}
+  //             style={{ width: 120, height: 120, borderRadius: 70 }}
+  //           />
+  //         </View>
+  //       </View>
+  //     </View>
+  //   );
+  // };
 
   useEffect(() => {
     requestVisitById();
@@ -216,33 +220,112 @@ export const DetailViewScreen = ({ route, navigation }) => {
     <View style={{ flex: 1 }}>
       <TopNavigation title="Vista Detallada" leftControl={goBackAction()} />
       {loading && <Spinner message="Cargando..." />}
-      <View style={{ flex: 1, backgroundColor: "pink" }}>
-        <ImageBackground source={cover} style={styles.imgBackground}>
-          <View style={styles.cover}>
+        {visit ?
+      <ScrollView>
+        <View
+          style={{
+            backgroundColor: "#fff",
+        width: "90%",
+        borderRadius: 5,
+        marginVertical: 5,
+        padding: 8,
+        elevation: 5
+          }}
+        >
+          
+            <View style={{ marginBottom: 10, alignSelf:'center' }}>
+              <Avatar.Picture size={120} uri={`${API_PORT()}/public/imgs/${visit.Visitante.picture}`}/>
+            </View>
+            <Text style={styles.nameText}>
+              {visit.Visitante.name} {visit.Visitante.lastName}
+            </Text>
             <View
               style={{
-                //justifyContent: "center",
-                alignItems: "center",
+                flexDirection: "row",
+                //backgroundColor: 'green',
+                justifyContent: 'space-between',
+                marginVertical: 15,
+                paddingVertical: 5,
+                paddingHorizontal: 10
               }}
             >
-              <View style={{ marginBottom: 10 }}>
-                <Image
-                  source={{
-                    uri: `${API_PORT()}/public/imgs/${visit.Visitante.picture}`,
-                  }}
-                  style={styles.profilePic}
-                />
+              <View
+                style={{
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Text style={styles.contentText}>{visit.Visitante.dni}</Text>
+                <Text style={styles.labelText}>dni</Text>
               </View>
-              <Text style={styles.nameText}>
-                {visit.Visitante.name} {visit.Visitante.lastName}
-              </Text>
+              <View
+                style={{
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Text style={styles.contentText}>{visit.UserZone.Zona.zone}</Text>
+                <Text style={styles.labelText}>Zona</Text>
+              </View>
+              <View
+                style={{
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Text style={styles.contentText}>{visit.Destino.name}</Text>
+                <Text style={styles.labelText}>Destino</Text>
+              </View>
+            </View>
+          
+        </View>
+        <FormContainer title="Visita">
+          <Text>{visit.descriptionEntry}</Text>
+          <Text>{visit.descriptionDeparture}</Text>
+          <Image
+            style={{
+              height: 250,
+              width: '100%',
+              borderRadius: 5,
+              overflow: 'hidden'
+            }}
+            source={{ uri: `${API_PORT()}/public/imgs/${visit.Fotos[0].picture}` }}
+          />
+          <View style={{flexDirection: 'row'}}>
+            <View style={{
+              flexDirection: 'row'
+            }}>
+              <Ionicons name="ios-timer" size={20} color="#8e8e8e" />
+              <Text>{moment(visit.entryDate).format("D MMM YYY")}</Text>
+            </View>
+            <View style={{
+              flexDirection: 'row'
+            }}>
+              <Ionicons name="ios-timer" size={20} color="#8e8e8e" />
+              <Text>{moment(visit.departureDate).format("D MMM YYY")}</Text>
             </View>
           </View>
-        </ImageBackground>
-      </View>
+        </FormContainer>
+        <FormContainer title="Seguridad">
+          <Avatar.Picture
+            size={56}
+            uri={`${API_PORT()}/public/imgs/${
+              visit.UserZone.User.Employee.picture
+            }`}
+          />
+          <Text>
+            {visit.UserZone.User.Employee.name}
+            {visit.UserZone.User.Employee.lastName}
+          </Text>
+          <Text>
+            {moment(visit.UserZone.assignationDate).format("D MMM YYYY")}
+          </Text>
+        </FormContainer>
+        
 
-      {/* -------------TAB BAR----------- */}
-      <View style={{ flex: 1, paddingHorizontal: 5 }}>
+        {/* -------------TAB BAR----------- */}
+
+        {/* <View style={{ flex: 1, paddingHorizontal: 5 }}>
         <View style={styles.tabBar}>
           <Animated.View
             style={{
@@ -316,7 +399,9 @@ export const DetailViewScreen = ({ route, navigation }) => {
         >
           <SecurityData />
         </Animated.View>
-      </View>
+      </View> */}
+      </ScrollView>
+      : null}
     </View>
   );
 };
@@ -339,8 +424,8 @@ const styles = StyleSheet.create({
   },
   nameText: {
     textAlign: "center",
-    fontSize: 32,
-    color: "#fff",
+    fontSize: 22,
+    color: "#262626",
   },
   tabBar: {
     flexDirection: "row",
@@ -368,9 +453,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
   },
+  contentText: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#262626",
+  },
   labelText: {
     fontSize: 14,
-    color: "grey",
+    color: "#8e8e8e",
   },
   dataText: {
     fontSize: 17,

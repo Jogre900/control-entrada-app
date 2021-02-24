@@ -1599,6 +1599,21 @@ password: "123456,
             model: models.Destination,
             as: "Destino",
             attributes: ["id", "name"]
+          },
+          {
+            model: models.UserZone,
+            as: "UserZone",
+            include: [
+              { model: models.Zone, as: "Zona" },
+              {
+                model: models.User,
+                as: "User",
+                include: {
+                  model: models.Employee,
+                  as: "Employee"
+                }
+              }
+            ]
           }
         ]
       });

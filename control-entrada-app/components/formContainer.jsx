@@ -18,12 +18,13 @@ const styles = StyleSheet.create({
         backgroundColor: "#fff",
         width: "90%",
         borderRadius: 5,
-        marginVertical: 2.5,
+        marginVertical: 5,
         padding: 8,
+        elevation: 5
       },
       labelTitle: {
-        fontSize: 16,
-        lineHeight: 16,
+        fontSize: 17,
+        lineHeight: 18,
         color: MainColor,
         fontWeight: '600'
       },
