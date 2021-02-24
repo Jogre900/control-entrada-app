@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
     //marginTop: Constants.statusBarHeight,
   },
   scrollView: {
-    flex: 1,
+    //flex: 1,
   },
   // listItemBox: {
   //   //flexDirection: "row",

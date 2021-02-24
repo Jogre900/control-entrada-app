@@ -646,7 +646,6 @@ password: "123456,
           as: "Employee"
         }
       });
-      console.log("user", user);
 
       if (!user) {
         let hash = await bcrypt.hash(password, 10);
@@ -695,13 +694,37 @@ password: "123456,
             ]
           }
         );
-
         if (employee) {
-          RESPONSE.error = false;
-          RESPONSE.msg = "Registro Exitoso!";
-          RESPONSE.data = employee;
-          res.status(200).json(RESPONSE);
-          console.log(RESPONSE.data);
+          const userC = await models.User.findOne({
+            where: {
+              id: employee.dataValues.id
+            },
+
+            include: [
+              {
+                model: models.Employee,
+                as: "Employee"
+              },
+              {
+                model: models.UserCompany,
+                as: "UserCompany"
+              },
+              {
+                model: models.UserZone,
+                as: "userZone",
+                include: {
+                  model: models.Zone,
+                  as: "Zona"
+                }
+              }
+            ]
+          });
+          if (userC) {
+            RESPONSE.error = false;
+            RESPONSE.msg = "Registro Exitoso!";
+            RESPONSE.data = userC;
+            res.json(RESPONSE);
+          }
         }
       } else {
         RESPONSE.msg = "usuario ya existe";
@@ -1322,7 +1345,11 @@ password: "123456,
             model: models.UserCompany,
             as: "UserCompany",
             where: {
-              [Op.not]: [{[Op.or]: [{privilege: 'Admin'},{privilege:'Supervisor'}]}]
+              [Op.not]: [
+                {
+                  [Op.or]: [{ privilege: "Admin" }, { privilege: "Supervisor" }]
+                }
+              ]
             }
           },
           {
@@ -1332,7 +1359,6 @@ password: "123456,
             include: {
               model: models.Zone,
               as: "Zona"
-              
             }
           }
         ]
@@ -1648,12 +1674,12 @@ password: "123456,
     console.log(req.params);
     try {
       let visits = await models.Visits.findAll({
-         where: {
-        //   entryDate: {
-        //     [Op.between]: [
-        //       `${moment().format("YYYY-MM-DD")} 00:00:00`,
-        //       `${moment().format("YYYY-MM-DD")} 23:59:00`
-        //     ]
+        where: {
+          //   entryDate: {
+          //     [Op.between]: [
+          //       `${moment().format("YYYY-MM-DD")} 00:00:00`,
+          //       `${moment().format("YYYY-MM-DD")} 23:59:00`
+          //     ]
           // }
         },
         include: [

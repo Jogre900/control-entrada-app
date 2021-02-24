@@ -7,7 +7,6 @@ import axios from "axios";
 import Modal from "react-native-modal";
 
 export const LogOutModal = ({ status, navigation, onClose }) => {
-  console.log("NAVIGATION MODAL-----", navigation);
 
   return (
     <Modal

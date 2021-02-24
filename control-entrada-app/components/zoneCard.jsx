@@ -2,6 +2,7 @@ import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import moment from "moment";
+import { ThirdColor } from '../assets/colors'
 
 const iconProps = {
   name: "ios-timer",
@@ -25,21 +26,13 @@ export const ZoneCard = ({ data, selected }) => {
           alignItems: "center",
         }}
       >
-        <Ionicons name="md-globe" size={28} color="grey" />
+        <Ionicons name="md-globe" size={22} color={ThirdColor} />
         <View
           style={{
             marginLeft: 15,
           }}
         >
-          <Text
-            style={{
-              fontSize: 16,
-              fontWeight: "normal",
-              lineHeight: 28
-            }}
-          >
-            {zone}
-          </Text>
+          <Text style={styles.contentText}>{zone}</Text>
           <View
             style={{
               flexDirection: "row",
@@ -55,7 +48,7 @@ export const ZoneCard = ({ data, selected }) => {
               }}
             >
               <Ionicons {...iconProps} />
-              <Text style={{}}>{firsEntryTime}</Text>
+              <Text style={styles.labelText}>{firsEntryTime}</Text>
             </View>
             <View
               style={{
@@ -64,13 +57,13 @@ export const ZoneCard = ({ data, selected }) => {
                 marginHorizontal: 10,
               }}
             >
-              <Ionicons {...iconProps} />
-              <Text style={{}}>{firsDepartureTime}</Text>
+              <Ionicons {...iconProps} color="red" />
+              <Text style={styles.labelText}>{firsDepartureTime}</Text>
             </View>
           </View>
         </View>
       </View>
-      <Ionicons name="ios-arrow-forward" size={26} color="grey" />
+      <Ionicons name="ios-arrow-forward" size={22} color="grey" />
     </View>
   );
 };
@@ -87,5 +80,14 @@ const styles = StyleSheet.create({
     marginVertical: 4,
     //borderRadius: 5,
     backgroundColor: "#fff",
+  },
+  contentText: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#262626",
+  },
+  labelText: {
+    fontSize: 14,
+    color: "#8e8e8e",
   },
 });

@@ -6,7 +6,8 @@ import { MainColor, ThirdColor, lightColor } from '../assets/colors'
 import moment from "moment";
 
 export const EmployeeCard = ({ data, key }) => {
-    return (
+  console.log("employee card------",data)  
+  return (
     <View style={styles.listEmployeBox} key={key}>
       <Avatar.Picture
         size={45}
@@ -19,13 +20,13 @@ export const EmployeeCard = ({ data, key }) => {
               {data.User?.UserCompany[0].privilege || data.UserCompany[0].privilege}
             </Text>
           </View>
-          <Text>
+          <Text style={styles.contentText}>
             {data.User?.Employee.name || data.Employee.name} {data.User?.Employee.lastName || data.Employee.lastName}
           </Text>
         </View>
         <View style={{ alignItems: "center" }}>
-          <Text>Asignado:</Text>
-          <Text>{moment(data.assignationDate).format("D MMM YYYY")}</Text>
+          <Text style={styles.labelText}>Asignado:</Text>
+          <Text style={styles.contentText}>{data.User?.userZone[0].Zona.zone || data.userZone[0].Zona.zone}</Text>
         </View>
         {/* <Text>Cambio de Turno: {moment(data.changeTurnDate).format('D MMM YYYY')}</Text> */}
       </View>
@@ -61,5 +62,14 @@ const styles = StyleSheet.create({
     //height: 32,
     alignItems: "center",
     justifyContent: "center",
+  },
+  contentText: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#262626",
+  },
+  labelText: {
+    fontSize: 14,
+    color: "#8e8e8e",
   },
 });
