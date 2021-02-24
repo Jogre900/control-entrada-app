@@ -9,7 +9,7 @@ import {
   Dimensions,
   Animated,
   TouchableOpacity,
-  ScrollView
+  ScrollView,
 } from "react-native";
 import axios from "axios";
 import { Ionicons } from "@expo/vector-icons";
@@ -49,11 +49,11 @@ export const DetailViewScreen = ({ route, navigation }) => {
 
   //REQUEST VISIT BY ID
   const requestVisitById = async () => {
-    console.log(id)
+    console.log(id);
     setLoading(true);
     try {
       const res = await axios.get(`${API_PORT()}/api/findVisitId/${id}`);
-      console.log(res.data)
+      console.log(res.data);
       if (!res.data.error) {
         setLoading(false);
         setVisit(res.data.data);
@@ -220,35 +220,19 @@ export const DetailViewScreen = ({ route, navigation }) => {
     <View style={{ flex: 1 }}>
       <TopNavigation title="Vista Detallada" leftControl={goBackAction()} />
       {loading && <Spinner message="Cargando..." />}
-        {visit ?
-      <ScrollView>
-        <View
-          style={{
-            backgroundColor: "#fff",
-        width: "90%",
-        borderRadius: 5,
-        marginVertical: 5,
-        padding: 8,
-        elevation: 5
-          }}
-        >
-          
-            <View style={{ marginBottom: 10, alignSelf:'center' }}>
-              <Avatar.Picture size={120} uri={`${API_PORT()}/public/imgs/${visit.Visitante.picture}`}/>
+      {visit ? (
+        <ScrollView contentContainerStyle={{ alignItems: "center" }}>
+          <View style={styles.profileContainer}>
+            <View style={{ marginBottom: 10, alignSelf: "center" }}>
+              <Avatar.Picture
+                size={120}
+                uri={`${API_PORT()}/public/imgs/${visit.Visitante.picture}`}
+              />
             </View>
             <Text style={styles.nameText}>
               {visit.Visitante.name} {visit.Visitante.lastName}
             </Text>
-            <View
-              style={{
-                flexDirection: "row",
-                //backgroundColor: 'green',
-                justifyContent: 'space-between',
-                marginVertical: 15,
-                paddingVertical: 5,
-                paddingHorizontal: 10
-              }}
-            >
+            <View style={styles.profileDataContainer}>
               <View
                 style={{
                   justifyContent: "center",
@@ -264,7 +248,9 @@ export const DetailViewScreen = ({ route, navigation }) => {
                   alignItems: "center",
                 }}
               >
-                <Text style={styles.contentText}>{visit.UserZone.Zona.zone}</Text>
+                <Text style={styles.contentText}>
+                  {visit.UserZone.Zona.zone}
+                </Text>
                 <Text style={styles.labelText}>Zona</Text>
               </View>
               <View
@@ -277,55 +263,87 @@ export const DetailViewScreen = ({ route, navigation }) => {
                 <Text style={styles.labelText}>Destino</Text>
               </View>
             </View>
-          
-        </View>
-        <FormContainer title="Visita">
-          <Text>{visit.descriptionEntry}</Text>
-          <Text>{visit.descriptionDeparture}</Text>
-          <Image
-            style={{
-              height: 250,
-              width: '100%',
-              borderRadius: 5,
-              overflow: 'hidden'
-            }}
-            source={{ uri: `${API_PORT()}/public/imgs/${visit.Fotos[0].picture}` }}
-          />
-          <View style={{flexDirection: 'row'}}>
-            <View style={{
-              flexDirection: 'row'
-            }}>
-              <Ionicons name="ios-timer" size={20} color="#8e8e8e" />
-              <Text>{moment(visit.entryDate).format("D MMM YYY")}</Text>
-            </View>
-            <View style={{
-              flexDirection: 'row'
-            }}>
-              <Ionicons name="ios-timer" size={20} color="#8e8e8e" />
-              <Text>{moment(visit.departureDate).format("D MMM YYY")}</Text>
-            </View>
           </View>
-        </FormContainer>
-        <FormContainer title="Seguridad">
-          <Avatar.Picture
-            size={56}
-            uri={`${API_PORT()}/public/imgs/${
-              visit.UserZone.User.Employee.picture
-            }`}
-          />
-          <Text>
-            {visit.UserZone.User.Employee.name}
-            {visit.UserZone.User.Employee.lastName}
-          </Text>
-          <Text>
-            {moment(visit.UserZone.assignationDate).format("D MMM YYYY")}
-          </Text>
-        </FormContainer>
-        
+          <FormContainer title="Visita">
+            <View style={{ flexDirection: "row" }}>
+              <Text style={styles.labelText}>Entrada: </Text>
+              <Text>{visit.descriptionEntry}</Text>
+            </View>
+            <View style={{ flexDirection: "row" }}>
+              <Text style={styles.labelText}>Salida: </Text>
+              <Text>
+                {visit.descriptionDeparture
+                  ? visit.descriptionDeparture
+                  : "----"}
+              </Text>
+            </View>
+            <Image
+              style={{
+                height: 250,
+                width: "100%",
+                borderRadius: 5,
+                overflow: "hidden",
+                marginVertical: 5,
+              }}
+              source={{
+                uri: `${API_PORT()}/public/imgs/${visit.Fotos[0].picture}`,
+              }}
+            />
+            <View style={{ flexDirection: "column", marginBottom: 5 }}>
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                }}
+              >
+                <Ionicons
+                  name="ios-timer"
+                  size={20}
+                  color="#8e8e8e"
+                  style={{ marginRight: 4 }}
+                />
+                <Text>
+                  {moment(visit.entryDate).format("D MMM YY, HH:mm a")}
+                </Text>
+              </View>
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  marginLeft: 0,
+                }}
+              >
+                <Ionicons
+                  name="ios-timer"
+                  size={20}
+                  color="#8e8e8e"
+                  style={{ marginRight: 4 }}
+                />
+                <Text>
+                  {moment(visit.departureDate).format("D MMM YY, HH:mm a")}
+                </Text>
+              </View>
+            </View>
+          </FormContainer>
+          <FormContainer title="Seguridad">
+            <Avatar.Picture
+              size={56}
+              uri={`${API_PORT()}/public/imgs/${
+                visit.UserZone.User.Employee.picture
+              }`}
+            />
+            <Text>
+              {visit.UserZone.User.Employee.name}
+              {visit.UserZone.User.Employee.lastName}
+            </Text>
+            <Text>
+              {moment(visit.UserZone.assignationDate).format("D MMM YYYY")}
+            </Text>
+          </FormContainer>
 
-        {/* -------------TAB BAR----------- */}
+          {/* -------------TAB BAR----------- */}
 
-        {/* <View style={{ flex: 1, paddingHorizontal: 5 }}>
+          {/* <View style={{ flex: 1, paddingHorizontal: 5 }}>
         <View style={styles.tabBar}>
           <Animated.View
             style={{
@@ -400,28 +418,30 @@ export const DetailViewScreen = ({ route, navigation }) => {
           <SecurityData />
         </Animated.View>
       </View> */}
-      </ScrollView>
-      : null}
+        </ScrollView>
+      ) : null}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  imgBackground: {
-    flex: 1,
-    resizeMode: "cover",
+  profileContainer: {
+    backgroundColor: "#fff",
+    width: "90%",
+    borderRadius: 5,
+    marginVertical: 5,
+    padding: 8,
+    elevation: 5,
   },
-  cover: {
-    backgroundColor: "black",
-    flex: 1,
-    opacity: 0.8,
-    justifyContent: "center",
+  profileDataContainer: {
+    flexDirection: "row",
+    //backgroundColor: 'green',
+    justifyContent: "space-between",
+    marginVertical: 15,
+    paddingVertical: 5,
+    paddingHorizontal: 10,
   },
-  profilePic: {
-    width: 140,
-    height: 140,
-    borderRadius: 70,
-  },
+
   nameText: {
     textAlign: "center",
     fontSize: 22,
@@ -446,7 +466,6 @@ const styles = StyleSheet.create({
     //borderBottomWidth: 1,
     borderColor: "grey",
   },
-  //elemento 1
   dataBox: {
     marginVertical: 10,
     flexDirection: "row",

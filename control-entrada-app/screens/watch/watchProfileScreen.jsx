@@ -15,18 +15,19 @@ import axios from "axios";
 import { API_PORT } from "../../config/index";
 import AsyncStorage from "@react-native-community/async-storage";
 import moment from "moment";
-import {connect} from 'react-redux'
+import { connect } from "react-redux";
 //components
 import { TopNavigation } from "../../components/TopNavigation.component";
 import { MainButton } from "../../components/mainButton.component";
 import Input from "../../components/input.component";
 import { MainColor, lightColor } from "../../assets/colors.js";
 import Modal from "react-native-modal";
-import { Divider } from "../../components/Divider";
+import { FormContainer } from "../../components/formContainer";
+import Avatar from "../../components/avatar.component";
 
-const WatchProfileScreen = ({navigation, profile}) => {
-  console.log("redux:----", profile)
-  const destiny = profile.userZone[0].Zona.Destinos
+const WatchProfileScreen = ({ navigation, profile }) => {
+  console.log("redux:----", profile);
+  const destiny = profile.userZone[0].Zona.Destinos;
   const [editVisibility, setEditVisibility] = useState(false);
   const [passChange, setPassChange] = useState("");
   const [repeatPass, setRepeatPass] = useState("");
@@ -123,7 +124,7 @@ const WatchProfileScreen = ({navigation, profile}) => {
   };
 
   //RENDER DESTINY LIST
-  const DestinyList = ({destiny}) => {
+  const DestinyList = ({ destiny }) => {
     return (
       <>
         {destiny.map((elem) => (
@@ -152,26 +153,51 @@ const WatchProfileScreen = ({navigation, profile}) => {
       <TopNavigation title="Mi Perfil" leftControl={goBackAction()} />
       {profile ? (
         <ScrollView contentContainerStyle={styles.perfilContainer}>
-          <View style={styles.section1}>
-            <Image
-              style={{
-                width: 120,
-                height: 120,
-                borderRadius: 60,
-                resizeMode: "cover",
-              }}
-              source={{ uri: `${API_PORT()}/public/imgs/${profile.picture}` }}
-            />
+          <View style={styles.profileContainer}>
+            <View style={{ marginBottom: 10, alignSelf: "center" }}>
+              <Avatar
+                size={120}
+                uri={`${API_PORT()}/public/imgs/${profile.picture}`}
+              />
+            </View>
             <Text style={styles.profileName}>
               {profile.name} {profile.lastName}
             </Text>
+            <View style={styles.profileDataContainer}>
+              <View
+                style={{
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Text style={styles.contentText}>{profile.dni}</Text>
+                <Text style={styles.labelText}>dni</Text>
+              </View>
+              <View
+                style={{
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Text style={styles.contentText}>{profile.email}</Text>
+                <Text style={styles.labelText}>email</Text>
+              </View>
+              <View
+                style={{
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Text style={styles.contentText}>0</Text>
+                <Text style={styles.labelText}>Visitas Registradas</Text>
+              </View>
+            </View>
+
             <Text style={styles.dataText}>{profile.email}</Text>
             <Text style={styles.dataText}>Dni: {profile.dni}</Text>
           </View>
           <View style={styles.section2}>
-            <View style={styles.dateContainer}>
-              <Text style={styles.containerTitle}>Horario</Text>
-              <Divider size="small" />
+            <FormContainer title="Horario">
               <View style={styles.dateBox}>
                 <View style={styles.dateIconBox}>
                   <Ionicons name="ios-document" size={28} color={lightColor} />
@@ -194,10 +220,8 @@ const WatchProfileScreen = ({navigation, profile}) => {
                   )}
                 </Text>
               </View>
-            </View>
-            <View style={styles.zoneContainer}>
-              <Text style={styles.containerTitle}>Zona Asignada</Text>
-              <Divider size="small" />
+            </FormContainer>
+            <FormContainer title="Zona Asignada">
               <View style={styles.zoneBox}>
                 <View style={{ flexDirection: "row", alignItems: "center" }}>
                   <View style={styles.dateIconBox}>
@@ -243,10 +267,10 @@ const WatchProfileScreen = ({navigation, profile}) => {
                     />
                   </TouchableOpacity>
                 </View>
-                {destinyvisibility && <DestinyList destiny={destiny}/>}
+                {destinyvisibility && <DestinyList destiny={destiny} />}
               </View>
-            </View>
-            <View style={styles.editContainer}>
+            </FormContainer>
+            {/* <View style={styles.editContainer}>
               <Text style={styles.containerTitle}>Editar</Text>
               <Divider size="small" />
               <View
@@ -304,7 +328,7 @@ const WatchProfileScreen = ({navigation, profile}) => {
                   />
                 </View>
               )}
-            </View>
+            </View> */}
           </View>
         </ScrollView>
       ) : (
@@ -314,48 +338,46 @@ const WatchProfileScreen = ({navigation, profile}) => {
   );
 };
 
-const mapStateToPRops = state => ({
-  profile: state.profile.profile
-})
+const mapStateToPRops = (state) => ({
+  profile: state.profile.profile,
+});
 
-export default connect(mapStateToPRops, {})(WatchProfileScreen)
+export default connect(mapStateToPRops, {})(WatchProfileScreen);
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#eee",
   },
-  perfilContainer: {
-    alignItems: "center",
-  },
-  section1: {
+  profileContainer: {
     backgroundColor: "#fff",
-    alignItems: "center",
-    paddingVertical: "10%",
     width: "90%",
     borderRadius: 5,
-    marginVertical: 2.5,
+    marginVertical: 5,
+    padding: 8,
+    elevation: 5,
   },
-  perfilLogo: {
-    width: 120,
-    height: 120,
+  profileDataContainer: {
+    flexDirection: "row",
+    //backgroundColor: 'green',
+    justifyContent: "space-between",
+    marginVertical: 15,
+    paddingVertical: 5,
+    paddingHorizontal: 10,
   },
   profileName: {
     fontSize: 22,
     fontWeight: "100",
     color: "black",
   },
-  containerTitle: {
-    fontSize: 16,
-    fontWeight: "normal",
-    color: MainColor,
-  },
-  dataText: {
+  contentText: {
     fontSize: 14,
-    fontWeight: "100",
+    fontWeight: "600",
+    color: "#262626",
   },
-  section2: {
-    width: "90%",
+  labelText: {
+    fontSize: 14,
+    color: "#8e8e8e",
   },
   dateContainer: {
     backgroundColor: "#fff",

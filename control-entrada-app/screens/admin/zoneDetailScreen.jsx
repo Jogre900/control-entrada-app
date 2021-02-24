@@ -123,6 +123,7 @@ const ZoneDetailScreen = ({
         }`
       );
       if (!res.data.error) {
+        console.log(res.data.data.encargado_zona)
         setZoneApi(res.data.data);
         setDestiny(res.data.data.Destinos);
         setZoneEmployee(res.data.data.encargado_zona);
@@ -285,7 +286,7 @@ const ZoneDetailScreen = ({
               <FormContainer title="Encargados">
                 {zoneApi.encargado_zona.length > 0 ? (
                   zoneApi.encargado_zona.map((elem) => (
-                    <EmployeeCard key={elem.id} data={elem} />
+                    <EmployeeCard key={elem.id} data={elem} zone={true}/>
                   ))
                 ) : (
                   <View>

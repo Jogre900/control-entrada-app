@@ -28,6 +28,9 @@ import { MainColor, ligthColor } from "../../assets/colors";
 import Modal from "react-native-modal";
 import { connect } from "react-redux";
 import { storage } from "../../helpers/asyncStorage";
+import { LoadingModal } from "../../components/loadingModal";
+import { StatusModal } from "../../components/statusModal";
+import {FormContainer } from '../../components/formContainer'
 
 const EntryScreen = ({ navigation, profile, saveVisit }) => {
   //console.log("profile from redux---", profile);
@@ -35,6 +38,8 @@ const EntryScreen = ({ navigation, profile, saveVisit }) => {
   const destinys = profile.userZone[0].Zona.Destinos;
   const userZoneId = profile.userZone[0].id;
 
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
   const [saveImg, setSaveImg] = useState();
   const [changeImg, setChangeImg] = useState(false);
   const [userId, setUserId] = useState();
@@ -77,9 +82,10 @@ const EntryScreen = ({ navigation, profile, saveVisit }) => {
 
   //CREATE VISIT
   const createVisit = async () => {
-    //console.log("destiny id---------------", destinyId);
+    setLoading(true);
+
     let token = await storage.getItem("userToken");
-    console.log("TOKEN FROM STORAGE-----",token)
+
     if (!name || !lastName || !dni) {
       setProfileCaption("Debe ingresar todos los datos");
       return;
@@ -95,8 +101,6 @@ const EntryScreen = ({ navigation, profile, saveVisit }) => {
       data.append("departureDate", moment().toString());
       data.append("descriptionEntry", entry);
       data.append("userZoneId", userZoneId);
-      console.log("ME ESTOY EJECUTANDO!!!!!", data)
-      console.log("DESTINY ID-------", destinyId)
       try {
         let res = await axios.post(
           `${API_PORT()}/api/createVisit/${destinyId}`,
@@ -108,18 +112,16 @@ const EntryScreen = ({ navigation, profile, saveVisit }) => {
             },
           }
         );
-        console.log("RES DE CREACION DE VISITA-----",res.data)
+
         if (!res.data.error) {
-          console.log(res.data);
+          setLoading(false);
           saveVisit(res.data.data);
-          setModalVisibility(false);
-          alert("Registro exitoso!");
+          setSuccess(true);
           clearInputs();
         }
       } catch (error) {
-        setModalVisibility(false);
-        alert(error.message);
-        console.log(error.message)
+        setLoading(false);
+        console.log(error.message);
       }
     }
   };
@@ -136,8 +138,8 @@ const EntryScreen = ({ navigation, profile, saveVisit }) => {
         setLastName(citizen.lastName);
         setImgUrl(citizen.picture);
         setEditable(false);
-      }else{
-        console.log(res.data.msg)
+      } else {
+        console.log(res.data.msg);
       }
     } catch (error) {
       console.log("error:---", error.message);
@@ -204,26 +206,6 @@ const EntryScreen = ({ navigation, profile, saveVisit }) => {
     );
   };
 
-  //LOADING
-  const LoadingModal = () => {
-    return (
-      <Modal
-        isVisible={modalVisibility}
-        onBackdropPress={() => setModalVisibility(!modalVisibility)}
-      >
-        <View
-          style={{
-            flex: 1,
-            backgroundColor: "transparent",
-            justifyContent: "center",
-          }}
-        >
-          <ActivityIndicator size="large" color={MainColor} />
-        </View>
-      </Modal>
-    );
-  };
-
   const clearInputs = () => {
     setName("");
     setLastName("");
@@ -270,9 +252,7 @@ const EntryScreen = ({ navigation, profile, saveVisit }) => {
             </View>
           </View>
 
-          <View style={styles.dateContainer}>
-            <Text style={styles.containerTitle}>Datos Personales</Text>
-            <Divider size="small" />
+          <FormContainer title='Datos Personales'>
             <Input
               title="Nombre"
               secureTextEntry={false}
@@ -317,10 +297,8 @@ const EntryScreen = ({ navigation, profile, saveVisit }) => {
             <View>
               <Text style={styles.captionText}>{profileCaption}</Text>
             </View>
-          </View>
-          <View style={styles.dateContainer}>
-            <Text style={styles.containerTitle}>Datos de Ingreso</Text>
-            <Divider size="small" />
+          </FormContainer>
+          <FormContainer title='Datos de Ingreso'>
             <View>
               <Text>Selecione un destino:</Text>
               {destinys ? (
@@ -347,7 +325,7 @@ const EntryScreen = ({ navigation, profile, saveVisit }) => {
               <View>
                 <Image
                   source={{ uri: visitImg }}
-                  style={{ width: 100, height: 100 }}
+                  style={{ width: '100%', height: 250, overflow: 'hidden', borderRadius: 5 }}
                 />
               </View>
             </View>
@@ -362,8 +340,7 @@ const EntryScreen = ({ navigation, profile, saveVisit }) => {
             <View>
               <Text style={styles.captionText}>{destinyCaption}</Text>
             </View>
-          </View>
-          <LoadingModal />
+          </FormContainer>
           <View style={{ width: "90%" }}>
             <MainButton
               title="Registrar Entrada"
@@ -373,12 +350,14 @@ const EntryScreen = ({ navigation, profile, saveVisit }) => {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
+      <LoadingModal status={loading} message="Guardando..." />
+      <StatusModal status={succes} onClose={() => setSuccess(false)} />
     </View>
   );
 };
 
 const mapStateToProps = (state) => ({
-  profile: state.profile.profile
+  profile: state.profile.profile,
 });
 
 const mapDispatchToProps = (dispatch) => ({

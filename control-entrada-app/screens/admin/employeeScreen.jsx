@@ -121,7 +121,7 @@ const EmployeeScreen = ({ navigation, employee, removeEmployee }) => {
                 }
                 key={item.id}
               >
-                <EmployeeCard data={item} />
+                <EmployeeCard data={item} zone={false}/>
               </TouchableOpacity>
             ))
           ) : (

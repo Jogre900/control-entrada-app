@@ -2,31 +2,43 @@ import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import Avatar from "./avatar.component";
 import { API_PORT } from "../config/index";
-import { MainColor, ThirdColor, lightColor } from '../assets/colors'
+import { MainColor, ThirdColor, lightColor } from "../assets/colors";
 import moment from "moment";
 
-export const EmployeeCard = ({ data, key }) => {
-  console.log("employee card------",data)  
+export const EmployeeCard = ({ data, key, zone }) => {
+  console.log("employee card------", data);
   return (
     <View style={styles.listEmployeBox} key={key}>
       <Avatar.Picture
         size={45}
-        uri={`${API_PORT()}/public/imgs/${data.User?.Employee.picture || data.Employee.picture}`}
+        uri={`${API_PORT()}/public/imgs/${
+          data.User?.Employee.picture || data.Employee.picture
+        }`}
       />
       <View style={styles.listSubItemBox}>
         <View style={{ alignItems: "center" }}>
           <View style={styles.privilegeBox}>
             <Text style={{ color: "#fff", fontSize: 16, lineHeight: 16 }}>
-              {data.User?.UserCompany[0].privilege || data.UserCompany[0].privilege}
+              {data.User?.UserCompany[0].privilege ||
+                data.UserCompany[0].privilege}
             </Text>
           </View>
           <Text style={styles.contentText}>
-            {data.User?.Employee.name || data.Employee.name} {data.User?.Employee.lastName || data.Employee.lastName}
+            {data.User?.Employee.name || data.Employee.name}{" "}
+            {data.User?.Employee.lastName || data.Employee.lastName}
           </Text>
         </View>
         <View style={{ alignItems: "center" }}>
           <Text style={styles.labelText}>Asignado:</Text>
-          <Text style={styles.contentText}>{data.User?.userZone[0].Zona.zone || data.userZone[0].Zona.zone}</Text>
+          {zone ? (
+            <Text style={styles.contentText}>
+              {moment(data.assignationDate).format("D MMM YYYY")}
+            </Text>
+          ) : (
+            <Text style={styles.contentText}>
+              {data.userZone[0]?.Zona.zone}
+            </Text>
+          )}
         </View>
         {/* <Text>Cambio de Turno: {moment(data.changeTurnDate).format('D MMM YYYY')}</Text> */}
       </View>

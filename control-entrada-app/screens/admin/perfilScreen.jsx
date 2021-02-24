@@ -22,6 +22,8 @@ import AsyncStorage from "@react-native-community/async-storage";
 import { Divider } from "../../components/Divider";
 import { MainColor } from "../../assets/colors";
 import Modal from "react-native-modal";
+import { FormContainer } from "../../components/formContainer";
+import Avatar from "../../components/avatar.component";
 
 const PerfilScreen = ({ navigation, profile, company }) => {
   console.log("profile-redux:  ", profile);
@@ -101,26 +103,6 @@ const PerfilScreen = ({ navigation, profile, company }) => {
     }
   };
 
-  const RenderCompany = () => {
-    return (
-      <View style={styles.editContainer}>
-        <Text style={styles.containerTitle}>Empresa</Text>
-        <Divider size="small" />
-        {company.map((elem) => (
-          <>
-            <Text>{elem.companyName}</Text>
-            <Text>{elem.businessName}</Text>
-            <Text>{elem.logo}</Text>
-            <Text>{elem.city}</Text>
-            <Text>{elem.address}</Text>
-            <Text>{elem.nic}</Text>
-            <Text>{elem.phoneNumber}</Text>
-            <Text>{elem.phoneNumberOther}</Text>
-          </>
-        ))}
-      </View>
-    );
-  };
   return (
     <View style={styles.container}>
       <TopNavigation
@@ -131,30 +113,74 @@ const PerfilScreen = ({ navigation, profile, company }) => {
 
       {profile ? (
         <ScrollView contentContainerStyle={styles.perfilContainer}>
-          <View style={styles.section1}>
+          <View
+            style={{
+              backgroundColor: "#fff",
+              width: "90%",
+              borderRadius: 5,
+              marginVertical: 5,
+              padding: 8,
+              elevation: 5,
+            }}
+          >
             <View
               style={{
-                width: 120,
-                height: 120,
+                alignSelf: "center",
               }}
             >
-              <Image
-                style={{
-                  flex: 1,
-                  width: null,
-                  height: null,
-                  borderRadius: 120 / 2,
-                }}
-                source={{ uri: `${API_PORT()}/public/imgs/${profile.picture}` }}
+              <Avatar
+                size={120}
+                uri={`${API_PORT()}/public/imgs/${profile.picture}`}
               />
             </View>
             <Text style={styles.profileName}>
               {profile.name} {profile.lastName}
             </Text>
-            <Text style={styles.dataText}>{profile.email}</Text>
-            <Text style={styles.dataText}>Dni: {profile.dni}</Text>
+            <View
+              style={{
+                flexDirection: "row",
+                //backgroundColor: 'green',
+                justifyContent: "space-between",
+                marginVertical: 15,
+                paddingVertical: 5,
+                paddingHorizontal: 10,
+              }}
+            >
+              <View
+                style={{
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Text style={styles.contentText}>{profile.dni}</Text>
+                <Text style={styles.labelText}>dni</Text>
+              </View>
+              <View
+                style={{
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Text style={styles.contentText}>{profile.email}</Text>
+                <Text style={styles.labelText}>email</Text>
+              </View>
+            </View>
           </View>
-          <RenderCompany />
+          <FormContainer title="Negocio">
+            {company.map((elem) => (
+              <>
+                <Text style={styles.contentText}>{elem.companyName}</Text>
+                <Text style={styles.contentText}>{elem.businessName}</Text>
+                <Text style={styles.contentText}>{elem.logo}</Text>
+                <Text style={styles.contentText}>{elem.city}</Text>
+                <Text style={styles.contentText}>{elem.address}</Text>
+                <Text style={styles.contentText}>{elem.nic}</Text>
+                <Text style={styles.contentText}>{elem.phoneNumber}</Text>
+                <Text style={styles.contentText}>{elem.phoneNumberOther}</Text>
+              </>
+            ))}
+          </FormContainer>
+
           <View style={styles.editContainer}>
             <Text style={styles.containerTitle}>Editar</Text>
             <Divider size="small" />
@@ -228,14 +254,6 @@ const styles = StyleSheet.create({
   perfilContainer: {
     alignItems: "center",
   },
-  section1: {
-    backgroundColor: "#fff",
-    alignItems: "center",
-    paddingVertical: "10%",
-    width: "90%",
-    borderRadius: 5,
-    marginVertical: 2.5,
-  },
   perfilLogo: {
     width: 120,
     height: 120,
@@ -245,16 +263,19 @@ const styles = StyleSheet.create({
     fontWeight: "100",
     color: "black",
   },
-  containerTitle: {
-    fontSize: 16,
-    fontWeight: "normal",
-    color: MainColor,
+  contentText: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#262626",
+  },
+  labelText: {
+    fontSize: 14,
+    color: "#8e8e8e",
   },
   dataText: {
     fontSize: 14,
     fontWeight: "100",
   },
-
   editContainer: {
     backgroundColor: "#fff",
     borderRadius: 5,
