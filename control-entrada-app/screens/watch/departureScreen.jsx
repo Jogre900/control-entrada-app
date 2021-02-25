@@ -179,7 +179,7 @@ export const DepartureScreen = (props) => {
                   Hora de salida
                   {moment(visit.departureDate).format("D, HH:mm a")}
                 </Text>
-                <Text>Observacion: {visit.descriptionDeparture}</Text>
+                <Text>Observacion: {visit.descriptionDeparture ? visit.descriptionDeparture : '----'}</Text>
               </>
             ) : (
               <>
@@ -192,7 +192,7 @@ export const DepartureScreen = (props) => {
               </>
             )}
           </FormContainer>
-          <View>
+          <View style={{width: '90%'}}>
             <MainButton
               title="Registrar Salida"
               onPress={() => updateEntry()}

@@ -13,20 +13,24 @@ import { TopNavigation } from "../../components/TopNavigation.component";
 import { API_PORT } from "../../config/index";
 import { Ionicons } from "@expo/vector-icons";
 import { Divider } from "../../components/Divider";
+import { FormContainer } from "../../components/formContainer";
+import { Spinner } from "../../components/spinner";
 import { MainColor, ThirdColor } from "../../assets/colors";
+import Avatar from "../../components/avatar.component";
 import axios from "axios";
 import moment from "moment";
 
-export const EmployeeDetailScreen = (props) => {
+export const EmployeeDetailScreen = ({ route, navigation }) => {
+  const [loading, setLoading] = useState(false);
   const [user, setUser] = useState();
-  console.log("DETAIL EMPLOYEE-----", props.route.params);
-  const { id } = props.route.params;
+  console.log("DETAIL EMPLOYEE-----", route.params);
+  const { id } = route.params;
   const goBackAction = () => {
     return (
       <View>
         <TouchableOpacity
           onPress={() => {
-            props.navigation.navigate("Employee");
+            navigation.navigate("Employee");
           }}
         >
           <Ionicons name="ios-arrow-back" size={28} color="white" />
@@ -36,13 +40,16 @@ export const EmployeeDetailScreen = (props) => {
   };
 
   const requestUser = async () => {
+    setLoading(true);
     setUser();
     try {
       const res = await axios.get(`${API_PORT()}/api/findUser/${id}`);
       if (!res.data.error) {
         setUser(res.data.data);
+        setLoading(false);
       }
     } catch (error) {
+      setLoading(false);
       console.log(error.message);
     }
   };
@@ -52,54 +59,82 @@ export const EmployeeDetailScreen = (props) => {
   return (
     <View style={{ flex: 1 }}>
       <TopNavigation title="Perfil" leftControl={goBackAction()} />
-      {user ? (
+      {loading && <Spinner message="Cargando..." />}
+      {user && (
         <View>
           <View style={styles.section1}>
-            <Image
-              style={{
-                width: 120,
-                height: 120,
-                borderRadius: 60,
-                resizeMode: "cover",
-              }}
-              source={{
-                uri: `${API_PORT()}/public/imgs/${user.Employee.picture}`,
-              }}
-            />
+            <View style={{ marginBottom: 10, alignSelf: "center" }}>
+              <Avatar.Picture
+                size={120}
+                uri={`${API_PORT()}/public/imgs/${user.Employee.picture}`}
+              />
+            </View>
             <Text style={styles.profileName}>
               {user.Employee.name} {user.Employee.lastName}
             </Text>
-            <Text>{user.email}</Text>
+            <View style={styles.profileDataContainer}>
+              <View
+                style={{
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Text style={styles.contentText}>
+                  {user.userCompany[0].privilege}
+                </Text>
+                <Text style={styles.labelText}>Rol</Text>
+              </View>
+              <View
+                style={{
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Text style={styles.contentText}>
+                  {user.userZone[0].Zona.zone}
+                </Text>
+                <Text style={styles.labelText}>Zona</Text>
+              </View>
+              <View
+                style={{
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Text style={styles.contentText}>0</Text>
+                <Text style={styles.labelText}>Entradas Registradas</Text>
+              </View>
+            </View>
+
+            {/* <Text>{user.email}</Text>
             <View style={styles.privilegeBox}>
               <Text style={styles.privilegeText}>
                 {user.UserCompany[0].privilege}
               </Text>
-            </View>
+            </View> */}
           </View>
-          <View style={styles.section2}>
-            <Text>Datos Personales</Text>
-            <Divider size="small" />
+          <FormContainer>
             <View>
               <Text>DNI: {user.Employee.dni}</Text>
 
               {user.userZone.length > 0 ? (
                 <View>
                   <Text>
-                    Contratado el:{" "}
+                    Contratado el:
                     {moment(user.userZone[0].assignationDate).format(
-                      "D MM YYYY"
+                      "D MMM YYYY"
                     )}
                   </Text>
                   <Text>
-                    Cambio de Turno:{" "}
+                    Fin de Contrato:
                     {moment(user.userZone[0].changeTurnDate).format(
-                      "d MM YYYY"
+                      "D MMM YY"
                     )}
                   </Text>
                 </View>
               ) : (
                 <Text>
-                  Registrado el: {moment(user.createdAt).format("D MMM YYYY")}
+                  Registrado el: {moment(user.createdAt).format("D MMM YY")}
                 </Text>
               )}
             </View>
@@ -114,10 +149,8 @@ export const EmployeeDetailScreen = (props) => {
                 <Text>El usuario no posea zona asignada.</Text>
               )}
             </View>
-          </View>
+          </FormContainer>
         </View>
-      ) : (
-        <ActivityIndicator size="small" color={MainColor} />
       )}
     </View>
   );
@@ -127,10 +160,30 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  section1: {
-    height: "40%",
-    justifyContent: "center",
-    alignItems: "center",
+  profileContainer: {
+    backgroundColor: "#fff",
+    width: "90%",
+    borderRadius: 5,
+    marginVertical: 5,
+    padding: 8,
+    elevation: 5,
+  },
+  profileDataContainer: {
+    flexDirection: "row",
+    //backgroundColor: 'green',
+    justifyContent: "space-between",
+    marginVertical: 15,
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+  },
+  contentText: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#262626",
+  },
+  labelText: {
+    fontSize: 14,
+    color: "#8e8e8e",
   },
   section2: {
     height: "50%",
