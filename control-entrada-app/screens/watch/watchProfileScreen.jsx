@@ -152,15 +152,15 @@ const WatchProfileScreen = ({ navigation, profile }) => {
     <View style={styles.container}>
       <TopNavigation title="Mi Perfil" leftControl={goBackAction()} />
       {profile ? (
-        <ScrollView contentContainerStyle={styles.perfilContainer}>
+        <ScrollView contentContainerStyle={{ alignItems: "center" }}>
           <View style={styles.profileContainer}>
             <View style={{ marginBottom: 10, alignSelf: "center" }}>
-              <Avatar
+              <Avatar.Picture
                 size={120}
                 uri={`${API_PORT()}/public/imgs/${profile.picture}`}
               />
             </View>
-            <Text style={styles.profileName}>
+            <Text style={styles.nameText}>
               {profile.name} {profile.lastName}
             </Text>
             <View style={styles.profileDataContainer}>
@@ -189,88 +189,79 @@ const WatchProfileScreen = ({ navigation, profile }) => {
                 }}
               >
                 <Text style={styles.contentText}>0</Text>
-                <Text style={styles.labelText}>Visitas Registradas</Text>
+                <Text style={styles.labelText}>Visitas</Text>
               </View>
             </View>
-
-            <Text style={styles.dataText}>{profile.email}</Text>
-            <Text style={styles.dataText}>Dni: {profile.dni}</Text>
           </View>
-          <View style={styles.section2}>
-            <FormContainer title="Horario">
-              <View style={styles.dateBox}>
+
+          <FormContainer title="Horario">
+            <View style={styles.dateBox}>
+              <View style={styles.dateIconBox}>
+                <Ionicons name="ios-document" size={28} color={lightColor} />
+              </View>
+              <Text style={styles.dataText}>
+                Contratado el:{" "}
+                {moment(profile.userZone[0].assignationDate).format(
+                  "D MMM YYYY"
+                )}
+              </Text>
+            </View>
+            <View style={styles.dateBox}>
+              <View style={styles.dateIconBox}>
+                <Ionicons name="ios-calendar" size={28} color={lightColor} />
+              </View>
+              <Text style={styles.dataText}>
+                Cambio Turno:{" "}
+                {moment(profile.userZone[0].changeTurnDate).format(
+                  "D MMM YYYY"
+                )}
+              </Text>
+            </View>
+          </FormContainer>
+          <FormContainer title="Zona Asignada">
+            <View style={styles.zoneBox}>
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
                 <View style={styles.dateIconBox}>
-                  <Ionicons name="ios-document" size={28} color={lightColor} />
+                  <Ionicons name="ios-business" size={28} color={lightColor} />
                 </View>
                 <Text style={styles.dataText}>
-                  Contratado el:{" "}
-                  {moment(profile.userZone[0].assignationDate).format(
-                    "D MMM YYYY"
-                  )}
+                  {profile.userZone[0].Zona.zone}
                 </Text>
               </View>
-              <View style={styles.dateBox}>
-                <View style={styles.dateIconBox}>
-                  <Ionicons name="ios-calendar" size={28} color={lightColor} />
-                </View>
-                <Text style={styles.dataText}>
-                  Cambio Turno:{" "}
-                  {moment(profile.userZone[0].changeTurnDate).format(
-                    "D MMM YYYY"
-                  )}
-                </Text>
-              </View>
-            </FormContainer>
-            <FormContainer title="Zona Asignada">
-              <View style={styles.zoneBox}>
-                <View style={{ flexDirection: "row", alignItems: "center" }}>
-                  <View style={styles.dateIconBox}>
-                    <Ionicons
-                      name="ios-business"
-                      size={28}
-                      color={lightColor}
-                    />
-                  </View>
-                  <Text style={styles.dataText}>
-                    {profile.userZone[0].Zona.zone}
-                  </Text>
-                </View>
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
+              >
                 <View
                   style={{
                     flexDirection: "row",
-                    justifyContent: "space-between",
                     alignItems: "center",
+                    marginVertical: 5,
                   }}
                 >
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                      marginVertical: 5,
-                    }}
-                  >
-                    <View style={styles.dateIconBox}>
-                      <Ionicons name="ios-pin" size={28} color={lightColor} />
-                    </View>
-                    <Text>Destinos</Text>
+                  <View style={styles.dateIconBox}>
+                    <Ionicons name="ios-pin" size={28} color={lightColor} />
                   </View>
-
-                  <TouchableOpacity
-                    onPress={() => setDestinyvisibility(!destinyvisibility)}
-                  >
-                    <Ionicons
-                      name={
-                        destinyvisibility ? "ios-arrow-up" : "ios-arrow-down"
-                      }
-                      size={28}
-                      color="grey"
-                    />
-                  </TouchableOpacity>
+                  <Text>Destinos</Text>
                 </View>
-                {destinyvisibility && <DestinyList destiny={destiny} />}
+
+                <TouchableOpacity
+                  onPress={() => setDestinyvisibility(!destinyvisibility)}
+                >
+                  <Ionicons
+                    name={destinyvisibility ? "ios-arrow-up" : "ios-arrow-down"}
+                    size={28}
+                    color="grey"
+                  />
+                </TouchableOpacity>
               </View>
-            </FormContainer>
-            {/* <View style={styles.editContainer}>
+              {destinyvisibility && <DestinyList destiny={destiny} />}
+            </View>
+          </FormContainer>
+          {/* <View style={styles.editContainer}>
               <Text style={styles.containerTitle}>Editar</Text>
               <Divider size="small" />
               <View
@@ -329,7 +320,6 @@ const WatchProfileScreen = ({ navigation, profile }) => {
                 </View>
               )}
             </View> */}
-          </View>
         </ScrollView>
       ) : (
         <LoadingModal />
@@ -365,10 +355,10 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     paddingHorizontal: 10,
   },
-  profileName: {
+  nameText: {
+    textAlign: "center",
     fontSize: 22,
-    fontWeight: "100",
-    color: "black",
+    color: "#262626",
   },
   contentText: {
     fontSize: 14,

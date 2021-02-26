@@ -184,7 +184,7 @@ const DestinyScreen = ({ navigation, zonesRedux, company, saveDestiny }) => {
         onClose={() => setVisible(false)}
       />
       <StatusModal status={success} onClose={() => setSuccess(false)} />
-      <FloatingBotton onPress={() => setVisible(true)} />
+      <FloatingBotton icon='ios-add' onPress={() => setVisible(true)} />
     </View>
   );
 };

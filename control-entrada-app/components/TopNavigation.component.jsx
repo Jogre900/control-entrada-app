@@ -24,14 +24,14 @@ function NormalNav({size}) {
   );
 }
 
-export const TopNavigation = (props) => {
-  const { title, leftControl, rightControl } = props;
+export const TopNavigation = ({title, leftControl, rightControl, style}) => {
+  
   const size = leftControl.props.children.props.children.props.size
   // console.log("rigth props",rightControl)
   // console.log("left props",leftControl)
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, style]}>
       <StatusBar hidden={true} />
       <TouchableOpacity
         onPress={leftControl.props.children.props.onPress}
@@ -63,7 +63,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingTop: Constants.statusBarHeight,
     backgroundColor: MainColor,
-    //paddingTop: Constants.statusBarHeight,
     marginBottom: 2.5,
     //maxHeight: 60,
     //height: 60

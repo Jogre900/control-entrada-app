@@ -208,7 +208,7 @@ const ZonasScreen = ({
         onClose={() => setVisible(false)}
       />
       <StatusModal status={create} onClose={() => setCreate(false)} />
-      <FloatingBotton onPress={() => setVisible(true)} />
+      <FloatingBotton icon='ios-add' onPress={() => setVisible(true)} />
     </View>
   );
 };

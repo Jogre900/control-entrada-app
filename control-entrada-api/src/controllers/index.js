@@ -1637,30 +1637,38 @@ password: "123456,
       tokn: null
     };
 
-    const { id } = req.params;
+    const { dni } = req.params;
     console.log("VISIT BY DNI----", req.params);
 
     try {
-      let visit = await models.Citizen.findOne({
-        where: { dni: id },
+      let visit = await models.Visits.findOne({
         include: [
+          { model: models.Citizen, as: "Visitante", where: { dni } },
+          { model: models.Destination, as: "Destino" },
           {
-            model: models.Visits,
-            as: "Visitas",
+            model: models.UserZone,
+            as: "UserZone",
             include: [
-              { model: models.Destination, as: "Destino" },
-              { model: models.Picture, as: "Fotos" },
+              { model: models.Zone, as: "Zona" },
               {
-                model: models.UserZone,
-                include: [
-                  { model: models.Zone, as: "Zona" },
-                  { model: models.User, as: "User" }
-                ]
+                model: models.User,
+                as: "User",
+                include: {
+                  model: models.Employee,
+                  as: "Employee"
+                }
               }
             ]
           }
+
+          // {model: models.UserZone, as: 'UserZone', include: [
+          //   {model: models.Zone, as: 'Zona'},
+          //   {model: models.User, as: 'User'}
+
+          // ]
         ]
       });
+      console.log("VISIT BY DNI------", visit);
       if (visit) {
         console.log(visit);
         RESPONSE.error = false;
@@ -1758,13 +1766,20 @@ password: "123456,
         },
         include: [
           { model: models.Citizen, as: "Visitante" },
-          { model: models.Destination, as: "Destino" },
+          {
+            model: models.Destination,
+            as: "Destino",
+            include: {
+              model: models.Zone,
+              as: "Zona",
+              attributes: ["id", "zone"]
+            }
+          },
           { model: models.Picture, as: "Fotos" },
           {
             model: models.UserZone,
             attributes: ["id", "changeTurnDate", "assignationDate"],
             include: [
-              { model: models.Zone, as: "Zona", attributes: ["id", "zone"] },
               {
                 model: models.User,
                 attributes: ["email"],

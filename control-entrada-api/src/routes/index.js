@@ -86,7 +86,7 @@ router.post(
   Controllers.createVisits
 );
 router.delete("/deleteVisit/:id", Controllers.deleteVisit);
-router.get("/findVisit/:id", Controllers.findVisit);
+router.get("/findVisit/:dni", Controllers.findVisit);
 router.get("/findVisitId/:id", Controllers.findVisitId);
 router.put("/updateVisit/:id", middleware.verifyToken, Controllers.updateVisit);
 router.get("/findTodayVisits/:companyId", Controllers.findTodayVisits);

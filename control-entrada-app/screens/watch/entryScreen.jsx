@@ -351,7 +351,7 @@ const EntryScreen = ({ navigation, profile, saveVisit }) => {
         </ScrollView>
       </KeyboardAvoidingView>
       <LoadingModal status={loading} message="Guardando..." />
-      <StatusModal status={succes} onClose={() => setSuccess(false)} />
+      <StatusModal status={success} onClose={() => setSuccess(false)} />
     </View>
   );
 };

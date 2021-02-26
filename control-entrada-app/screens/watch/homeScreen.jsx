@@ -142,6 +142,6 @@ const styles = StyleSheet.create({
     marginBottom: "10%",
   },
   button: {
-    borderColor: "#ff7e00",
+    marginVertical: 2.5
   },
 });

@@ -5,22 +5,22 @@ import { MainColor } from "../assets/colors";
 
 const { height, width } = Dimensions.get('screen')
 
-const SIZE = 50;
-export const FloatingBotton = ({onPress}) => {
+const SIZE = 28;
+export const FloatingBotton = ({onPress, icon}) => {
   return (
     <TouchableOpacity
     style={styles.container} 
     onPress={onPress}>
-      <Avatar.Icon name="ios-add" size={SIZE} color="#fff" />
+      <Avatar.Icon name={icon} size={SIZE} color="#fff" />
     </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    height: SIZE * 1.2,
-    width: SIZE * 1.2,
-    borderRadius: (SIZE * 1.2) / 2,
+    height: 60,
+    width: 60,
+    borderRadius: 60 / 2,
     backgroundColor: MainColor,
     justifyContent: "center",
     alignItems: "center",

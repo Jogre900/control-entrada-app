@@ -45,6 +45,7 @@ export const EmployeeDetailScreen = ({ route, navigation }) => {
     try {
       const res = await axios.get(`${API_PORT()}/api/findUser/${id}`);
       if (!res.data.error) {
+        console.log(res.data.data)
         setUser(res.data.data);
         setLoading(false);
       }
@@ -61,8 +62,8 @@ export const EmployeeDetailScreen = ({ route, navigation }) => {
       <TopNavigation title="Perfil" leftControl={goBackAction()} />
       {loading && <Spinner message="Cargando..." />}
       {user && (
-        <View>
-          <View style={styles.section1}>
+        <View style={{alignItems: 'center'}}>
+          <View style={styles.profileContainer}>
             <View style={{ marginBottom: 10, alignSelf: "center" }}>
               <Avatar.Picture
                 size={120}
@@ -80,7 +81,7 @@ export const EmployeeDetailScreen = ({ route, navigation }) => {
                 }}
               >
                 <Text style={styles.contentText}>
-                  {user.userCompany[0].privilege}
+                  {user.UserCompany[0].privilege}
                 </Text>
                 <Text style={styles.labelText}>Rol</Text>
               </View>
@@ -102,7 +103,7 @@ export const EmployeeDetailScreen = ({ route, navigation }) => {
                 }}
               >
                 <Text style={styles.contentText}>0</Text>
-                <Text style={styles.labelText}>Entradas Registradas</Text>
+                <Text style={styles.labelText}>Entradas</Text>
               </View>
             </View>
 

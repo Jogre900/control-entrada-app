@@ -7,13 +7,9 @@ import {
   Dimensions,
   TouchableOpacity,
   ScrollView,
-  ImageBackground,
   Image,
-  KeyboardAvoidingView,
-  Keyboard,
-  Alert,
+  Vibration,
   ActivityIndicator,
-  FlatList,
 } from "react-native";
 import { RectButton } from "react-native-gesture-handler";
 import { TopNavigation } from "../../components/TopNavigation.component";
@@ -27,11 +23,19 @@ import axios from "axios";
 import { API_PORT } from "../../config/index";
 import { MainColor, lightColor } from "../../assets/colors.js";
 import Modal from "react-native-modal";
-import {connect} from 'react-redux'
+import { VisitCard } from "../../components/visitCard";
+import { FloatingBotton } from "../../components/floatingBotton";
+import { Spinner } from "../../components/spinner";
+import { SearchVisitModal } from "../../components/searchVisitModal";
+import { Header } from "../../components/header.component";
+import { connect } from "react-redux";
 const { width } = Dimensions.get("window");
 
-const VisitScreen = ({navigation, profile}) => {
-  console.log("profile----", profile)
+const VisitScreen = ({ navigation, profile }) => {
+  console.log("profile----", profile);
+  const [loading, setLoading] = useState(false);
+  const [selectItem, setSeletedItem] = useState([]);
+  const [active, setActive] = useState(false);
   const [findIt, setFindIt] = useState(false);
   const [citizen, setCitizen] = useState();
   const [showList, setShowList] = useState(false);
@@ -64,236 +68,148 @@ const VisitScreen = ({navigation, profile}) => {
   };
   //REQUEST TODAY VISITS
   const todayVisit = async () => {
-    setModalVisible(true);
+    setVisits([]);
+    setLoading(true);
     try {
       let res = await axios.get(
         `${API_PORT()}/api/findTodayVisitsByUser/${profile.userZone[0].id}`
       );
-      console.log(res.data)
       if (!res.data.error) {
-        console.log("today Visits:", res.data.data);
+        setLoading(false);
         setVisits(res.data.data);
-        setModalVisible(false);
       }
     } catch (error) {
+      setLoading(false);
       console.log("error: ", error);
     }
   };
 
-  //REQUEST VISIT
-  const requestVisit = async () => {
-    if (!dni) {
-      Alert.alert("Debe ingresar un DNI valido.");
-    } else {
-      try {
-        let res = await axios.get(`${API_PORT()}/api/findVisit/${dni}`);
-        console.log("busqueda por dni:----- ", res.data);
-        if (!res.data.error) {
-          setCitizen(res.data.data);
-          setvisitsDni(res.data.data.Visitas);
-          setFindIt(true);
-          setShowList(false);
-          if (
-            res.data.data.Visitas[0].entryDate !==
-            res.data.data.Visitas[0].departureDate
-          ) {
-            setEntryCheck(true);
-            console.log("las horas son distintas!!!!!");
-          } else {
-            console.log("las horas son iguales!!!!!");
-            setEntryCheck(false);
-          }
-
-          setVisitId(res.data.data.Visitas[0].id);
-          //console.log("Visitas//----", res.data.data.Visitas[0]);
-        }else{
-          alert(res.data.msg)
-        }
-      } catch (error) {
-        console.log(error.message);
-      }
+  //ONLONGPRESS
+  const onLong = (id) => {
+    if (selectItem.includes(id)) {
+      setSeletedItem((value) => value.filter((elem) => elem !== id));
+      //hideCheckMark();
+      return;
     }
+    Vibration.vibrate(100), setSeletedItem(selectItem.concat(id));
+    //showCheckMark();
+    //setChangeStyle(!changeStyle);
   };
 
-  //LOADING MODAL
-  const LoadingModal = () => {
-    return (
-      <Modal
-        isVisible={modalVisible}
-        onBackdropPress={() => setModalVisible(!modalVisible)}
-      >
-        <View
-          style={{
-            flex: 1,
-            backgroundColor: "transparent",
-            justifyContent: "center",
-          }}
-        >
-          <ActivityIndicator size="large" color={MainColor} />
-        </View>
-      </Modal>
-    );
+  const clearList = () => setSeletedItem([]);
+
+  const selectAll = () => {
+    let array = [];
+    visits.map(({ id }) => array.push(id));
+    console.log(array);
+    setSeletedItem(array);
   };
-  //RENDER TODAY VISIT
-  const renderVisits = ({ item }) => (
-    <TouchableOpacity
-      onPress={() => navigation.navigate("departure", { id: item.id })}
-      style={styles.listItemBox}
-    >
-      <Image
-        style={{ height: 50, width: 50, borderRadius: 25, resizeMode: "cover" }}
-        source={{ uri: `${API_PORT()}/public/imgs/${item.Fotos[0].picture}` }}
-      />
-      <View style={styles.subItemBox}>
-        <Text style={styles.subItemTitle}>Nombre:</Text>
-        <Text style={styles.dataText}>
-          {item.Visitante.name} {item.Visitante.lastName}
-        </Text>
-      </View>
-      <View style={styles.subItemBox}>
-        <Text style={styles.subItemTitle}>Destino: </Text>
-        <Text style={styles.dataText}>{item.Destino.name}</Text>
-      </View>
-      <View style={styles.subItemBox}>
-        <Text style={styles.subItemTitle}>Entrada:</Text>
-        <Text style={styles.dataText}>{moment(item.entryDate).format("MMM D, HH:mm a")}</Text>
-      </View>
-      <View style={styles.subItemBox}>
-        <Text style={styles.subItemTitle}>Salida:</Text>
-        <Text style={styles.dataText}>{moment(item.departureDate).format("MMM D, HH:mm a")}</Text>
-      </View>
-    </TouchableOpacity>
-  );
+
+  // {findIt && (
+  //   <View style={{ flex: 1 }}>
+  //     {visitsDni.map((elem, i) => (
+  //       <TouchableOpacity
+  //         onPress={() =>
+  //           navigation.navigate("departure", { id: elem.id })
+  //         }
+  //         style={styles.listItemBox}
+  //         key={elem.id}
+  //       >
+  //         <View>
+  //           {elem.Fotos.map((foto) => (
+  //             <Image
+  //               key={foto.id}
+  //               source={{
+  //                 uri: `${API_PORT()}/public/imgs/${foto.picture}`,
+  //               }}
+  //               style={styles.profilePic}
+  //             />
+  //           ))}
+  //         </View>
+  //         <View style={styles.subItemBox}>
+  //           <Text style={styles.nameText}>
+  //             {citizen.name} {citizen.lastName}
+  //           </Text>
+  //           <Text style={styles.dataText}>{citizen.dni}</Text>
+  //         </View>
+  //         <View style={styles.subItemBox}>
+  //           <Ionicons name="ios-pin" size={22} color="grey" />
+  //           <Text style={styles.dataText}>{elem.Destino.name}</Text>
+  //         </View>
+  //         <View style={styles.subItemBox}>
+  //           <Text style={styles.labelText}>Entrada:</Text>
+  //           <Text style={styles.dataText}>
+  //             {moment(elem.entryDate).format("MMM D, HH:mm a")}
+  //           </Text>
+  //         </View>
+  //         <View style={styles.subItemBox}>
+  //           <Text style={styles.labelText}>Salida:</Text>
+  //           <Text style={styles.dataText}>
+  //             {moment(elem.departureDate).format("MMM D, HH:mm a")}
+  //           </Text>
+  //         </View>
+
+  //       </TouchableOpacity>
+  //     ))}
+  //   </View>
+  // )}
 
   useEffect(() => {
     todayVisit();
   }, []);
 
   return (
-    <View style={{ flex: 1 }}>
-      <TopNavigation title="Salida" leftControl={goBackAction()} />
-      <View style={styles.searchBox}>
-        <View style={{ width: "70%" }}>
-          <Input
-            title="Buscar por DNI"
-            shape="round"
-            alignText="center"
-            style={{ backgroundColor: "white" }}
-            retrunKeyType="search"
-            onSubmitEditing={() => requestVisit()}
-            onChangeText={(valor) => setDni(valor)}
-            value={dni}
-          />
-        </View>
-        <TouchableOpacity onPress={() => requestVisit()}>
-          <Ionicons name="ios-search" size={28} color="white" />
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => {
-            setShowList(true), setFindIt(false);
-          }}
-        >
-          <Ionicons name="ios-list" size={28} color="white" />
-        </TouchableOpacity>
-      </View>
-      {
-        showList || !findIt
-          ? visits && (
-              <View>
-                <FlatList data={visits} renderItem={renderVisits} />
-              </View>
-            )
-          : null
-        // <LoadingModal />
-      }
-      {findIt ? (
-        <View style={{ flex: 1 }}>
-          {visitsDni.map((elem, i) => (
+    <View
+      style={{
+        flex: 1,
+      }}
+    >
+      {selectItem.length > 0 ? (
+        <Header
+          value={selectItem.length}
+          clearAction={clearList}
+          //deleteAction={() => deleteZones(selectItem)}
+          selectAction={selectAll}
+        />
+      ) : (
+        <TopNavigation
+          style={{ elevation: 0 }}
+          title="Salida"
+          leftControl={goBackAction()}
+        />
+      )}
+
+      {loading && <Spinner message="Cargando..." />}
+
+      {visits && !loading &&
+        <ScrollView>
+          {visits.map((elem) => (
             <TouchableOpacity
-              onPress={() =>
-                navigation.navigate("departure", { id: elem.id })
-              }
-              style={styles.listItemBox}
               key={elem.id}
+              onPress={
+                selectItem.length > 0
+                  ? () => onLong(elem.id)
+                  : () => navigation.navigate("departure", { id: elem.id })
+              }
+              onLongPress={() => onLong(elem.id)}
+              delayLongPress={200}
             >
-              <View>
-                {elem.Fotos.map((foto) => (
-                  <Image
-                    key={foto.id}
-                    source={{
-                      uri: `${API_PORT()}/public/imgs/${foto.picture}`,
-                    }}
-                    style={styles.profilePic}
-                  />
-                ))}
-              </View>
-              <View style={styles.subItemBox}>
-                <Text style={styles.nameText}>
-                  {citizen.name} {citizen.lastName}
-                </Text>
-                <Text style={styles.dataText}>{citizen.dni}</Text>
-              </View>
-              <View style={styles.subItemBox}>
-                <Ionicons name="ios-pin" size={22} color="grey" />
-                <Text style={styles.dataText}>{elem.Destino.name}</Text>
-              </View>
-              <View style={styles.subItemBox}>
-                <Text style={styles.labelText}>Entrada:</Text>
-                <Text style={styles.dataText}>
-                  {
-                    moment(elem.entryDate).format("MMM D, HH:mm a")}
-                </Text>
-              </View>
-              <View style={styles.subItemBox}>
-                <Text style={styles.labelText}>Salida:</Text>
-                <Text style={styles.dataText}>
-                  {
-                   moment(elem.departureDate).format("MMM D, HH:mm a")}
-                </Text>
-              </View>
-              {/* <View style={styles.subItemBox}>
-                <Ionicons
-                  name="md-timer"
-                  size={22}
-                  color={
-                    moment(elem.entryDate).format("HH:mm:ss") !==
-                      moment(elem.departureDate).format("HH:mm:ss") &&
-                    moment(elem.UserZone.Zone.firsDepartureTime).format(
-                      "HH:mm:ss"
-                    ) > moment(elem.departureDate).format("HH:mm:ss")
-                      ? "grey"
-                      : moment(elem.entryDate).format("HH:mm:ss") !==
-                      moment(elem.departureDate).format("HH:mm:ss") &&
-                    moment(elem.UserZone.Zone.firsDepartureTime).format(
-                      "HH:mm:ss"
-                    ) < moment(elem.departureDate).format("HH:mm:ss")
-                      ? "green"
-                      : moment().format("HH:mm:ss") <
-                          moment(elem.UserZone.Zone.firsDepartureTime).format(
-                            "HH:mm:ss")
-                           &&
-                        moment(elem.UserZone.Zone.firsDepartureTime).format(
-                          "HH:mm:ss"
-                        ) < moment(elem.departureDate).format("HH:mm:ss")
-                      ? "red"
-                      : null
-                  }
-                />
-              </View> */}
+              <VisitCard data={elem} selected={selectItem.includes(elem.id) ? true : false}/>
             </TouchableOpacity>
           ))}
-        </View>
-      ) : (
-        <LoadingModal />
-      )}
+        </ScrollView>
+      }
+
+      <FloatingBotton icon="ios-search" onPress={() => setActive(true)} />
+      <SearchVisitModal status={active} onClose={() => setActive(false)} />
     </View>
   );
 };
-const mapStateToProps = state => ({
-  profile: state.profile.profile
-})
+const mapStateToProps = (state) => ({
+  profile: state.profile.profile,
+});
 
-export default connect(mapStateToProps, {})(VisitScreen)
+export default connect(mapStateToProps, {})(VisitScreen);
 
 const styles = StyleSheet.create({
   imgBackground: {

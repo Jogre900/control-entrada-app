@@ -22,6 +22,7 @@ import { storage } from "../../helpers/asyncStorage";
 import { LoadingModal } from "../../components/loadingModal";
 import { StatusModal } from "../../components/statusModal";
 import { FormContainer } from "../../components/formContainer";
+import { Spinner } from "../../components/spinner";
 import Avatar from "../../components/avatar.component";
 
 export const DepartureScreen = (props) => {
@@ -30,6 +31,7 @@ export const DepartureScreen = (props) => {
 
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [visit, setVisit] = useState();
   const [departureText, setDepartureText] = useState("");
   const [entryCheck, setEntryCheck] = useState(false);
@@ -50,13 +52,16 @@ export const DepartureScreen = (props) => {
   };
   //FIND VISIT BY ID
   const findVisitId = async () => {
+    setLoading(true);
     try {
       let res = await axios.get(`${API_PORT()}/api/findVisitId/${id}`);
-      console.log(res.data);
+
       if (!res.data.error) {
+        setLoading(false);
         setVisit(res.data.data);
       }
     } catch (error) {
+      setLoading(false);
       console.log(error.message);
     }
   };
@@ -67,7 +72,7 @@ export const DepartureScreen = (props) => {
       descriptionDeparture: departureText,
     };
     setSuccess(false);
-    setLoading(true);
+    setSaving(true);
     const token = await storage.getItem("userToken");
     try {
       let res = await axios.put(`${API_PORT()}/api/updateVisit/${id}`, data, {
@@ -75,17 +80,17 @@ export const DepartureScreen = (props) => {
           Authorization: `bearer ${token}`,
         },
       });
-      console.log("UPDATE ENTRY-----", res.data);
+
       if (!res.data.error) {
         console.log(res.data);
         setEntryCheck(true);
         setUpdateVisit(res.data.data);
         setSuccess(true);
-        setLoading(false);
+        setSaving(false);
       }
     } catch (error) {
       console.log("error: ", error.message);
-      setLoading(false);
+      setSaving(false);
     }
   };
 
@@ -104,9 +109,16 @@ export const DepartureScreen = (props) => {
     // </>
 
     <View style={{ flex: 1 }}>
-      <TopNavigation title="Marcar Salida" leftControl={goBackAction()} />
-
-      {visit && (
+      <TopNavigation
+        title={
+          visit && !loading && visit.entryDate !== visit.departureDate
+            ? "Visita"
+            : "Marcar Salida"
+        }
+        leftControl={goBackAction()}
+      />
+      {loading && <Spinner message="Cargando..." />}
+      {visit && !loading && (
         <ScrollView contentContainerStyle={{ alignItems: "center" }}>
           <View style={styles.profileContainer}>
             <View style={{ marginBottom: 10, alignSelf: "center" }}>
@@ -153,11 +165,12 @@ export const DepartureScreen = (props) => {
             </View>
           </View>
 
-          <FormContainer title="Datos">
-            <Text>
-              Hora de entrada:
-              {moment(visit.entryDate).format("HH:mm a")}
-            </Text>
+          <FormContainer title="Entrada">
+            <View style={{ flexDirection: "row" }}>
+              <Text style={styles.labelText}>Entrada: </Text>
+              <Text>{moment(visit.entryDate).format("D MMM YY, HH:mm a")}</Text>
+            </View>
+
             <Image
               style={{
                 width: "100%",
@@ -170,21 +183,30 @@ export const DepartureScreen = (props) => {
                 uri: `${API_PORT()}/public/imgs/${visit.Fotos[0].picture}`,
               }}
             />
-            <Text>Observacion: {visit.descriptionEntry}</Text>
+            <Text style={styles.contentText}>{visit.descriptionEntry}</Text>
           </FormContainer>
           <FormContainer title="Salida">
             {visit.entryDate !== visit.departureDate ? (
               <>
-                <Text>
-                  Hora de salida
-                  {moment(visit.departureDate).format("D, HH:mm a")}
-                </Text>
-                <Text>Observacion: {visit.descriptionDeparture ? visit.descriptionDeparture : '----'}</Text>
+                <View style={{ flexDirection: "row" }}>
+                  <Text style={styles.labelText}>Salida: </Text>
+                  <Text>
+                    {moment(visit.departureDate).format("D MMM YY, HH:mm a")}
+                  </Text>
+                </View>
+                <>
+                  <Text>
+                    {visit.descriptionDeparture
+                      ? visit.descriptionDeparture
+                      : "----"}
+                  </Text>
+                </>
               </>
             ) : (
               <>
                 <Input
                   title="Descripcion Salida (Opcional)"
+                  icon="md-create"
                   value={departureText}
                   onChangeText={(value) => setDepartureText(value)}
                   shape="flat"
@@ -192,16 +214,19 @@ export const DepartureScreen = (props) => {
               </>
             )}
           </FormContainer>
-          <View style={{width: '90%'}}>
-            <MainButton
-              title="Registrar Salida"
-              onPress={() => updateEntry()}
-            />
-          </View>
+          {visit.entryDate === visit.departureDate ? (
+            <View style={{ width: "90%" }}>
+              <MainButton
+                style={{ marginBottom: 10 }}
+                title="Registrar Salida"
+                onPress={() => updateEntry()}
+              />
+            </View>
+          ) : null}
         </ScrollView>
       )}
-      <LoadingModal status={loading} />
-      <StatusModal status={succes} onClose={() => setSuccess(false)} />
+      <LoadingModal status={saving} message="Guardando..." />
+      <StatusModal status={success} onClose={() => setSuccess(false)} />
     </View>
   );
 };
@@ -229,6 +254,11 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginVertical: 2.5,
     padding: 8,
+  },
+  nameText: {
+    textAlign: "center",
+    fontSize: 22,
+    color: "#262626",
   },
   contentText: {
     fontSize: 14,

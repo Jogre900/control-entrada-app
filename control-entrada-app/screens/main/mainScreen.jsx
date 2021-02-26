@@ -167,7 +167,7 @@ const MainScreen = ({ navigation, saveProfile, saveCompany, saveLogin, route, is
     if(route.params?.logOut){
       setTimeout(() => {
         dispatch({type: 'CLEAR_STORAGE'})
-      }, 2000);
+      }, 3000);
     }
   }, [route.params?.logOut])
 

@@ -43,7 +43,41 @@ export const VisitCard = ({ data, selected }) => {
             <Text style={styles.contentText} numberOfLines={1}>
               {Visitante.name} {Visitante.lastName}
             </Text>
+            
+            
+          </View>
+          <View style={{ 
+            flexDirection: "row", 
+          //backgroundColor: "red" ,
+          justifyContent: 'space-between'
+          }}>
             <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+              }}
+            >
+              {/* <Ionicons name="md-globe" {...iconProps} /> */}
+              <Text style={styles.dataText} numberOfLines={1}>
+                {Destino.Zona.zone}
+              </Text>
+            </View>
+            
+            {/* <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                marginLeft: 0,
+              }}
+            >
+               <Ionicons name="ios-pin" {...iconProps} /> 
+              <Text style={styles.dataText} numberOfLines={1}> {Destino.name}</Text>
+            </View> */}
+          </View>
+        </View>
+      </View>
+      <View style={styles.locationContainer}>
+      <View
               style={{
                 //backgroundColor: "pink",
                 alignItems: "center",
@@ -56,39 +90,20 @@ export const VisitCard = ({ data, selected }) => {
                 {moment(data.entryDate).format("D MMM YYYY")}
               </Text>
             </View>
-          </View>
-          <View style={{ 
-            flexDirection: "row", 
-          //backgroundColor: "red" 
-          }}>
-            <View
+      <View
               style={{
-                flexDirection: "row",
+                //backgroundColor: "pink",
                 alignItems: "center",
+                flexDirection: "row",
+                marginLeft: 10
               }}
             >
-              <Ionicons name="md-globe" {...iconProps} />
-              <Text style={styles.dataText} numberOfLines={1}>
-                {Destino.Zona.zone} - 
+              <Text style={styles.dataText} numberOfLines={1}>Salida: </Text>
+              <Text style={styles.contentText} numberOfLines={1}>
+                {data.entryDate !== data.departureDate ? moment(data.entryDate).format("D MMM YYYY"): '----'}
               </Text>
             </View>
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                marginLeft: 0,
-              }}
-            >
-              {/* <Ionicons name="ios-pin" {...iconProps} /> */}
-              <Text style={styles.dataText} numberOfLines={1}> {Destino.name}</Text>
-            </View>
-          </View>
-        </View>
       </View>
-      {/* <View style={styles.locationContainer}>
-        <View style={styles.iconContainer}></View>
-        <View style={{}}></View>
-      </View> */}
 
       {/* <View style={styles.dataContainerView}>
                   <Text>Entrada</Text>
@@ -111,7 +126,7 @@ const styles = StyleSheet.create({
     //justifyContent: "center",
     alignItems: "center",
     paddingVertical: 10,
-    paddingHorizontal: 5,
+    paddingHorizontal: 10,
     //borderBottomWidth: 0.5,
     borderColor: "grey",
     marginVertical: 4,
@@ -131,10 +146,11 @@ const styles = StyleSheet.create({
     flex: 1
   },
   locationContainer: {
-    backgroundColor: "green",
-    //flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
+    //backgroundColor: "blue",
+    flex: 1,
+    justifyContent: 'flex-start',
+    flexDirection: "column",
+    //alignItems: "center",
     //marginRight: 5,
     marginLeft: 10,
   },
