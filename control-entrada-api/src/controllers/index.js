@@ -1067,7 +1067,7 @@ password: "123456,
           res.json(RESPONSE);
         }
       } else {
-        RESPONSE.msg = "Usuario no registrado";
+        RESPONSE.msg = "Usuario no registrado.";
         res.json(RESPONSE);
       }
     } catch (error) {

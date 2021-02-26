@@ -10,8 +10,10 @@ import Input from "../../components/input.component";
 import Modal from "react-native-modal";
 import AsyncStorage from "@react-native-community/async-storage";
 import { Ionicons } from "@expo/vector-icons";
-import { MainColor } from "../../assets/colors";
+import { MainColor, Danger } from "../../assets/colors";
+import { LoadingModal } from '../../components/loadingModal'
 import { BackAction } from "../../helpers/ui/ui";
+import { FormContainer } from '../../components/formContainer'
 import { storage } from "../../helpers/asyncStorage";
 
 const LoginScreen = ({ navigation, saveProfile, saveCompany, saveLogin, savePrivilege }) => {
@@ -37,29 +39,13 @@ const LoginScreen = ({ navigation, saveProfile, saveCompany, saveLogin, savePriv
     );
   };
 
-  //LOADING
-  const LoadingModal = () => {
-    return (
-      <Modal isVisible={modalVisible} onBackdropPress={() => setModalVisible(!modalVisible)}>
-        <View
-          style={{
-            flex: 1,
-            backgroundColor: "transparent",
-            justifyContent: "center",
-          }}
-        >
-          <ActivityIndicator size="large" color={MainColor} />
-        </View>
-      </Modal>
-    );
-  };
   //SIGN IN
   const signIn = async () => {
     setModalVisible(true);
     setCaption('')
     if (!email || !pass) {
       setModalVisible(false);
-      alert("Debe llenar los campos");
+      setCaption("Debe llenar los campos");
       return;
     }
     // }else{
@@ -74,7 +60,6 @@ const LoginScreen = ({ navigation, saveProfile, saveCompany, saveLogin, savePriv
         email,
         password: pass,
       });
-      console.log("res----------", res.data);
       if (!res.data.error) {
         storage.setItem("userToken", res.data.token);
         let slogin = {
@@ -142,7 +127,6 @@ const LoginScreen = ({ navigation, saveProfile, saveCompany, saveLogin, savePriv
       }
     } catch (error) {
       setModalVisible(false);
-      alert(error.message);
       setCaption(error.message)
       // console.log(error.response.data.msg);
       // switch (error.response.status) {
@@ -164,22 +148,19 @@ const LoginScreen = ({ navigation, saveProfile, saveCompany, saveLogin, savePriv
     <View style={{ flex: 1 }}>
       <TopNavigation title="Inicio" leftControl={goBackAction()} />
       <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-        <View style={styles.buttonContainer}>
-          <Text style={styles.labelTitle}>Porfavor ingrese sus datos de usuario</Text>
-          <Divider size="small" />
+        <FormContainer title='Ingrese Datos de Usuario'>
           <View style={styles.subContainer}>
             <Input
               //styleInput={{ color: "white" }}
               icon="ios-mail"
               title="Correo"
-              textColor="grey"
               shape="flat"
               keyboardType="email-address"
               returnKeyType="next"
               caption={emailCaption}
               onSubmitEditing={() => nextInput.current.focus()}
               onChangeText={(correo) => {
-                setEmail(correo), setEmailCaption("");
+                setEmail(correo), setEmailCaption(""), setCaption('');
               }}
               value={email}
             />
@@ -187,31 +168,36 @@ const LoginScreen = ({ navigation, saveProfile, saveCompany, saveLogin, savePriv
               //styleInput={{ color: "white" }}
               icon="ios-lock"
               title="Clave"
-              textColor="grey"
               shape="flat"
               returnKeyType="done"
               secureTextEntry={true}
               caption={passCaption}
               onSubmitEditing={() => signIn()}
               onChangeText={(pass) => {
-                setPass(pass), setPassCaption("");
+                setPass(pass), setPassCaption(""), setCaption('');
               }}
               value={pass}
               ref={nextInput}
             />
           </View>
           <View>
-            <Text style={{color: 'red'}}>{caption}</Text>
+            <Text style={{
+              color: Danger,
+              fontSize: 15,
+              fontWeight: '600'
+
+              }}>{caption}</Text>
           </View>
 
-          <View style={styles.subContainer}>
+          
             <MainButton
+              style={{marginTop: 20, marginBottom: 5}}
               title="Iniciar Sesion"
               onPress={() => {
                 signIn();
               }}
             />
-          </View>
+          
           <Divider size="small" />
           <View style={styles.forgetcontainer}>
             <Text>Olvidaste tu contraseña?</Text>
@@ -219,8 +205,8 @@ const LoginScreen = ({ navigation, saveProfile, saveCompany, saveLogin, savePriv
               <Text style={{ color: MainColor }}> Recuperar</Text>
             </TouchableOpacity>
           </View>
-        </View>
-        <LoadingModal />
+        </FormContainer>
+        <LoadingModal status={modalVisible} message='Iniciando Sesión..'/>
       </View>
     </View>
   );
@@ -235,7 +221,8 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   subContainer: {
-    marginVertical: 10,
+    //marginVertical: 5,
+    //backgroundColor: 'pink'
   },
   labelTitle: {
     fontSize: 16,

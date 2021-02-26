@@ -11,20 +11,28 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import moment from "moment";
 import Input from "./input.component.jsx";
 import { StatusModal } from "./statusModal";
-import { MainColor, ThirdColor } from "../assets/colors";
+import { MainColor, ThirdColor, Danger } from "../assets/colors";
 import Modal from "react-native-modal";
 const timeState = {
   entry: false,
   exit: false,
 };
 
-const CreateZoneModal = ({ status, onClose, create, addZones, companyRedux }) => {
+const CreateZoneModal = ({
+  status,
+  onClose,
+  create,
+  addZones,
+  companyRedux,
+}) => {
   const [displayTime, setDisplayTime] = useState(timeState);
-  const [zoneName, setZoneName] = useState();
+  const [caption, setCaption] = useState("");
+  const [timeCaption, setTimeCaption] = useState("");
+  const [zoneName, setZoneName] = useState("");
   const [entranceTime, setEntranceTime] = useState(new Date());
-  const [entry, setEntry] = useState(false)
+  const [entry, setEntry] = useState(false);
   const [departureTime, setDepartureTime] = useState(new Date());
-  const [exit, setExit] = useState(false)
+  const [exit, setExit] = useState(false);
   const [show1, setShow1] = useState(false);
   const [show2, setShow2] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -43,7 +51,7 @@ const CreateZoneModal = ({ status, onClose, create, addZones, companyRedux }) =>
     const currentDate = selectedDate || entranceTime;
     setShow1(false);
     setEntranceTime(currentDate);
-    setEntry(true);
+    setTimeCaption(""), setEntry(true);
   };
 
   const displayTimePicker2 = () => {
@@ -59,10 +67,40 @@ const CreateZoneModal = ({ status, onClose, create, addZones, companyRedux }) =>
     const currentDate = selectedDate || departureTime;
     setShow2(Platform.OS === "ios");
     setDepartureTime(currentDate);
-    setExit(true);
+    setTimeCaption(""), setExit(true);
   };
   const createZone = async () => {
     setLoading(true);
+    if (zoneName.length === 0) {
+      setCaption("Debe ingresar un nombre.");
+      setLoading(false);
+      return;
+    }
+    if (zoneName.length < 4 || zoneName.length > 15) {
+      setCaption("Ingrese un nombre entre 4 y 15 caracteres.");
+      setLoading(false);
+      return;
+    }
+    if (!entry || !exit) {
+      setTimeCaption("Debe seleccionar ambas horas.");
+      setLoading(false);
+      return;
+    }
+    if (
+      moment(entranceTime).format("HH: mm a") >
+      moment(departureTime).format("HH: mm a")
+    ) {
+      setTimeCaption("La hora de entrada no puede ser menor que la de salida");
+      setLoading(false);
+      return;
+    }
+
+    if (entranceTime === departureTime) {
+      setTimeCaption("La hora de entrada y salida deben ser distintas");
+      setLoading(false);
+      return;
+    }
+
     try {
       let res = await axios.post(
         `${API_PORT()}/api/createZone/${companyRedux[0].id}`,
@@ -72,14 +110,16 @@ const CreateZoneModal = ({ status, onClose, create, addZones, companyRedux }) =>
           firsDepartureTime: moment(departureTime).format("HH:mm").toString(),
         }
       );
-      console.log("res crear zonas--", res.data);
       if (!res.data.error) {
         addZones(res.data.data);
-        setZoneName("");
-        setLoading(false);
-        create(true)
-        onClose()
-        
+        setCaption(""),
+          setTimeCaption(""),
+          setZoneName(""),
+          setEntry(false),
+          setExit(false),
+          setLoading(false);
+        create(true);
+        onClose();
       }
     } catch (error) {
       setLoading(false);
@@ -88,46 +128,63 @@ const CreateZoneModal = ({ status, onClose, create, addZones, companyRedux }) =>
   };
   return (
     <Modal
-        isVisible={status}
-        onBackdropPress={onClose}
-        useNativeDriver={true}
-        animationIn="fadeInUp"
+      isVisible={status}
+      onBackdropPress={() => {
+        setCaption(""),
+          setTimeCaption(""),
+          setZoneName(""),
+          setEntry(false),
+          setExit(false),
+          onClose();
+      }}
+      useNativeDriver={true}
+      animationIn="fadeInUp"
       animationInTiming={300}
-      animationOut='fadeOutDown'
+      animationOut="fadeOutDown"
       animationOutTiming={300}
-        style={{
-            //backgroundColor: '#fff',
-            justifyContent: "center",
-            alignItems: "center",
-          }}
+      style={{
+        //backgroundColor: '#fff',
+        justifyContent: "center",
+        alignItems: "center",
+      }}
     >
-      <FormContainer style={{ padding: 20 }} title="Ingrese los datos de la zona">
+      <FormContainer
+        style={{ padding: 20, elevation: 0 }}
+        title="Ingrese los datos de la zona"
+      >
         <Input
-          style={{ borderColor: "black", marginBottom: 10 }}
-          styleInput={{ color: "black" }}
-          title="Nombre de la Zona"
+          title="Nombre"
           icon="md-globe"
-          textColor="black"
-          shape="square"
-          //alignText="center"
           returnKeyType="next"
           onChangeText={(nombre) => {
             setZoneName(nombre);
+            setCaption("");
           }}
           value={zoneName}
         />
+        <View>
+          <Text
+            style={{
+              color: Danger,
+              fontSize: 15,
+              fontWeight: "600",
+            }}
+          >
+            {caption}
+          </Text>
+        </View>
         <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
           <View style={styles.pickerButtonContainer}>
             <MainButton
               style={styles.pickerButton}
-              title='Entrada'
+              title="Entrada"
               onPress={() => displayTimePicker()}
             />
-              {/* <Ionicons name="ios-timer" size={20} color="green" /> */}
-              {/* <Text style={styles.buttonText}>Entrada</Text> */}
+            {/* <Ionicons name="ios-timer" size={20} color="green" /> */}
+            {/* <Text style={styles.buttonText}>Entrada</Text> */}
             {/* </TouchableOpacity> */}
             <Text style={styles.timeText}>
-              {entry ? moment(entranceTime).format("HH:mm a") : '----'}
+              {entry ? moment(entranceTime).format("HH:mm a") : "----"}
             </Text>
             {show1 && (
               <DateTimePicker
@@ -141,15 +198,15 @@ const CreateZoneModal = ({ status, onClose, create, addZones, companyRedux }) =>
           </View>
           <View style={styles.pickerButtonContainer}>
             <MainButton
-              title='Salida'
+              title="Salida"
               style={styles.pickerButton}
               onPress={() => displayTimePicker2()}
             />
-              {/* <Text style={styles.buttonText}>Salida</Text> */}
-              {/* <Ionicons name="ios-timer" size={20} color="#ccc" /> */}
-            
+            {/* <Text style={styles.buttonText}>Salida</Text> */}
+            {/* <Ionicons name="ios-timer" size={20} color="#ccc" /> */}
+
             <Text style={styles.timeText}>
-              {exit ? moment(departureTime).format("HH:MM a") : '----'}
+              {exit ? moment(departureTime).format("HH:mm a") : "----"}
             </Text>
             {show2 && (
               <DateTimePicker
@@ -162,14 +219,25 @@ const CreateZoneModal = ({ status, onClose, create, addZones, companyRedux }) =>
             )}
           </View>
         </View>
+        <View style={{ marginVertical: 5 }}>
+          <Text
+            style={{
+              color: Danger,
+              fontSize: 15,
+              fontWeight: "600",
+            }}
+          >
+            {timeCaption}
+          </Text>
+        </View>
         <MainButton
           title="Registrar Zona"
-          style={{marginVertical: 5}}
+          style={{ marginVertical: 5 }}
           onPress={() => {
             createZone();
           }}
         />
-        <LoadingModal status={loading} message='Guardando...'/>
+        <LoadingModal status={loading} message="Guardando..." />
       </FormContainer>
     </Modal>
   );
