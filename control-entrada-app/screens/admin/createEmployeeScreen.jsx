@@ -13,7 +13,12 @@ import {
 
 import axios from "axios";
 import { API_PORT } from "../../config/index.js";
-import { MainColor, ThirdColor, lightColor } from "../../assets/colors.js";
+import {
+  MainColor,
+  ThirdColor,
+  lightColor,
+  Danger,
+} from "../../assets/colors.js";
 import Input from "../../components/input.component";
 import { TopNavigation } from "../../components/TopNavigation.component";
 import { MainButton } from "../../components/mainButton.component";
@@ -26,6 +31,7 @@ import moment from "moment";
 import { FormContainer } from "../../components/formContainer";
 import { LoadingModal } from "../../components/loadingModal";
 import { StatusModal } from "../../components/statusModal";
+import Avatar from "../../components/avatar.component";
 import { connect } from "react-redux";
 const companyId = "9a28095a-9029-40ec-88c2-30e3fac69bc5";
 
@@ -35,9 +41,9 @@ const CreateEmployeScreen = ({
   companyRedux,
   addEmployee,
 }) => {
-  // console.log("zonesRedux---", zonesRedux);
-  // console.log("company Redux-----", companyRedux);
-
+  const [caption, setCaption] = useState("");
+  const [timeCaption, setTimeCaption] = useState("");
+  const [imageCaption, setImageCaption] = useState("");
   const [zoneId, setZoneId] = useState(zonesRedux[0].id);
   const [name, setName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -54,7 +60,7 @@ const CreateEmployeScreen = ({
   const [show, setShow] = useState(false);
   const [show2, setShow2] = useState(false);
   const [create, setCreate] = useState(false);
-  const [image, setImage] = useState();
+  const [image, setImage] = useState("");
   const [fileName, setFileName] = useState("");
   const [fileType, setFileType] = useState("");
   const [visible, setVisible] = useState(false);
@@ -85,6 +91,7 @@ const CreateEmployeScreen = ({
     const currentDate = selectedDate || date;
     setShow(Platform.OS === "ios");
     setDate(currentDate);
+    setTimeCaption("");
     setEntryHolder(true);
   };
 
@@ -92,6 +99,7 @@ const CreateEmployeScreen = ({
     const currentDate = selectedDate || changeTurn;
     setShow2(Platform.OS === "ios");
     setChangeTurn(currentDate);
+    setTimeCaption("");
     setDepartureHolder(true);
   };
 
@@ -112,8 +120,45 @@ const CreateEmployeScreen = ({
     setShow2(true);
   };
 
+  //CREATE EMPLOYEE
   const createEmploye = async () => {
     setVisible(true);
+    if (
+      name.length === 0 ||
+      lastName.length === 0 ||
+      dni.length === 0 ||
+      email.length === 0
+    ) {
+      setCaption("Debe llenar todos los campos");
+      setVisible(false);
+      return;
+    }
+    if (image.length === 0) {
+      setImageCaption("Debe agregar una foto");
+      setVisible(false);
+      return;
+    }
+    if (!entryHolder || !departureHolder) {
+      setTimeCaption("Debe seleccionar ambas horas.");
+      setVisible(false);
+      return;
+    }
+    if (
+      moment(date).format("D MMM YYYY") >
+      moment(changeTurn).format("D MMM YYYY")
+    ) {
+      setTimeCaption(
+        "La fecha de inicio no puede ser mayor que la de culminacion"
+      );
+      setVisible(false);
+      return;
+    }
+
+    if (date === changeTurn) {
+      setTimeCaption("La fecha de inicio y culminacion deben ser distintas");
+      setVisible(false);
+      return;
+    }
     let data = new FormData();
     data.append("file", { uri: image, name: fileName, type: fileType });
     data.append("name", name);
@@ -166,6 +211,13 @@ const CreateEmployeScreen = ({
           setCreate(true);
           setVisible(false);
           setSuccess(true);
+          setName("")
+          setLastName("")
+          setEmail("")
+          setDni("")
+          setImage("")
+          setEntryHolder(false)
+          setDepartureHolder(false)
           //setSaving(false);
         } else {
           alert(res.data.msg);
@@ -173,7 +225,7 @@ const CreateEmployeScreen = ({
         }
       }
     } catch (error) {
-      setVisible(false)
+      setVisible(false);
       console.log("error-----: ", error);
       alert(error.message);
     }
@@ -219,16 +271,14 @@ const CreateEmployeScreen = ({
     }
 
     if (!result.cancelled) {
-      console.log(result);
       setImage(result.uri);
+      setImageCaption("");
       let filename = result.uri.split("/").pop();
       setFileName(filename);
       // Infer the type of the image
       let match = /\.(\w+)$/.exec(filename);
       let type = match ? `image/${match[1]}` : `image`;
       setFileType(type);
-      console.log("fileName: ", filename);
-      console.log("file type: ", type);
     }
   };
 
@@ -244,20 +294,22 @@ const CreateEmployeScreen = ({
             alignItems: "center",
           }}
         >
-          <View style={image ? styles.imageContainer2 : styles.imageContainer}>
+          <View style={pickPictureContainer}>
             <View style={styles.imageBox}>
               {image ? (
-                <Image
-                  source={{ uri: image }}
-                  style={{ width: 150, height: 150 }}
-                />
+                <Avatar.Picture size={120} uri={image} />
               ) : (
+                // <Image
+                //   source={{ uri: image }}
+                //   style={{ width: 150, height: 150 }}
+                // />
                 <TouchableOpacity
                   style={{ justifyContent: "center", alignItems: "center" }}
                   onPress={() => getImage()}
                 >
-                  <Ionicons name="md-photos" size={28} color={lightColor} />
-                  <Text>Agregar Foto</Text>
+                  <Avatar.Icon size={28} name="md-photos" />
+                  {/* <Ionicons name="md-photos" size={28} color={lightColor} /> */}
+                  {/* <Text>Agregar Foto</Text> */}
                 </TouchableOpacity>
               )}
             </View>
@@ -267,6 +319,17 @@ const CreateEmployeScreen = ({
                 <Ionicons name="ios-camera" size={28} color={lightColor} />
               </TouchableOpacity>
             </View> */}
+            <View>
+              <Text
+                style={{
+                  color: Danger,
+                  fontSize: 15,
+                  fontWeight: "600",
+                }}
+              >
+                {imageCaption}
+              </Text>
+            </View>
           </View>
 
           <FormContainer title="Datos Personales">
@@ -280,7 +343,7 @@ const CreateEmployeScreen = ({
               //alignText="center"
               returnKeyType="next"
               onChangeText={(nombre) => {
-                setName(nombre);
+                setName(nombre), setCaption("");
               }}
               value={name}
             />
@@ -294,7 +357,7 @@ const CreateEmployeScreen = ({
               //alignText="center"
               returnKeyType="next"
               onChangeText={(apellido) => {
-                setLastName(apellido);
+                setLastName(apellido), setCaption("");
               }}
               value={lastName}
             />
@@ -308,7 +371,7 @@ const CreateEmployeScreen = ({
               //alignText="center"
               returnKeyType="next"
               onChangeText={(dni) => {
-                setDni(dni);
+                setDni(dni), setCaption("");
               }}
               value={dni}
             />
@@ -322,10 +385,21 @@ const CreateEmployeScreen = ({
               //alignText="center"
               returnKeyType="next"
               onChangeText={(email) => {
-                setEmail(email);
+                setEmail(email), setCaption("");
               }}
               value={email}
             />
+            <View>
+              <Text
+                style={{
+                  color: Danger,
+                  fontSize: 15,
+                  fontWeight: "600",
+                }}
+              >
+                {caption}
+              </Text>
+            </View>
           </FormContainer>
 
           {/* ----ROLL---- */}
@@ -406,6 +480,17 @@ const CreateEmployeScreen = ({
                 onChange={onChange2}
               />
             )}
+            <View>
+              <Text
+                style={{
+                  color: Danger,
+                  fontSize: 15,
+                  fontWeight: "600",
+                }}
+              >
+                {timeCaption}
+              </Text>
+            </View>
           </FormContainer>
           <View
             style={{
@@ -422,7 +507,7 @@ const CreateEmployeScreen = ({
           </View>
         </View>
       </ScrollView>
-      <LoadingModal status={visible} message='Guardando...'/>
+      <LoadingModal status={visible} message="Guardando..." />
       <StatusModal status={success} onClose={() => setSuccess(false)} />
     </View>
   );
@@ -453,6 +538,14 @@ const styles = StyleSheet.create({
   },
   mainWrapper: {
     width: "90%",
+  },
+  pickPictureContainer: {
+    backgroundColor: "#fff",
+    width: "90%",
+    borderRadius: 5,
+    marginVertical: 5,
+    padding: 8,
+    elevation: 5,
   },
   imageContainer: {
     //backgroundColor: "#f09",
