@@ -8,8 +8,6 @@ import {
   Image,
   KeyboardAvoidingView,
   TouchableWithoutFeedback,
-  Alert,
-  ActivityIndicator,
   Platform,
 } from "react-native";
 
@@ -23,14 +21,16 @@ import moment from "moment";
 import axios from "axios";
 import { Picker } from "@react-native-community/picker";
 import { API_PORT } from "../../config/index";
-import { Divider } from "../../components/Divider";
-import { MainColor, ligthColor } from "../../assets/colors";
-import Modal from "react-native-modal";
+import { MainColor, ligthColor, Danger } from "../../assets/colors";
 import { connect } from "react-redux";
 import { storage } from "../../helpers/asyncStorage";
 import { LoadingModal } from "../../components/loadingModal";
 import { StatusModal } from "../../components/statusModal";
-import {FormContainer } from '../../components/formContainer'
+import { FormContainer } from "../../components/formContainer";
+import { CameraModal } from "../../components/cameraModal";
+import Avatar from "../../components/avatar.component";
+
+let destinyCaption, imageCaption, imageVisitCaption;
 
 const EntryScreen = ({ navigation, profile, saveVisit }) => {
   //console.log("profile from redux---", profile);
@@ -38,6 +38,9 @@ const EntryScreen = ({ navigation, profile, saveVisit }) => {
   const destinys = profile.userZone[0].Zona.Destinos;
   const userZoneId = profile.userZone[0].id;
 
+  const [camera, setCamera] = useState(false);
+  const [type, setType] = useState("");
+  const [profileCaption, setProfileCaption] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [saveImg, setSaveImg] = useState();
@@ -55,75 +58,80 @@ const EntryScreen = ({ navigation, profile, saveVisit }) => {
   const [fileName2, setFileName2] = useState("");
   const [fileType2, setFileType2] = useState("");
   const [destinyId, setDestinyId] = useState(destinys[0].id);
-  const [modalVisibility, setModalVisibility] = useState(false);
-  const [profileCaption, setProfileCaption] = useState("");
-  const [destinyCaption, setDestinyCaption] = useState("");
+
   const [editable, setEditable] = useState(true);
   const nameRef = useRef();
   const lastNameRef = useRef();
   const dniRef = useRef();
   const destinyRef = useRef();
 
-  //REQUEST USERZONE
-  const requestUserZone = async () => {
-    if (userId) {
-      try {
-        const res = await axios.get(
-          `${API_PORT()}/api//findUserZone/${userId}`
-        );
-        if (!res.data.error) {
-          setDestiny(res.data.data);
-        }
-      } catch (error) {
-        console.log(error.message);
-      }
-    }
+  //CLEAR INPUTS
+  const clearInputs = () => {
+    setName("");
+    setLastName("");
+    setDni("");
+    setDestiny("");
+    setSaveImg("");
+    setImgUrl("");
+    setVisitImg("");
   };
-
   //CREATE VISIT
   const createVisit = async () => {
     setLoading(true);
-
-    let token = await storage.getItem("userToken");
-
-    if (!name || !lastName || !dni) {
-      setProfileCaption("Debe ingresar todos los datos");
+    if (name.length === 0 || lastName.length === 0 || dni.length === 0) {
+      setProfileCaption("Debe llenar todos los campos");
+      setLoading(false);
       return;
-    } else {
-      setModalVisibility(true);
-      let data = new FormData();
-      data.append("name", name);
-      data.append("lastName", lastName);
-      data.append("dni", dni);
-      data.append("file", { uri: imgUrl, name: fileName, type: fileType });
-      data.append("file", { uri: visitImg, name: fileName2, type: fileType2 });
-      data.append("entryDate", moment().toString());
-      data.append("departureDate", moment().toString());
-      data.append("descriptionEntry", entry);
-      data.append("userZoneId", userZoneId);
-      try {
-        let res = await axios.post(
-          `${API_PORT()}/api/createVisit/${destinyId}`,
-          data,
-          {
-            headers: {
-              "content-type": "multipart/form-data",
-              Authorization: `bearer ${token}`,
-            },
-          }
-        );
-
-        if (!res.data.error) {
-          setLoading(false);
-          saveVisit(res.data.data);
-          setSuccess(true);
-          clearInputs();
-        }
-      } catch (error) {
-        setLoading(false);
-        console.log(error.message);
-      }
     }
+    // if (imgUrl.length === 0) {
+    //   setImageCaption("Debe agregar una foto");
+    //   setLoading(false);
+    //   return;
+    // }
+    // if (visitImg.length === 0) {
+    //   setImageVisitCaption("Debe agregar una foto como referencia al ingreso.");
+    //   setLoading(false);
+    //   return;
+    // }
+    // let token = await storage.getItem("userToken");
+
+    // if (!name || !lastName || !dni) {
+    //   setProfileCaption("Debe ingresar todos los datos");
+    //   return;
+    // }
+
+    // let data = new FormData();
+    // data.append("name", name);
+    // data.append("lastName", lastName);
+    // data.append("dni", dni);
+    // data.append("file", { uri: imgUrl, name: fileName, type: fileType });
+    // data.append("file", { uri: visitImg, name: fileName2, type: fileType2 });
+    // data.append("entryDate", moment().toString());
+    // data.append("departureDate", moment().toString());
+    // data.append("descriptionEntry", entry);
+    // data.append("userZoneId", userZoneId);
+    // try {
+    //   let res = await axios.post(
+    //     `${API_PORT()}/api/createVisit/${destinyId}`,
+    //     data,
+    //     {
+    //       headers: {
+    //         "content-type": "multipart/form-data",
+    //         Authorization: `bearer ${token}`,
+    //       },
+    //     }
+    //   );
+
+    //   if (!res.data.error) {
+    //     setLoading(false);
+    //     saveVisit(res.data.data);
+    //     setSuccess(true);
+    //     //clearInputs();
+    //   }
+    // } catch (error) {
+    //   setLoading(false);
+    //   console.log(error.message);
+    // }
   };
   //CHECK DNI
   const checkDni = async () => {
@@ -132,7 +140,7 @@ const EntryScreen = ({ navigation, profile, saveVisit }) => {
       console.log(res.data);
       if (!res.data.error) {
         console.log(res.data);
-        let citizen = res.data.data;
+        let citizen = res.data.data.Visitante;
         //console.log(citizen)
         setName(citizen.name);
         setLastName(citizen.lastName);
@@ -145,56 +153,6 @@ const EntryScreen = ({ navigation, profile, saveVisit }) => {
       console.log("error:---", error.message);
     }
   };
-  //PICK IMAGE
-  const pickImage = async (type) => {
-    let options = {
-      allowsEditing: false,
-      aspect: [4, 3],
-      quality: 1,
-    };
-    try {
-      let result = await ImagePicker.launchCameraAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        ...options,
-      });
-
-      switch (type) {
-        case "profile":
-          if (!result.cancelled) {
-            setImgUrl(result.uri);
-            let filename = result.uri.split("/").pop();
-            setFileName(filename);
-            // Infer the type of the image
-            let match = /\.(\w+)$/.exec(filename);
-            let type = match ? `image/${match[1]}` : `image`;
-            setFileType(type);
-            setChangeImg(true);
-          } else {
-            setChangeImg(false);
-          }
-          break;
-        case "visit":
-          if (!result.cancelled) {
-            setVisitImg(result.uri);
-            let filename2 = result.uri.split("/").pop();
-            setFileName2(filename2);
-            // Infer the type of the image
-            let match2 = /\.(\w+)$/.exec(filename2);
-            let type2 = match2 ? `image/${match2[1]}` : `image`;
-            setFileType2(type2);
-            setChangeImg(true);
-          } else {
-            setChangeImg(false);
-          }
-          break;
-
-        default:
-          break;
-      }
-    } catch (error) {
-      console.log("error: ", error.message);
-    }
-  };
 
   const goBackAction = () => {
     return (
@@ -205,14 +163,17 @@ const EntryScreen = ({ navigation, profile, saveVisit }) => {
       </View>
     );
   };
-
-  const clearInputs = () => {
-    setName("");
-    setLastName("");
-    setDni("");
-    setDestiny("");
-    setSaveImg("");
-    setImgUrl("");
+  const profilePic = (uri, fileName, fileType, caption, changeImg) => {
+    console.log("URI FROM MODAL-----", uri);
+    setImgUrl(uri),
+      setFileName(fileName),
+      setFileType(fileType),
+      //imageCaption = caption,
+      setChangeImg(changeImg);
+  };
+  const visitPic = (uri, fileName, fileType, caption) => {
+    setVisitImg(uri), setFileName2(fileName), setFileType2(fileType);
+    //imageVisitCaption = caption,
   };
   useEffect(() => {
     (async () => {
@@ -232,27 +193,44 @@ const EntryScreen = ({ navigation, profile, saveVisit }) => {
       <KeyboardAvoidingView style={styles.containerKeyboard} behavior="padding">
         <TopNavigation title="Entrada" leftControl={goBackAction()} />
         <ScrollView contentContainerStyle={{ alignItems: "center" }}>
-          <View style={styles.imgBackground}>
+          <View style={styles.pickPictureContainer}>
             <View style={styles.profilePicBox}>
               {imgUrl ? (
-                <Image source={{ uri: imgUrl }} style={styles.profilePic} />
-              ) : (
-                <TouchableOpacity onPress={() => pickImage("profile")}>
-                  <Ionicons name="ios-camera" size={48} color="grey" />
+                 <Avatar.Picture size={120} uri={!editable ? `${API_PORT()}/public/imgs/${imgUrl}`
+                : imgUrl}/>
+              //   <Image style={{
+              //     height: 120,
+              //     width: 120,
+              //     borderRadius: 120/2
+              //   }} source={{uri: `${API_PORT()}/public/imgs/${imgUrl}`}}/>
+               ) : (
+                <TouchableOpacity
+                  onPress={() => {
+                    setCamera(true), setType("profile");
+                  }}
+                >
+                  <Avatar.Icon name="ios-camera" size={32} color="#8e8e8e" />
                 </TouchableOpacity>
               )}
-              <TouchableOpacity
-                onPress={() => pickImage("profile")}
-                style={styles.cameraIcon}
-              >
-                {changeImg && (
-                  <Ionicons name="ios-close" size={42} color="#ff7e00" />
-                )}
-              </TouchableOpacity>
+
+              {changeImg && editable &&(
+                <TouchableOpacity
+                  onPress={() => {
+                    setCamera(true), setType("profile");
+                  }}
+                  style={styles.cameraIcon}
+                >
+                  <Ionicons name="ios-close" size={48} color="#ff7e00" />
+                </TouchableOpacity>
+              )}
+            </View>
+
+            <View>
+              <Text style={styles.captionText}>{imageCaption}</Text>
             </View>
           </View>
 
-          <FormContainer title='Datos Personales'>
+          <FormContainer title="Datos Personales">
             <Input
               title="Nombre"
               secureTextEntry={false}
@@ -260,7 +238,9 @@ const EntryScreen = ({ navigation, profile, saveVisit }) => {
               icon="ios-person"
               returnKeyType="next"
               onSubmitEditing={() => lastNameRef.current.focus()}
-              onChangeText={(name) => setName(name)}
+              onChangeText={(name) => {
+                setName(name);
+              }}
               editable={editable}
               value={name}
               ref={nameRef}
@@ -272,7 +252,9 @@ const EntryScreen = ({ navigation, profile, saveVisit }) => {
               icon="ios-person"
               returnKeyType="next"
               onSubmitEditing={() => dniRef.current.focus()}
-              onChangeText={(lastname) => setLastName(lastname)}
+              onChangeText={(lastname) => {
+                setLastName(lastname);
+              }}
               editable={editable}
               value={lastName}
               ref={lastNameRef}
@@ -298,7 +280,7 @@ const EntryScreen = ({ navigation, profile, saveVisit }) => {
               <Text style={styles.captionText}>{profileCaption}</Text>
             </View>
           </FormContainer>
-          <FormContainer title='Datos de Ingreso'>
+          <FormContainer title="Datos de Ingreso">
             <View>
               <Text>Selecione un destino:</Text>
               {destinys ? (
@@ -318,22 +300,41 @@ const EntryScreen = ({ navigation, profile, saveVisit }) => {
               ) : null}
             </View>
             <View>
-              <Text>Foto de Entrada</Text>
-              <TouchableOpacity onPress={() => pickImage("visit")}>
-                <Ionicons name="ios-camera" size={48} color="grey" />
-              </TouchableOpacity>
+              <Text>Foto de Entrada: vehiculo, pertenencia, etc.</Text>
+
               <View>
-                <Image
-                  source={{ uri: visitImg }}
-                  style={{ width: '100%', height: 250, overflow: 'hidden', borderRadius: 5 }}
-                />
+                <Text style={styles.captionText}>{imageVisitCaption}</Text>
+              </View>
+              <View>
+                {visitImg ? (
+                  <Image
+                    source={{ uri: visitImg }}
+                    style={{
+                      width: "100%",
+                      height: 250,
+                      overflow: "hidden",
+                      borderRadius: 5,
+                    }}
+                  />
+                ) : (
+                  <View style={styles.profilePicBox}>
+                    <TouchableOpacity
+                      style={{ alignSelf: "center" }}
+                      onPress={() => {
+                        setCamera(true), setType("visit");
+                      }}
+                    >
+                      <Ionicons name="ios-camera" size={48} color="grey" />
+                    </TouchableOpacity>
+                  </View>
+                )}
               </View>
             </View>
             <Input
               title="Descipcion Entrada (opcional)"
               secureTextEntry={false}
               shape="flat"
-              icon="ios-person"
+              icon="md-create"
               onChangeText={(entry) => setEntry(entry)}
               value={entry}
             />
@@ -344,12 +345,19 @@ const EntryScreen = ({ navigation, profile, saveVisit }) => {
           <View style={{ width: "90%" }}>
             <MainButton
               title="Registrar Entrada"
-              style={{ marginTop: 10 }}
+              style={{ marginVertical: 5 }}
               onPress={() => createVisit()}
             />
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
+      <CameraModal
+        status={camera}
+        onClose={() => setCamera(false)}
+        profile={profilePic}
+        anotherPic={visitPic}
+        type={type}
+      />
       <LoadingModal status={loading} message="Guardando..." />
       <StatusModal status={success} onClose={() => setSuccess(false)} />
     </View>
@@ -377,22 +385,25 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     backgroundColor: "#eee",
   },
-  imgBackground: {
-    width: "90%",
-    marginVertical: 5,
+  pickPictureContainer: {
     backgroundColor: "#fff",
+    width: "90%",
     borderRadius: 5,
-    justifyContent: "center",
-    alignItems: "center",
-    paddingVertical: "10%",
+    marginVertical: 5,
+    padding: 8,
+    elevation: 5,
   },
   profilePicBox: {
-    width: 200,
-    height: 200,
-    borderRadius: 100,
-    backgroundColor: "pink",
+    alignSelf: "center",
+    width: 120,
+    height: 120,
+    borderRadius: 120 / 2,
+    backgroundColor: "#e8e8e8",
     justifyContent: "center",
     alignItems: "center",
+    borderStyle: "dotted",
+    borderWidth: 1,
+    marginVertical: 10,
   },
   profilePic: {
     width: "100%",
@@ -405,21 +416,9 @@ const styles = StyleSheet.create({
     bottom: 0,
     right: 5,
   },
-  dateContainer: {
-    backgroundColor: "#fff",
-    width: "90%",
-    borderRadius: 5,
-    marginVertical: 2.5,
-    padding: 8,
-  },
-  containerTitle: {
-    fontSize: 16,
-    fontWeight: "normal",
-    color: MainColor,
-  },
   captionText: {
-    fontSize: 16,
-    fontWeight: "normal",
-    color: "red",
+    fontSize: 15,
+    fontWeight: "600",
+    color: Danger,
   },
 });

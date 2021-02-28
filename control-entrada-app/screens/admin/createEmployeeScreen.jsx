@@ -32,6 +32,7 @@ import { FormContainer } from "../../components/formContainer";
 import { LoadingModal } from "../../components/loadingModal";
 import { StatusModal } from "../../components/statusModal";
 import Avatar from "../../components/avatar.component";
+import { CameraModal } from "../../components/cameraModal";
 import { connect } from "react-redux";
 const companyId = "9a28095a-9029-40ec-88c2-30e3fac69bc5";
 
@@ -60,12 +61,14 @@ const CreateEmployeScreen = ({
   const [show, setShow] = useState(false);
   const [show2, setShow2] = useState(false);
   const [create, setCreate] = useState(false);
+  const [changeImg, setChangeImg] = useState(false);
   const [image, setImage] = useState("");
   const [fileName, setFileName] = useState("");
   const [fileType, setFileType] = useState("");
+  const [camera, setCamera] = useState(false);
   const [visible, setVisible] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [saving, setSaving] = useState(false);
+
   const goBackAction = () => {
     return (
       <View>
@@ -118,6 +121,14 @@ const CreateEmployeScreen = ({
 
   const showMode2 = (currentMode) => {
     setShow2(true);
+  };
+
+  const profilePic = (uri, fileName, fileType, caption, changeImg) => {
+    setImage(uri),
+      setFileName(fileName),
+      setFileType(fileType),
+      //imageCaption = caption,
+      setChangeImg(changeImg);
   };
 
   //CREATE EMPLOYEE
@@ -211,13 +222,13 @@ const CreateEmployeScreen = ({
           setCreate(true);
           setVisible(false);
           setSuccess(true);
-          setName("")
-          setLastName("")
-          setEmail("")
-          setDni("")
-          setImage("")
-          setEntryHolder(false)
-          setDepartureHolder(false)
+          setName("");
+          setLastName("");
+          setEmail("");
+          setDni("");
+          setImage("");
+          setEntryHolder(false);
+          setDepartureHolder(false);
           //setSaving(false);
         } else {
           alert(res.data.msg);
@@ -231,60 +242,6 @@ const CreateEmployeScreen = ({
     }
   };
 
-  const requestZone = async () => {
-    try {
-      let res = await axios.get(`${API_PORT()}/api/findZones/${companyId}`);
-      if (!res.data.error) {
-        console.log("zones array:-----", res.data.data[0]);
-        setZones(res.data.data);
-        setZoneId(res.data.data[0].id);
-      }
-    } catch (error) {
-      alert(error.message);
-    }
-  };
-
-  const getImage = async (type) => {
-    const options = {
-      allowsEditing: false,
-      aspect: [4, 3],
-      quality: 1,
-    };
-    if (type === "galery") {
-      try {
-        var result = await ImagePicker.launchImageLibraryAsync({
-          mediaTypes: ImagePicker.MediaTypeOptions.All,
-          ...options,
-        });
-      } catch (error) {
-        console.log(error);
-      }
-    } else {
-      try {
-        var result = await ImagePicker.launchCameraAsync({
-          mediaTypes: ImagePicker.MediaTypeOptions.Images,
-          ...options,
-        });
-      } catch (error) {
-        console.log(error);
-      }
-    }
-
-    if (!result.cancelled) {
-      setImage(result.uri);
-      setImageCaption("");
-      let filename = result.uri.split("/").pop();
-      setFileName(filename);
-      // Infer the type of the image
-      let match = /\.(\w+)$/.exec(filename);
-      let type = match ? `image/${match[1]}` : `image`;
-      setFileType(type);
-    }
-  };
-
-  // useEffect(() => {
-  //   requestZone();
-  // }, []);
   return (
     <View style={{ flex: 1 }}>
       <TopNavigation title="Crear Empleado" leftControl={goBackAction()} />
@@ -295,7 +252,7 @@ const CreateEmployeScreen = ({
           }}
         >
           <View style={pickPictureContainer}>
-            <View style={styles.imageBox}>
+            <View style={styles.profilePicBox}>
               {image ? (
                 <Avatar.Picture size={120} uri={image} />
               ) : (
@@ -304,12 +261,21 @@ const CreateEmployeScreen = ({
                 //   style={{ width: 150, height: 150 }}
                 // />
                 <TouchableOpacity
-                  style={{ justifyContent: "center", alignItems: "center" }}
-                  onPress={() => getImage()}
+                  onPress={() => {
+                    setCamera(true), setType("profile");
+                  }}
                 >
-                  <Avatar.Icon size={28} name="md-photos" />
-                  {/* <Ionicons name="md-photos" size={28} color={lightColor} /> */}
-                  {/* <Text>Agregar Foto</Text> */}
+                  <Avatar.Icon size={28} name="md-photos" color="#8e8e8e" />
+                </TouchableOpacity>
+              )}
+              {changeImg && (
+                <TouchableOpacity
+                  onPress={() => {
+                    setCamera(true), setType("profile");
+                  }}
+                  style={styles.cameraIcon}
+                >
+                  <Ionicons name="ios-close" size={48} color="#ff7e00" />
                 </TouchableOpacity>
               )}
             </View>
@@ -507,6 +473,13 @@ const CreateEmployeScreen = ({
           </View>
         </View>
       </ScrollView>
+      <CameraModal
+        status={camera}
+        onClose={() => setCamera(false)}
+        profile={profilePic}
+        anotherPic={visitPic}
+        type={type}
+      />
       <LoadingModal status={visible} message="Guardando..." />
       <StatusModal status={success} onClose={() => setSuccess(false)} />
     </View>
@@ -547,32 +520,24 @@ const styles = StyleSheet.create({
     padding: 8,
     elevation: 5,
   },
-  imageContainer: {
-    //backgroundColor: "#f09",
+  profilePicBox: {
+    alignSelf: "center",
+    width: 120,
+    height: 120,
+    borderRadius: 120 / 2,
+    backgroundColor: "#e8e8e8",
     justifyContent: "center",
     alignItems: "center",
-    marginVertical: 2.5,
-    height: 250,
-    borderColor: "#ccc",
-    borderWidth: 2,
     borderStyle: "dotted",
+    borderWidth: 1,
+    marginVertical: 10,
   },
-  imageContainer2: {
-    backgroundColor: "#fff",
-    justifyContent: "center",
-    alignItems: "center",
-    marginVertical: 2.5,
-    height: 250,
-    // borderColor: "#ccc",
-    // borderWidth: 2,
-    // borderStyle: "dotted",
+  cameraIcon: {
+    position: "absolute",
+    bottom: 0,
+    right: 5,
   },
-  imageBox: {
-    justifyContent: "center",
-    alignItems: "center",
-    //height: 150
-    //backgroundColor: "red",
-  },
+
   photoButtonBox: {
     flexDirection: "row",
     alignItems: "center",

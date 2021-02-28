@@ -10,7 +10,7 @@ export const Divider = (props) => {
 
 const styles = StyleSheet.create({
     divider: {
-        backgroundColor: 'grey',
+        backgroundColor: '#8e8e8e',
         //height: 2,
         width: '100%',
         marginVertical: 4
