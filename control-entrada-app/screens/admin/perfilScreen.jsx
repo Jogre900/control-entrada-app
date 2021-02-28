@@ -128,7 +128,7 @@ const PerfilScreen = ({ navigation, profile, company }) => {
                 alignSelf: "center",
               }}
             >
-              <Avatar
+              <Avatar.Picture
                 size={120}
                 uri={`${API_PORT()}/public/imgs/${profile.picture}`}
               />
@@ -171,7 +171,7 @@ const PerfilScreen = ({ navigation, profile, company }) => {
               <>
                 <Text style={styles.contentText}>{elem.companyName}</Text>
                 <Text style={styles.contentText}>{elem.businessName}</Text>
-                <Text style={styles.contentText}>{elem.logo}</Text>
+                {/* <Text style={styles.contentText}>{elem.logo}</Text> */}
                 <Text style={styles.contentText}>{elem.city}</Text>
                 <Text style={styles.contentText}>{elem.address}</Text>
                 <Text style={styles.contentText}>{elem.nic}</Text>
@@ -179,6 +179,7 @@ const PerfilScreen = ({ navigation, profile, company }) => {
                 <Text style={styles.contentText}>{elem.phoneNumberOther}</Text>
               </>
             ))}
+            <Avatar.Picture size={60} uri={`${API_PORT()}/public/imgs/${company[0].logo}`}/>
           </FormContainer>
 
           <View style={styles.editContainer}>
@@ -262,6 +263,7 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: "100",
     color: "black",
+    alignSelf: 'center'
   },
   contentText: {
     fontSize: 14,

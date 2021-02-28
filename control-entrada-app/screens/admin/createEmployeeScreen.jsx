@@ -165,7 +165,7 @@ const CreateEmployeScreen = ({
       return;
     }
 
-    if (date === changeTurn) {
+    if (moment(date).format("D MMM YYYY") === moment(changeTurn).format("D MMM YYYY")) {
       setTimeCaption("La fecha de inicio y culminacion deben ser distintas");
       setVisible(false);
       return;
@@ -251,7 +251,7 @@ const CreateEmployeScreen = ({
             alignItems: "center",
           }}
         >
-          <View style={pickPictureContainer}>
+          <View style={styles.pickPictureContainer}>
             <View style={styles.profilePicBox}>
               {image ? (
                 <Avatar.Picture size={120} uri={image} />
@@ -262,7 +262,7 @@ const CreateEmployeScreen = ({
                 // />
                 <TouchableOpacity
                   onPress={() => {
-                    setCamera(true), setType("profile");
+                    setCamera(true)
                   }}
                 >
                   <Avatar.Icon size={28} name="md-photos" color="#8e8e8e" />
@@ -271,7 +271,7 @@ const CreateEmployeScreen = ({
               {changeImg && (
                 <TouchableOpacity
                   onPress={() => {
-                    setCamera(true), setType("profile");
+                    setCamera(true)
                   }}
                   style={styles.cameraIcon}
                 >
@@ -477,8 +477,7 @@ const CreateEmployeScreen = ({
         status={camera}
         onClose={() => setCamera(false)}
         profile={profilePic}
-        anotherPic={visitPic}
-        type={type}
+        type={"profile"}
       />
       <LoadingModal status={visible} message="Guardando..." />
       <StatusModal status={success} onClose={() => setSuccess(false)} />

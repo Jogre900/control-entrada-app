@@ -193,6 +193,7 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: "100",
     color: "black",
+    alignSelf: 'center'
   },
   privilegeBox: {
     backgroundColor: ThirdColor,
