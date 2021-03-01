@@ -36,6 +36,7 @@ const HomeAdminScreen = ({
   saveTodayVisits,
   saveAvailable,
   saveZones,
+  saveDestiny,
   profile,
   privilege,
 }) => {
@@ -53,7 +54,7 @@ const HomeAdminScreen = ({
       const res = await axios.get(
         `${API_PORT()}/api/findZone/${profile.userZone[0].ZoneId}`
       );
-      console.log("zone by Id from api---", res.data.data);
+      //console.log("zone by Id from api---", res.data.data);
       if (!res.data.error) {
         setLoading(false);
         saveZones(res.data.data);
@@ -80,6 +81,21 @@ const HomeAdminScreen = ({
       alert(error.message);
     }
   };
+  //REQUEST ALL DESTINY BY COMPANY
+  const requestAllDestiny = async () => {
+    setLoading(true)
+    try {
+      const res = await axios.get(`${API_PORT()}/api/findAllDestiny/${company.id}`)
+      if(!res.data.error){
+        
+        saveDestiny(res.data.data)
+        setLoading(false)
+      }
+    } catch (error) {
+      setLoading(false)
+      alert(error.message)
+    }
+  }
   //VISITS
   const requestVisits = async () => {
     if (company) {
@@ -89,7 +105,6 @@ const HomeAdminScreen = ({
         let res = await axios.get(
           `${API_PORT()}/api/findTodayVisits/${company.id}`
         );
-        console.log("VISITS FROM API-----", res.data);
         if (!res.data.error && res.data.data.length > 0) {
           saveTodayVisits(res.data.data);
           setVisits(res.data.data);
@@ -189,12 +204,16 @@ const HomeAdminScreen = ({
   useEffect(() => {
     privilege === "Admin" ? requestZones() : requestZone();
   }, []);
+
   useEffect(() => {
     if (privilege === "Admin") {
       requestEmployee();
     } else {
       requestEmployeeByZone();
     }
+  }, []);
+  useEffect(() => {
+    privilege === "Admin" && requestAllDestiny();
   }, []);
 
   useEffect(() => {
@@ -267,6 +286,12 @@ const mapDispatchToProps = (dispatch) => ({
       type: "setZones",
       payload: zones,
     });
+  },
+  saveDestiny(destinys){
+    dispatch({
+      type: 'SAVE_DESTINY',
+      payload: destinys
+    })
   },
   saveTodayVisits(todayVisits) {
     dispatch({

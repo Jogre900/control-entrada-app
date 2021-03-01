@@ -10,9 +10,9 @@ import Modal from "react-native-modal";
 import { Success, Danger } from "../assets/colors";
 
 const { width, height } = Dimensions.get("screen");
-export const StatusModal = ({ status, onClose }) => {
+export const StatusModal = ({ status, onClose, message }) => {
   console.log(status);
-  //const [visible, setVisible] = useState(status)
+  const [succes, setSuccess] = useState(false)
   return (
     <Modal
       isVisible={status}
@@ -54,7 +54,7 @@ export const StatusModal = ({ status, onClose }) => {
               fontWeight: "600",
             }}
           >
-            Registro Exitoso!
+            {message}
           </Text>
         </View>
       }

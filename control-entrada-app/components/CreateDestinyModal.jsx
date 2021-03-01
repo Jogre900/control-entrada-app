@@ -29,7 +29,7 @@ export const CreateDestinyModal = ({ status, create, onClose, zoneId }) => {
     }
 
     setLoading(true);
-    create(false);
+    // create(false);
     try {
       let res = await axios.post(`${API_PORT()}/api/createDestiny/${zoneId}`, {
         name: destinyName,
@@ -38,12 +38,12 @@ export const CreateDestinyModal = ({ status, create, onClose, zoneId }) => {
         setDestinyName("");
         setCaption("");
         setLoading(false);
-        create(true);
+        create(true, res.data.msg, res.data.data);
         onClose();
       }
     } catch (error) {
       setLoading(false);
-      console.log(error.message);
+      create(false, error.message)
     }
   };
   return (

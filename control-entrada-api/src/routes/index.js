@@ -70,7 +70,8 @@ router.get("/findZone/:zoneId", Controllers.findZone);
 router.delete("/deleteZone", Controllers.deleteZone);
 router.post("/createDestiny/:id", Controllers.createDestiny);
 router.get("/findDestiny/:id", Controllers.findDestinyByZone);
-router.delete("/deleteDestiny/:id", Controllers.deleteDestiny);
+router.get("/findAllDestiny/:id", Controllers.findAllDestiny)
+router.delete("/deleteDestiny", Controllers.deleteDestiny);
 router.post("/createEmployee", Controllers.createEmployee);
 router.get("/findEmployees", Controllers.findEmployees);
 router.post("/createUserZone", Controllers.createUserZone);

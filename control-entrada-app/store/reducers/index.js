@@ -4,6 +4,7 @@ import ApplicationReducer from "./application";
 import EmployeeReducer from "./employee";
 import VisitsReducer from "./visits";
 import ZonesReducer from "./zones";
+import DestinyReducer from './destiny'
 
 export default combineReducers({
   profile: ProfileReducer,
@@ -11,4 +12,5 @@ export default combineReducers({
   application: ApplicationReducer,
   zones: ZonesReducer,
   visits: VisitsReducer,
+  destiny: DestinyReducer
 });

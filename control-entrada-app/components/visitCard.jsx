@@ -59,7 +59,7 @@ export const VisitCard = ({ data, selected }) => {
             >
               {/* <Ionicons name="md-globe" {...iconProps} /> */}
               <Text style={styles.dataText} numberOfLines={1}>
-                {Destino.Zona.zone}
+                {/* {Destino.Zona.zone} */}
               </Text>
             </View>
             

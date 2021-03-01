@@ -1,17 +1,9 @@
 import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  ScrollView,
-  Vibration,
-} from "react-native";
+import { View, TouchableOpacity, ScrollView, Vibration } from "react-native";
 import { Picker } from "@react-native-community/picker";
 import { connect } from "react-redux";
 import { useFocusEffect } from "@react-navigation/native";
 
-import axios from "axios";
-import { API_PORT } from "../../config/index.js";
 import { TopNavigation } from "../../components/TopNavigation.component";
 import { Ionicons } from "@expo/vector-icons";
 import { FloatingBotton } from "../../components/floatingBotton";
@@ -21,16 +13,22 @@ import { Header } from "../../components/header.component";
 import { CreateDestinyModal } from "../../components/CreateDestinyModal";
 import { StatusModal } from "../../components/statusModal";
 import { Spinner } from "../../components/spinner";
+import { PrompModal } from "../../components/prompModal";
 
-const DestinyScreen = ({ navigation, zonesRedux, company, saveDestiny }) => {
-
+const DestinyScreen = ({
+  navigation,
+  zonesRedux,
+  destinos,
+  addDestiny,
+  removeDestiny,
+}) => {
   const [visible, setVisible] = useState(false);
   const [success, setSuccess] = useState(false);
   const [zoneId, setZoneId] = useState(zonesRedux[0].id);
   const [create, setCreate] = useState(false);
   const [destinys, setDestinys] = useState([]);
-  const [notFound, setNotFound] = useState(false);
-
+  const [promp, setPromp] = useState(false);
+  const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [selectItem, setSeletedItem] = useState([]);
 
@@ -48,44 +46,23 @@ const DestinyScreen = ({ navigation, zonesRedux, company, saveDestiny }) => {
     );
   };
 
-  const requestZone = async () => {
-    setLoading(true);
-    setNotFound(false);
-    try {
-      let res = await axios.get(`${API_PORT()}/api/findZones/${companyId}`);
-      if (!res.data.error) {
-        setZones(res.data.data);
-        setZoneId(res.data.data[0].id);
-        setLoading(false);
-      }
-    } catch (error) {
-      console.log("error: ", error.message);
-    }
-  };
-  const requestDestiny = async () => {
-    setLoading(true);
-    setDestinys([]);
-    setNotFound(false);
-    setSeletedItem([]);
-    try {
-      let res = await axios.get(`${API_PORT()}/api/findDestiny/${zoneId}`);
-      if (res.data.data.length >= 1) {
-        setDestinys(res.data.data);
-        setNotFound(false);
-        setLoading(false);
-      } else {
-        setLoading(false);
-        setNotFound(true);
-        setDestinys([]);
-      }
-    } catch (error) {
-      setLoading(false);
-      console.log("error: ", error);
-    }
-  };
   //CHEKC CREATE
-  const checkCreate = (status) => {
-    setCreate(status), status ? setSuccess(true) : null;
+  const checkCreate = (status, message, data) => {
+    setMessage(message);
+    setSuccess(true);
+    addDestiny(data);
+    setDestinys((prevValue) => prevValue.concat(data));
+  };
+  //CHECK DELETE
+  const checkDeleted = (status, message) => {
+    setMessage(message), setSuccess(true);
+    if (status) {
+      removeDestiny(selectItem);
+      setDestinys((prevValue) =>
+        prevValue.filter((elem) => !selectItem.includes(elem.id))
+      );
+    }
+    clearList();
   };
 
   const onLong = (id) => {
@@ -103,15 +80,13 @@ const DestinyScreen = ({ navigation, zonesRedux, company, saveDestiny }) => {
   const selectAll = () => {
     let array = [];
     destinys.map(({ id }) => array.push(id));
-    console.log(array);
     setSeletedItem(array);
   };
-  // useEffect(() => {
-  //   requestZone();
-  // }, []);
   useEffect(() => {
-    requestDestiny();
-  }, [zoneId, create]);
+    let filterDestiny = [];
+    filterDestiny = destinos.filter((elem) => elem.zoneId === zoneId);
+    setDestinys(filterDestiny);
+  }, [zoneId]);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -126,7 +101,7 @@ const DestinyScreen = ({ navigation, zonesRedux, company, saveDestiny }) => {
         <Header
           value={selectItem.length}
           clearAction={clearList}
-          //deleteAction={() => deleteZones(selectItem)}
+          deleteAction={() => setPromp(true)}
           selectAction={selectAll}
         />
       ) : (
@@ -169,11 +144,11 @@ const DestinyScreen = ({ navigation, zonesRedux, company, saveDestiny }) => {
                   />
                 </TouchableOpacity>
               ))}
-            {notFound && (
+            {/* {notFound && (
               <View>
                 <Text>No hay Destinos disponibles</Text>
               </View>
-            )}
+            )} */}
           </View>
         </FormContainer>
       </ScrollView>
@@ -183,17 +158,40 @@ const DestinyScreen = ({ navigation, zonesRedux, company, saveDestiny }) => {
         create={checkCreate}
         onClose={() => setVisible(false)}
       />
-      <StatusModal status={success} onClose={() => setSuccess(false)} />
-      <FloatingBotton icon='ios-add' onPress={() => setVisible(true)} />
+      <PrompModal
+        status={promp}
+        onClose={() => setPromp(false)}
+        deleted={checkDeleted}
+        data={selectItem}
+      />
+      <StatusModal
+        status={success}
+        onClose={() => setSuccess(false)}
+        message={message}
+      />
+      <FloatingBotton icon="ios-add" onPress={() => setVisible(true)} />
     </View>
   );
 };
 
 const mapStateToProps = (state) => ({
   zonesRedux: state.zones.zones,
-  company: state.profile.companySelect,
+  destinos: state.destiny.destinys,
 });
 
-const mapDispatchToProps = (dispatch) => ({});
+const mapDispatchToProps = (dispatch) => ({
+  addDestiny(destiny) {
+    dispatch({
+      type: "ADD_DESTINY",
+      payload: destiny,
+    });
+  },
+  removeDestiny(destiny) {
+    dispatch({
+      type: "REMOVE_DESTINY",
+      payload: destiny,
+    });
+  },
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(DestinyScreen);

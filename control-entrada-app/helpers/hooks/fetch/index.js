@@ -25,6 +25,3 @@ export function useCreateDestiny({destinyName, zoneId}) {
     )
 }
 
-export function name() {
-    return null
-}

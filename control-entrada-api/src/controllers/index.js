@@ -355,50 +355,70 @@ password: "123456,
       data: null,
       token: null
     };
-    const { zonesId } = req.body;
+    const { id } = req.body;
     console.log("body de delete--", req.body);
-    console.log(zonesId);
     try {
-      let userZones = await models.UserZone.findAll({
+      const zones = await models.Zone.findAll({
         where: {
-          ZoneId: zonesId
+          id
         },
-        include: [
-          {
-            model: models.User
-          }
-        ]
-      });
-      let zones = await models.Zone.findAll({
-        where: {
-          id: zonesId
+        include: {
+          model: models.UserZone,
+          as: "encargado_zona"
         }
       });
+      //res.json(zones)
+      if (zones) {
+        let deleted = true;
+        zones.map(({ dataValues }) => {
+          //console.log(dataValues.encargado_zona.length)
+          if (dataValues.encargado_zona.length > 0) {
+            deleted = false
+            return
+          }
+          
+        });
+        console.log("STATUS-----",deleted)
+        if (deleted) {
+          const deleteZones = await models.Zone.destroy({
+            where: {
+              id
+            }
+          })
+          RESPONSE.msg = "Las zonas se pueden borrar";
+          RESPONSE.data = deleteZones;
+          res.json(RESPONSE);
+        }else{
+          RESPONSE.msg = "Las zonas no se pueden borrar";
+          RESPONSE.data = zones;
+          res.json(RESPONSE);
+        }
+      }
+
       let trabajadores = [];
       let trabajadoresId = [];
-      console.log("userZone*-------", userZones);
       //console.log("zone*-------", zones);
-      if (userZones.length > 0) {
-        trabajadores = userZones.map(uz => uz.User);
-        console.log("trabajadores---", trabajadores);
+      // if (userZones.length > 0) {
+      //   trabajadores = userZones.map(uz => uz.User);
+      //   console.log("trabajadores---", trabajadores);
 
-        trabajadores.map(async trabajador => {
-          (trabajador.privilege = "Available"), await u.save();
-        });
-        userZones.map(async uz => await uz.destroy());
-        zones.map(async zone => await zone.destroy());
-        RESPONSE.error = false;
-        RESPONSE.msg = "Registro borrado!";
-        RESPONSE.data = usersToUpdate;
-        res.json(RESPONSE);
-      } else {
-        console.log("zona sin encargados!!!!");
-        zones.map(async zone => await zone.destroy());
-        RESPONSE.error = false;
-        RESPONSE.msg = "Registro borrado!";
-        RESPONSE.data = zones;
-        res.json(RESPONSE);
-      }
+      //   trabajadores.map(async trabajador => {
+      //     (trabajador.privilege = "Available"), await u.save();
+      //   });
+      //   userZones.map(async uz => await uz.destroy());
+      //   zones.map(async zone => await zone.destroy());
+      //   RESPONSE.error = false;
+      //   RESPONSE.msg = "Registro borrado!";
+      //   RESPONSE.data = usersToUpdate;
+      //   res.json(RESPONSE);
+      // } else {
+      //   console.log("zona sin encargados!!!!");
+      //   zones.map(async zone => await zone.destroy());
+      //   RESPONSE.error = false;
+      //   RESPONSE.msg = "Registro borrado!";
+      //   RESPONSE.data = zones;
+      //   res.json(RESPONSE);
+      // }
     } catch (error) {
       RESPONSE.msg = error.message;
       res.json(RESPONSE);
@@ -453,7 +473,7 @@ password: "123456,
       RESPONSE.msg = error.message;
     }
   },
-  deleteDestiny: async function(req, res) {
+  findAllDestiny: async function(req, res) {
     let RESPONSE = {
       error: true,
       msg: "",
@@ -462,19 +482,59 @@ password: "123456,
     };
     const { id } = req.params;
     try {
-      let destiny = await models.Destination.findOne({
+      const zones = await models.Zone.findAll({
+        where: {
+          companyId: id
+        },
+        include: {
+          model: models.Destination,
+          as: "Destinos"
+        }
+      });
+      if (zones) {
+        let zoneIDArray = [];
+        zones.map(({ dataValues }) => {
+          zoneIDArray.push(dataValues.id);
+        });
+        const destinos = await models.Destination.findAll({
+          where: {
+            zoneId: zoneIDArray
+          }
+        });
+        if (destinos) RESPONSE.error = false;
+        RESPONSE.MSG = "Busqueda Exitosa!";
+        RESPONSE.data = destinos;
+        res.json(RESPONSE);
+      }
+    } catch (error) {
+      RESPONSE.msg = error.message;
+      res.json(RESPONSE);
+    }
+  },
+  deleteDestiny: async function(req, res) {
+    let RESPONSE = {
+      error: true,
+      msg: "",
+      data: null,
+      token: null
+    };
+    console.log(req.body);
+
+    const { id } = req.body;
+
+    try {
+      const destiny = await models.Destination.destroy({
         where: {
           id
         }
       });
       if (destiny) {
-        destiny.destroy();
-        (RESPONSE.error = false), (RESPONSE.msg = "Registro borrado!");
+        (RESPONSE.error = false), (RESPONSE.msg = "Borrado Exitoso!");
         RESPONSE.data = destiny;
         res.json(RESPONSE);
       }
     } catch (error) {
-      RESPONSE.msg = error;
+      RESPONSE.msg = error.message;
       res.json(RESPONSE);
     }
   },
