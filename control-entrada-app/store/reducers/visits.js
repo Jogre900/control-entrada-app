@@ -10,6 +10,11 @@ export default (state = initialState, action = {}) => {
         ...state,
         today: state.today.concat(action.payload),
       };
+      case "REMOVE_VISIT":
+        return {
+          ...state,
+          today: state.today.filter(({id}) => !action.payload.includes(id))
+        }
     default:
       return state;
   }

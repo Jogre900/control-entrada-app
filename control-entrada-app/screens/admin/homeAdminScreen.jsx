@@ -249,7 +249,7 @@ const HomeAdminScreen = ({
         {visits.length > 0 ? (
           visits.map((elem, i) => (
             <TouchableOpacity
-              key={i}
+              key={elem.id}
               onPress={
                 selectItem.length > 0
                   ? () => onLong(elem.id)

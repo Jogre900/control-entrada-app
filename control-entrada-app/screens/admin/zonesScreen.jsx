@@ -3,23 +3,17 @@ import {
   View,
   Text,
   TouchableOpacity,
-  Dimensions,
-  FlatList,
   StyleSheet,
-  ActivityIndicator,
-  Alert,
   ScrollView,
   Vibration,
   Animated,
 } from "react-native";
 import { connect } from "react-redux";
-import axios from "axios";
 import { Ionicons } from "@expo/vector-icons";
-
 import { useFocusEffect } from "@react-navigation/native";
 
 //componentes
-import { API_PORT } from "../../config/index.js";
+
 import { TopNavigation } from "../../components/TopNavigation.component.jsx";
 import { Header } from "../../components/header.component";
 import Input from "../../components/input.component.jsx";
@@ -30,6 +24,7 @@ import { ZoneCard } from "../../components/zoneCard";
 import { FloatingBotton } from "../../components/floatingBotton";
 import CreateZoneModal from "../../components/createZoneModal";
 import { StatusModal } from "../../components/statusModal";
+import { PrompModal } from "../../components/prompModal";
 
 const ZonasScreen = ({
   navigation,
@@ -43,6 +38,7 @@ const ZonasScreen = ({
   const [selectItem, setSeletedItem] = useState([]);
   const [visible, setVisible] = useState(false);
   const [create, setCreate] = useState(false);
+  const [message, setMessage] = useState("");
   //const [changeStyle, setChangeStyle] = useState(false);
   const [deleted, setDeleted] = useState(false);
   const [zone, setZone] = useState([]);
@@ -80,45 +76,6 @@ const ZonasScreen = ({
     );
   };
 
-  //ZONE API
-  const requestZone = async () => {
-    try {
-      let res = await axios.get(
-        `${API_PORT()}/api/findZones/${companyRedux.id}`
-      );
-      if (!res.data.error && res.data.data.length > 0) {
-        setZone(res.data.data);
-        await saveZones(res.data.data);
-      } else {
-      }
-    } catch (error) {
-      alert(error.message);
-    }
-  };
-
-  const deleteZones = async (zonesId) => {
-    setDeleted(false);
-    try {
-      let res = await axios({
-        method: "DELETE",
-        url: `${API_PORT()}/api/deleteZone`,
-        data: {
-          zonesId,
-        },
-      });
-      console.log(res.data);
-      if (!res.data.error) {
-        setAvailable(res.data.data);
-        removeZones(zonesId);
-        setSeletedItem([]);
-        alert("Borrado!!");
-        setDeleted(true);
-      }
-    } catch (error) {
-      alert(error.message);
-    }
-  };
-
   const onLong = (id) => {
     if (selectItem.includes(id)) {
       setSeletedItem((value) => value.filter((elem) => elem !== id));
@@ -137,14 +94,18 @@ const ZonasScreen = ({
     console.log(array);
     setSeletedItem(array);
   };
-  // useEffect(() => {
-  //   requestCompany();
-  // }, []);
-  // useEffect(() => {
-  //   requestZone();
-  // }, [deleted]);
-  const checkCreate = (status) => {
+  //CHECK CREATE
+  const checkCreate = (status, message) => {
     setCreate(status);
+    setMessage(message);
+  };
+  //CHECK DELETE
+  const checkDeleted = (status, message) => {
+    setMessage(message), setCreate(true);
+    if (status) {
+      removeZones(selectItem);
+    }
+    clearList();
   };
   useFocusEffect(
     React.useCallback(() => {
@@ -207,8 +168,19 @@ const ZonasScreen = ({
         create={checkCreate}
         onClose={() => setVisible(false)}
       />
-      <StatusModal status={create} onClose={() => setCreate(false)} />
-      <FloatingBotton icon='ios-add' onPress={() => setVisible(true)} />
+      <PrompModal
+        status={promp}
+        onClose={() => setPromp(false)}
+        deleted={checkDeleted}
+        data={selectItem}
+        uri="deleteZone"
+      />
+      <StatusModal
+        status={create}
+        onClose={() => setCreate(false)}
+        message={message}
+      />
+      <FloatingBotton icon="ios-add" onPress={() => setVisible(true)} />
     </View>
   );
 };

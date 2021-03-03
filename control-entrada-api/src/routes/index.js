@@ -86,7 +86,7 @@ router.post(
   uploadImg.array("file"),
   Controllers.createVisits
 );
-router.delete("/deleteVisit/:id", Controllers.deleteVisit);
+router.delete("/visit/:id", Controllers.deleteVisit);
 router.get("/findVisit/:dni", Controllers.findVisit);
 router.get("/findVisitId/:id", Controllers.findVisitId);
 router.put("/updateVisit/:id", middleware.verifyToken, Controllers.updateVisit);

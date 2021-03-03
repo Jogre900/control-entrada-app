@@ -356,7 +356,6 @@ password: "123456,
       token: null
     };
     const { id } = req.body;
-    console.log("body de delete--", req.body);
     try {
       const zones = await models.Zone.findAll({
         where: {
@@ -367,28 +366,24 @@ password: "123456,
           as: "encargado_zona"
         }
       });
-      //res.json(zones)
       if (zones) {
         let deleted = true;
         zones.map(({ dataValues }) => {
-          //console.log(dataValues.encargado_zona.length)
           if (dataValues.encargado_zona.length > 0) {
-            deleted = false
-            return
+            deleted = false;
+            return;
           }
-          
         });
-        console.log("STATUS-----",deleted)
         if (deleted) {
           const deleteZones = await models.Zone.destroy({
             where: {
               id
             }
-          })
+          });
           RESPONSE.msg = "Las zonas se pueden borrar";
           RESPONSE.data = deleteZones;
           res.json(RESPONSE);
-        }else{
+        } else {
           RESPONSE.msg = "Las zonas no se pueden borrar";
           RESPONSE.data = zones;
           res.json(RESPONSE);
@@ -1942,21 +1937,25 @@ password: "123456,
     };
 
     try {
-      let visits = await models.Visits.findAll({
-        where: {
-          entryDate: {
-            [Op.between]: [
-              moment()
-                .subtract(7, "days")
-                .calendar(),
-              `${moment().format("YYYY-MM-DD")} 23:59:00`
-            ]
-          }
-        },
+      const visits = await models.Visits.findAll({
+        // where: {
+        //   entryDate: {
+        //     [Op.between]: [
+        //       moment()
+        //         .subtract(7, "days")
+        //         .calendar(),
+        //       `${moment().format("YYYY-MM-DD")} 23:59:00`
+        //     ]
+        //   }
+        // },
         include: [
           { model: models.Citizen, as: "Visitante" },
           { model: models.Picture, as: "Fotos" },
-          { model: models.Destination, attributes: ["id", "name"] },
+          {
+            model: models.Destination,
+            as: "Destino",
+            attributes: ["id", "name"]
+          },
           {
             model: models.UserZone,
             attributes: ["id", "changeTurnDate", "assignationDate"],
@@ -1965,27 +1964,30 @@ password: "123456,
               {
                 model: models.User,
                 as: "User",
-                attributes: [
-                  "id",
-                  "name",
-                  "lastName",
-                  "dni",
-                  "email",
-                  "picture"
-                ]
+                include: {
+                  model: models.Employee,
+                  as: "Employee",
+                  attributes: [
+                    "id",
+                    "name",
+                    "lastName",
+                    "dni",
+                    "picture"
+                  ]
+                }
               }
             ]
           }
         ]
       });
-      console.log("res:-------", visits);
+
       if (visits) {
         (RESPONSE.error = false), (RESPONSE.msg = "Busqueda exitosa!");
         RESPONSE.data = visits;
         res.json(RESPONSE);
       }
     } catch (error) {
-      RESPONSE.msg = error;
+      RESPONSE.msg = error.message;
       res.json(RESPONSE);
     }
   },

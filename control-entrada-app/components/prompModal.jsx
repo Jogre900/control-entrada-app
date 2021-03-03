@@ -10,13 +10,13 @@ import Modal from "react-native-modal";
 import { LoadingModal } from "./loadingModal";
 import { deleteInfo } from "../helpers/";
 
-export const PrompModal = ({ status, deleted, onClose, data }) => {
+export const PrompModal = ({ status, deleted, onClose, data, uri }) => {
   const [loading, setLoading] = useState(false);
 
   //DELETE DESTINY
-  const deleteDestiny = async () => {
+  const deleteHelper = async () => {
     setLoading(true);
-    const { check, msg} = await deleteInfo(`${API_PORT()}/api/deleteDestiny`, data);
+    const { check, msg} = await deleteInfo(`${API_PORT()}/api/${uri}`, data);
     console.log(check, msg)
     setLoading(false);
     deleted(check, msg);
@@ -63,7 +63,7 @@ export const PrompModal = ({ status, deleted, onClose, data }) => {
             }}
             title="Si"
             onPress={() => {
-              deleteDestiny();
+              deleteHelper();
             }}
           />
         </View>
