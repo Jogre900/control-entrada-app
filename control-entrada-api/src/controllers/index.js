@@ -356,6 +356,7 @@ password: "123456,
       token: null
     };
     const { id } = req.body;
+    console.log(req.body)
     try {
       const zones = await models.Zone.findAll({
         where: {
@@ -380,13 +381,15 @@ password: "123456,
               id
             }
           });
-          RESPONSE.msg = "Las zonas se pueden borrar";
+          RESPONSE.error = false
+          RESPONSE.msg = "Borrado Exitoso!";
           RESPONSE.data = deleteZones;
           res.json(RESPONSE);
+
         } else {
-          RESPONSE.msg = "Las zonas no se pueden borrar";
+          RESPONSE.msg = "Error al Borrar, la(s) zona(s) posee personal asignado.";
           RESPONSE.data = zones;
-          res.json(RESPONSE);
+          res.json(RESPONSE)
         }
       }
 
@@ -1582,19 +1585,20 @@ password: "123456,
       data: null,
       token: null
     };
-    const { id } = req.params;
+    const { id } = req.body;
+    console.log("DELETE VISIT----",id)
     try {
-      let visit = await models.Visits.findOne({
+      let visit = await models.Visits.destroy({
         where: {
           id
         }
       });
       if (visit) {
-        visit.destroy();
         RESPONSE.error = false;
         RESPONSE.data = visit;
         RESPONSE.msg = "Registro borrado con exito!";
         res.status(200).json(RESPONSE);
+        console.log(RESPONSE)
       }
     } catch (error) {
       RESPONSE.msg = error.message;

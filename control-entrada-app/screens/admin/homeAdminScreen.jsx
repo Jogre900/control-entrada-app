@@ -1,33 +1,33 @@
 import React, { useState, useEffect } from "react";
 import {
   View,
-  Text,
   StyleSheet,
-  Alert,
   TouchableOpacity,
-  TouchableHighlight,
-  ActivityIndicator,
-  Image,
   ScrollView,
   Vibration,
-  BackHandler
+  BackHandler,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+
 import { useFocusEffect } from "@react-navigation/native";
 //components
 import { TopNavigation } from "../../components/TopNavigation.component";
-import axios from "axios";
-import { API_PORT } from "../../config/index";
-import moment from "moment";
-import { MainColor, ThirdColor } from "../../assets/colors";
-import Modal from "react-native-modal";
+
+import { ThirdColor } from "../../assets/colors";
 import { connect } from "react-redux";
 import { Spinner } from "../../components/spinner";
 import { NotFound } from "../../components/NotFound";
 import { DrawerAction, Notifications } from "../../helpers/ui/ui";
 import { VisitCard } from "../../components/visitCard";
 import { Header } from "../../components/header.component";
-import { LogOutModal } from '../../components/logOutModal'
+import { LogOutModal } from "../../components/logOutModal";
+import {
+  fetchZonyById,
+  fetchAllZones,
+  fetchDestiny,
+  fetchAllEmployee,
+  fetchEmployeeByZone,
+  fetchTodayVisist,
+} from "../../helpers/";
 
 const HomeAdminScreen = ({
   navigation,
@@ -40,121 +40,62 @@ const HomeAdminScreen = ({
   profile,
   privilege,
 }) => {
-  const [visible, setVisible] = useState(false)
+  const [visible, setVisible] = useState(false);
   const [selectItem, setSeletedItem] = useState([]);
-  const [object, setObject] = useState({});
   const [loading, setLoading] = useState(true);
   const [visits, setVisits] = useState([]);
-  const [visitCaption, setVisitCaption] = useState("");
 
   //REQUEST ZONE BY ID
   const requestZone = async () => {
     setLoading(true);
-    try {
-      const res = await axios.get(
-        `${API_PORT()}/api/findZone/${profile.userZone[0].ZoneId}`
-      );
-      //console.log("zone by Id from api---", res.data.data);
-      if (!res.data.error) {
-        setLoading(false);
-        saveZones(res.data.data);
-      }
-    } catch (error) {
-      setLoading(false);
-      console.error(error.message);
-    }
+    const res = await fetchZonyById(profile.userZone[0].ZoneId);
+    setLoading(false);
+    saveZones(res);
   };
   //REQUEST ZONES
   const requestZones = async () => {
     setLoading(true);
-
-    try {
-      let res = await axios.get(`${API_PORT()}/api/findZones/${company.id}`);
-
-      //console.log("ZONES FROM API------", res.data)
-      if (!res.data.error && res.data.data.length > 0) {
-        saveZones(res.data.data);
-        setLoading(false);
-      }
-    } catch (error) {
-      setLoading(false);
-      alert(error.message);
-    }
+    const res = await fetchAllZones(company.id);
+    saveZones(res);
+    setLoading(false);
   };
   //REQUEST ALL DESTINY BY COMPANY
   const requestAllDestiny = async () => {
-    setLoading(true)
-    try {
-      const res = await axios.get(`${API_PORT()}/api/findAllDestiny/${company.id}`)
-      if(!res.data.error){
-        
-        saveDestiny(res.data.data)
-        setLoading(false)
-      }
-    } catch (error) {
-      setLoading(false)
-      alert(error.message)
-    }
-  }
+    setLoading(true);
+
+    const res = await fetchDestiny(company.id);
+
+    saveDestiny(res);
+    setLoading(false);
+  };
   //VISITS
   const requestVisits = async () => {
     if (company) {
-      setVisitCaption("");
       setLoading(true);
-      try {
-        let res = await axios.get(
-          `${API_PORT()}/api/findTodayVisits/${company.id}`
-        );
-        if (!res.data.error && res.data.data.length > 0) {
-          saveTodayVisits(res.data.data);
-          setVisits(res.data.data);
-          setLoading(false);
-        } else {
-          setVisitCaption("No Hay Visitas!");
-        }
-        //setVisits([]);
-        setLoading(false);
-      } catch (error) {
-        setLoading(false);
-        alert(error.message);
-      }
+      const res = await fetchTodayVisist(company.id);
+      saveTodayVisits(res);
+      setVisits(res);
+      setLoading(false);
     }
   };
+
   //REQUEST ALL EMPLOYEE FROM COMPANY
   const requestEmployee = async () => {
     if (company) {
       setLoading(true);
-      try {
-        let res = await axios.get(`${API_PORT()}/api/findUsers/${company.id}`);
-        //console.log("employee from API----",res.data);
-        if (!res.data.error && res.data.data.length > 0) {
-          saveEmployee(res.data.data);
-          setLoading(false);
-        }
-        // saveEmployee([]);
-        setLoading(false);
-      } catch (error) {
-        setLoading(false);
-        console.log("error: ", error.message);
-      }
+      const res = await fetchAllEmployee(company.id);
+      saveEmployee(res);
+      setLoading(false);
     }
   };
   //REQUEST ALL EMPLOYEES FORM ONE ZONE
   const requestEmployeeByZone = async () => {
     setLoading(true);
-    try {
-      const res = await axios.get(
-        `${API_PORT()}/api/findUsersByZone/${profile.userZone[0].ZoneId}`
-      );
-      if (!res.data.error && res.data.data.length > 0) {
-        setLoading(false);
-        saveEmployee(res.data.data);
-      }
-    } catch (error) {
-      setLoading(false);
-      alert(error.message);
-    }
+    const res = await fetchEmployeeByZone(profile.userZone[0].ZoneId);
+    setLoading(false);
+    saveEmployee(res);
   };
+
   //REQUEST AVAILABLE
   const findAvailableUsers = async () => {
     if (company) {
@@ -195,9 +136,9 @@ const HomeAdminScreen = ({
     setSeletedItem(array);
   };
   const backAction = () => {
-    setVisible(true)
-    return true
-  }
+    setVisible(true);
+    return true;
+  };
   // useEffect(() => {
   //   findAvailableUsers();
   // }, []);
@@ -244,7 +185,7 @@ const HomeAdminScreen = ({
           rightControl={Notifications(navigation)}
         />
       )}
-      <ScrollView contentContainerStyle={styles.listEntry}>
+      <ScrollView>
         {loading && <Spinner />}
         {visits.length > 0 ? (
           visits.map((elem, i) => (
@@ -253,7 +194,7 @@ const HomeAdminScreen = ({
               onPress={
                 selectItem.length > 0
                   ? () => onLong(elem.id)
-                  : () => navigation.navigate("detail-view", {id: elem.id})
+                  : () => navigation.navigate("detail-view", { id: elem.id })
               }
               onLongPress={() => onLong(elem.id)}
               delayLongPress={200}
@@ -266,10 +207,14 @@ const HomeAdminScreen = ({
             </TouchableOpacity>
           ))
         ) : (
-          <NotFound message={visitCaption} />
+          <NotFound message="No hay Visitas" />
         )}
       </ScrollView>
-      <LogOutModal status={visible} navigation={navigation} onClose={() => setVisible(false)}/>
+      <LogOutModal
+        status={visible}
+        navigation={navigation}
+        onClose={() => setVisible(false)}
+      />
     </View>
   );
 };
@@ -287,11 +232,11 @@ const mapDispatchToProps = (dispatch) => ({
       payload: zones,
     });
   },
-  saveDestiny(destinys){
+  saveDestiny(destinys) {
     dispatch({
-      type: 'SAVE_DESTINY',
-      payload: destinys
-    })
+      type: "SAVE_DESTINY",
+      payload: destinys,
+    });
   },
   saveTodayVisits(todayVisits) {
     dispatch({

@@ -10,13 +10,13 @@ import Modal from "react-native-modal";
 import { LoadingModal } from "./loadingModal";
 import { deleteInfo } from "../helpers/";
 
-export const PrompModal = ({ status, deleted, onClose, data, uri }) => {
+export const PrompModal = ({ status, deleted, onClose, data, url }) => {
   const [loading, setLoading] = useState(false);
 
   //DELETE DESTINY
   const deleteHelper = async () => {
     setLoading(true);
-    const { check, msg} = await deleteInfo(`${API_PORT()}/api/${uri}`, data);
+    const { check, msg } = await deleteInfo(`${API_PORT()}/api/${url}`, data);
     console.log(check, msg)
     setLoading(false);
     deleted(check, msg);
@@ -38,19 +38,13 @@ export const PrompModal = ({ status, deleted, onClose, data, uri }) => {
         alignItems: "center",
       }}
     >
-      <FormContainer style={{ padding: 20, elevation: 0 }}>
+      <FormContainer style={styles.container}>
         <Text>Seguro que desea borrar?</Text>
         <View
-          style={{
-            flexDirection: "row",
-            backgroundColor: 'green',
-            justifyContent: 'flex-end'
-          }}
+          style={styles.buttonContainer}
         >
           <MainButton
-            style={{ 
-                width: '40%' 
-            }}
+            style={[styles.button, styles.buttonLeft]}
             outline
             title="No"
             onPress={() => {
@@ -58,9 +52,7 @@ export const PrompModal = ({ status, deleted, onClose, data, uri }) => {
             }}
           />
           <MainButton
-            style={{ 
-                width: '40%' 
-            }}
+            style={styles.button}
             title="Si"
             onPress={() => {
               deleteHelper();
@@ -74,5 +66,21 @@ export const PrompModal = ({ status, deleted, onClose, data, uri }) => {
 };
 
 const styles = StyleSheet.create({
-  caption: {},
+  container: {
+    padding: 20,
+    elevation: 0,
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    paddingVertical: 0,
+    justifyContent: "flex-end",
+    marginTop: 20,
+  },
+  button: {
+    width: "40%",
+  },
+  buttonLeft: {
+    marginRight: 10,
+    backgroundColor: "#fff",
+  },
 });

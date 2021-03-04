@@ -39,13 +39,10 @@ const ZonasScreen = ({
   const [visible, setVisible] = useState(false);
   const [create, setCreate] = useState(false);
   const [message, setMessage] = useState("");
-  //const [changeStyle, setChangeStyle] = useState(false);
-  const [deleted, setDeleted] = useState(false);
-  const [zone, setZone] = useState([]);
-  const [zoneName, setZoneName] = useState("");
+  const [promp, setPromp] = useState(false)
+  
 
-  const [saving, setSaving] = useState(false);
-  const [success, setSuccess] = useState(false);
+ 
 
   const [scaleUp, setScaleUp] = useState(new Animated.Value(0));
   // const opacityInterpolate = scaleUp.interpolate({
@@ -120,7 +117,7 @@ const ZonasScreen = ({
         <Header
           value={selectItem.length}
           clearAction={clearList}
-          //deleteAction={() => deleteZones(selectItem)}
+          deleteAction={() => setPromp(true)}
           selectAction={selectAll}
         />
       ) : (
@@ -173,7 +170,7 @@ const ZonasScreen = ({
         onClose={() => setPromp(false)}
         deleted={checkDeleted}
         data={selectItem}
-        uri="deleteZone"
+        url="zone"
       />
       <StatusModal
         status={create}

@@ -64,10 +64,10 @@ router.get("/findUsersByZone/:zoneId", Controllers.findUsersByZone);
 router.get("/findAvailableUsers/:companyId", Controllers.findAvailableUsers);
 router.delete("/deleteUser/:id", Controllers.deleteUser);
 router.get("/findCompany/:id", Controllers.findCompany);
-router.post("/createZone/:id", Controllers.createZone);
 router.get("/findZones/:companyId", Controllers.findZones);
 router.get("/findZone/:zoneId", Controllers.findZone);
-router.delete("/deleteZone", Controllers.deleteZone);
+router.post("/createZone/:id", Controllers.createZone);
+router.delete("/zone", Controllers.deleteZone);
 router.post("/createDestiny/:id", Controllers.createDestiny);
 router.get("/findDestiny/:id", Controllers.findDestinyByZone);
 router.get("/findAllDestiny/:id", Controllers.findAllDestiny)
@@ -86,7 +86,6 @@ router.post(
   uploadImg.array("file"),
   Controllers.createVisits
 );
-router.delete("/visit/:id", Controllers.deleteVisit);
 router.get("/findVisit/:dni", Controllers.findVisit);
 router.get("/findVisitId/:id", Controllers.findVisitId);
 router.put("/updateVisit/:id", middleware.verifyToken, Controllers.updateVisit);
@@ -94,6 +93,7 @@ router.get("/findTodayVisits/:companyId", Controllers.findTodayVisits);
 router.get("/findTodayVisitsByZone/:zoneId", Controllers.findTodayVisitsByZone);
 router.get("/findTodayVisitsByUser/:id", Controllers.findTodayVisitsByUser);
 router.get("/findWeekVisits/", Controllers.findWeekVisits);
+router.delete("/visit/", Controllers.deleteVisit);
 // NUEVAS RUTA AJUSTE SISTEMA
 router.post("/createCompany", Controllers.createCompany);
 router.post(

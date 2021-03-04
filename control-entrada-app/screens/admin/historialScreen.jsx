@@ -5,6 +5,7 @@ import {
   StyleSheet,
   Vibration,
   TouchableOpacity,
+  ScrollView
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -17,6 +18,7 @@ import { PrompModal } from "../../components/prompModal";
 import { connect } from "react-redux";
 
 const HistorialScreen = ({ navigation, visits, removeVisit }) => {
+ 
   const [selectItem, setSeletedItem] = useState([]);
   const [message, setMessage] = useState("")
   const [create, setCreate] = useState(false)
@@ -26,7 +28,7 @@ const HistorialScreen = ({ navigation, visits, removeVisit }) => {
       <View>
         <TouchableOpacity
           onPress={() => {
-            navigation.navigate("home");
+            navigation.navigate("admin-home");
           }}
         >
           <Ionicons name="ios-arrow-back" size={28} color="white" />
@@ -86,7 +88,7 @@ const HistorialScreen = ({ navigation, visits, removeVisit }) => {
             delayLongPress={200}
           >
             <VisitCard
-              data={elem.id}
+              data={elem}
               selected={selectItem.includes(elem.id) ? true : false}
             />
           </TouchableOpacity>
@@ -97,7 +99,7 @@ const HistorialScreen = ({ navigation, visits, removeVisit }) => {
         onClose={() => setPromp(false)}
         deleted={checkDeleted}
         data={selectItem}
-        uri="visit"
+        url="visit"
       />
       <StatusModal
         status={create}

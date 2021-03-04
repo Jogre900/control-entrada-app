@@ -28,7 +28,7 @@ export const StatusModal = ({ status, onClose, message }) => {
       onModalShow={() =>
         setTimeout(() => {
           onClose();
-        }, 1200)
+        }, 2000)
       }
       style={{
         justifyContent: "flex-end",

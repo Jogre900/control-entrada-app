@@ -163,7 +163,7 @@ const DestinyScreen = ({
         onClose={() => setPromp(false)}
         deleted={checkDeleted}
         data={selectItem}
-        uri='deleteDestiny'
+        url='deleteDestiny'
       />
       <StatusModal
         status={success}
