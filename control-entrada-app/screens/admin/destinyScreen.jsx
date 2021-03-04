@@ -31,6 +31,7 @@ const DestinyScreen = ({
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [selectItem, setSeletedItem] = useState([]);
+  const [status, setStatus] = useState(false)
 
   const goBackAction = () => {
     return (
@@ -49,13 +50,16 @@ const DestinyScreen = ({
   //CHEKC CREATE
   const checkCreate = (status, message, data) => {
     setMessage(message);
+    setStatus(status)
     setSuccess(true);
     addDestiny(data);
-    setDestinys((prevValue) => prevValue.concat(data));
+    setDestinys(prevValue => [...prevValue, data]);
   };
   //CHECK DELETE
   const checkDeleted = (status, message) => {
-    setMessage(message), setSuccess(true);
+    setStatus(status)
+    setMessage(message)
+    setSuccess(true)
     if (status) {
       removeDestiny(selectItem);
       setDestinys((prevValue) =>
@@ -159,16 +163,17 @@ const DestinyScreen = ({
         onClose={() => setVisible(false)}
       />
       <PrompModal
-        status={promp}
+        visible={promp}
         onClose={() => setPromp(false)}
         deleted={checkDeleted}
         data={selectItem}
         url='deleteDestiny'
       />
       <StatusModal
-        status={success}
+        visible={success}
         onClose={() => setSuccess(false)}
         message={message}
+        status={status}
       />
       <FloatingBotton icon="ios-add" onPress={() => setVisible(true)} />
     </View>

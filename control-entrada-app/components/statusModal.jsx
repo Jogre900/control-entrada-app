@@ -10,12 +10,12 @@ import Modal from "react-native-modal";
 import { Success, Danger } from "../assets/colors";
 
 const { width, height } = Dimensions.get("screen");
-export const StatusModal = ({ status, onClose, message }) => {
+export const StatusModal = ({ visible, status, onClose, message }) => {
   console.log(status);
   const [succes, setSuccess] = useState(false)
   return (
     <Modal
-      isVisible={status}
+      isVisible={visible}
       //backdropColor={Success}
       hasBackdrop={false}
       useNativeDriver={true}
@@ -37,7 +37,7 @@ export const StatusModal = ({ status, onClose, message }) => {
       children={
         <View
           style={{
-            backgroundColor: "rgba(40, 167, 69, 1)",
+            backgroundColor: status ? Success : Danger, 
 
             borderTopRightRadius: 10,
             borderTopLeftRadius: 10,

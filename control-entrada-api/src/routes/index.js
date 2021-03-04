@@ -55,7 +55,7 @@ router.post(
   uploadImg.single("file"),
   Controllers.createUser
 );
-router.put("/updatePass/:id", Controllers.updatePass);
+
 router.put("/updateAdmin/:companyId", Controllers.updateAdminId);
 router.post("/login", Controllers.login);
 router.get("/findUser/:id", Controllers.findUser)
@@ -78,6 +78,7 @@ router.post("/createUserZone", Controllers.createUserZone);
 //router.post("/uploadImage", uploadImg.single('file'), Controllers.uploadImage)
 router.get("/displayPicture", Controllers.displayPicture);
 router.get("/profile", Controllers.getProfile);
+router.put("/profile/:id", Controllers.updateProfile);
 router.get("/findUserZone/:id", Controllers.findUserZone);
 router.get("/verifyToken", Controllers.verifyExpToken);
 router.post(

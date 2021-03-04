@@ -17,19 +17,18 @@ export const EmployeeCard = ({ data, key, zone }) => {
       />
       <View style={styles.listSubItemBox}>
         <View style={{ alignItems: "center" }}>
-          <View style={styles.privilegeBox}>
-            <Text style={{ color: "#fff", fontSize: 16, lineHeight: 16 }}>
-              {data.User?.UserCompany[0].privilege ||
-                data.UserCompany[0].privilege}
-            </Text>
-          </View>
           <Text style={styles.contentText}>
             {data.User?.Employee.name || data.Employee.name}{" "}
             {data.User?.Employee.lastName || data.Employee.lastName}
           </Text>
+          <View>
+            <Text style={styles.labelText}>
+              {data.User?.UserCompany[0].privilege ||
+                data.UserCompany[0].privilege}
+            </Text>
+          </View>
         </View>
         <View style={{ alignItems: "center" }}>
-          <Text style={styles.labelText}>Asignado:</Text>
           {zone ? (
             <Text style={styles.contentText}>
               {moment(data.assignationDate).format("D MMM YYYY")}
@@ -39,6 +38,7 @@ export const EmployeeCard = ({ data, key, zone }) => {
               {data.userZone[0]?.Zona.zone}
             </Text>
           )}
+          <Text style={styles.labelText}>Asignado:</Text>
         </View>
         {/* <Text>Cambio de Turno: {moment(data.changeTurnDate).format('D MMM YYYY')}</Text> */}
       </View>

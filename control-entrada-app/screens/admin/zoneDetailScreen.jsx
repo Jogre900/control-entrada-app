@@ -47,6 +47,7 @@ const ZoneDetailScreen = ({
 }) => {
   const { zoneId } = route?.params;
   const [selectItem, setSeletedItem] = useState([]);
+  const [loading, setLoading] = useState(false);
   //const [zoneId, setZoneId] = useState(route.params.zoneId)
   //const [params, setParams] = useState()
   const [destiny, setDestiny] = useState();
@@ -116,6 +117,7 @@ const ZoneDetailScreen = ({
   //REQUEST ZONE
   const requestZone = async () => {
     setZoneApi();
+    setLoading(true);
     try {
       const res = await axios.get(
         `${API_PORT()}/api/findZone/${
@@ -123,12 +125,14 @@ const ZoneDetailScreen = ({
         }`
       );
       if (!res.data.error) {
-        console.log(res.data.data.encargado_zona)
+        setLoading(false);
+        console.log(res.data.data.encargado_zona);
         setZoneApi(res.data.data);
         setDestiny(res.data.data.Destinos);
         setZoneEmployee(res.data.data.encargado_zona);
       }
     } catch (error) {
+      setLoading(false);
       console.error(error.message);
     }
   };
@@ -181,41 +185,6 @@ const ZoneDetailScreen = ({
   // ])
   // }
 
-  // const onChange = (event, selectedDate) => {
-  //   const currentDate = selectedDate || changeTurn;
-  //   setShow(Platform.OS === "ios");
-  //   setChangeTurn(currentDate);
-  // };
-  // const showDatepicker = () => {
-  //   showMode("date");
-  // };
-  // const showMode = (currentMode) => {
-  //   setShow(true);
-  //   //setMode(currentMode);
-  // };
-  // const asignPersonal = () => {
-  //   console.log(user)
-  //   try {
-  //     let res = axios.post(`${API_PORT()}/api//createUserZone`, {
-  //       userId: user.id,
-  //       zoneId: zone.id,
-  //       chargeTurn,
-  //     });
-  //     if (!res.data.error) {
-  //       setNewEmployee(user);
-  //       setUser("");
-  //     }
-  //   } catch (error) {
-  //     console.log(error.message);
-  //   }
-  // };
-
-  // useFocusEffect(
-  //   React.useCallback(() => {
-  //     setZoneId(route.params.zoneId)
-  //   }, [])
-  // );
-
   const onLong = (id) => {
     if (selectItem.includes(id)) {
       setSeletedItem((value) => value.filter((elem) => elem !== id));
@@ -257,51 +226,51 @@ const ZoneDetailScreen = ({
           leftControl={goBackAction()}
         />
       )}
-      <ScrollView>
-        <View style={{ flex: 1}}>
-          {zoneApi && (
-            <View style={{ alignItems: "center" }}>
-              <ZoneDetailCard data={zoneApi} />
-              <FormContainer title="Destinos">
-                {zoneApi.Destinos.length > 0 ? (
-                  zoneApi.Destinos.map((elem) => (
-                    <TouchableOpacity
-                      key={elem.id}
-                      onPress={
-                        selectItem.length > 0 ? () => onLong(elem.id) : null
-                      }
-                      onLongPress={() => onLong(elem.id)}
-                      delayLongPress={200}
-                    >
-                      <DestinyCard
-                        data={elem}
-                        selected={selectItem.includes(elem.id) ? true : false}
-                      />
-                    </TouchableOpacity>
-                  ))
-                ) : (
-                  <Text>La zona no posee destinos creados</Text>
-                )}
-              </FormContainer>
-              <FormContainer title="Encargados">
-                {zoneApi.encargado_zona.length > 0 ? (
-                  zoneApi.encargado_zona.map((elem) => (
-                    <EmployeeCard key={elem.id} data={elem} zone={true}/>
-                  ))
-                ) : (
+      {loading && <Spinner message="Cargando..." />}
+      {zoneApi && (
+        <ScrollView>
+          <View style={{ alignItems: "center" }}>
+            <ZoneDetailCard data={zoneApi} />
+            <FormContainer title="Destinos">
+              {zoneApi.Destinos.length > 0 ? (
+                zoneApi.Destinos.map((elem) => (
+                  <TouchableOpacity
+                    key={elem.id}
+                    onPress={
+                      selectItem.length > 0 ? () => onLong(elem.id) : null
+                    }
+                    onLongPress={() => onLong(elem.id)}
+                    delayLongPress={200}
+                  >
+                    <DestinyCard
+                      data={elem}
+                      selected={selectItem.includes(elem.id) ? true : false}
+                    />
+                  </TouchableOpacity>
+                ))
+              ) : (
+                <Text>La zona no posee destinos creados</Text>
+              )}
+            </FormContainer>
+            <FormContainer title="Encargados">
+              {zoneApi.encargado_zona.length > 0 ? (
+                zoneApi.encargado_zona.map((elem) => (
+                  <EmployeeCard key={elem.id} data={elem} zone={true} />
+                ))
+              ) : (
+                <View>
+                  <Text>La zona no posea Personal Asignado</Text>
                   <View>
-                    <Text>La zona no posea Personal Asignado</Text>
-                    <View>
-                      <Text>Agregar Personal</Text>
-                      <MainButton.Icon
-                        onPress={() => setListVisible(!listVisible)}
-                        name={listVisible ? "ios-arrow-up" : "ios-arrow-down"}
-                        size={22}
-                        color="#4f4f4f"
-                      />
-                    </View>
+                    <Text>Agregar Personal</Text>
+                    <MainButton.Icon
+                      onPress={() => setListVisible(!listVisible)}
+                      name={listVisible ? "ios-arrow-up" : "ios-arrow-down"}
+                      size={22}
+                      color="#4f4f4f"
+                    />
+                  </View>
 
-                    {/* { listVisible && (
+                  {/* { listVisible && (
                 <View>
                   {availableU.length > 0 ? (
                     <FlatList
@@ -317,14 +286,12 @@ const ZoneDetailScreen = ({
                   )}
                 </View>
               )} */}
-                  </View>
-                )}
-              </FormContainer>
-            </View>
-          )}
-          {!zoneApi && <Spinner />}
-        </View>
-      </ScrollView>
+                </View>
+              )}
+            </FormContainer>
+          </View>
+        </ScrollView>
+      )}
     </View>
   );
 };

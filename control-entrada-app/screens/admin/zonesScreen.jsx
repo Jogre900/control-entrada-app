@@ -39,10 +39,8 @@ const ZonasScreen = ({
   const [visible, setVisible] = useState(false);
   const [create, setCreate] = useState(false);
   const [message, setMessage] = useState("");
-  const [promp, setPromp] = useState(false)
-  
-
- 
+  const [promp, setPromp] = useState(false);
+  const [status, setStatus] = useState(false);
 
   const [scaleUp, setScaleUp] = useState(new Animated.Value(0));
   // const opacityInterpolate = scaleUp.interpolate({
@@ -88,17 +86,19 @@ const ZonasScreen = ({
   const selectAll = () => {
     let array = [];
     zonesRedux.map(({ id }) => array.push(id));
-    console.log(array);
     setSeletedItem(array);
   };
   //CHECK CREATE
   const checkCreate = (status, message) => {
-    setCreate(status);
+    setStatus(status);
     setMessage(message);
+    setCreate(true);
   };
   //CHECK DELETE
   const checkDeleted = (status, message) => {
-    setMessage(message), setCreate(true);
+    setStatus(status);
+    setMessage(message);
+     setCreate(true);
     if (status) {
       removeZones(selectItem);
     }
@@ -166,16 +166,17 @@ const ZonasScreen = ({
         onClose={() => setVisible(false)}
       />
       <PrompModal
-        status={promp}
+        visible={promp}
         onClose={() => setPromp(false)}
         deleted={checkDeleted}
         data={selectItem}
         url="zone"
       />
       <StatusModal
-        status={create}
+        visible={create}
         onClose={() => setCreate(false)}
         message={message}
+        status={status}
       />
       <FloatingBotton icon="ios-add" onPress={() => setVisible(true)} />
     </View>

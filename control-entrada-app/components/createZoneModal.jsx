@@ -13,6 +13,7 @@ import Input from "./input.component.jsx";
 import { StatusModal } from "./statusModal";
 import { MainColor, ThirdColor, Danger } from "../assets/colors";
 import Modal from "react-native-modal";
+import { createInfo } from "../helpers";
 const timeState = {
   entry: false,
   exit: false,
@@ -101,29 +102,29 @@ const CreateZoneModal = ({
       return;
     }
 
-    try {
-      let res = await axios.post(
-        `${API_PORT()}/api/createZone/${companyRedux[0].id}`,
-        {
-          zone: zoneName,
-          firsEntryTime: moment(entranceTime).format("HH:mm").toString(),
-          firsDepartureTime: moment(departureTime).format("HH:mm").toString(),
-        }
-      );
-      if (!res.data.error) {
-        addZones(res.data.data);
-        setCaption(""),
-          setTimeCaption(""),
-          setZoneName(""),
-          setEntry(false),
-          setExit(false),
-          setLoading(false);
-        create(true);
-        onClose();
-      }
-    } catch (error) {
+    const res = await createInfo(
+      "createZone",
+      companyRedux[0].id,
+      (data = {
+        zone: zoneName,
+        firsEntryTime: moment(entranceTime).format("HH:mm").toString(),
+        firsDepartureTime: moment(departureTime).format("HH:mm").toString(),
+      })
+    );
+    if (!res.error) {
+      addZones(res.data);
+      setCaption(""),
+        setTimeCaption(""),
+        setZoneName(""),
+        setEntry(false),
+        setExit(false),
+        setLoading(false);
+      create(true, res.msg);
+      onClose();
+    } else {
       setLoading(false);
-      alert(error.message);
+      create(false, res.msg);
+      onClose();
     }
   };
   return (

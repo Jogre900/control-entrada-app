@@ -14,25 +14,27 @@ export async function deleteInfo(url, arrayIds) {
       url: url,
       data: { id: arrayIds },
     });
-    if (!res.data.error) {
-      check = true;
-      msg = res.data.msg;
-
-      return { check, msg };
-    } else {
-      msg = res.data.msg;
-      return check, msg;
-    }
+    return res.data
   } catch (error) {
-    msg = error.message;
-    return { check, msg };
+    
+    return error.message;
+  }
+}
+//SAVE INFO TO API
+export async function createInfo(url, params, data) {
+  console.log(url, params, data)
+  try {
+    const res = await axios.post(`${API_PORT()}/api/${url}/${params}`, data);
+    return res.data ;
+  } catch (error) {
+    return error.message;
   }
 }
 //ZONES BY ID
 export async function fetchZonyById(id) {
   try {
     const res = await axios.get(`${API_PORT()}/api/findZone/${id}`);
-    if (!res.data.data) {
+    if (!res.data.error) {
       return res.data.data;
     }
   } catch (error) {

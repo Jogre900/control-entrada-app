@@ -5,17 +5,7 @@ import { Ionicons } from "@expo/vector-icons";
 
 export const ZoneDetailCard = ({ data }) => {
   return (
-    <View
-      style={{
-        flexDirection: "row",
-        backgroundColor: "#fff",
-        width: "90%",
-        borderRadius: 5,
-        marginVertical: 2.5,
-        padding: 8,
-        alignItems: 'center'
-      }}
-    >
+    <View style={styles.container}>
       <Image
         source={require("../assets/images/map.jpg")}
         style={{
@@ -37,7 +27,7 @@ export const ZoneDetailCard = ({ data }) => {
             style={{
               flexDirection: "row",
               alignItems: "center",
-              marginVertical: 1.5
+              marginVertical: 1.5,
             }}
           >
             <Ionicons
@@ -52,7 +42,7 @@ export const ZoneDetailCard = ({ data }) => {
             style={{
               flexDirection: "row",
               alignItems: "center",
-              marginLeft: 10
+              marginLeft: 10,
             }}
           >
             <Ionicons
@@ -67,16 +57,18 @@ export const ZoneDetailCard = ({ data }) => {
         <View
           style={{
             //justifyContent: "flex-start",
-            alignItems: 'flex-start',
-            marginVertical: 1.5
+            alignItems: "flex-start",
+            marginVertical: 1.5,
             //backgroundColor: "blue",
           }}
         >
-          <View style={{
+          <View
+            style={{
               //backgroundColor: 'red',
-              justifyContent: 'center',
-              alignItems: 'center'
-          }}>
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
             <Text style={styles.contentText}>25</Text>
             <Text style={styles.labelText}>Entradas</Text>
           </View>
@@ -87,6 +79,16 @@ export const ZoneDetailCard = ({ data }) => {
 };
 
 const styles = StyleSheet.create({
+  container: {
+    flexDirection: "row",
+    backgroundColor: "#fff",
+    width: "90%",
+    borderRadius: 5,
+    marginVertical: 2.5,
+    padding: 8,
+    alignItems: "center",
+    elevation: 5,
+  },
   contentText: {
     fontSize: 14,
     fontWeight: "600",

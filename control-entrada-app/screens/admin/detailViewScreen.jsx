@@ -265,11 +265,16 @@ export const DetailViewScreen = ({ route, navigation }) => {
             </View>
           </View>
           <FormContainer title="Visita">
-            <View style={{ flexDirection: "row" }}>
+            <View style={{ 
+              //flexDirection: "row" 
+            }}>
               <Text style={styles.labelText}>Entrada: </Text>
               <Text>{visit.descriptionEntry}</Text>
             </View>
-            <View style={{ flexDirection: "row" }}>
+            <View style={{ 
+              //flexDirection: "row",
+              //backgroundColor: 'green' 
+              }}>
               <Text style={styles.labelText}>Salida: </Text>
               <Text>
                 {visit.descriptionDeparture

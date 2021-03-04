@@ -10,21 +10,26 @@ import Modal from "react-native-modal";
 import { LoadingModal } from "./loadingModal";
 import { deleteInfo } from "../helpers/";
 
-export const PrompModal = ({ status, deleted, onClose, data, url }) => {
+export const PrompModal = ({ visible, deleted, onClose, data, url }) => {
   const [loading, setLoading] = useState(false);
 
   //DELETE DESTINY
   const deleteHelper = async () => {
     setLoading(true);
-    const { check, msg } = await deleteInfo(`${API_PORT()}/api/${url}`, data);
-    console.log(check, msg)
-    setLoading(false);
-    deleted(check, msg);
-    onClose();
+    const res = await deleteInfo(`${API_PORT()}/api/${url}`, data);
+    if (!res.error) {
+      setLoading(false);
+      deleted(true, res.msg);
+      onClose();
+    } else {
+      setLoading(false);
+      deleted(false, res.msg);
+      onClose();
+    }
   };
   return (
     <Modal
-      isVisible={status}
+      isVisible={visible}
       backdropColor="black"
       hasBackdrop={true}
       useNativeDriver={true}
@@ -38,11 +43,8 @@ export const PrompModal = ({ status, deleted, onClose, data, url }) => {
         alignItems: "center",
       }}
     >
-      <FormContainer style={styles.container}>
-        <Text>Seguro que desea borrar?</Text>
-        <View
-          style={styles.buttonContainer}
-        >
+      <FormContainer style={styles.container} title="¿Seguro que desea borra?">
+        <View style={styles.buttonContainer}>
           <MainButton
             style={[styles.button, styles.buttonLeft]}
             outline

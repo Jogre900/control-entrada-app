@@ -1208,7 +1208,7 @@ password: "123456,
       res.json(RESPONSE);
     }
   },
-  updatePass: async function(req, res) {
+  updateProfile: async function(req, res) {
     let RESPONSE = {
       error: true,
       msg: "",

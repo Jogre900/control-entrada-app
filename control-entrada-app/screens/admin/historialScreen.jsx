@@ -23,6 +23,7 @@ const HistorialScreen = ({ navigation, visits, removeVisit }) => {
   const [message, setMessage] = useState("")
   const [create, setCreate] = useState(false)
   const [promp, setPromp] = useState(false)
+  const [status, setStatus] = useState(false)
   const goBackAction = () => {
     return (
       <View>
@@ -56,6 +57,7 @@ const HistorialScreen = ({ navigation, visits, removeVisit }) => {
 
    //CHECK DELETE
   const checkDeleted = (status, message) => {
+    setStatus(status)
     setMessage(message), setCreate(true);
     if (status) {
       removeVisit(selectItem);
@@ -95,16 +97,17 @@ const HistorialScreen = ({ navigation, visits, removeVisit }) => {
         ))}
       </ScrollView>
       <PrompModal
-        status={promp}
+        visible={promp}
         onClose={() => setPromp(false)}
         deleted={checkDeleted}
         data={selectItem}
         url="visit"
       />
       <StatusModal
-        status={create}
+        visible={create}
         onClose={() => setCreate(false)}
         message={message}
+        status={status}
       />
     </View>
   );
