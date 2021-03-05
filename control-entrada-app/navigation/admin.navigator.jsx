@@ -35,7 +35,7 @@ import DestinyScreen from "../screens/admin/destinyScreen";
 import SuperDestinyScreen from "../screens/admin/superDestinyScreen";
 import HistorialScreen from "../screens/admin/historialScreen";
 import PerfilScreen from "../screens/admin/perfilScreen";
-import { EditProfileScreen } from "../screens/admin/editProfileScreen";
+import EditProfileScreen from "../screens/admin/editProfileScreen";
 import EmployeeScreen from "../screens/admin/employeeScreen";
 import CreateEmployeScreen from "../screens/admin/createEmployeeScreen";
 import { EmployeeDetailScreen } from "../screens/admin/employeeDetailScreen";

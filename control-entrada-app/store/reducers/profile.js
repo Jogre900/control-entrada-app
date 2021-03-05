@@ -45,7 +45,7 @@ export default (state = initialState, action = {}) => {
         //company: companySelect(state),
       };
     case "SAVE_PROFILE":
-    console.log("SAVE PROF----",action.payload)  
+    
     return {
         ...state,
         profile: action.payload,

@@ -78,7 +78,7 @@ router.post("/createUserZone", Controllers.createUserZone);
 //router.post("/uploadImage", uploadImg.single('file'), Controllers.uploadImage)
 router.get("/displayPicture", Controllers.displayPicture);
 router.get("/profile", Controllers.getProfile);
-router.put("/profile/:id", Controllers.updateProfile);
+router.post("/profile/:id", uploadImg.single("file"), Controllers.updateProfile);
 router.get("/findUserZone/:id", Controllers.findUserZone);
 router.get("/verifyToken", Controllers.verifyExpToken);
 router.post(

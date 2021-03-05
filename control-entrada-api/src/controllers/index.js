@@ -356,7 +356,7 @@ password: "123456,
       token: null
     };
     const { id } = req.body;
-    console.log(req.body)
+    console.log(req.body);
     try {
       const zones = await models.Zone.findAll({
         where: {
@@ -381,15 +381,15 @@ password: "123456,
               id
             }
           });
-          RESPONSE.error = false
+          RESPONSE.error = false;
           RESPONSE.msg = "Borrado Exitoso!";
           RESPONSE.data = deleteZones;
           res.json(RESPONSE);
-
         } else {
-          RESPONSE.msg = "Error al Borrar, la(s) zona(s) posee personal asignado.";
+          RESPONSE.msg =
+            "Error al Borrar, la(s) zona(s) posee personal asignado.";
           RESPONSE.data = zones;
-          res.json(RESPONSE)
+          res.json(RESPONSE);
         }
       }
 
@@ -1215,21 +1215,51 @@ password: "123456,
       data: null,
       token: null
     };
+    console.log("UPDATE PROFILE----");
     const { id } = req.params;
-    const { password } = req.body;
+    const { email, password, nic, number, numberTwo } = req.body;
+
     console.log(req.params);
     console.log(req.body);
+    console.log(req.file);
     try {
       let user = await models.User.findOne({
-        where: {
-          id
-        }
+        include: [
+          {
+            model: models.Employee,
+            as: "Employee",
+            where: {
+              id
+            }
+          },
+          {
+            model: models.UserCompany,
+            as: "UserCompany",
+            include: {
+              model: models.Company,
+              as: "Company"
+            }
+          }
+        ]
       });
-      let hash = await bcrypt.hash(password, 10);
-      user.password = hash;
+      if (user) {
+       
+        let hash = await bcrypt.hash(password, 10);
+        user.password = hash;
+        user.email = email.toLowerCase();
+        user.Employee.picture = req.file.filename;
+        if (typeof nic !== undefined) {
+          user.UserCompany[0].Company.nic = nic;
+          user.UserCompany[0].Company.phoneNumber = number;
+          user.UserCompany[0].Company.phoneNumberOther = numberTwo;
+        }
+      }
+
       await user.save();
+      await user.Employee.save()
+      await user.UserCompany[0].Company.save()
       RESPONSE.error = false;
-      RESPONSE.msg = "Cambio de contraseña exitoso!";
+      RESPONSE.msg = "Datos actualizados!";
       RESPONSE.data = user;
       res.status(200).json(RESPONSE);
     } catch (error) {
@@ -1305,7 +1335,7 @@ password: "123456,
       data: null,
       token: null
     };
-    console.log("FIND USER ENDPOINT", req.params);
+
     const { id } = req.params;
     try {
       let user = await models.User.findOne({
@@ -1335,7 +1365,6 @@ password: "123456,
       RESPONSE.msg = "Busqueda Exitosa";
       RESPONSE.data = user;
       res.json(RESPONSE);
-      console.log(user);
     } catch (error) {
       RESPONSE.msg = error.message;
       res.json(RESPONSE);
@@ -1348,7 +1377,7 @@ password: "123456,
       data: null,
       token: null
     };
-    console.log("FIND USERS ENDPOINT", req.params);
+
     const { companyId } = req.params;
     try {
       let user = await models.User.findAll({
@@ -1377,7 +1406,6 @@ password: "123456,
       (RESPONSE.error = false), (RESPONSE.msg = "Busqueda Exitosa");
       RESPONSE.data = user;
       res.status(200).json(RESPONSE);
-      console.log(user);
     } catch (error) {
       RESPONSE.msg = error.message;
       res.json(RESPONSE);
@@ -1586,7 +1614,7 @@ password: "123456,
       token: null
     };
     const { id } = req.body;
-    console.log("DELETE VISIT----",id)
+    console.log("DELETE VISIT----", id);
     try {
       let visit = await models.Visits.destroy({
         where: {
@@ -1598,7 +1626,7 @@ password: "123456,
         RESPONSE.data = visit;
         RESPONSE.msg = "Registro borrado con exito!";
         res.status(200).json(RESPONSE);
-        console.log(RESPONSE)
+        console.log(RESPONSE);
       }
     } catch (error) {
       RESPONSE.msg = error.message;
@@ -1792,7 +1820,7 @@ password: "123456,
           }
         ]
       });
-      console.log("res:-------", visits);
+
       if (visits) {
         (RESPONSE.error = false), (RESPONSE.msg = "Busqueda exitosa!");
         RESPONSE.data = visits;
@@ -1971,13 +1999,7 @@ password: "123456,
                 include: {
                   model: models.Employee,
                   as: "Employee",
-                  attributes: [
-                    "id",
-                    "name",
-                    "lastName",
-                    "dni",
-                    "picture"
-                  ]
+                  attributes: ["id", "name", "lastName", "dni", "picture"]
                 }
               }
             ]

@@ -164,7 +164,6 @@ const EntryScreen = ({ navigation, profile, saveVisit }) => {
     );
   };
   const profilePic = (uri, fileName, fileType, caption, changeImg) => {
-    console.log("URI FROM MODAL-----", uri);
     setImgUrl(uri),
       setFileName(fileName),
       setFileType(fileType),

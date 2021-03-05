@@ -132,6 +132,7 @@ const PerfilScreen = ({ navigation, profile, company }) => {
                 size={120}
                 uri={`${API_PORT()}/public/imgs/${profile.picture}`}
               />
+              
             </View>
             <Text style={styles.profileName}>
               {profile.name} {profile.lastName}
@@ -167,8 +168,8 @@ const PerfilScreen = ({ navigation, profile, company }) => {
             </View>
           </View>
           <FormContainer title="Negocio">
-            {company.map((elem) => (
-              <>
+            {company.map((elem, index) => (
+              <View key={index}>
                 <Text style={styles.contentText}>{elem.companyName}</Text>
                 <Text style={styles.contentText}>{elem.businessName}</Text>
                 {/* <Text style={styles.contentText}>{elem.logo}</Text> */}
@@ -177,7 +178,7 @@ const PerfilScreen = ({ navigation, profile, company }) => {
                 <Text style={styles.contentText}>{elem.nic}</Text>
                 <Text style={styles.contentText}>{elem.phoneNumber}</Text>
                 <Text style={styles.contentText}>{elem.phoneNumberOther}</Text>
-              </>
+              </View>
             ))}
             <Avatar.Picture size={60} uri={`${API_PORT()}/public/imgs/${company[0].logo}`}/>
           </FormContainer>

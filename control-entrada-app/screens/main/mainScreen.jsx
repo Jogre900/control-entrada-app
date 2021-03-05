@@ -94,7 +94,7 @@ const MainScreen = ({ navigation, saveProfile, saveCompany, saveLogin, route, is
             Authorization: `bearer ${token}`,
           },
         });
-        console.log(res.data)
+        
         //console.log("RES DE TOKEN----", res.data.data.UserCompany[0].privilege)
         if (res.data.error && res.data.msg === "jwt expired") {
           setModalVisible(false);

@@ -7,8 +7,7 @@ import Constants from "expo-constants";
 import { MainColor } from "../assets/colors";
 
 const DrawerHeader = ({ navigation, profile, login, company }) => {
-  console.log("company----", company);
-  console.log("login----", login);
+  
   return (
     <View style={styles.drawerHeadercontainer}>
       <Avatar.Picture
