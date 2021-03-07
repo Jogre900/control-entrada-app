@@ -1,11 +1,5 @@
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  ScrollView,
-  StyleSheet,
-} from "react-native";
+import { View, TouchableOpacity, ScrollView, StyleSheet } from "react-native";
 import { FormContainer } from "../../components/formContainer";
 import Input from "../../components/input.component";
 import Avatar from "../../components/avatar.component";
@@ -14,20 +8,16 @@ import { MainButton } from "../../components/mainButton.component";
 import { API_PORT } from "../../config/index";
 import { TopNavigation } from "../../components/TopNavigation.component";
 import { StatusModal } from "../../components/statusModal";
-import { LoadingModal } from '../../components/loadingModal'
+import { LoadingModal } from "../../components/loadingModal";
 import { Ionicons } from "@expo/vector-icons";
 import { MainColor } from "../../assets/colors";
-import { storage } from "../../helpers/asyncStorage";
+import { updateProfile } from "../../helpers/index";
 import { connect } from "react-redux";
-import axios from "axios";
 
-let formInitialValues = {
+let initialValues = {
   email: undefined,
   pass: undefined,
   repPass: undefined,
-  nic: undefined,
-  number: undefined,
-  numberTwo: undefined,
 };
 let fileInitialValues = {
   uri: undefined,
@@ -39,98 +29,47 @@ let statusModalValues = {
   message: "",
   status: null,
 };
-const EditProfileScreen = ({
+const EditWatchProfileScreen = ({
   profile,
-  privilege,
   saveLogin,
   saveProfile,
-  saveCompany,
   navigation,
 }) => {
-  const [formValues, setFormValues] = useState(formInitialValues);
+  const [formValues, setFormValues] = useState(initialValues);
   const [fileValues, setFileValues] = useState(fileInitialValues);
   const [modalProps, setModalProps] = useState(statusModalValues);
-  const [visible, setVisible] = useState(false)
-  const [loading, setLoading] = useState(false)
+  const [visible, setVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [type, setType] = useState("");
 
   const profilePic = (uri, fileName, fileType, caption, changeImg) => {
     setFileValues((values) => ({ ...values, uri, fileName, fileType }));
   };
 
-  const updateProfile = async () => {
-    setLoading(true)
-    const { email, pass, repPass, nic, number, numberTwo } = formValues;
-    const { uri, fileName, fileType } = fileValues;
-
+  const updateWatchProfile = async () => {
+    setLoading(true);
+    const { pass, repPass } = formValues;
     if (pass !== repPass) {
       alert("las contraseña deben ser iguales");
       return;
     }
-    let data = new FormData();
-
-    data.append("email", email);
-    data.append("password", repPass);
-    data.append("nic", nic);
-    data.append("number", number);
-    data.append("numberTwo", numberTwo);
-    data.append("file", { uri, name: fileName, type: fileType });
     try {
-      const res = await axios.post(
-        `${API_PORT()}/api/profile/${profile.id}`,
-        data,
-        {
-          headers: {
-            "content-type": "multipart/form-data",
-          },
-        }
+      const { slogin, sprofile, res } = await updateProfile(
+        formValues,
+        fileValues,
+        profile.id
       );
-      if (!res.data.error) {
-        let slogin = {
-          token: res.data.token,
-          userId: res.data.data.id,
-          privilege: res.data.data.UserCompany[0].privilege,
-        };
-        let sprofile = {
-          id: res.data.data.Employee.id,
-          dni: res.data.data.Employee.dni,
-          name: res.data.data.Employee.name,
-          lastName: res.data.data.Employee.lastName,
-          picture: res.data.data.Employee.picture,
-          email: res.data.data.email,
-        };
-        let company = [];
-        res.data.data.UserCompany.map((comp) => {
-          company.push({
-            id: comp.Company.id,
-            companyName: comp.Company.companyName,
-            businessName: comp.Company.businessName,
-            nic: comp.Company.nic,
-            city: comp.Company.city,
-            address: comp.Company.address,
-            phoneNumber: comp.Company.phoneNumber,
-            phoneNumberOther: comp.Company.phoneNumberOther,
-            logo: comp.Company.logo,
-            privilege: comp.privilege,
-            select: true,
-          });
-        });
-        await storage.removeItem("userToken");
-        await storage.setItem("userToken", res.data.token);
-        saveLogin(slogin);
-        saveProfile(sprofile);
-        saveCompany(company);
-        setLoading(false)
-        setModalProps((values) => ({
-          ...values,
-          visible: true,
-          message: res.data.msg,
-          status: true,
-        }));
-      }
-      
+      saveLogin(slogin);
+      saveProfile(sprofile);
+      setLoading(false);
+      setModalProps((values) => ({
+        ...values,
+        visible: true,
+        message: res.data.msg,
+        status: true,
+      }));
     } catch (error) {
-      setLoading(false)
+      setLoading(false);
       setModalProps((values) => ({
         ...values,
         visible: true,
@@ -142,7 +81,7 @@ const EditProfileScreen = ({
   const goBackAction = () => {
     return (
       <View>
-        <TouchableOpacity onPress={() => navigation.navigate("Profile")}>
+        <TouchableOpacity onPress={() => navigation.navigate("watch-profile")}>
           <Ionicons name="ios-arrow-back" size={28} color="white" />
         </TouchableOpacity>
       </View>
@@ -200,31 +139,6 @@ const EditProfileScreen = ({
               }}
             />
           </FormContainer>
-          {privilege === "Admin" && (
-            <FormContainer title="Empresa">
-              <Input
-                title="Rif"
-                icon="ios-card"
-                onChangeText={(nic) =>
-                  setFormValues((value) => ({ ...value, nic }))
-                }
-              />
-              <Input
-                title="Telefono"
-                icon="md-call"
-                onChangeText={(number) =>
-                  setFormValues((value) => ({ ...value, number }))
-                }
-              />
-              <Input
-                title="Telefono Adicional"
-                icon="md-call"
-                onChangeText={(numberTwo) =>
-                  setFormValues((value) => ({ ...value, numberTwo }))
-                }
-              />
-            </FormContainer>
-          )}
           <CameraModal
             status={visible}
             onClose={() => setVisible(false)}
@@ -238,7 +152,7 @@ const EditProfileScreen = ({
           >
             <MainButton
               title="Guardar"
-              onPress={updateProfile}
+              onPress={updateWatchProfile}
               style={styles.buttonMargin}
             />
           </View>
@@ -250,14 +164,13 @@ const EditProfileScreen = ({
         }
         {...modalProps}
       />
-      <LoadingModal visible={loading} message='Guardando...'/>
+      <LoadingModal visible={loading} message="Guardando..." />
     </View>
   );
 };
 
 const mapStateToProps = (state) => ({
   profile: state.profile.profile,
-  privilege: state.profile.login.privilege,
   company: state.profile.company,
 });
 
@@ -282,7 +195,10 @@ const mapDispatchToProps = (dispatch) => ({
   },
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(EditProfileScreen);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(EditWatchProfileScreen);
 
 const styles = StyleSheet.create({
   profileTopContainer: {

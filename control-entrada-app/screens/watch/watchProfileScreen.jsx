@@ -61,35 +61,7 @@ const WatchProfileScreen = ({ navigation, profile }) => {
   //     }
   //   }
   // };
-  //UPDATE PASSWORD
-  const updatePassword = async () => {
-    console.log(passChange, repeatPass);
-    setLoading(true);
-    if (passChange === "") {
-      setPassCaption("Debe Llenar los campos");
-      return;
-    } else if (passChange != repeatPass) {
-      setPassCaption("Las contraseñas no son iguales");
-    } else {
-      try {
-        let res = await axios.put(
-          `${API_PORT()}/api/updatePass/${profile.id}`,
-          {
-            password: repeatPass,
-          }
-        );
-        if (!res.data.error) {
-          console.log(res.data);
-          setLoading(false);
-          setPassChange("");
-          setRepeatPass("");
-          alert("Cambio de contraseña exitoso");
-        }
-      } catch (error) {
-        console.log(error.message);
-      }
-    }
-  };
+  
   const goBackAction = () => {
     return (
       <View>
@@ -99,6 +71,19 @@ const WatchProfileScreen = ({ navigation, profile }) => {
           }}
         >
           <Ionicons name="ios-arrow-back" size={28} color="white" />
+        </TouchableOpacity>
+      </View>
+    );
+  };
+  const editAction = () => {
+    return (
+      <View>
+        <TouchableOpacity
+          onPress={() => {
+            navigation.navigate("EDIT_PROFILE");
+          }}
+        >
+          <Ionicons name="md-create" size={28} color="white" />
         </TouchableOpacity>
       </View>
     );
@@ -150,11 +135,11 @@ const WatchProfileScreen = ({ navigation, profile }) => {
 
   return (
     <View style={styles.container}>
-      <TopNavigation title="Mi Perfil" leftControl={goBackAction()} />
+      <TopNavigation title="Mi Perfil" leftControl={goBackAction()} rightControl={editAction()}/>
       {profile ? (
         <ScrollView contentContainerStyle={{ alignItems: "center" }}>
           <View style={styles.profileContainer}>
-            <View style={{ marginBottom: 10, alignSelf: "center" }}>
+            <View style={styles.pictureContainer}>
               <Avatar.Picture
                 size={120}
                 uri={`${API_PORT()}/public/imgs/${profile.picture}`}
@@ -346,6 +331,16 @@ const styles = StyleSheet.create({
     marginVertical: 5,
     padding: 8,
     elevation: 5,
+  },
+  pictureContainer: {
+    alignSelf: "center",
+    position: "relative",
+    marginVertical: 10,
+    borderColor: "#fff",
+    borderWidth: 2,
+    elevation: 10,
+    borderRadius: 120 / 2,
+    backgroundColor: "#fff",
   },
   profileDataContainer: {
     flexDirection: "row",

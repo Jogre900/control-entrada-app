@@ -103,3 +103,75 @@ export async function fetchEmployeeByZone(zoneId) {
     return error.message;
   }
 }
+
+//UPDATE PROFILE
+export async function updateProfile(formData, fileData, profileId){
+  const { email, pass, repPass, nic, number, numberTwo } = formData;
+    const { uri, fileName, fileType } = fileData;
+    let data = new FormData();
+
+    data.append("email", email);
+    data.append("password", repPass);
+    data.append("nic", nic);
+    data.append("number", number);
+    data.append("numberTwo", numberTwo);
+    data.append("file", { uri, name: fileName, type: fileType });
+    try {
+    const res = await axios.post(
+      `${API_PORT()}/api/profile/${profileId}`,
+      data,
+      {
+        headers: {
+          "content-type": "multipart/form-data",
+        },
+      }
+    );
+    if (!res.data.error) {
+      let slogin = {
+        token: res.data.token,
+        userId: res.data.data.id,
+        privilege: res.data.data.UserCompany[0].privilege,
+      };
+      let sprofile = {
+        id: res.data.data.Employee.id,
+        dni: res.data.data.Employee.dni,
+        name: res.data.data.Employee.name,
+        lastName: res.data.data.Employee.lastName,
+        picture: res.data.data.Employee.picture,
+        email: res.data.data.email,
+      };
+      let company = [];
+      res.data.data.UserCompany.map((comp) => {
+        company.push({
+          id: comp.Company.id,
+          companyName: comp.Company.companyName,
+          businessName: comp.Company.businessName,
+          nic: comp.Company.nic,
+          city: comp.Company.city,
+          address: comp.Company.address,
+          phoneNumber: comp.Company.phoneNumber,
+          phoneNumberOther: comp.Company.phoneNumberOther,
+          logo: comp.Company.logo,
+          privilege: comp.privilege,
+          select: true,
+        });
+      });
+      await storage.removeItem("userToken");
+      await storage.setItem("userToken", res.data.token);
+      return { slogin,  sprofile, company, res }
+    }
+  } catch (error) {
+    return {error}
+  }
+}
+
+export async function recoverPass(email, data){
+  console.log("email y data:----", email, data)
+  try {
+    const res = await axios.post(`${API_PORT()}/api/password/${email}`, {password: data})
+    console.log("RES-DATA---------",res)
+      return res.data
+  } catch (error) {
+    return error    
+  }
+}

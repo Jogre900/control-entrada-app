@@ -48,7 +48,7 @@ export default (state = initialState, action = {}) => {
     
     return {
         ...state,
-        profile: action.payload,
+        profile: action.payload
         //companySelect: companySelect(state),
       };
     case "SAVE_COMPANY":

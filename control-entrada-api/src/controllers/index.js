@@ -1111,7 +1111,7 @@ password: "123456,
           }
         ]
       });
-      console.log("USER LOGIN----", user);
+      //console.log("USER LOGIN----", user);
       if (user) {
         if (bcrypt.compareSync(password, user.password)) {
           let token = jwt.sign(user.dataValues, SECRETKEY, { expiresIn: "1d" });
@@ -1232,6 +1232,7 @@ password: "123456,
               id
             }
           },
+          { model: models.UserZone, as: "userZone" },
           {
             model: models.UserCompany,
             as: "UserCompany",
@@ -1243,28 +1244,80 @@ password: "123456,
         ]
       });
       if (user) {
-       
-        let hash = await bcrypt.hash(password, 10);
-        user.password = hash;
-        user.email = email.toLowerCase();
-        user.Employee.picture = req.file.filename;
-        if (typeof nic !== undefined) {
-          user.UserCompany[0].Company.nic = nic;
-          user.UserCompany[0].Company.phoneNumber = number;
-          user.UserCompany[0].Company.phoneNumberOther = numberTwo;
+        if (password) {
+          let hash = await bcrypt.hash(password, 10);
+          user.password = hash;
+          await user.save();
         }
-      }
+        if (email) {
+          user.email = email.toLowerCase();
+          await user.save();
+        }
 
-      await user.save();
-      await user.Employee.save()
-      await user.UserCompany[0].Company.save()
-      RESPONSE.error = false;
-      RESPONSE.msg = "Datos actualizados!";
-      RESPONSE.data = user;
-      res.status(200).json(RESPONSE);
+        if (req.file) {
+          user.Employee.picture = req.file.filename;
+          await user.Employee.save();
+        }
+
+        if (nic) {
+          user.UserCompany[0].Company.nic = nic;
+          await user.UserCompany[0].Company.save();
+        }
+        if (number) {
+          user.UserCompany[0].Company.phoneNumber = number;
+          await user.UserCompany[0].Company.save();
+        }
+        if (numberTwo) {
+          user.UserCompany[0].Company.phoneNumberOther = numberTwo;
+          await user.UserCompany[0].Company.save();
+        }
+        // await user.save();
+        // await user.Employee.save();
+        // await user.UserCompany[0].Company.save();
+        const token = jwt.sign(user.dataValues, SECRETKEY, { expiresIn: "1d" });
+        RESPONSE.error = false;
+        RESPONSE.msg = "Datos actualizados!";
+        RESPONSE.data = user;
+        RESPONSE.token = token;
+        res.status(200).json(RESPONSE);
+      }
     } catch (error) {
       RESPONSE.msg = error;
       res.json(RESPONSE);
+    }
+  },
+  recoverPassword: async function(req, res) {
+    let RESPONSE = {
+      error: true,
+      msg: "",
+      data: null,
+      token: null
+    };
+    const { email } = req.params;
+    const { password } = req.body;
+    try {
+      const user = await models.User.findOne({
+        where: {
+          email: email.toLowerCase()
+        }
+      });
+
+      if (user) {
+        const newPassword = await bcrypt.hash(password, 10);
+        user.password = newPassword;
+        await user.save();
+
+        RESPONSE.error = false;
+        RESPONSE.msg = "Cambio de clave Exitoso!";
+        RESPONSE.data = user;
+        res.status(200).json(RESPONSE);
+      } else {
+        RESPONSE.msg = "Usuario no registrado";
+        res.json(RESPONSE);
+      }
+    } catch (error) {
+      RESPONSE.msg = error;
+      res.status(500).json(RESPONSE);
     }
   },
   findUserZone: async function(req, res) {

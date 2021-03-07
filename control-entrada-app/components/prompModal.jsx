@@ -13,10 +13,10 @@ import { deleteInfo } from "../helpers/";
 export const PrompModal = ({ visible, deleted, onClose, data, url }) => {
   const [loading, setLoading] = useState(false);
 
-  //DELETE DESTINY
   const deleteHelper = async () => {
     setLoading(true);
     const res = await deleteInfo(`${API_PORT()}/api/${url}`, data);
+    console.log("res de BORRAR---", res)
     if (!res.error) {
       setLoading(false);
       deleted(true, res.msg);

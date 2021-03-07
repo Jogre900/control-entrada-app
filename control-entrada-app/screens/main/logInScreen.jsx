@@ -1,5 +1,11 @@
 import React, { useState, useRef } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ActivityIndicator,
+} from "react-native";
 import { connect } from "react-redux";
 import axios from "axios";
 import { API_PORT } from "../../config/index";
@@ -11,19 +17,40 @@ import Modal from "react-native-modal";
 import AsyncStorage from "@react-native-community/async-storage";
 import { Ionicons } from "@expo/vector-icons";
 import { MainColor, Danger } from "../../assets/colors";
-import { LoadingModal } from '../../components/loadingModal'
+import { LoadingModal } from "../../components/loadingModal";
 import { BackAction } from "../../helpers/ui/ui";
-import { FormContainer } from '../../components/formContainer'
+import { FormContainer } from "../../components/formContainer";
+import { RecoverPassModal } from "../../components/recoverPassModal"
+import { StatusModal } from '../../components/statusModal'
 import { storage } from "../../helpers/asyncStorage";
 
-const LoginScreen = ({ navigation, saveProfile, saveCompany, saveLogin, savePrivilege }) => {
+let passModalValues = {
+  visible: false,
+  onClose: false,
+};
+
+let statusModalValues = {
+  visible: false,
+  message: "",
+  status: null,
+};
+
+const LoginScreen = ({
+  navigation,
+  saveProfile,
+  saveCompany,
+  saveLogin,
+  savePrivilege,
+}) => {
   const [email, setEmail] = useState("");
   const [pass, setPass] = useState("");
-  const [modalVisible, setModalVisible] = useState(false);
   const [caption, setCaption] = useState("");
   const [emailCaption, setEmailCaption] = useState("");
   const [passCaption, setPassCaption] = useState("");
-  
+  const [modalVisible, setModalVisible] = useState(false);
+  const [passModal, setPassModal] = useState(passModalValues);
+  const [modalProps, setModalProps] = useState(statusModalValues);
+
   const nextInput = useRef(null);
   const goBackAction = () => {
     return (
@@ -42,7 +69,7 @@ const LoginScreen = ({ navigation, saveProfile, saveCompany, saveLogin, savePriv
   //SIGN IN
   const signIn = async () => {
     setModalVisible(true);
-    setCaption('')
+    setCaption("");
     if (!email || !pass) {
       setModalVisible(false);
       setCaption("Debe llenar los campos");
@@ -74,8 +101,8 @@ const LoginScreen = ({ navigation, saveProfile, saveCompany, saveLogin, savePriv
           picture: res.data.data.Employee.picture,
           email: res.data.data.email,
         };
-        if(res.data.data.userZone.length > 0){
-          sprofile.userZone = res.data.data.userZone
+        if (res.data.data.userZone.length > 0) {
+          sprofile.userZone = res.data.data.userZone;
         }
         let company = [];
         res.data.data.UserCompany.map((comp) => {
@@ -121,13 +148,13 @@ const LoginScreen = ({ navigation, saveProfile, saveCompany, saveLogin, savePriv
           default:
             break;
         }
-      }else{
+      } else {
         setModalVisible(false);
-        setCaption(res.data.msg);  
+        setCaption(res.data.msg);
       }
     } catch (error) {
       setModalVisible(false);
-      setCaption(error.message)
+      setCaption(error.message);
       // console.log(error.response.data.msg);
       // switch (error.response.status) {
       //   case 401:
@@ -144,11 +171,22 @@ const LoginScreen = ({ navigation, saveProfile, saveCompany, saveLogin, savePriv
       // }
     }
   };
+
+  //CHECKPASS
+  const checkNewPass = (status, message) => {
+    if(status){
+      setModalProps((values) => ({...values, visible: true, status:false, message}))
+    }else{
+      setModalProps((values) => ({...values, visible: true, status:true, message}))
+      setPassModal((values) => ({ ...values, visible: false }))
+    }
+  }
+
   return (
     <View style={{ flex: 1 }}>
       <TopNavigation title="Inicio" leftControl={goBackAction()} />
       <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-        <FormContainer title='Ingrese Datos de Usuario'>
+        <FormContainer title="Ingrese Datos de Usuario">
           <View style={styles.subContainer}>
             <Input
               //styleInput={{ color: "white" }}
@@ -160,7 +198,7 @@ const LoginScreen = ({ navigation, saveProfile, saveCompany, saveLogin, savePriv
               caption={emailCaption}
               onSubmitEditing={() => nextInput.current.focus()}
               onChangeText={(correo) => {
-                setEmail(correo), setEmailCaption(""), setCaption('');
+                setEmail(correo), setEmailCaption(""), setCaption("");
               }}
               value={email}
             />
@@ -174,39 +212,58 @@ const LoginScreen = ({ navigation, saveProfile, saveCompany, saveLogin, savePriv
               caption={passCaption}
               onSubmitEditing={() => signIn()}
               onChangeText={(pass) => {
-                setPass(pass), setPassCaption(""), setCaption('');
+                setPass(pass), setPassCaption(""), setCaption("");
               }}
               value={pass}
               ref={nextInput}
             />
           </View>
           <View>
-            <Text style={{
-              color: Danger,
-              fontSize: 15,
-              fontWeight: '600'
-
-              }}>{caption}</Text>
+            <Text
+              style={{
+                color: Danger,
+                fontSize: 15,
+                fontWeight: "600",
+              }}
+            >
+              {caption}
+            </Text>
           </View>
 
-          
-            <MainButton
-              style={{marginTop: 20, marginBottom: 5}}
-              title="Iniciar Sesion"
-              onPress={() => {
-                signIn();
-              }}
-            />
-          
+          <MainButton
+            style={{ marginTop: 20, marginBottom: 5 }}
+            title="Iniciar Sesion"
+            onPress={() => {
+              signIn();
+            }}
+          />
+
           <Divider size="small" />
           <View style={styles.forgetcontainer}>
             <Text>Olvidaste tu contraseña?</Text>
-            <TouchableOpacity onPress={() => alert("recuperar contraseña")}>
+            <TouchableOpacity
+              onPress={() =>
+                setPassModal((values) => ({ ...values, visible: true }))
+              }
+            >
               <Text style={{ color: MainColor }}> Recuperar</Text>
             </TouchableOpacity>
           </View>
         </FormContainer>
-        <LoadingModal status={modalVisible} message='Iniciando Sesión..'/>
+        <RecoverPassModal
+          visible={passModal.visible}
+          onClose={() =>
+            setPassModal((values) => ({ ...values, visible: false }))
+          }
+          checkNewPass={checkNewPass}
+        />
+        <LoadingModal status={modalVisible} message="Iniciando Sesión.." />
+        <StatusModal
+        onClose={() =>
+          setModalProps((values) => ({ ...values, visible: false }))
+        }
+        {...modalProps}
+      />
       </View>
     </View>
   );

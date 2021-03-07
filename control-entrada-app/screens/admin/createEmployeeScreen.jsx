@@ -165,7 +165,10 @@ const CreateEmployeScreen = ({
       return;
     }
 
-    if (moment(date).format("D MMM YYYY") === moment(changeTurn).format("D MMM YYYY")) {
+    if (
+      moment(date).format("D MMM YYYY") ===
+      moment(changeTurn).format("D MMM YYYY")
+    ) {
       setTimeCaption("La fecha de inicio y culminacion deben ser distintas");
       setVisible(false);
       return;
@@ -252,39 +255,21 @@ const CreateEmployeScreen = ({
           }}
         >
           <View style={styles.pickPictureContainer}>
-            <View style={styles.profilePicBox}>
+            <View style={styles.pictureContainer}>
               {image ? (
                 <Avatar.Picture size={120} uri={image} />
               ) : (
-                // <Image
-                //   source={{ uri: image }}
-                //   style={{ width: 150, height: 150 }}
-                // />
-                <TouchableOpacity
-                  onPress={() => {
-                    setCamera(true)
-                  }}
-                >
-                  <Avatar.Icon size={28} name="md-photos" color="#8e8e8e" />
-                </TouchableOpacity>
+                <Avatar.Icon size={32} name="md-photos" color="#8e8e8e" />
               )}
-              {changeImg && (
-                <TouchableOpacity
-                  onPress={() => {
-                    setCamera(true)
-                  }}
-                  style={styles.cameraIcon}
-                >
-                  <Ionicons name="ios-close" size={48} color="#ff7e00" />
-                </TouchableOpacity>
-              )}
-            </View>
-
-            {/* <View style={styles.photoButtonBox}>
-              <TouchableOpacity onPress={() => getImage("camera")}>
-                <Ionicons name="ios-camera" size={28} color={lightColor} />
+              <TouchableOpacity
+                onPress={() => {
+                  setCamera(true);
+                }}
+                style={styles.openCameraButton}
+              >
+                <Ionicons name="ios-camera" size={32} color="#fff" />
               </TouchableOpacity>
-            </View> */}
+            </View>
             <View>
               <Text
                 style={{
@@ -303,10 +288,7 @@ const CreateEmployeScreen = ({
               style={{ borderColor: "black", marginBottom: 10 }}
               styleInput={{ color: "black" }}
               title="Nombre"
-              textColor="black"
               icon="ios-person"
-              //shape="square"
-              //alignText="center"
               returnKeyType="next"
               onChangeText={(nombre) => {
                 setName(nombre), setCaption("");
@@ -318,9 +300,6 @@ const CreateEmployeScreen = ({
               styleInput={{ color: "black" }}
               icon="ios-people"
               title="Apellido"
-              textColor="black"
-              //shape="square"
-              //alignText="center"
               returnKeyType="next"
               onChangeText={(apellido) => {
                 setLastName(apellido), setCaption("");
@@ -332,9 +311,6 @@ const CreateEmployeScreen = ({
               styleInput={{ color: "black" }}
               title="DNI"
               icon="ios-card"
-              textColor="black"
-              //shape="square"
-              //alignText="center"
               returnKeyType="next"
               onChangeText={(dni) => {
                 setDni(dni), setCaption("");
@@ -346,9 +322,6 @@ const CreateEmployeScreen = ({
               styleInput={{ color: "black" }}
               title="Email"
               icon="ios-mail"
-              textColor="black"
-              //shape="flat"
-              //alignText="center"
               returnKeyType="next"
               onChangeText={(email) => {
                 setEmail(email), setCaption("");
@@ -519,22 +492,33 @@ const styles = StyleSheet.create({
     padding: 8,
     elevation: 5,
   },
-  profilePicBox: {
-    alignSelf: "center",
-    width: 120,
+  pictureContainer: {
     height: 120,
+    width: 120,
+    alignSelf: "center",
+    position: "relative",
+    marginVertical: 10,
+    borderColor: "#fff",
+    borderWidth: 2,
+    elevation: 10,
     borderRadius: 120 / 2,
-    backgroundColor: "#e8e8e8",
+    backgroundColor: "#fff",
     justifyContent: "center",
     alignItems: "center",
-    borderStyle: "dotted",
-    borderWidth: 1,
-    marginVertical: 10,
   },
-  cameraIcon: {
+  openCameraButton: {
     position: "absolute",
     bottom: 0,
-    right: 5,
+    right: -15,
+    backgroundColor: MainColor,
+    justifyContent: "center",
+    alignItems: "center",
+    width: 40,
+    height: 40,
+    borderRadius: 40 / 2,
+    borderColor: "#fff",
+    borderWidth: 2,
+    elevation: 10,
   },
 
   photoButtonBox: {

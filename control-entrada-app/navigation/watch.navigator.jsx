@@ -1,11 +1,15 @@
 import React from "react";
-import { createStackNavigator, CardStyleInterpolators, } from "@react-navigation/stack";
+import {
+  createStackNavigator,
+  CardStyleInterpolators,
+} from "@react-navigation/stack";
 
 //screen
 import { HomeScreen } from "../screens/watch/homeScreen";
 import WatchProfileScreen from "../screens/watch/watchProfileScreen.jsx";
 import EntryScreen from "../screens/watch/entryScreen";
 import VisitScreen from "../screens/watch/visitScreen";
+import EditWatchProfileScreen from "../screens/watch/editWatchProfileScreen";
 import { DepartureScreen } from "../screens/watch/departureScreen";
 const Stack = createStackNavigator();
 
@@ -22,6 +26,7 @@ export const WatchNavigator = () => {
       <Stack.Screen name="watch-profile" component={WatchProfileScreen} />
       <Stack.Screen name="entrada" component={EntryScreen} />
       <Stack.Screen name="salida" component={VisitScreen} />
+      <Stack.Screen name="EDIT_PROFILE" component={EditWatchProfileScreen} />
       <Stack.Screen
         options={options}
         name="departure"

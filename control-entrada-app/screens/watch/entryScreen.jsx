@@ -217,9 +217,9 @@ const EntryScreen = ({ navigation, profile, saveVisit }) => {
                   onPress={() => {
                     setCamera(true), setType("profile");
                   }}
-                  style={styles.cameraIcon}
+                  style={styles.openCameraButton}
                 >
-                  <Ionicons name="ios-close" size={48} color="#ff7e00" />
+                  <Ionicons name="ios-camera" size={48} color="#fff" />
                 </TouchableOpacity>
               )}
             </View>
@@ -404,16 +404,19 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginVertical: 10,
   },
-  profilePic: {
-    width: "100%",
-    height: "100%",
-    borderRadius: 100,
-    //resizeMode: 'contain'
-  },
-  cameraIcon: {
+  openCameraButton: {
     position: "absolute",
     bottom: 0,
-    right: 5,
+    right: -15,
+    backgroundColor: MainColor,
+    justifyContent: "center",
+    alignItems: "center",
+    width: 40,
+    height: 40,
+    borderRadius: 40 / 2,
+    borderColor: "#fff",
+    borderWidth: 2,
+    elevation: 10,
   },
   captionText: {
     fontSize: 15,

@@ -121,7 +121,7 @@ export const DepartureScreen = (props) => {
       {visit && !loading && (
         <ScrollView contentContainerStyle={{ alignItems: "center" }}>
           <View style={styles.profileContainer}>
-            <View style={{ marginBottom: 10, alignSelf: "center" }}>
+            <View style={styles.pictureContainer}>
               <Avatar.Picture
                 size={120}
                 uri={`${API_PORT()}/public/imgs/${visit.Visitante.picture}`}
@@ -247,6 +247,16 @@ const styles = StyleSheet.create({
     marginVertical: 15,
     paddingVertical: 5,
     paddingHorizontal: 10,
+  },
+  pictureContainer: {
+    alignSelf: "center",
+    position: "relative",
+    marginVertical: 10,
+    borderColor: "#fff",
+    borderWidth: 2,
+    elevation: 10,
+    borderRadius: 120 / 2,
+    backgroundColor: "#fff",
   },
   dateContainer: {
     backgroundColor: "#fff",

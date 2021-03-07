@@ -3,7 +3,6 @@ import {
   View,
   Text,
   StyleSheet,
-  TouchableHighlight,
   Image,
   ImageBackground,
   Dimensions,
@@ -21,6 +20,7 @@ import { ProfileComponent } from "../../components/profile.component";
 import { Spinner } from "../../components/spinner";
 import { FormContainer } from "../../components/formContainer";
 import Avatar from "../../components/avatar.component";
+import { MainColor } from '../../assets/colors'
 
 const { width } = Dimensions.get("window");
 const cover = require("../../assets/images/background.jpg");
@@ -109,13 +109,13 @@ export const DetailViewScreen = ({ route, navigation }) => {
   const goBackAction = () => {
     return (
       <View>
-        <TouchableHighlight
+        <TouchableOpacity
           onPress={() => {
             navigation.goBack();
           }}
         >
           <Ionicons name="ios-arrow-back" size={28} color="white" />
-        </TouchableHighlight>
+        </TouchableOpacity>
       </View>
     );
   };
@@ -213,6 +213,24 @@ export const DetailViewScreen = ({ route, navigation }) => {
   //   );
   // };
 
+
+  const checkStatusEntry = () => {
+    if(visit.departureDate < visit.UserZone.Zona.firsDepartureTime){
+      return 'md-create'
+      // if(visit.departureDate <= visit.UserZone.Zona.firsDepartureTime){
+      //   return 'md-create'
+      //   }else {
+      //     return 'ios-card'
+       // }
+    }else if(visit.departureDate === visit.entryDate){
+      // if(visit.departureDate <= visit.UserZone.Zona.firsDepartureTime){
+      //   return 'md-create'
+      //   }else {
+      //     return 'ios-card'
+      //   }
+      return 'ios-card'
+    }
+  }
   useEffect(() => {
     requestVisitById();
   }, [route.params]);
@@ -223,11 +241,18 @@ export const DetailViewScreen = ({ route, navigation }) => {
       {visit ? (
         <ScrollView contentContainerStyle={{ alignItems: "center" }}>
           <View style={styles.profileContainer}>
-            <View style={{ marginBottom: 10, alignSelf: "center" }}>
+            <View style={styles.pictureContainer}>
               <Avatar.Picture
                 size={120}
                 uri={`${API_PORT()}/public/imgs/${visit.Visitante.picture}`}
               />
+              <TouchableOpacity style={styles.openCameraButton}>
+                <Avatar.Icon
+                  name={checkStatusEntry()}
+                  size={32}
+                  color="#fff"
+                />
+              </TouchableOpacity>
             </View>
             <Text style={styles.nameText}>
               {visit.Visitante.name} {visit.Visitante.lastName}
@@ -265,16 +290,24 @@ export const DetailViewScreen = ({ route, navigation }) => {
             </View>
           </View>
           <FormContainer title="Visita">
-            <View style={{ 
-              //flexDirection: "row" 
-            }}>
+            <View
+              style={
+                {
+                  //flexDirection: "row"
+                }
+              }
+            >
               <Text style={styles.labelText}>Entrada: </Text>
               <Text>{visit.descriptionEntry}</Text>
             </View>
-            <View style={{ 
-              //flexDirection: "row",
-              //backgroundColor: 'green' 
-              }}>
+            <View
+              style={
+                {
+                  //flexDirection: "row",
+                  //backgroundColor: 'green'
+                }
+              }
+            >
               <Text style={styles.labelText}>Salida: </Text>
               <Text>
                 {visit.descriptionDeparture
@@ -437,6 +470,30 @@ const styles = StyleSheet.create({
     marginVertical: 5,
     padding: 8,
     elevation: 5,
+  },
+  pictureContainer: {
+    alignSelf: "center",
+    position: "relative",
+    marginVertical: 10,
+    borderColor: "#fff",
+    borderWidth: 2,
+    elevation: 10,
+    borderRadius: 120 / 2,
+    backgroundColor: "#fff",
+  },
+  openCameraButton: {
+    position: "absolute",
+    bottom: 0,
+    right: -15,
+    backgroundColor: MainColor,
+    justifyContent: "center",
+    alignItems: "center",
+    width: 40,
+    height: 40,
+    borderRadius: 40 / 2,
+    borderColor: "#fff",
+    borderWidth: 2,
+    elevation: 10,
   },
   profileDataContainer: {
     flexDirection: "row",

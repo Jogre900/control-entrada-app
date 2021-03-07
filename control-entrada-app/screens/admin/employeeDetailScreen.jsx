@@ -64,7 +64,7 @@ export const EmployeeDetailScreen = ({ route, navigation }) => {
       {user && (
         <View style={{alignItems: 'center'}}>
           <View style={styles.profileContainer}>
-            <View style={{ marginBottom: 10, alignSelf: "center" }}>
+            <View style={styles.pictureContainer}>
               <Avatar.Picture
                 size={120}
                 uri={`${API_PORT()}/public/imgs/${user.Employee.picture}`}
@@ -116,6 +116,7 @@ export const EmployeeDetailScreen = ({ route, navigation }) => {
           </View>
           <FormContainer>
             <View>
+            <Text>Email: {user.Employee.email}</Text>
               <Text>DNI: {user.Employee.dni}</Text>
 
               {user.userZone.length > 0 ? (
@@ -168,6 +169,16 @@ const styles = StyleSheet.create({
     marginVertical: 5,
     padding: 8,
     elevation: 5,
+  },
+  pictureContainer: {
+    alignSelf: "center",
+    position: "relative",
+    marginVertical: 10,
+    borderColor: "#fff",
+    borderWidth: 2,
+    elevation: 10,
+    borderRadius: 120 / 2,
+    backgroundColor: "#fff",
   },
   profileDataContainer: {
     flexDirection: "row",

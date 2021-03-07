@@ -40,7 +40,7 @@ export default function App(props) {
         return;
       }
       token = (await Notifications.getDevicePushTokenAsync()).data;
-      console.log("devicetoken: ", token);
+      //console.log("devicetoken: ", token);
     } else {
       alert("Must use physical device for Push Notifications");
     }
