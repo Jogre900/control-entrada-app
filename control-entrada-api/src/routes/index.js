@@ -98,7 +98,7 @@ router.get("/findTodayVisitsByUser/:id", Controllers.findTodayVisitsByUser);
 router.get("/findWeekVisits/", Controllers.findWeekVisits);
 router.delete("/visit/", Controllers.deleteVisit);
 // NUEVAS RUTA AJUSTE SISTEMA
-router.post("/createCompany", Controllers.createCompany);
+router.post("/company", Controllers.createCompany);
 router.post(
   "/createUserSupervisor",
   uploadImg.single("file"),

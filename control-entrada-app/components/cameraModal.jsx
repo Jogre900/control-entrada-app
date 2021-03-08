@@ -46,7 +46,7 @@ export const CameraModal = ({ status, onClose, type, profile, anotherPic }) => {
           profile("", "", "", "", false);
         }
         break;
-      case "visit":
+      default:
         if (!result.cancelled) {
           let filename2 = result.uri.split("/").pop();
           // Infer the type of the image
@@ -55,11 +55,8 @@ export const CameraModal = ({ status, onClose, type, profile, anotherPic }) => {
           anotherPic(result.uri, filename2, type2, "", true);
           onClose();
         } else {
-          anotherPic("","","","", false);
+          anotherPic("", "", "", "", false);
         }
-        break;
-
-      default:
         break;
     }
   };

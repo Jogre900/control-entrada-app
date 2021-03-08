@@ -25,7 +25,7 @@ import { MainButton } from "../../components/mainButton.component";
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Picker } from "@react-native-community/picker";
-import * as ImagePicker from "expo-image-picker";
+
 import moment from "moment";
 
 import { FormContainer } from "../../components/formContainer";
@@ -34,7 +34,7 @@ import { StatusModal } from "../../components/statusModal";
 import Avatar from "../../components/avatar.component";
 import { CameraModal } from "../../components/cameraModal";
 import { connect } from "react-redux";
-const companyId = "9a28095a-9029-40ec-88c2-30e3fac69bc5";
+
 
 const CreateEmployeScreen = ({
   navigation,

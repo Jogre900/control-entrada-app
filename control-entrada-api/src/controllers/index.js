@@ -108,83 +108,84 @@ password: "123456,
     } = req.body;
 
     console.log("algo", req.body);
-    try {
-      let checkEmail = await models.User.findOne({
-        where: {
-          email: email.toLowerCase()
-        }
-      });
+    console.log(req.files)
+    // try {
+    //   let checkEmail = await models.User.findOne({
+    //     where: {
+    //       email: email.toLowerCase()
+    //     }
+    //   });
 
-      if (checkEmail) {
-        RESPONSE.msg = "Este correo ya se encuentra registrado en una empresa";
-        res.json(RESPONSE);
-      }
+    //   if (checkEmail) {
+    //     RESPONSE.msg = "Este correo ya se encuentra registrado en una empresa";
+    //     res.json(RESPONSE);
+    //   }
 
-      let newPass = await bcrypt.hash(password, 10);
-      let inputUser = {
-        email: email.toLowerCase(),
-        password: newPass,
-        Employee: {
-          dni: dni,
-          name: name,
-          lastName: lastName,
-          //picture: picture, ajustar a la carga de archivo
-          status: "Active"
-        }
-      };
+    //   let newPass = await bcrypt.hash(password, 10);
+    //   let inputUser = {
+    //     email: email.toLowerCase(),
+    //     password: newPass,
+    //     Employee: {
+    //       dni: dni,
+    //       name: name,
+    //       lastName: lastName,
+    //       //picture: picture, ajustar a la carga de archivo
+    //       status: "Active"
+    //     }
+    //   };
 
-      let NewUser = await models.User.create(
-        { ...inputUser },
-        {
-          include: {
-            model: models.Employee,
-            as: "Employee"
-          }
-        }
-      );
+    //   let NewUser = await models.User.create(
+    //     { ...inputUser },
+    //     {
+    //       include: {
+    //         model: models.Employee,
+    //         as: "Employee"
+    //       }
+    //     }
+    //   );
 
-      let inputCompany = {
-        companyName,
-        businessName,
-        nic,
-        city,
-        address,
-        phoneNumber
-        //logo, ajustar al subir archivo
-      };
+    //   let inputCompany = {
+    //     companyName,
+    //     businessName,
+    //     nic,
+    //     city,
+    //     address,
+    //     phoneNumber
+    //     //logo, ajustar al subir archivo
+    //   };
 
-      if (phoneNumberOther) {
-        inputCompany.phoneNumberOther = phoneNumberOther;
-      }
+    //   if (phoneNumberOther) {
+    //     inputCompany.phoneNumberOther = phoneNumberOther;
+    //   }
 
-      let newCompany = await models.Company.create({ ...inputCompany });
+    //   let newCompany = await models.Company.create({ ...inputCompany });
 
-      let inputUserCompany = {
-        companyId: newCompany.id,
-        userId: NewUser.id,
-        privilege: "Admin"
-      };
+    //   let inputUserCompany = {
+    //     companyId: newCompany.id,
+    //     userId: NewUser.id,
+    //     privilege: "Admin"
+    //   };
 
-      if (NewUser && newCompany) {
-        let userCompany = await models.UserCompany.create({
-          ...inputUserCompany
-        });
+    //   if (NewUser && newCompany) {
+    //     let userCompany = await models.UserCompany.create({
+    //       ...inputUserCompany
+    //     });
 
-        if (userCompany) {
-          RESPONSE.error = false;
-          RESPONSE.msg = "Registro Exitoso!";
-          RESPONSE.data = NewUser;
-          res.status(200).json(RESPONSE);
-        }
-      }
+    //     if (userCompany) {
+    //       RESPONSE.error = false;
+    //       RESPONSE.msg = "Registro Exitoso!";
+    //       RESPONSE.data = NewUser;
+    //       res.status(200).json(RESPONSE);
+    //     }
+    //   }
 
-      RESPONSE.msg = "error al registrar empresa";
-      res.json(RESPONSE);
-    } catch (error) {
-      console.log(error);
-      RESPONSE.msg = error.message;
-      res.json(RESPONSE);
-    }
+    //   RESPONSE.msg = "error al registrar empresa";
+    //   res.json(RESPONSE);
+    // } catch (error) {
+    //   console.log(error);
+    //   RESPONSE.msg = error.message;
+    //   res.json(RESPONSE);
+    // }
   },
 
   findCompany: async function(req, res) {

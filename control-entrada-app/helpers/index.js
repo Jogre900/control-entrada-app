@@ -14,18 +14,17 @@ export async function deleteInfo(url, arrayIds) {
       url: url,
       data: { id: arrayIds },
     });
-    return res.data
+    return res.data;
   } catch (error) {
-    
     return error.message;
   }
 }
 //SAVE INFO TO API
 export async function createInfo(url, params, data) {
-  console.log(url, params, data)
+  console.log(url, params, data);
   try {
     const res = await axios.post(`${API_PORT()}/api/${url}/${params}`, data);
-    return res.data ;
+    return res.data;
   } catch (error) {
     return error.message;
   }
@@ -105,18 +104,18 @@ export async function fetchEmployeeByZone(zoneId) {
 }
 
 //UPDATE PROFILE
-export async function updateProfile(formData, fileData, profileId){
+export async function updateProfile(formData, fileData, profileId) {
   const { email, pass, repPass, nic, number, numberTwo } = formData;
-    const { uri, fileName, fileType } = fileData;
-    let data = new FormData();
+  const { uri, fileName, fileType } = fileData;
+  let data = new FormData();
 
-    data.append("email", email);
-    data.append("password", repPass);
-    data.append("nic", nic);
-    data.append("number", number);
-    data.append("numberTwo", numberTwo);
-    data.append("file", { uri, name: fileName, type: fileType });
-    try {
+  data.append("email", email);
+  data.append("password", repPass);
+  data.append("nic", nic);
+  data.append("number", number);
+  data.append("numberTwo", numberTwo);
+  data.append("file", { uri, name: fileName, type: fileType });
+  try {
     const res = await axios.post(
       `${API_PORT()}/api/profile/${profileId}`,
       data,
@@ -158,20 +157,64 @@ export async function updateProfile(formData, fileData, profileId){
       });
       await storage.removeItem("userToken");
       await storage.setItem("userToken", res.data.token);
-      return { slogin,  sprofile, company, res }
+      return { slogin, sprofile, company, res };
     }
   } catch (error) {
-    return {error}
+    return { error };
   }
 }
 
-export async function recoverPass(email, data){
-  console.log("email y data:----", email, data)
+//RECOVER PASS
+export async function recoverPass(email, data) {
+  console.log("email y data:----", email, data);
   try {
-    const res = await axios.post(`${API_PORT()}/api/password/${email}`, {password: data})
-    console.log("RES-DATA---------",res)
-      return res.data
+    const res = await axios.post(`${API_PORT()}/api/password/${email}`, {
+      password: data,
+    });
+    console.log("RES-DATA---------", res);
+    return res.data;
   } catch (error) {
-    return error    
+    return error;
+  }
+}
+//CREATE COMPANY AND ADMIN
+export async function createCompany(companyData, profilePic, companyLogo) {
+  const {
+    name,
+    lastName,
+    dni,
+    email,
+    repPass,
+    companyName,
+    businessName,
+    nic,
+    address,
+    city,
+    phoneNumber,
+    phoneNumberOther,
+  } = companyData;
+  const { uri, fileName, fileType } = profilePic;
+  const { uriLogo, fileNameLogo, fileTypeLogo } = companyLogo;
+  let form = new FormData();
+  form.append("name", name);
+  form.append("lastName", lastName);
+  form.append("dni", dni);
+  form.append("email", email);
+  form.append("repPass", repPass);
+  form.append("companyName", companyName);
+  form.append("businessName", businessName);
+  form.append("nic", nic);
+  form.append("address", address);
+  form.append("city", city);
+  form.append("phoneNumber", phoneNumber);
+  form.append("phoneNumberOther", phoneNumberOther);
+  form.append("files", uri, fileName, fileType);
+  form.append("files", uriLogo, fileNameLogo, fileTypeLogo);
+
+  try {
+    const res = await axios.post(`${API_PORT()}/api/company`, data);
+    return res.data;
+  } catch (error) {
+    return error;
   }
 }
