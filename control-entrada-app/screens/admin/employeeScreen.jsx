@@ -125,9 +125,8 @@ const EmployeeScreen = ({ navigation, employee, removeEmployee }) => {
               </TouchableOpacity>
             ))
           ) : (
-            <Spinner />
+            <NotFound />
           )}
-          {employee.length === 0 && <NotFound />}
         </View>
       </ScrollView>
     </View>

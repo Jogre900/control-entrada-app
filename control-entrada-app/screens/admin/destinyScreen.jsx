@@ -31,7 +31,7 @@ const DestinyScreen = ({
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [selectItem, setSeletedItem] = useState([]);
-  const [status, setStatus] = useState(false)
+  const [status, setStatus] = useState(false);
 
   const goBackAction = () => {
     return (
@@ -50,16 +50,16 @@ const DestinyScreen = ({
   //CHEKC CREATE
   const checkCreate = (status, message, data) => {
     setMessage(message);
-    setStatus(status)
+    setStatus(status);
     setSuccess(true);
     addDestiny(data);
-    setDestinys(prevValue => [...prevValue, data]);
+    setDestinys((prevValue) => [...prevValue, data]);
   };
   //CHECK DELETE
   const checkDeleted = (status, message) => {
-    setStatus(status)
-    setMessage(message)
-    setSuccess(true)
+    setStatus(status);
+    setMessage(message);
+    setSuccess(true);
     if (status) {
       removeDestiny(selectItem);
       setDestinys((prevValue) =>
@@ -111,9 +111,9 @@ const DestinyScreen = ({
       ) : (
         <TopNavigation title="Destinos" leftControl={goBackAction()} />
       )}
-      <ScrollView contentContainerStyle={{ alignItems: "center" }}>
-        <FormContainer title="Seleccione la Zona" style={{ marginTop: 10 }}>
-          {zonesRedux && (
+      {zonesRedux.length ? (
+        <ScrollView contentContainerStyle={{ alignItems: "center" }}>
+          <FormContainer title="Seleccione la Zona" style={{ marginTop: 10 }}>
             <Picker
               mode="dropdown"
               selectedValue={zoneId}
@@ -127,35 +127,41 @@ const DestinyScreen = ({
                 );
               })}
             </Picker>
-          )}
-          <View
-            style={{
-              backgroundColor: "white",
-            }}
-          >
-            {loading && <Spinner />}
-            {destinys &&
-              destinys.map((item) => (
-                <TouchableOpacity
-                  key={item.id}
-                  onPress={selectItem.length > 0 ? () => onLong(item.id) : null}
-                  onLongPress={() => onLong(item.id)}
-                  delayLongPress={200}
-                >
-                  <DestinyCard
-                    data={item}
-                    selected={selectItem.includes(item.id) ? true : false}
-                  />
-                </TouchableOpacity>
-              ))}
-            {/* {notFound && (
+            <View
+              style={{
+                backgroundColor: "white",
+              }}
+            >
+              {destinys &&
+                destinys.map((item) => (
+                  <TouchableOpacity
+                    key={item.id}
+                    onPress={
+                      selectItem.length > 0 ? () => onLong(item.id) : null
+                    }
+                    onLongPress={() => onLong(item.id)}
+                    delayLongPress={200}
+                  >
+                    <DestinyCard
+                      data={item}
+                      selected={selectItem.includes(item.id) ? true : false}
+                    />
+                  </TouchableOpacity>
+                ))}
+              {/* {notFound && (
               <View>
                 <Text>No hay Destinos disponibles</Text>
-              </View>
-            )} */}
-          </View>
-        </FormContainer>
-      </ScrollView>
+                </View>
+              )} */}
+            </View>
+          </FormContainer>
+        </ScrollView>
+      ) : 
+      <View>
+        <Text>No hay zonas creadas!</Text>
+      </View>
+      }
+      {loading && <Spinner />}
       <CreateDestinyModal
         zoneId={zoneId}
         status={visible}
@@ -167,7 +173,7 @@ const DestinyScreen = ({
         onClose={() => setPromp(false)}
         deleted={checkDeleted}
         data={selectItem}
-        url='deleteDestiny'
+        url="deleteDestiny"
       />
       <StatusModal
         visible={success}

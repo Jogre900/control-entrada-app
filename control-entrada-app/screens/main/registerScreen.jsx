@@ -5,12 +5,9 @@ import {
   ScrollView,
   StyleSheet,
   TouchableOpacity,
-  ActivityIndicator,
-  TouchableWithoutFeedback,
-  Image,
 } from "react-native";
 import CheckBox from "@react-native-community/checkbox";
-import axios from "axios";
+
 import Input from "../../components/input.component";
 import { TopNavigation } from "../../components/TopNavigation.component";
 import { MainButton } from "../../components/mainButton.component";
@@ -18,13 +15,13 @@ import { MainColor } from "../../assets/colors";
 import * as ImagePicker from "expo-image-picker";
 // import * as ImagePicker from 'react-native-image-picker'
 import { Ionicons } from "@expo/vector-icons";
-import { API_PORT } from "../../config";
-import { storage } from "../../helpers/asyncStorage";
-import Modal from "react-native-modal";
+import { storage } from '../../helpers/asyncStorage'
 import { FormContainer } from "../../components/formContainer";
 import { CameraModal } from "../../components/cameraModal";
 import Avatar from "../../components/avatar.component";
-import { createCompany } from '../../helpers'
+import { createCompany, login } from "../../helpers";
+import { StatusModal } from "../../components/statusModal";
+import { LoadingModal } from '../../components/loadingModal'
 import { connect } from "react-redux";
 
 const inputProps = {
@@ -58,13 +55,32 @@ let compLogoValues = {
   fileTypeLogo: null,
 };
 
-const RegisterScreen = ({ navigation, saveProfile }) => {
-  const [statusPermissions, setStatusPermissions] = useState("");
+let statusModalValues = {
+  visible: false,
+  status: null,
+  message: null,
+};
+let loadingModalValues = {
+  status: false,
+  message: null
+}
+
+const RegisterScreen = ({
+  navigation,
+  saveProfile,
+  saveCompany,
+  saveLogin,
+  savePrivilege,
+}) => {
   const [dataComp, setDataComp] = useState(registerValues);
   const [profilePicData, setProfilePicData] = useState(profilePicValues);
   const [compPicData, setCompPicData] = useState(compLogoValues);
   const [camera, setCamera] = useState(false);
   const [type, setType] = useState("");
+  const [statusModal, setStatusModal] = useState(statusModalValues);
+  const [loadingModal, setLoadingModal] = useState(loadingModalValues)
+
+
 
   const [caption, setCaption] = useState("");
   const [dniCaption, setDniCaption] = useState("");
@@ -104,47 +120,58 @@ const RegisterScreen = ({ navigation, saveProfile }) => {
 
   //CREATE USER
   const createAdmin = async () => {
+    setLoadingModal(({status: true, message: 'Guardando...'}))
     //clearCaption();
-    const res = await createCompany(dataComp, profilePicData, compPicData)
-    console.log(res)
-
-    // if (!name || !lastName || !dni || !email || !pass || !repeatPass) {
-    //   (true);
-    //   setCaption("* Debe Llenar todos los datos");
-    // } else if (!check) {
-    //   (true);
-    //   setCaption("* Debe aceptar los terminos y condiciones");
-    // } else {
-    //   let data = new FormData();
-    //   data.append("name", name);
-    //   data.append("lastName", lastName);
-    //   data.append("dni", dni);
-    //   data.append("email", email);
-    //   //data.append("privilege", "Admin")
-    //   data.append("password", repeatPass);
-    //   data.append("file", { uri: imgUrl, name: fileName, type: fileType });
-    //   try {
-    //     let res = await axios.post(
-    //       `${API_PORT()}/api/createUser/${"Admin"}`,
-    //       data,
-    //       {
-    //         headers: {
-    //           "content-type": "multipart/form-data",
-    //         },
-    //       }
-    //     );
-    //     if (!res.data.error) {
-    //       console.log(res.data);
-    //       storage.setItem(res.data.token);
-    //       saveProfile(res.data.data);
-    //       setModalVisible(false);
-    //       navigation.navigate("admin");
-    //     }
-    //   } catch (error) {
-    //     alert(error.message);
-    //     setModalVisible(false);
-    //   }
-    // }
+    const res = await createCompany(
+      dataComp,
+      profilePicData,
+      compPicData
+    );
+    console.log("RES DE CREAT----",res.data);
+    if (!res.data.error) {
+      
+      
+      setLoadingModal((values => ({...values, status: false})))
+      setStatusModal((values) => ({
+        ...values,
+        visible: true,
+        status: true,
+        message: res.data.msg,
+      }));
+      setLoadingModal(({visible: true, message: 'Iniciando Sesión...'}))
+      const { slogin, sprofile, company, privilege, token } = await login(
+        dataComp.email, dataComp.repPass
+      );
+      console.log("VISTA-----",slogin, sprofile, company, privilege)
+      await storage.setItem('userToken', token)
+      saveLogin(slogin);
+      saveProfile(sprofile);
+      saveCompany(company);
+      savePrivilege(privilege);
+      switch (privilege) {
+        case "Watchman":
+          setLoadingModal((values => ({...values, visible: false})))
+          navigation.navigate("watch", {
+            screen: "watch-home",
+          });
+          break;
+        case "Admin":
+        case "Supervisor":
+          setLoadingModal((values => ({...values, visible: false})))
+          navigation.navigate("admin");
+          break;
+        default:
+          break;
+      }
+    } else {
+      setLoadingModal((values => ({...values, status: false})))
+      setStatusModal((values) => ({
+        ...values,
+        visible: true,
+        status: false,
+        message: res.data.msg,
+      }));
+    }
   };
   useEffect(() => {
     (async () => {
@@ -236,8 +263,8 @@ const RegisterScreen = ({ navigation, saveProfile }) => {
           </FormContainer>
           <FormContainer title="Datos de la empresa">
             <View style={styles.pictureContainer}>
-              {compPicData.uri ? (
-                <Avatar.Picture size={120} uri={compPicData.uri} />
+              {compPicData.uriLogo ? (
+                <Avatar.Picture size={120} uri={compPicData.uriLogo} />
               ) : (
                 <Avatar.Icon size={32} name="md-photos" color="#8e8e8e" />
               )}
@@ -316,7 +343,7 @@ const RegisterScreen = ({ navigation, saveProfile }) => {
             </View>
           </View>
           <View style={{ width: "90%" }}>
-            <MainButton title="Enviar" onPress={() => createUser()} />
+            <MainButton title="Enviar" onPress={createAdmin} />
           </View>
         </View>
       </ScrollView>
@@ -328,14 +355,39 @@ const RegisterScreen = ({ navigation, saveProfile }) => {
         anotherPic={companyPic}
         type={type}
       />
+      <LoadingModal {...loadingModal}/>
+      <StatusModal
+        {...statusModal}
+        onClose={() =>
+          setStatusModal((values) => ({ ...values, visible: false }))
+        }
+      />
     </View>
   );
 };
 const mapDispatchToProps = (dispatch) => ({
   saveProfile(profile) {
     dispatch({
-      type: "setProfile",
+      type: "SAVE_PROFILE",
       payload: profile,
+    });
+  },
+  saveCompany(company) {
+    dispatch({
+      type: "SAVE_COMPANY",
+      payload: company,
+    });
+  },
+  saveLogin(login) {
+    dispatch({
+      type: "SET_LOGIN",
+      payload: login,
+    });
+  },
+  savePrivilege(privilege) {
+    dispatch({
+      type: "SAVE_PRIVILEGE",
+      payload: privilege,
     });
   },
 });

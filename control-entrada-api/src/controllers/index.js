@@ -102,90 +102,85 @@ password: "123456,
       name,
       lastName,
       email,
-      password,
-      logo,
-      picture
+      password
     } = req.body;
 
-    console.log("algo", req.body);
-    console.log(req.files)
-    // try {
-    //   let checkEmail = await models.User.findOne({
-    //     where: {
-    //       email: email.toLowerCase()
-    //     }
-    //   });
+    console.log("CREATE ADMIN", req.body);
+    console.log("FOTO ADMIN", req.files);
+    try {
+      let checkEmail = await models.User.findOne({
+        where: {
+          email: email.toLowerCase()
+        }
+      });
 
-    //   if (checkEmail) {
-    //     RESPONSE.msg = "Este correo ya se encuentra registrado en una empresa";
-    //     res.json(RESPONSE);
-    //   }
+      if (checkEmail) {
+        RESPONSE.msg = "Este correo ya se encuentra registrado en una empresa";
+        res.json(RESPONSE);
+      }
 
-    //   let newPass = await bcrypt.hash(password, 10);
-    //   let inputUser = {
-    //     email: email.toLowerCase(),
-    //     password: newPass,
-    //     Employee: {
-    //       dni: dni,
-    //       name: name,
-    //       lastName: lastName,
-    //       //picture: picture, ajustar a la carga de archivo
-    //       status: "Active"
-    //     }
-    //   };
+      let newPass = await bcrypt.hash(password, 10);
+      let inputUser = {
+        email: email.toLowerCase(),
+        password: newPass,
+        Employee: {
+          dni,
+          name,
+          lastName,
+          picture: req.files[0].filename,
+          status: "Active"
+        }
+      };
 
-    //   let NewUser = await models.User.create(
-    //     { ...inputUser },
-    //     {
-    //       include: {
-    //         model: models.Employee,
-    //         as: "Employee"
-    //       }
-    //     }
-    //   );
+      let NewUser = await models.User.create(
+        { ...inputUser },
+        {
+          include: {
+            model: models.Employee,
+            as: "Employee"
+          }
+        }
+      );
 
-    //   let inputCompany = {
-    //     companyName,
-    //     businessName,
-    //     nic,
-    //     city,
-    //     address,
-    //     phoneNumber
-    //     //logo, ajustar al subir archivo
-    //   };
+      let inputCompany = {
+        companyName,
+        businessName,
+        nic,
+        city,
+        address,
+        phoneNumber,
+        logo: req.files[1].filename
+      };
 
-    //   if (phoneNumberOther) {
-    //     inputCompany.phoneNumberOther = phoneNumberOther;
-    //   }
+      if (phoneNumberOther) {
+        inputCompany.phoneNumberOther = phoneNumberOther;
+      }
 
-    //   let newCompany = await models.Company.create({ ...inputCompany });
+      let newCompany = await models.Company.create({ ...inputCompany });
 
-    //   let inputUserCompany = {
-    //     companyId: newCompany.id,
-    //     userId: NewUser.id,
-    //     privilege: "Admin"
-    //   };
+      let inputUserCompany = {
+        companyId: newCompany.id,
+        userId: NewUser.id,
+        privilege: "Admin"
+      };
 
-    //   if (NewUser && newCompany) {
-    //     let userCompany = await models.UserCompany.create({
-    //       ...inputUserCompany
-    //     });
+      if (NewUser && newCompany) {
+        let userCompany = await models.UserCompany.create({
+          ...inputUserCompany
+        });
 
-    //     if (userCompany) {
-    //       RESPONSE.error = false;
-    //       RESPONSE.msg = "Registro Exitoso!";
-    //       RESPONSE.data = NewUser;
-    //       res.status(200).json(RESPONSE);
-    //     }
-    //   }
-
-    //   RESPONSE.msg = "error al registrar empresa";
-    //   res.json(RESPONSE);
-    // } catch (error) {
-    //   console.log(error);
-    //   RESPONSE.msg = error.message;
-    //   res.json(RESPONSE);
-    // }
+        if (userCompany) {
+          RESPONSE.error = false;
+          RESPONSE.msg = "Registro Exitoso!";
+          RESPONSE.data = NewUser;
+          res.json(RESPONSE);
+        }
+      }
+    } catch (error) {
+      console.log(error);
+      RESPONSE.msg = error.message;
+      res.json(RESPONSE);
+    }
   },
 
   findCompany: async function(req, res) {
@@ -1112,7 +1107,7 @@ password: "123456,
           }
         ]
       });
-      //console.log("USER LOGIN----", user);
+      console.log("USER LOGIN----", user);
       if (user) {
         if (bcrypt.compareSync(password, user.password)) {
           let token = jwt.sign(user.dataValues, SECRETKEY, { expiresIn: "1d" });
@@ -1838,39 +1833,49 @@ password: "123456,
     console.log(req.params);
     try {
       let visits = await models.Visits.findAll({
-        where: {
+        //where: {
           //   entryDate: {
           //     [Op.between]: [
           //       `${moment().format("YYYY-MM-DD")} 00:00:00`,
           //       `${moment().format("YYYY-MM-DD")} 23:59:00`
           //     ]
           // }
-        },
+        //},
         include: [
           { model: models.Citizen, as: "Visitante" },
           { model: models.Picture, as: "Fotos" },
           {
             model: models.Destination,
             as: "Destino",
-            attributes: ["id", "name"],
-            include: {
-              model: models.Zone,
-              as: "Zona",
-              where: { companyId },
-              attributes: ["id", "zone"]
-            }
+            attributes: ["id", "name"]
           },
           {
             model: models.UserZone,
             attributes: ["id", "changeTurnDate", "assignationDate"],
-            include: {
-              model: models.User,
-              as: "User",
-              include: {
-                model: models.Employee,
-                as: "Employee"
+            include: [
+              {
+                model: models.User,
+                as: "User",
+                include: {
+                  model: models.Employee,
+                  as: "Employee"
+                }
+              },
+              {
+                model: models.Zone,
+                as: "Zona",
+                where: {
+                  companyId
+                }
+                // include: {
+                //   model: models.Company,
+                //   as: "companyZone",
+                //   where: {
+                //     id: companyId
+                //   }
+                // }
               }
-            }
+            ]
           }
         ]
       });

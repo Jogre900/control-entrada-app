@@ -1,11 +1,5 @@
 import React, { useState, useRef } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ActivityIndicator,
-} from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { connect } from "react-redux";
 import axios from "axios";
 import { API_PORT } from "../../config/index";
@@ -13,15 +7,14 @@ import { TopNavigation } from "../../components/TopNavigation.component";
 import { Divider } from "../../components/Divider";
 import { MainButton } from "../../components/mainButton.component";
 import Input from "../../components/input.component";
-import Modal from "react-native-modal";
-import AsyncStorage from "@react-native-community/async-storage";
+
 import { Ionicons } from "@expo/vector-icons";
 import { MainColor, Danger } from "../../assets/colors";
 import { LoadingModal } from "../../components/loadingModal";
-import { BackAction } from "../../helpers/ui/ui";
+import { login } from "../../helpers/";
 import { FormContainer } from "../../components/formContainer";
-import { RecoverPassModal } from "../../components/recoverPassModal"
-import { StatusModal } from '../../components/statusModal'
+import { RecoverPassModal } from "../../components/recoverPassModal";
+import { StatusModal } from "../../components/statusModal";
 import { storage } from "../../helpers/asyncStorage";
 
 let passModalValues = {
@@ -83,104 +76,60 @@ const LoginScreen = ({
     //   }
     // }
     try {
-      let res = await axios.post(`${API_PORT()}/api/login`, {
+      const { slogin, sprofile, company, privilege, res } = await login(
         email,
-        password: pass,
-      });
-      if (!res.data.error) {
-        storage.setItem("userToken", res.data.token);
-        let slogin = {
-          token: res.data.token,
-          userId: res.data.data.id,
-        };
-        let sprofile = {
-          id: res.data.data.Employee.id,
-          dni: res.data.data.Employee.dni,
-          name: res.data.data.Employee.name,
-          lastName: res.data.data.Employee.lastName,
-          picture: res.data.data.Employee.picture,
-          email: res.data.data.email,
-        };
-        if (res.data.data.userZone.length > 0) {
-          sprofile.userZone = res.data.data.userZone;
-        }
-        let company = [];
-        res.data.data.UserCompany.map((comp) => {
-          company.push({
-            id: comp.Company.id,
-            companyName: comp.Company.companyName,
-            businessName: comp.Company.businessName,
-            nic: comp.Company.nic,
-            city: comp.Company.city,
-            address: comp.Company.address,
-            phoneNumber: comp.Company.phoneNumber,
-            phoneNumberOther: comp.Company.phoneNumberOther,
-            logo: comp.Company.logo,
-            privilege: comp.privilege,
-            select: true,
-          });
-        });
+        pass
+      );
 
-        saveLogin(slogin);
-        saveProfile(sprofile);
-        saveCompany(company);
-
-        if (res.data.data.UserCompany.length > 1) {
-          setModalVisible(false);
-          navigation.navigate(); //TODO modal para seleccionar company
-          //TODO enviar res.data.data.UserCompany como parametro
-        }
-        let privilege = res.data.data.UserCompany[0].privilege;
-        savePrivilege(privilege);
-
-        switch (privilege) {
-          case "Watchman":
-            setModalVisible(false);
-            navigation.navigate("watch", {
-              screen: "watch-home",
-            });
-            break;
-          case "Admin":
-          case "Supervisor":
-            setModalVisible(false);
-            navigation.navigate("admin");
-            break;
-          default:
-            break;
-        }
-      } else {
+      if (res.data.data.UserCompany.length > 1) {
         setModalVisible(false);
-        setCaption(res.data.msg);
+        navigation.navigate(); //TODO modal para seleccionar company
+        //TODO enviar res.data.data.UserCompany como parametro
+      }
+      saveLogin(slogin);
+      saveProfile(sprofile);
+      saveCompany(company);
+      savePrivilege(privilege);
+      switch (privilege) {
+        case "Watchman":
+          setModalVisible(false);
+          navigation.navigate("watch", {
+            screen: "watch-home",
+          });
+          break;
+        case "Admin":
+        case "Supervisor":
+          setModalVisible(false);
+          navigation.navigate("admin");
+          break;
+        default:
+          break;
       }
     } catch (error) {
       setModalVisible(false);
       setCaption(error.message);
-      // console.log(error.response.data.msg);
-      // switch (error.response.status) {
-      //   case 401:
-      //     setPassCaption(error.response.data.msg);
-      //     setPass("");
-      //     //alert(error.response.data.msg);
-      //     break;
-      //   case 404:
-      //     setEmailCaption(error.response.data.msg);
-      //     //alert(error.response.data.msg);
-      //     break;
-      //   default:
-      //     break;
-      // }
     }
   };
 
   //CHECKPASS
   const checkNewPass = (status, message) => {
-    if(status){
-      setModalProps((values) => ({...values, visible: true, status:false, message}))
-    }else{
-      setModalProps((values) => ({...values, visible: true, status:true, message}))
-      setPassModal((values) => ({ ...values, visible: false }))
+    if (status) {
+      setModalProps((values) => ({
+        ...values,
+        visible: true,
+        status: false,
+        message,
+      }));
+    } else {
+      setModalProps((values) => ({
+        ...values,
+        visible: true,
+        status: true,
+        message,
+      }));
+      setPassModal((values) => ({ ...values, visible: false }));
     }
-  }
+  };
 
   return (
     <View style={{ flex: 1 }}>
@@ -259,11 +208,11 @@ const LoginScreen = ({
         />
         <LoadingModal status={modalVisible} message="Iniciando Sesión.." />
         <StatusModal
-        onClose={() =>
-          setModalProps((values) => ({ ...values, visible: false }))
-        }
-        {...modalProps}
-      />
+          onClose={() =>
+            setModalProps((values) => ({ ...values, visible: false }))
+          }
+          {...modalProps}
+        />
       </View>
     </View>
   );

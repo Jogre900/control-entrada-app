@@ -353,7 +353,7 @@ const CreateEmployeScreen = ({
             </Picker>
             <View>
               <Text>Zonas</Text>
-              {zonesRedux && (
+              {zonesRedux ? (
                 <Picker
                   mode="dropdown"
                   selectedValue={zoneId}
@@ -363,7 +363,7 @@ const CreateEmployeScreen = ({
                     <Picker.Item label={item.zone} value={item.id} key={i} />
                   ))}
                 </Picker>
-              )}
+              ): alert("No hay zonas creadas, no podras registrar personal")}
             </View>
           </FormContainer>
 

@@ -155,6 +155,7 @@ export async function updateProfile(formData, fileData, profileId) {
           select: true,
         });
       });
+
       await storage.removeItem("userToken");
       await storage.setItem("userToken", res.data.token);
       return { slogin, sprofile, company, res };
@@ -195,25 +196,84 @@ export async function createCompany(companyData, profilePic, companyLogo) {
   } = companyData;
   const { uri, fileName, fileType } = profilePic;
   const { uriLogo, fileNameLogo, fileTypeLogo } = companyLogo;
-  let form = new FormData();
-  form.append("name", name);
-  form.append("lastName", lastName);
-  form.append("dni", dni);
-  form.append("email", email);
-  form.append("repPass", repPass);
-  form.append("companyName", companyName);
-  form.append("businessName", businessName);
-  form.append("nic", nic);
-  form.append("address", address);
-  form.append("city", city);
-  form.append("phoneNumber", phoneNumber);
-  form.append("phoneNumberOther", phoneNumberOther);
-  form.append("files", uri, fileName, fileType);
-  form.append("files", uriLogo, fileNameLogo, fileTypeLogo);
+  let data = new FormData();
+  data.append("name", name);
+  data.append("lastName", lastName);
+  data.append("dni", dni);
+  data.append("email", email);
+  data.append("password", repPass);
+  data.append("companyName", companyName);
+  data.append("businessName", businessName);
+  data.append("nic", nic);
+  data.append("address", address);
+  data.append("city", city);
+  data.append("phoneNumber", phoneNumber);
+  data.append("phoneNumberOther", phoneNumberOther);
+  data.append("file", { uri, name: fileName, type: fileType });
+  data.append("file", { uri: uriLogo, name: fileNameLogo, type: fileTypeLogo });
 
   try {
-    const res = await axios.post(`${API_PORT()}/api/company`, data);
-    return res.data;
+    const res = await axios.post(`${API_PORT()}/api/company`, data, {
+      headers: {
+        "content-type": "multipart/form-data",
+      },
+    });
+    return res;
+  } catch (error) {
+    return error.message;
+  }
+}
+
+//LOGIN
+export async function login(email, password) {
+  try {
+    const res = await axios.post(`${API_PORT()}/api/login`, {
+      email,
+      password,
+    });
+    if (!res.data.error) {
+      console.log("RES DE LOGIN---------", res.data);
+
+      let slogin = {
+        token: res.data.token,
+        userId: res.data.data.id,
+      };
+
+      let sprofile = {
+        id: res.data.data.Employee.id,
+        dni: res.data.data.Employee.dni,
+        name: res.data.data.Employee.name,
+        lastName: res.data.data.Employee.lastName,
+        picture: res.data.data.Employee.picture,
+        email: res.data.data.email,
+      };
+      if (res.data.data.userZone.length > 0) {
+        sprofile.userZone = res.data.data.userZone;
+      }
+      let company = [];
+      res.data.data.UserCompany.map((comp) => {
+        company.push({
+          id: comp.Company.id,
+          companyName: comp.Company.companyName,
+          businessName: comp.Company.businessName,
+          nic: comp.Company.nic,
+          city: comp.Company.city,
+          address: comp.Company.address,
+          phoneNumber: comp.Company.phoneNumber,
+          phoneNumberOther: comp.Company.phoneNumberOther,
+          logo: comp.Company.logo,
+          privilege: comp.privilege,
+          select: true,
+        });
+      });
+      let privilege = res.data.data.UserCompany[0].privilege;
+      let token = res.data.token
+      // await storage.removeItem("userToken", res.data.token);
+      // await storage.setItem("userToken", res.data.token);
+      return { slogin, sprofile, company, privilege, token };
+    } else {
+      return res;
+    }
   } catch (error) {
     return error;
   }
