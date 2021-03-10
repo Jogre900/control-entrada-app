@@ -76,34 +76,72 @@ const LoginScreen = ({
     //   }
     // }
     try {
-      const { slogin, sprofile, company, privilege, res } = await login(
-        email,
-        pass
-      );
+      const res = await login(email, pass);
+      if (!res.data.error) {
+        let slogin = {
+          token: res.data.token,
+          userId: res.data.data.id,
+        };
 
-      if (res.data.data.UserCompany.length > 1) {
-        setModalVisible(false);
-        navigation.navigate(); //TODO modal para seleccionar company
-        //TODO enviar res.data.data.UserCompany como parametro
-      }
-      saveLogin(slogin);
-      saveProfile(sprofile);
-      saveCompany(company);
-      savePrivilege(privilege);
-      switch (privilege) {
-        case "Watchman":
-          setModalVisible(false);
-          navigation.navigate("watch", {
-            screen: "watch-home",
+        let sprofile = {
+          id: res.data.data.Employee.id,
+          dni: res.data.data.Employee.dni,
+          name: res.data.data.Employee.name,
+          lastName: res.data.data.Employee.lastName,
+          picture: res.data.data.Employee.picture,
+          email: res.data.data.email,
+        };
+        if (res.data.data.userZone.length > 0) {
+          sprofile.userZone = res.data.data.userZone;
+        }
+        let company = [];
+        res.data.data.UserCompany.map((comp) => {
+          company.push({
+            id: comp.Company.id,
+            companyName: comp.Company.companyName,
+            businessName: comp.Company.businessName,
+            nic: comp.Company.nic,
+            city: comp.Company.city,
+            address: comp.Company.address,
+            phoneNumber: comp.Company.phoneNumber,
+            phoneNumberOther: comp.Company.phoneNumberOther,
+            logo: comp.Company.logo,
+            privilege: comp.privilege,
+            select: true,
           });
-          break;
-        case "Admin":
-        case "Supervisor":
+        });
+        let privilege = res.data.data.UserCompany[0].privilege;
+        let token = res.data.token;
+        // await storage.removeItem("userToken", res.data.token);
+        await storage.setItem("userToken", token);
+
+        if (res.data.data.UserCompany.length > 1) {
           setModalVisible(false);
-          navigation.navigate("admin");
-          break;
-        default:
-          break;
+          navigation.navigate(); //TODO modal para seleccionar company
+          //TODO enviar res.data.data.UserCompany como parametro
+        }
+        saveLogin(slogin);
+        saveProfile(sprofile);
+        saveCompany(company);
+        savePrivilege(privilege);
+        switch (privilege) {
+          case "Watchman":
+            setModalVisible(false);
+            navigation.navigate("watch", {
+              screen: "watch-home",
+            });
+            break;
+          case "Admin":
+          case "Supervisor":
+            setModalVisible(false);
+            navigation.navigate("admin");
+            break;
+          default:
+            break;
+        }
+      }else{
+        setModalVisible(false);
+        setCaption(res.data.msg)
       }
     } catch (error) {
       setModalVisible(false);

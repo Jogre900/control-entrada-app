@@ -231,49 +231,50 @@ export async function login(email, password) {
       email,
       password,
     });
-    if (!res.data.error) {
-      console.log("RES DE LOGIN---------", res.data);
+    // if (!res.data.error) {
+    //   console.log("RES DE LOGIN---------", res.data);
 
-      let slogin = {
-        token: res.data.token,
-        userId: res.data.data.id,
-      };
+    //   let slogin = {
+    //     token: res.data.token,
+    //     userId: res.data.data.id,
+    //   };
 
-      let sprofile = {
-        id: res.data.data.Employee.id,
-        dni: res.data.data.Employee.dni,
-        name: res.data.data.Employee.name,
-        lastName: res.data.data.Employee.lastName,
-        picture: res.data.data.Employee.picture,
-        email: res.data.data.email,
-      };
-      if (res.data.data.userZone.length > 0) {
-        sprofile.userZone = res.data.data.userZone;
-      }
-      let company = [];
-      res.data.data.UserCompany.map((comp) => {
-        company.push({
-          id: comp.Company.id,
-          companyName: comp.Company.companyName,
-          businessName: comp.Company.businessName,
-          nic: comp.Company.nic,
-          city: comp.Company.city,
-          address: comp.Company.address,
-          phoneNumber: comp.Company.phoneNumber,
-          phoneNumberOther: comp.Company.phoneNumberOther,
-          logo: comp.Company.logo,
-          privilege: comp.privilege,
-          select: true,
-        });
-      });
-      let privilege = res.data.data.UserCompany[0].privilege;
-      let token = res.data.token
-      // await storage.removeItem("userToken", res.data.token);
-      // await storage.setItem("userToken", res.data.token);
-      return { slogin, sprofile, company, privilege, token };
-    } else {
-      return res;
-    }
+    //   let sprofile = {
+    //     id: res.data.data.Employee.id,
+    //     dni: res.data.data.Employee.dni,
+    //     name: res.data.data.Employee.name,
+    //     lastName: res.data.data.Employee.lastName,
+    //     picture: res.data.data.Employee.picture,
+    //     email: res.data.data.email,
+    //   };
+    //   if (res.data.data.userZone.length > 0) {
+    //     sprofile.userZone = res.data.data.userZone;
+    //   }
+    //   let company = [];
+    //   res.data.data.UserCompany.map((comp) => {
+    //     company.push({
+    //       id: comp.Company.id,
+    //       companyName: comp.Company.companyName,
+    //       businessName: comp.Company.businessName,
+    //       nic: comp.Company.nic,
+    //       city: comp.Company.city,
+    //       address: comp.Company.address,
+    //       phoneNumber: comp.Company.phoneNumber,
+    //       phoneNumberOther: comp.Company.phoneNumberOther,
+    //       logo: comp.Company.logo,
+    //       privilege: comp.privilege,
+    //       select: true,
+    //     });
+    //   });
+    //   let privilege = res.data.data.UserCompany[0].privilege;
+    //   let token = res.data.token
+    //   // await storage.removeItem("userToken", res.data.token);
+    //   // await storage.setItem("userToken", res.data.token);
+    //   return { slogin, sprofile, company, privilege, token };
+    // } else {
+    //   return res;
+    // }
+    return res
   } catch (error) {
     return error;
   }

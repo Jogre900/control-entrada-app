@@ -185,10 +185,10 @@ const HomeAdminScreen = ({
           rightControl={Notifications(navigation)}
         />
       )}
-      <ScrollView>
-        {loading && <Spinner />}
-        {visits.length > 0 ? (
-          visits.map((elem, i) => (
+      {loading && <Spinner message='Cargando...'/>}
+      {visits.length > 0 && (
+        <ScrollView>
+          {visits.map((elem, i) => (
             <TouchableOpacity
               key={elem.id}
               onPress={
@@ -205,11 +205,9 @@ const HomeAdminScreen = ({
                 selected={selectItem.includes(elem.id) ? true : false}
               />
             </TouchableOpacity>
-          ))
-        ) : (
-          <NotFound message="No hay Visitas" />
-        )}
-      </ScrollView>
+          ))}
+        </ScrollView>
+      )}
       <LogOutModal
         status={visible}
         navigation={navigation}

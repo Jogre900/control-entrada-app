@@ -25,6 +25,13 @@ import { FloatingBotton } from "../../components/floatingBotton";
 import CreateZoneModal from "../../components/createZoneModal";
 import { StatusModal } from "../../components/statusModal";
 import { PrompModal } from "../../components/prompModal";
+import { NotFound } from "../../components/NotFound";
+
+let statusModalValues = {
+  visible: false,
+  message: "",
+  status: null,
+};
 
 const ZonasScreen = ({
   navigation,
@@ -37,6 +44,8 @@ const ZonasScreen = ({
 }) => {
   const [selectItem, setSeletedItem] = useState([]);
   const [visible, setVisible] = useState(false);
+  const [statusModalProps, setStatusModalProps] = useState(statusModalProps);
+
   const [create, setCreate] = useState(false);
   const [message, setMessage] = useState("");
   const [promp, setPromp] = useState(false);
@@ -90,15 +99,21 @@ const ZonasScreen = ({
   };
   //CHECK CREATE
   const checkCreate = (status, message) => {
-    setStatus(status);
-    setMessage(message);
-    setCreate(true);
+    setStatusModalProps((values) => ({
+      ...values,
+      visible: true,
+      status,
+      message,
+    }));
   };
   //CHECK DELETE
   const checkDeleted = (status, message) => {
-    setStatus(status);
-    setMessage(message);
-     setCreate(true);
+    setStatusModalProps((values) => ({
+      ...values,
+      visible: true,
+      status,
+      message,
+    }));
     if (status) {
       removeZones(selectItem);
     }
@@ -123,43 +138,34 @@ const ZonasScreen = ({
       ) : (
         <TopNavigation title="Zonas" leftControl={goBackAction()} />
       )}
-      <ScrollView>
-        <View>
-          {zonesRedux.length > 0 ? (
-            zonesRedux.map((item, i) => (
-              <View key={i}>
-                <TouchableOpacity
-                  onPress={
-                    selectItem.length > 0
-                      ? () => onLong(item.id)
-                      : () =>
-                          navigation.navigate("zone_detail", {
-                            zoneId: item.id,
-                          })
-                  }
-                  onLongPress={() => onLong(item.id)}
-                  delayLongPress={200}
-                >
-                  <ZoneCard
-                    data={item}
-                    selected={selectItem.includes(item.id) ? true : false}
-                  />
-                </TouchableOpacity>
-              </View>
-            ))
-          ) : (
-            <View
-              style={{
-                flex: 1,
-                justifyContent: "center",
-                alignItems: "center",
-              }}
+
+      {zonesRedux.length ? (
+        <ScrollView>
+          {zonesRedux.map((item) => (
+            <TouchableOpacity
+              key={item.id}
+              onPress={
+                selectItem.length > 0
+                  ? () => onLong(item.id)
+                  : () =>
+                      navigation.navigate("zone_detail", {
+                        zoneId: item.id,
+                      })
+              }
+              onLongPress={() => onLong(item.id)}
+              delayLongPress={200}
             >
-              <Text>No hay zonas creadas!</Text>
-            </View>
-          )}
-        </View>
-      </ScrollView>
+              <ZoneCard
+                data={item}
+                selected={selectItem.includes(item.id) ? true : false}
+              />
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      ) : (
+        <NotFound message="No tienes zonas creadas" navigation={navigation} route='admin-home'/>
+      )}
+
       <CreateZoneModal
         status={visible}
         create={checkCreate}
@@ -173,10 +179,10 @@ const ZonasScreen = ({
         url="zone"
       />
       <StatusModal
-        visible={create}
-        onClose={() => setCreate(false)}
-        message={message}
-        status={status}
+        {...statusModalProps}
+        onClose={() =>
+          setStatusModalProps((values) => ({ ...values, visible: false }))
+        }
       />
       <FloatingBotton icon="ios-add" onPress={() => setVisible(true)} />
     </View>
