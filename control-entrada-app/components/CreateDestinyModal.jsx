@@ -34,6 +34,7 @@ export const CreateDestinyModal = ({ status, create, onClose, zoneId }) => {
       let res = await axios.post(`${API_PORT()}/api/createDestiny/${zoneId}`, {
         name: destinyName,
       });
+      console.log(res.data)
       if (!res.data.error) {
         setDestinyName("");
         setCaption("");

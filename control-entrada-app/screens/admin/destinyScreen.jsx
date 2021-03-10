@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { View, TouchableOpacity, ScrollView, Vibration } from "react-native";
+import {
+  View,
+  TouchableOpacity,
+  Text,
+  ScrollView,
+  Vibration,
+  StyleSheet,
+} from "react-native";
 import { Picker } from "@react-native-community/picker";
 import { connect } from "react-redux";
 import { useFocusEffect } from "@react-navigation/native";
@@ -14,6 +21,13 @@ import { CreateDestinyModal } from "../../components/CreateDestinyModal";
 import { StatusModal } from "../../components/statusModal";
 import { Spinner } from "../../components/spinner";
 import { PrompModal } from "../../components/prompModal";
+import { NotFound } from "../../components/NotFound";
+
+let statusModalValues = {
+  visible: false,
+  message: "",
+  status: null,
+};
 
 const DestinyScreen = ({
   navigation,
@@ -22,16 +36,16 @@ const DestinyScreen = ({
   addDestiny,
   removeDestiny,
 }) => {
+  const [statusModalProps, setStatusModalProps] = useState(statusModalValues);
+
   const [visible, setVisible] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [zoneId, setZoneId] = useState(zonesRedux[0].id);
-  const [create, setCreate] = useState(false);
+  const [zoneId, setZoneId] = useState(
+    zonesRedux.length ? zonesRedux[0].id : null
+  );
   const [destinys, setDestinys] = useState([]);
   const [promp, setPromp] = useState(false);
-  const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [selectItem, setSeletedItem] = useState([]);
-  const [status, setStatus] = useState(false);
 
   const goBackAction = () => {
     return (
@@ -49,17 +63,23 @@ const DestinyScreen = ({
 
   //CHEKC CREATE
   const checkCreate = (status, message, data) => {
-    setMessage(message);
-    setStatus(status);
-    setSuccess(true);
+    setStatusModalProps((values) => ({
+      ...values,
+      visible: true,
+      status,
+      message,
+    }));
     addDestiny(data);
     setDestinys((prevValue) => [...prevValue, data]);
   };
   //CHECK DELETE
   const checkDeleted = (status, message) => {
-    setStatus(status);
-    setMessage(message);
-    setSuccess(true);
+    setStatusModalProps((values) => ({
+      ...values,
+      visible: true,
+      status,
+      message,
+    }));
     if (status) {
       removeDestiny(selectItem);
       setDestinys((prevValue) =>
@@ -111,6 +131,7 @@ const DestinyScreen = ({
       ) : (
         <TopNavigation title="Destinos" leftControl={goBackAction()} />
       )}
+      {loading && <Spinner />}
       {zonesRedux.length ? (
         <ScrollView contentContainerStyle={{ alignItems: "center" }}>
           <FormContainer title="Seleccione la Zona" style={{ marginTop: 10 }}>
@@ -121,19 +142,19 @@ const DestinyScreen = ({
                 setZoneId(value);
               }}
             >
-              {zonesRedux.map((item, index) => {
+              {zonesRedux.map((item) => {
                 return (
-                  <Picker.Item label={item.zone} value={item.id} key={index} />
+                  <Picker.Item
+                    label={item.zone}
+                    value={item.id}
+                    key={item.id}
+                  />
                 );
               })}
             </Picker>
-            <View
-              style={{
-                backgroundColor: "white",
-              }}
-            >
-              {destinys &&
-                destinys.map((item) => (
+            {destinys.length ? (
+              <>
+                {destinys.map((item) => (
                   <TouchableOpacity
                     key={item.id}
                     onPress={
@@ -148,20 +169,20 @@ const DestinyScreen = ({
                     />
                   </TouchableOpacity>
                 ))}
-              {/* {notFound && (
-              <View>
-                <Text>No hay Destinos disponibles</Text>
-                </View>
-              )} */}
-            </View>
+              </>
+            ) : (
+              <Text style={styles.labelText}>* La zona no posee destinos</Text>
+            )}
           </FormContainer>
         </ScrollView>
-      ) : 
-      <View>
-        <Text>No hay zonas creadas!</Text>
-      </View>
-      }
-      {loading && <Spinner />}
+      ) : (
+        <NotFound
+          message="No tienes zonas creadas"
+          navigation={navigation}
+          route="admin-home"
+        />
+      )}
+
       <CreateDestinyModal
         zoneId={zoneId}
         status={visible}
@@ -176,12 +197,14 @@ const DestinyScreen = ({
         url="deleteDestiny"
       />
       <StatusModal
-        visible={success}
-        onClose={() => setSuccess(false)}
-        message={message}
-        status={status}
+        {...statusModalProps}
+        onClose={() =>
+          setStatusModalProps((values) => ({ ...values, visible: false }))
+        }
       />
-      <FloatingBotton icon="ios-add" onPress={() => setVisible(true)} />
+      {zonesRedux.length ? (
+        <FloatingBotton icon="ios-add" onPress={() => setVisible(true)} />
+      ) : null}
     </View>
   );
 };
@@ -207,3 +230,11 @@ const mapDispatchToProps = (dispatch) => ({
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(DestinyScreen);
+
+const styles = StyleSheet.create({
+  labelText: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#8e8e8e",
+  },
+});

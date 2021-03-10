@@ -45,12 +45,7 @@ const ZonasScreen = ({
   const [selectItem, setSeletedItem] = useState([]);
   const [visible, setVisible] = useState(false);
   const [statusModalProps, setStatusModalProps] = useState(statusModalProps);
-
-  const [create, setCreate] = useState(false);
-  const [message, setMessage] = useState("");
   const [promp, setPromp] = useState(false);
-  const [status, setStatus] = useState(false);
-
   const [scaleUp, setScaleUp] = useState(new Animated.Value(0));
   // const opacityInterpolate = scaleUp.interpolate({
   //   inputRange: [0, 1],
@@ -163,7 +158,11 @@ const ZonasScreen = ({
           ))}
         </ScrollView>
       ) : (
-        <NotFound message="No tienes zonas creadas" navigation={navigation} route='admin-home'/>
+        <NotFound
+          message="No tienes zonas creadas"
+          navigation={navigation}
+          route="admin-home"
+        />
       )}
 
       <CreateZoneModal
