@@ -33,8 +33,20 @@ import { LoadingModal } from "../../components/loadingModal";
 import { StatusModal } from "../../components/statusModal";
 import Avatar from "../../components/avatar.component";
 import { CameraModal } from "../../components/cameraModal";
+import { MessageModal } from "../../components/messageModal";
+import { createSupervisor, createWatchman } from "../../helpers";
 import { connect } from "react-redux";
 
+let alertModalValues = {
+  visible: false,
+  message: null,
+  route: "admin-home",
+};
+let statusModalValues = {
+  visible: false,
+  message: "",
+  status: null,
+};
 
 const CreateEmployeScreen = ({
   navigation,
@@ -42,32 +54,38 @@ const CreateEmployeScreen = ({
   companyRedux,
   addEmployee,
 }) => {
+  let employeeValues = {
+    name: "",
+    lastName: "",
+    email: "",
+    dni: "",
+    password: null,
+    privilege: null,
+    assignationDate: new Date(),
+    changeTurnDate: new Date(),
+    uri: null,
+    fileName: null,
+    fileType: null,
+    zoneId: zonesRedux.length ? zonesRedux[0].id : null,
+    companyId: companyRedux[0].id,
+  };
+
+  const [alertModal, setAlertModal] = useState(alertModalValues);
+  const [statusModalProps, setStatusModalProps] = useState(statusModalValues);
+  const [employeeData, setEmployeeData] = useState(employeeValues);
+  const [privilege, setPrivilege] = useState("supervisor");
+
   const [caption, setCaption] = useState("");
   const [timeCaption, setTimeCaption] = useState("");
   const [imageCaption, setImageCaption] = useState("");
-  const [zoneId, setZoneId] = useState(zonesRedux[0].id);
-  const [name, setName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [dni, setDni] = useState("");
-  const [email, setEmail] = useState("");
-  const [picture, setPicture] = useState("");
-  const [privilege, setPrivilege] = useState("Supervisor");
-  const [date, setDate] = useState(new Date());
   const [entryHolder, setEntryHolder] = useState(false);
-  const [changeTurn, setChangeTurn] = useState(new Date());
   const [departureHolder, setDepartureHolder] = useState(false);
   const [mode, setMode] = useState("date");
   const [mode2, setMode2] = useState("date");
   const [show, setShow] = useState(false);
   const [show2, setShow2] = useState(false);
-  const [create, setCreate] = useState(false);
-  const [changeImg, setChangeImg] = useState(false);
-  const [image, setImage] = useState("");
-  const [fileName, setFileName] = useState("");
-  const [fileType, setFileType] = useState("");
   const [camera, setCamera] = useState(false);
   const [visible, setVisible] = useState(false);
-  const [success, setSuccess] = useState(false);
 
   const goBackAction = () => {
     return (
@@ -93,7 +111,7 @@ const CreateEmployeScreen = ({
   const onChange = (event, selectedDate) => {
     const currentDate = selectedDate || date;
     setShow(Platform.OS === "ios");
-    setDate(currentDate);
+    setEmployeeData((values) => ({ ...values, assignationDate: currentDate }));
     setTimeCaption("");
     setEntryHolder(true);
   };
@@ -101,7 +119,7 @@ const CreateEmployeScreen = ({
   const onChange2 = (event, selectedDate) => {
     const currentDate = selectedDate || changeTurn;
     setShow2(Platform.OS === "ios");
-    setChangeTurn(currentDate);
+    setEmployeeData((values) => ({ ...values, changeTurnDate: currentDate }));
     setTimeCaption("");
     setDepartureHolder(true);
   };
@@ -122,128 +140,128 @@ const CreateEmployeScreen = ({
   const showMode2 = (currentMode) => {
     setShow2(true);
   };
-
+  //GET PROFILE PHOTO FROM MODAL
   const profilePic = (uri, fileName, fileType, caption, changeImg) => {
-    setImage(uri),
-      setFileName(fileName),
-      setFileType(fileType),
-      //imageCaption = caption,
-      setChangeImg(changeImg);
+    setEmployeeData((values) => ({ ...values, uri, fileName, fileType }));
+    //imageCaption = caption,
   };
 
   //CREATE EMPLOYEE
   const createEmploye = async () => {
+    console.log(employeeData);
     setVisible(true);
-    if (
-      name.length === 0 ||
-      lastName.length === 0 ||
-      dni.length === 0 ||
-      email.length === 0
-    ) {
-      setCaption("Debe llenar todos los campos");
-      setVisible(false);
-      return;
-    }
-    if (image.length === 0) {
-      setImageCaption("Debe agregar una foto");
-      setVisible(false);
-      return;
-    }
-    if (!entryHolder || !departureHolder) {
-      setTimeCaption("Debe seleccionar ambas horas.");
-      setVisible(false);
-      return;
-    }
-    if (
-      moment(date).format("D MMM YYYY") >
-      moment(changeTurn).format("D MMM YYYY")
-    ) {
-      setTimeCaption(
-        "La fecha de inicio no puede ser mayor que la de culminacion"
-      );
-      setVisible(false);
-      return;
-    }
+    // if (
+    //   employeeData.name.length === 0 ||
+    //   employeeData.lastName.length === 0 ||
+    //   employeeData.dni.length === 0 ||
+    //   employeeData.email.length === 0
+    // ) {
+    //   setCaption("Debe llenar todos los campos");
+    //   setVisible(false);
+    //   return;
+    // }
+    // if (employeeData.uri.length === 0) {
+    //   setImageCaption("Debe agregar una foto");
+    //   setVisible(false);
+    //   return;
+    // }
+    // if (!entryHolder || !departureHolder) {
+    //   setTimeCaption("Debe seleccionar ambas horas.");
+    //   setVisible(false);
+    //   return;
+    // }
+    // if (
+    //   moment(employeeData.assignationDate).format("D MMM YYYY") >
+    //   moment(employeeData.changeTurnDate).format("D MMM YYYY")
+    // ) {
+    //   setTimeCaption(
+    //     "La fecha de inicio no puede ser mayor que la de culminacion"
+    //   );
+    //   setVisible(false);
+    //   return;
+    // }
 
-    if (
-      moment(date).format("D MMM YYYY") ===
-      moment(changeTurn).format("D MMM YYYY")
-    ) {
-      setTimeCaption("La fecha de inicio y culminacion deben ser distintas");
-      setVisible(false);
-      return;
-    }
-    let data = new FormData();
-    data.append("file", { uri: image, name: fileName, type: fileType });
-    data.append("name", name);
-    data.append("lastName", lastName);
-    data.append("dni", dni);
-    data.append("email", email);
-    data.append("password", "12345");
-    data.append("zoneId", zoneId);
-    data.append("privilege", privilege);
-    data.append("assignationDate", date.toString());
-    data.append("changeTurnDate", changeTurn.toString());
-    data.append("companyId", companyRedux[0].id);
-
+    // if (
+    //   moment(employeeData.assignationDate).format("D MMM YYYY") ===
+    //   moment(employeeData.changeTurnDate).format("D MMM YYYY")
+    // ) {
+    //   setTimeCaption("La fecha de inicio y culminacion deben ser distintas");
+    //   setVisible(false);
+    //   return;
+    // }
+    setEmployeeData((values) => ({ ...values, privilege: privilege }));
     try {
       if (privilege === "Supervisor") {
-        const res = await axios.post(
-          `${API_PORT()}/api/createUserSupervisor/`,
-          data,
-          {
-            headers: {
-              "content-type": "multipart/form-data",
-            },
-          }
-        );
+        const res = await createSupervisor(employeeData);
         console.log("CREATE EMPLOYEE----", res.data);
         if (!res.data.error) {
           console.log(res.data.data);
           addEmployee(res.data.data);
           setVisible(false);
-          setSuccess(true);
+          setStatusModalProps((values) => ({
+            ...values,
+            visible: true,
+            status: true,
+            message: res.data.msg,
+          }));
           //setCreate(true);
           //setSaving(false);
         } else {
-          alert(res.data.msg);
           setVisible(false);
+          setStatusModalProps((values) => ({
+            ...values,
+            visible: true,
+            status: false,
+            message: res.data.msg,
+          }));
         }
       } else {
-        const res = await axios.post(
-          `${API_PORT()}/api/createUserWatchman`,
-          data,
-          {
-            headers: {
-              "content-type": "multipart/form-data",
-            },
-          }
-        );
+        const res = await createWatchman(employeeData);
         if (!res.data.error) {
           console.log(res.data.data);
           addEmployee(res.data.data);
-          setCreate(true);
+
           setVisible(false);
-          setSuccess(true);
-          setName("");
-          setLastName("");
-          setEmail("");
-          setDni("");
-          setImage("");
+          setStatusModalProps((values) => ({
+            ...values,
+            visible: true,
+            status: true,
+            message: res.data.msg,
+          }));
+
           setEntryHolder(false);
           setDepartureHolder(false);
           //setSaving(false);
         } else {
-          alert(res.data.msg);
           setVisible(false);
+          setStatusModalProps((values) => ({
+            ...values,
+            visible: true,
+            status: false,
+            message: res.data.msg,
+          }));
         }
       }
     } catch (error) {
       setVisible(false);
-      console.log("error-----: ", error);
-      alert(error.message);
+      setStatusModalProps((values) => ({
+        ...values,
+        visible: true,
+        status: false,
+        message: error,
+      }));
     }
   };
+
+  useEffect(() => {
+    !zonesRedux.length &&
+      setAlertModal((values) => ({
+        ...values,
+        visible: true,
+        message:
+          "Parece que aun no tienes zonas creadas, para registrar personal crea al menos una.",
+      }));
+  }, []);
 
   return (
     <View style={{ flex: 1 }}>
@@ -254,10 +272,10 @@ const CreateEmployeScreen = ({
             alignItems: "center",
           }}
         >
-          <View style={styles.pickPictureContainer}>
+          <FormContainer title="Datos Personales">
             <View style={styles.pictureContainer}>
-              {image ? (
-                <Avatar.Picture size={120} uri={image} />
+              {employeeData.uri ? (
+                <Avatar.Picture size={120} uri={employeeData.uri} />
               ) : (
                 <Avatar.Icon size={32} name="md-photos" color="#8e8e8e" />
               )}
@@ -270,30 +288,16 @@ const CreateEmployeScreen = ({
                 <Ionicons name="ios-camera" size={32} color="#fff" />
               </TouchableOpacity>
             </View>
-            <View>
-              <Text
-                style={{
-                  color: Danger,
-                  fontSize: 15,
-                  fontWeight: "600",
-                }}
-              >
-                {imageCaption}
-              </Text>
-            </View>
-          </View>
-
-          <FormContainer title="Datos Personales">
             <Input
               style={{ borderColor: "black", marginBottom: 10 }}
               styleInput={{ color: "black" }}
               title="Nombre"
               icon="ios-person"
               returnKeyType="next"
-              onChangeText={(nombre) => {
-                setName(nombre), setCaption("");
+              onChangeText={(name) => {
+                setEmployeeData((values) => ({ ...values, name })),
+                  setCaption("");
               }}
-              value={name}
             />
             <Input
               style={{ borderColor: "black", marginBottom: 10 }}
@@ -301,10 +305,10 @@ const CreateEmployeScreen = ({
               icon="ios-people"
               title="Apellido"
               returnKeyType="next"
-              onChangeText={(apellido) => {
-                setLastName(apellido), setCaption("");
+              onChangeText={(lastName) => {
+                setEmployeeData((values) => ({ ...values, lastName })),
+                  setCaption("");
               }}
-              value={lastName}
             />
             <Input
               style={{ borderColor: "black", marginBottom: 10 }}
@@ -313,9 +317,9 @@ const CreateEmployeScreen = ({
               icon="ios-card"
               returnKeyType="next"
               onChangeText={(dni) => {
-                setDni(dni), setCaption("");
+                setEmployeeData((values) => ({ ...values, dni })),
+                  setCaption("");
               }}
-              value={dni}
             />
             <Input
               style={{ borderColor: "black", marginBottom: 10 }}
@@ -324,9 +328,9 @@ const CreateEmployeScreen = ({
               icon="ios-mail"
               returnKeyType="next"
               onChangeText={(email) => {
-                setEmail(email), setCaption("");
+                setEmployeeData((values) => ({ ...values, email })),
+                  setCaption("");
               }}
-              value={email}
             />
             <View>
               <Text
@@ -353,17 +357,23 @@ const CreateEmployeScreen = ({
             </Picker>
             <View>
               <Text>Zonas</Text>
-              {zonesRedux ? (
+              {zonesRedux.length ? (
                 <Picker
                   mode="dropdown"
-                  selectedValue={zoneId}
-                  onValueChange={(value) => setZoneId(value)}
+                  selectedValue={employeeData.zoneId}
+                  onValueChange={(zoneId) =>
+                    setEmployeeData((values) => ({ ...values, zoneId }))
+                  }
                 >
-                  {zonesRedux.map((item, i) => (
-                    <Picker.Item label={item.zone} value={item.id} key={i} />
+                  {zonesRedux.map((item) => (
+                    <Picker.Item
+                      label={item.zone}
+                      value={item.id}
+                      key={item.id}
+                    />
                   ))}
                 </Picker>
-              ): alert("No hay zonas creadas, no podras registrar personal")}
+              ) : null}
             </View>
           </FormContainer>
 
@@ -381,7 +391,9 @@ const CreateEmployeScreen = ({
                   onPress={() => showDatepicker()}
                 />
                 <Text style={{ alignSelf: "center" }}>
-                  {entryHolder ? moment(date).format("D MMM YYYY") : "----"}
+                  {entryHolder
+                    ? moment(employeeData.assignationDate).format("D MMM YYYY")
+                    : "----"}
                 </Text>
               </View>
               <View style={styles.pickerButtonContainer}>
@@ -392,7 +404,7 @@ const CreateEmployeScreen = ({
                 />
                 <Text style={{ alignSelf: "center" }}>
                   {departureHolder
-                    ? moment(changeTurn).format("D MMM YYYY")
+                    ? moment(employeeData.changeTurnDate).format("D MMM YYYY")
                     : "----"}
                 </Text>
               </View>
@@ -401,7 +413,7 @@ const CreateEmployeScreen = ({
               <View>
                 <DateTimePicker
                   testID="dateTimePicker1"
-                  value={date}
+                  value={employeeData.assignationDate}
                   mode={mode}
                   is24Hour={true}
                   display="default"
@@ -412,7 +424,7 @@ const CreateEmployeScreen = ({
 
             {show2 && (
               <DateTimePicker
-                value={changeTurn}
+                value={employeeData.changeTurnDate}
                 mode={"date"}
                 is24Hour={true}
                 display="default"
@@ -452,8 +464,20 @@ const CreateEmployeScreen = ({
         profile={profilePic}
         type={"profile"}
       />
+      <MessageModal
+        {...alertModal}
+        onClose={() =>
+          setAlertModal((values) => ({ ...values, visible: false }))
+        }
+        navigation={navigation}
+      />
       <LoadingModal status={visible} message="Guardando..." />
-      <StatusModal status={success} onClose={() => setSuccess(false)} />
+      <StatusModal
+        {...statusModalProps}
+        onClose={() =>
+          setStatusModalProps((values) => ({ ...values, visible: false }))
+        }
+      />
     </View>
   );
 };

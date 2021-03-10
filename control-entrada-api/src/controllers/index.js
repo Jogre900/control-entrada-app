@@ -839,85 +839,85 @@ password: "123456,
     const privilege = "Supervisor";
 
     console.log(req.file);
-    try {
-      let user = await models.User.findOne({
-        where: {
-          email: email.toLowerCase()
-        },
-        include: {
-          model: models.Employee,
-          as: "Employee"
-        }
-      });
-      console.log("user", user);
+    // try {
+    //   let user = await models.User.findOne({
+    //     where: {
+    //       email: email.toLowerCase()
+    //     },
+    //     include: {
+    //       model: models.Employee,
+    //       as: "Employee"
+    //     }
+    //   });
+    //   console.log("user", user);
 
-      if (!user) {
-        let hash = await bcrypt.hash(password, 10);
-        password = hash;
+    //   if (!user) {
+    //     let hash = await bcrypt.hash(password, 10);
+    //     password = hash;
 
-        let inputUser = {
-          email: email.toLowerCase(),
-          password: hash,
-          Employee: {
-            name,
-            lastName,
-            dni,
-            picture: req.file.filename,
-            //picture: "foto de prueba",
-            status: "Active"
-          },
-          userZone: {
-            ZoneId: zoneId,
-            assignationDate,
-            changeTurnDate
-          },
-          UserCompany: {
-            companyId,
-            privilege
-          }
-        };
+    //     let inputUser = {
+    //       email: email.toLowerCase(),
+    //       password: hash,
+    //       Employee: {
+    //         name,
+    //         lastName,
+    //         dni,
+    //         picture: req.file.filename,
+    //         //picture: "foto de prueba",
+    //         status: "Active"
+    //       },
+    //       userZone: {
+    //         ZoneId: zoneId,
+    //         assignationDate,
+    //         changeTurnDate
+    //       },
+    //       UserCompany: {
+    //         companyId,
+    //         privilege
+    //       }
+    //     };
 
-        let employee = await models.User.create(
-          {
-            ...inputUser
-          },
-          {
-            include: [
-              {
-                model: models.Employee,
-                as: "Employee"
-              },
-              {
-                model: models.UserZone,
-                as: "userZone"
-              },
-              {
-                model: models.UserCompany,
-                as: "UserCompany"
-              }
-            ]
-          }
-        );
+    //     let employee = await models.User.create(
+    //       {
+    //         ...inputUser
+    //       },
+    //       {
+    //         include: [
+    //           {
+    //             model: models.Employee,
+    //             as: "Employee"
+    //           },
+    //           {
+    //             model: models.UserZone,
+    //             as: "userZone"
+    //           },
+    //           {
+    //             model: models.UserCompany,
+    //             as: "UserCompany"
+    //           }
+    //         ]
+    //       }
+    //     );
 
-        if (employee) {
-          RESPONSE.error = false;
-          RESPONSE.msg = "Registro Exitoso!";
-          RESPONSE.data = employee;
-          res.status(200).json(RESPONSE);
-        } else {
-          RESPONSE.msg = "Error al registrar";
-          res.json(RESPONSE);
-        }
-      } else {
-        RESPONSE.error = true;
-        RESPONSE.msg = "usuario ya existe";
-        RESPONSE.data = user;
-        res.json(RESPONSE);
-      }
-    } catch (error) {
-      RESPONSE.msg = error.message;
-      res.json(RESPONSE);
-    }
+    //     if (employee) {
+    //       RESPONSE.error = false;
+    //       RESPONSE.msg = "Registro Exitoso!";
+    //       RESPONSE.data = employee;
+    //       res.status(200).json(RESPONSE);
+    //     } else {
+    //       RESPONSE.msg = "Error al registrar";
+    //       res.json(RESPONSE);
+    //     }
+    //   } else {
+    //     RESPONSE.error = true;
+    //     RESPONSE.msg = "usuario ya existe";
+    //     RESPONSE.data = user;
+    //     res.json(RESPONSE);
+    //   }
+    // } catch (error) {
+    //   RESPONSE.msg = error.message;
+    //   res.json(RESPONSE);
+    // }
 
     // let user = await models.User.create({
     //   name: req.body.name,

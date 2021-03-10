@@ -102,12 +102,12 @@ router.post("/company",
 uploadImg.array('file'),
  Controllers.createCompany);
 router.post(
-  "/createUserSupervisor",
+  "/supervisor",
   uploadImg.single("file"),
   Controllers.createUserSupervisor
 );
 router.post(
-  "/createUserWatchman",
+  "/watchman",
   uploadImg.single("file"),
   Controllers.createUserWatchman
 );

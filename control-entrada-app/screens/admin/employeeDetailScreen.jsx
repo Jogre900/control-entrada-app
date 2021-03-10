@@ -116,7 +116,7 @@ export const EmployeeDetailScreen = ({ route, navigation }) => {
           </View>
           <FormContainer>
             <View>
-            <Text>Email: {user.Employee.email}</Text>
+            <Text>Email: {user.email}</Text>
               <Text>DNI: {user.Employee.dni}</Text>
 
               {user.userZone.length > 0 ? (
@@ -130,7 +130,7 @@ export const EmployeeDetailScreen = ({ route, navigation }) => {
                   <Text>
                     Fin de Contrato:
                     {moment(user.userZone[0].changeTurnDate).format(
-                      "D MMM YY"
+                      "D MMM YYYY"
                     )}
                   </Text>
                 </View>

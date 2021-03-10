@@ -9,9 +9,9 @@ import {
 import Modal from "react-native-modal";
 import { Ionicons } from "@expo/vector-icons";
 import { MainButton } from "./mainButton.component";
-import { ThirdColor } from '../assets/colors'
+import { MainColor, ThirdColor } from '../assets/colors'
 const { width, height } = Dimensions.get("screen");
-export const MessageModal = ({ visible, status, onClose, message }) => {
+export const MessageModal = ({ visible, status, onClose, navigation , route, message }) => {
   console.log(status);
   const [succes, setSuccess] = useState(false);
   return (
@@ -26,21 +26,16 @@ export const MessageModal = ({ visible, status, onClose, message }) => {
       onBackdropPress={onClose}
       animationOut="fadeOutDown"
       animationOutTiming={500}
-      onModalShow={() =>
-        setTimeout(() => {
-          onClose();
-        }, 1500)
-      }
       style={{
-        justifyContent: "flex-end",
+        //justifyContent: "flex-end",
         //marginHorizontal: 0,
       }}
       children={
         <View style={styles.container}>
-          <Ionicons name="md-warning-outline" size={40} color={MainColor} />
+          <Ionicons name="ios-warning" size={120} color={ThirdColor} />
           <Text style={styles.loadingText}>{message}</Text>
           <View style={styles.buttonContainer}>
-            <MainButton title="Volver" />
+            <MainButton title="Cerrar" onPress={() => { onClose(), navigation.navigate(route)}} />
           </View>
         </View>
       }
@@ -55,7 +50,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     padding: 8,
     backgroundColor: "#fff",
-    width: "90%",
+
     marginVertical: 5,
   },
   title: {
@@ -66,8 +61,8 @@ const styles = StyleSheet.create({
     marginVertical: 5,
   },
   loadingText: {
-    fontSize: 14,
-    fontWeight: "700",
+    fontSize: 18,
+    fontWeight: "600",
     color: "#8e8e8e",
     textAlign: "center",
   },

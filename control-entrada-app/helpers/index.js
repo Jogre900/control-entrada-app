@@ -274,8 +274,94 @@ export async function login(email, password) {
     // } else {
     //   return res;
     // }
-    return res
+    return res;
   } catch (error) {
     return error;
+  }
+}
+//CREATE SUPERVISOR
+export async function createSupervisor(employeeData) {
+  const {
+    name,
+    lastName,
+    dni,
+    email,
+    password,
+    privilege,
+    assignationDate,
+    changeTurnDate,
+    uri,
+    fileName,
+    fileType,
+    zoneId,
+    companyId,
+  } = employeeData;
+  
+  let data = new FormData();
+  data.append('name', name)
+  data.append('lastName', lastName)
+  data.append('dni', dni)
+  data.append('email', email)
+  data.append('password', password)
+  data.append('privilege', privilege)
+  data.append('assignationDate', assignationDate.toISOString())
+  data.append('changeTurnDate', changeTurnDate.toISOString())
+  data.append('file', {uri, name: fileName, type: fileType})
+  data.append('zoneId', zoneId)
+  data.append('companyId', companyId)
+
+
+  try {
+    const res = await axios.post(`${API_PORT()}/api/supervisor`, data, {
+      headers: {
+        "content-type": "multipart/form-data",
+      },
+    });
+    return res;
+  } catch (error) {
+    console.log(error);
+  }
+}
+//CREATE WATCHMAN
+export async function createWatchman(employeeData) {
+  const {
+    name,
+    lastName,
+    dni,
+    email,
+    password,
+    privilege,
+    assignationDate,
+    changeTurnDate,
+    uri,
+    fileName,
+    fileType,
+    zoneId,
+    companyId,
+  } = employeeData;
+  
+  let data = new FormData();
+  data.append('name', name)
+  data.append('lastName', lastName)
+  data.append('dni', dni)
+  data.append('email', email)
+  data.append('password', password)
+  data.append('privilege', privilege)
+  data.append('assignationDate', assignationDate.toISOString())
+  data.append('changeTurnDate', changeTurnDate.toISOString())
+  data.append('file', {uri, name: fileName, type: fileType})
+  data.append('zoneId', zoneId)
+  data.append('companyId', companyId)
+
+
+  try {
+    const res = await axios.post(`${API_PORT()}/api/watchman`, data, {
+      headers: {
+        "content-type": "multipart/form-data",
+      },
+    });
+    return res;
+  } catch (error) {
+    console.log(error);
   }
 }
