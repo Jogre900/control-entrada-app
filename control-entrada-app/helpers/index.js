@@ -67,21 +67,70 @@ export async function fetchDestiny(companyId) {
   }
 }
 
+//CREATE VISIT
+export async function createVisit(visitData, token) {
+  const {
+    name,
+    lastName,
+    dni,
+    profileUri,
+    profileFileName,
+    profileFileType,
+    entryDate,
+    departureDate,
+    descriptionEntry,
+    visitUri,
+    visitFileName,
+    visitFileType,
+    userZoneId,
+    destinyId
+  } = visitData;
+  let data = new FormData();
+  data.append('name', name)
+  data.append('lastName', lastName)
+  data.append('dni', dni)
+  data.append('file', {uri: profileUri, name: profileFileName, type: profileFileType})
+  data.append('descriptionEntry', descriptionEntry)
+  data.append('entryDate', entryDate.toISOString())
+  data.append('departureDate', departureDate.toISOString())
+  data.append('file', {uri: visitUri, name: visitFileName, type: visitFileType})
+  data.append('userZoneId', userZoneId)
+  data.append('destinyId', destinyId)
+  try {
+    const res = await axios.post(`${API_PORT()}/api/visit`, data, {
+      headers: {
+        "content-type": "multipart/form-data",
+        Authorization: `bearer ${token}`,
+      },
+    });
+    return res
+  } catch (error) {
+    console.log(`Error: ${error.message}`)
+  }
+}
+
+//FIND VISIT BY DNI
+export async function findVisitdni(dni){
+  try {
+    const res = await axios.get(`${API_PORT()}/api/visit/${dni}`)
+    return res
+  } catch (error) {
+    console.log(`Error: ${error.message}`)
+  }
+}
 //TODAY VISITS
 export async function fetchTodayVisist(companyId, employee) {
-  console.log("uzid helper----",employee)
+  console.log("uzid helper----", employee);
   try {
-    let res = await axios(
-      {
-        method: 'POST',
-        url: `${API_PORT()}/api/visits`,
-        data: {id: employee} 
-      })
-      // `${API_PORT()}/api/findTodayVisits/${companyId}`, {data: employee});
-    console.log(res.data)
-      
-      return res
-    
+    let res = await axios({
+      method: "POST",
+      url: `${API_PORT()}/api/visits`,
+      data: { id: employee },
+    });
+    // `${API_PORT()}/api/findTodayVisits/${companyId}`, {data: employee});
+    console.log(res.data);
+
+    return res;
   } catch (error) {
     return error.message;
   }
@@ -91,7 +140,7 @@ export async function fetchTodayVisist(companyId, employee) {
 export async function fetchAllEmployee(companyId) {
   try {
     const res = await axios.get(`${API_PORT()}/api/user/${companyId}`);
-    return res
+    return res;
   } catch (error) {
     return error.message;
   }
@@ -101,7 +150,7 @@ export async function fetchAllEmployee(companyId) {
 export async function fetchEmployeeByZone(zoneId) {
   try {
     const res = await axios.get(`${API_PORT()}/api/user/${zoneId}`);
-   return res
+    return res;
   } catch (error) {
     return error.message;
   }
@@ -229,7 +278,8 @@ export async function createCompany(companyData, profilePic, companyLogo) {
 }
 
 //LOGIN
-export async function login(email, password) {
+export async function login(loginData) {
+  const { email, password } = loginData;
   try {
     const res = await axios.post(`${API_PORT()}/api/login`, {
       email,
@@ -300,20 +350,19 @@ export async function createSupervisor(employeeData) {
     zoneId,
     companyId,
   } = employeeData;
-  
-  let data = new FormData();
-  data.append('name', name)
-  data.append('lastName', lastName)
-  data.append('dni', dni)
-  data.append('email', email)
-  data.append('password', password)
-  data.append('privilege', privilege)
-  data.append('assignationDate', assignationDate.toISOString())
-  data.append('changeTurnDate', changeTurnDate.toISOString())
-  data.append('file', {uri, name: fileName, type: fileType})
-  data.append('zoneId', zoneId)
-  data.append('companyId', companyId)
 
+  let data = new FormData();
+  data.append("name", name);
+  data.append("lastName", lastName);
+  data.append("dni", dni);
+  data.append("email", email);
+  data.append("password", password);
+  data.append("privilege", privilege);
+  data.append("assignationDate", assignationDate.toISOString());
+  data.append("changeTurnDate", changeTurnDate.toISOString());
+  data.append("file", { uri, name: fileName, type: fileType });
+  data.append("zoneId", zoneId);
+  data.append("companyId", companyId);
 
   try {
     const res = await axios.post(`${API_PORT()}/api/supervisor`, data, {
@@ -343,20 +392,19 @@ export async function createWatchman(employeeData) {
     zoneId,
     companyId,
   } = employeeData;
-  
-  let data = new FormData();
-  data.append('name', name)
-  data.append('lastName', lastName)
-  data.append('dni', dni)
-  data.append('email', email)
-  data.append('password', password)
-  data.append('privilege', privilege)
-  data.append('assignationDate', assignationDate.toISOString())
-  data.append('changeTurnDate', changeTurnDate.toISOString())
-  data.append('file', {uri, name: fileName, type: fileType})
-  data.append('zoneId', zoneId)
-  data.append('companyId', companyId)
 
+  let data = new FormData();
+  data.append("name", name);
+  data.append("lastName", lastName);
+  data.append("dni", dni);
+  data.append("email", email);
+  data.append("password", password);
+  data.append("privilege", privilege);
+  data.append("assignationDate", assignationDate.toISOString());
+  data.append("changeTurnDate", changeTurnDate.toISOString());
+  data.append("file", { uri, name: fileName, type: fileType });
+  data.append("zoneId", zoneId);
+  data.append("companyId", companyId);
 
   try {
     const res = await axios.post(`${API_PORT()}/api/watchman`, data, {

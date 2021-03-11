@@ -88,12 +88,12 @@ router.get("/findUserZone/:id", Controllers.findUserZone);
 router.get("/verifyToken", Controllers.verifyExpToken);
 //VISIT ROUTES
 router.post(
-  "/visit/:id",
+  "/visit",
   middleware.verifyToken,
   uploadImg.array("file"),
   Controllers.createVisits
 );
-router.get("/findVisit/:dni", Controllers.findVisit);
+router.get("/visit/:dni", Controllers.findVisit);
 router.get("/findVisitId/:id", Controllers.findVisitId);
 router.put("/updateVisit/:id", middleware.verifyToken, Controllers.updateVisit);
 

@@ -1567,8 +1567,6 @@ password: "123456,
       tokn: null
     };
     console.log("BODY--", req.body);
-    console.log("PARAMS---", req.params);
-    console.log("1 foto:---", req.file);
     console.log("varias fotos----", req.files);
     const {
       dni,
@@ -1578,81 +1576,82 @@ password: "123456,
       descriptionEntry,
       departureDate,
       descriptionDeparture,
-      userZoneId
+      userZoneId,
+      destinyId
     } = req.body;
-    const { id } = req.params;
-    try {
-      let person = await models.Citizen.findOne({
-        where: {
-          dni
-        }
-      });
-      if (person) {
-        let visit = await models.Visits.create(
-          {
-            entryDate,
-            descriptionEntry,
-            departureDate,
-            descriptionDeparture,
-            destinationId: id,
-            UserZoneId: userZoneId,
-            citizenId: person.id,
-            Fotos: {
-              picture: req.files[0].filename,
-              entry: "algo"
-            }
-          },
-          {
-            include: {
-              model: models.Picture,
-              as: "Fotos"
-            }
-          }
-        );
-        //console.log("visita con dni ya registrado", visit)
-        RESPONSE.msg = "Registro Exitoso!";
-        RESPONSE.data = visit;
-        res.status(200).json(RESPONSE);
-      } else {
-        let visits = await models.Citizen.create(
-          {
-            dni,
-            name,
-            lastName,
-            picture: req.files[0].filename,
-            Visitas: {
-              entryDate,
-              descriptionEntry,
-              departureDate,
-              descriptionDeparture,
-              destinationId: id,
-              UserZoneId: userZoneId,
-              Fotos: {
-                picture: req.files[1].filename,
-                entry: "algo"
-              }
-            }
-          },
-          {
-            include: [
-              {
-                model: models.Visits,
-                as: "Visitas",
-                include: { model: models.Picture, as: "Fotos" }
-              }
-            ]
-          }
-        );
-        RESPONSE.error = false;
-        RESPONSE.msg = "Registro Exitoso";
-        RESPONSE.data = visits;
-        res.json(RESPONSE);
-      }
-    } catch (error) {
-      RESPONSE.msg = error.message;
-      console.log(error.message);
-      res.json(RESPONSE);
-    }
+    
+    // try {
+    //   let person = await models.Citizen.findOne({
+    //     where: {
+    //       dni
+    //     }
+    //   });
+    //   if (person) {
+    //     let visit = await models.Visits.create(
+    //       {
+    //         entryDate,
+    //         descriptionEntry,
+    //         departureDate,
+    //         descriptionDeparture,
+    //         destinationId: destinyId,
+    //         UserZoneId: userZoneId,
+    //         citizenId: person.id,
+    //         Fotos: {
+    //           picture: req.files[0].filename,
+    //           entry: "algo"
+    //         }
+    //       },
+    //       {
+    //         include: {
+    //           model: models.Picture,
+    //           as: "Fotos"
+    //         }
+    //       }
+    //     );
+    //     //console.log("visita con dni ya registrado", visit)
+    //     RESPONSE.msg = "Registro Exitoso!";
+    //     RESPONSE.data = visit;
+    //     res.status(200).json(RESPONSE);
+    //   } else {
+    //     let visits = await models.Citizen.create(
+    //       {
+    //         dni,
+    //         name,
+    //         lastName,
+    //         picture: req.files[0].filename,
+    //         Visitas: {
+    //           entryDate,
+    //           descriptionEntry,
+    //           departureDate,
+    //           descriptionDeparture,
+    //           destinationId: id,
+    //           UserZoneId: userZoneId,
+    //           Fotos: {
+    //             picture: req.files[1].filename,
+    //             entry: "algo"
+    //           }
+    //         }
+    //       },
+    //       {
+    //         include: [
+    //           {
+    //             model: models.Visits,
+    //             as: "Visitas",
+    //             include: { model: models.Picture, as: "Fotos" }
+    //           }
+    //         ]
+    //       }
+    //     );
+    //     RESPONSE.error = false;
+    //     RESPONSE.msg = "Registro Exitoso";
+    //     RESPONSE.data = visits;
+    //     res.json(RESPONSE);
+    //   }
+    // } catch (error) {
+    //   RESPONSE.msg = error.message;
+    //   console.log(error.message);
+    //   res.json(RESPONSE);
+    // }
   },
   //DELETE Visits
   deleteVisit: async function(req, res) {

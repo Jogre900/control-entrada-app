@@ -7,7 +7,7 @@ import {
   ScrollView,
   Image,
   KeyboardAvoidingView,
-  TouchableWithoutFeedback,
+  TouchableOpacity,
   Platform,
 } from "react-native";
 
@@ -28,6 +28,7 @@ import { LoadingModal } from "../../components/loadingModal";
 import { StatusModal } from "../../components/statusModal";
 import { FormContainer } from "../../components/formContainer";
 import { CameraModal } from "../../components/cameraModal";
+import { createVisit, findVisitdni } from "../../helpers";
 import Avatar from "../../components/avatar.component";
 
 let destinyCaption, imageCaption, imageVisitCaption;
@@ -61,26 +62,19 @@ const EntryScreen = ({ navigation, profile, saveVisit }) => {
   const userZoneId = profile.userZone[0].id;
 
   const [visitData, setVisitData] = useState(visitInitialValues);
+  const [statusModalProps, setStatusModalProps] = useState(statusModalValues);
 
   const [camera, setCamera] = useState(false);
   const [type, setType] = useState("");
   const [profileCaption, setProfileCaption] = useState("");
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [saveImg, setSaveImg] = useState();
-  const [changeImg, setChangeImg] = useState(false);
-  const [userId, setUserId] = useState();
+
   const [name, setName] = useState("");
   const [lastName, setLastName] = useState("");
   const [dni, setDni] = useState("");
   const [destiny, setDestiny] = useState("");
   const [entry, setEntry] = useState("");
-  const [imgUrl, setImgUrl] = useState();
-  const [visitImg, setVisitImg] = useState();
-  const [fileName, setFileName] = useState("");
-  const [fileType, setFileType] = useState("");
-  const [fileName2, setFileName2] = useState("");
-  const [fileType2, setFileType2] = useState("");
+
   const [destinyId, setDestinyId] = useState(destinys[0].id);
 
   const [editable, setEditable] = useState(true);
@@ -100,13 +94,21 @@ const EntryScreen = ({ navigation, profile, saveVisit }) => {
     setVisitImg("");
   };
   //CREATE VISIT
-  const createVisit = async () => {
+  const registerVisit = async () => {
     setLoading(true);
     if (name.length === 0 || lastName.length === 0 || dni.length === 0) {
       setProfileCaption("Debe llenar todos los campos");
       setLoading(false);
       return;
     }
+
+    visitData.destinyId = destinyId;
+    visitData.userZoneId = userZoneId;
+
+    let token = await storage.getItem("userToken");
+    const res = await createVisit(visitData, token);
+    console.log(res.data);
+
     // if (imgUrl.length === 0) {
     //   setImageCaption("Debe agregar una foto");
     //   setLoading(false);
@@ -117,7 +119,6 @@ const EntryScreen = ({ navigation, profile, saveVisit }) => {
     //   setLoading(false);
     //   return;
     // }
-    // let token = await storage.getItem("userToken");
 
     // if (!name || !lastName || !dni) {
     //   setProfileCaption("Debe ingresar todos los datos");
@@ -159,31 +160,30 @@ const EntryScreen = ({ navigation, profile, saveVisit }) => {
   };
   //CHECK DNI
   const checkDni = async () => {
-    try {
-      let res = await axios.get(`${API_PORT()}/api/findVisit/${dni}`);
+    const res = await findVisitdni(visitData.dni);
+    console.log(res.data);
+    if (!res.data.error) {
       console.log(res.data);
-      if (!res.data.error) {
-        console.log(res.data);
-        let citizen = res.data.data.Visitante;
-        //console.log(citizen)
-        setName(citizen.name);
-        setLastName(citizen.lastName);
-        setImgUrl(citizen.picture);
-        setEditable(false);
-      } else {
-        console.log(res.data.msg);
-      }
-    } catch (error) {
-      console.log("error:---", error.message);
+      let citizen = res.data.data.Visitante;
+      //console.log(citizen)
+      setVisitData((values) => ({
+        ...values,
+        name: citizen.name,
+        lastName: citizen.lastName,
+        profileUri: citizen.picture,
+      }));
+      setEditable(false);
+    } else {
+      console.log(res.data.msg);
     }
   };
 
   const goBackAction = () => {
     return (
       <View>
-        <TouchableWithoutFeedback onPress={() => navigation.goBack()}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
           <Ionicons name="ios-arrow-back" size={28} color="white" />
-        </TouchableWithoutFeedback>
+        </TouchableOpacity>
       </View>
     );
   };
@@ -195,7 +195,6 @@ const EntryScreen = ({ navigation, profile, saveVisit }) => {
       profileFyleType: fileType,
     }));
     //imageCaption = caption,
-    setChangeImg(changeImg);
   };
   const visitPic = (uri, fileName, fileType, caption) => {
     setVisitData((values) => ({
@@ -224,19 +223,10 @@ const EntryScreen = ({ navigation, profile, saveVisit }) => {
       <KeyboardAvoidingView style={styles.containerKeyboard} behavior="padding">
         <TopNavigation title="Entrada" leftControl={goBackAction()} />
         <ScrollView contentContainerStyle={{ alignItems: "center" }}>
-          <View style={styles.pickPictureContainer}>
-            <View>
-              <Text style={styles.captionText}>{imageCaption}</Text>
-            </View>
-          </View>
-
           <FormContainer title="Datos Personales">
-            <View style={styles.profilePicBox}>
+            <View style={styles.pictureContainer}>
               {visitData.profileUri ? (
-                <Avatar.Picture
-                  size={120}
-                  uri={`${API_PORT()}/public/imgs/${visitData.profileUri}`}
-                />
+                <Avatar.Picture size={120} uri={visitData.profileUri} />
               ) : (
                 <Avatar.Icon size={32} name="md-photos" color="#8e8e8e" />
               )}
@@ -247,7 +237,7 @@ const EntryScreen = ({ navigation, profile, saveVisit }) => {
                 }}
                 style={styles.openCameraButton}
               >
-                <Ionicons name="ios-camera" size={48} color="#fff" />
+                <Ionicons name="ios-camera" size={32} color="#fff" />
               </TouchableOpacity>
             </View>
             <Input
@@ -273,7 +263,6 @@ const EntryScreen = ({ navigation, profile, saveVisit }) => {
                 setVisitData((values) => ({ ...values, lastName }));
               }}
               editable={editable}
-              
               ref={lastNameRef}
             />
             <View>
@@ -288,7 +277,6 @@ const EntryScreen = ({ navigation, profile, saveVisit }) => {
                 onChangeText={(dni) => {
                   setVisitData((values) => ({ ...values, dni }));
                 }}
-                
                 ref={dniRef}
               />
               <TouchableOpacity onPress={() => checkDni()}>
@@ -319,12 +307,12 @@ const EntryScreen = ({ navigation, profile, saveVisit }) => {
               ) : null}
             </View>
             <View>
-              <Text>Foto de Entrada: vehiculo, pertenencia, etc.</Text>
+              <Text style={styles.labelText}>* Foto de Entrada.</Text>
 
               <View>
                 <Text style={styles.captionText}>{imageVisitCaption}</Text>
               </View>
-              <View>
+              <View style={styles.pictureVisitContainer}>
                 {visitData.visitUri ? (
                   <Image
                     source={{ uri: visitData.visitUri }}
@@ -336,17 +324,16 @@ const EntryScreen = ({ navigation, profile, saveVisit }) => {
                     }}
                   />
                 ) : (
-                  <View style={styles.profilePicBox}>
-                    <TouchableOpacity
-                      style={{ alignSelf: "center" }}
-                      onPress={() => {
-                        setCamera(true), setType("visit");
-                      }}
-                    >
-                      <Ionicons name="ios-camera" size={48} color="grey" />
-                    </TouchableOpacity>
-                  </View>
+                  <Avatar.Icon size={32} name="md-photos" color="#8e8e8e" />
                 )}
+                <TouchableOpacity
+                  onPress={() => {
+                    setCamera(true), setType("visit");
+                  }}
+                  style={styles.openCameraButton}
+                >
+                  <Ionicons name="ios-camera" size={32} color="#fff" />
+                </TouchableOpacity>
               </View>
             </View>
             <Input
@@ -367,7 +354,7 @@ const EntryScreen = ({ navigation, profile, saveVisit }) => {
             <MainButton
               title="Registrar Entrada"
               style={{ marginVertical: 5 }}
-              onPress={() => createVisit()}
+              onPress={() => registerVisit()}
             />
           </View>
         </ScrollView>
@@ -419,17 +406,33 @@ const styles = StyleSheet.create({
     padding: 8,
     elevation: 5,
   },
-  profilePicBox: {
-    alignSelf: "center",
-    width: 120,
+  pictureContainer: {
     height: 120,
+    width: 120,
+    alignSelf: "center",
+    position: "relative",
+    marginVertical: 10,
+    borderColor: "#fff",
+    borderWidth: 2,
+    elevation: 10,
     borderRadius: 120 / 2,
-    backgroundColor: "#e8e8e8",
+    backgroundColor: "#fff",
     justifyContent: "center",
     alignItems: "center",
-    borderStyle: "dotted",
-    borderWidth: 1,
+  },
+  pictureVisitContainer: {
+    alignSelf: "center",
+    position: "relative",
     marginVertical: 10,
+    borderColor: "#fff",
+    borderWidth: 2,
+    elevation: 5,
+    borderRadius: 5,
+    backgroundColor: "#fff",
+    justifyContent: "center",
+    alignItems: "center",
+    width: "100%",
+    height: 250,
   },
   openCameraButton: {
     position: "absolute",
@@ -449,5 +452,10 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: "600",
     color: Danger,
+  },
+  labelText: {
+    color: "#8e8e8e",
+    fontSize: 14,
+    fontWeight: "600",
   },
 });

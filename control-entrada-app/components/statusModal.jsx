@@ -12,7 +12,7 @@ import { Success, Danger } from "../assets/colors";
 
 const { width, height } = Dimensions.get("screen");
 export const StatusModal = ({ visible, status, onClose, message }) => {
-  console.log(status)
+  
   const [succes, setSuccess] = useState(false);
   return (
     <Modal

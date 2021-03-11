@@ -15,6 +15,7 @@ import { login } from "../../helpers/";
 import { FormContainer } from "../../components/formContainer";
 import { RecoverPassModal } from "../../components/recoverPassModal";
 import { StatusModal } from "../../components/statusModal";
+import { validateForm } from '../../helpers/forms'
 import { storage } from "../../helpers/asyncStorage";
 
 let passModalValues = {
@@ -28,6 +29,11 @@ let statusModalValues = {
   status: null,
 };
 
+let loginInitialValues = {
+  email: null,
+  password: null
+}
+
 const LoginScreen = ({
   navigation,
   saveProfile,
@@ -35,8 +41,13 @@ const LoginScreen = ({
   saveLogin,
   savePrivilege,
 }) => {
+  
+  const [loginData, setLoginData] = useState(loginInitialValues)
+  
   const [email, setEmail] = useState("");
   const [pass, setPass] = useState("");
+
+
   const [caption, setCaption] = useState("");
   const [emailCaption, setEmailCaption] = useState("");
   const [passCaption, setPassCaption] = useState("");
@@ -61,13 +72,10 @@ const LoginScreen = ({
 
   //SIGN IN
   const signIn = async () => {
+    
     setModalVisible(true);
     setCaption("");
-    if (!email || !pass) {
-      setModalVisible(false);
-      setCaption("Debe llenar los campos");
-      return;
-    }
+    
     // }else{
     //   if(!validateEmail(email)){
     //     setModalVisible(false);
@@ -75,8 +83,9 @@ const LoginScreen = ({
     //     return;
     //   }
     // }
+    
     try {
-      const res = await login(email, pass);
+      const res = await login(loginData);
       if (!res.data.error) {
         let slogin = {
           token: res.data.token,
@@ -184,10 +193,10 @@ const LoginScreen = ({
               returnKeyType="next"
               caption={emailCaption}
               onSubmitEditing={() => nextInput.current.focus()}
-              onChangeText={(correo) => {
-                setEmail(correo), setEmailCaption(""), setCaption("");
+              onChangeText={(email) => {
+                setLoginData(values => ({...values, email})), setEmailCaption(""), setCaption("");
               }}
-              value={email}
+              
             />
             <Input
               //styleInput={{ color: "white" }}
@@ -198,10 +207,10 @@ const LoginScreen = ({
               secureTextEntry={true}
               caption={passCaption}
               onSubmitEditing={() => signIn()}
-              onChangeText={(pass) => {
-                setPass(pass), setPassCaption(""), setCaption("");
+              onChangeText={(password) => {
+                setLoginData(values => ({...values, password})), setPassCaption(""), setCaption("");
               }}
-              value={pass}
+              
               ref={nextInput}
             />
           </View>
