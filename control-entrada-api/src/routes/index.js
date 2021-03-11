@@ -33,10 +33,11 @@ const uploadImg = multer({
 //VERIFY TOKEN MIDDLEWARE
 const middleware = {
   verifyToken: function(req, res, next) {
+    //console.log("req.headers middleware---", req.headers)
     if (!req.headers["authorization"])
       return next(createError(401, "Usuario no Autorizado"));
     const headerToken = req.headers["authorization"];
-    console.log("CABECERA-----",headerToken)
+    //console.log("CABECERA-----",headerToken)
     const token = headerToken.split(" ")[1];
     jwt.verify(token, SECRETKEY, (err, payload) => {
       console.log(payload);
@@ -90,7 +91,7 @@ router.get("/verifyToken", Controllers.verifyExpToken);
 router.post(
   "/visit",
   middleware.verifyToken,
-  uploadImg.array("file"),
+  uploadImg.single("file"),
   Controllers.createVisits
 );
 router.get("/visit/:dni", Controllers.findVisit);
@@ -103,6 +104,10 @@ router.get("/findTodayVisitsByZone/:zoneId", Controllers.findTodayVisitsByZone);
 router.get("/findTodayVisitsByUser/:id", Controllers.findTodayVisitsByUser);
 router.get("/findWeekVisits/", Controllers.findWeekVisits);
 router.delete("/visit/", Controllers.deleteVisit);
+
+//CITIZEN
+router.get("/citizen/:dni", middleware.verifyToken, Controllers.findCitizen)
+router.post("/citizen", middleware.verifyToken, uploadImg.array('file'), Controllers.createCitizen)
 
 // NUEVAS RUTA AJUSTE SISTEMA
 router.post("/company", 

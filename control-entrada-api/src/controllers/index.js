@@ -1136,7 +1136,7 @@ password: "123456,
       data: null,
       token: null
     };
-    console.log(req.headers);
+    
     const token = req.headers.authorization.split(" ")[1];
 
     let decode = jwt.verify(token, SECRETKEY);
@@ -1358,12 +1358,11 @@ password: "123456,
       data: null,
       token: null
     };
-    console.log(req.headers);
+    
     const token = req.headers.authorization.split(" ")[1];
-    console.log("token---", token);
+   
     try {
       let decode = jwt.verify(token, SECRETKEY);
-      console.log("decode------", decode);
       if (decode) {
         RESPONSE.error = false;
         RESPONSE.data = decode;
@@ -1559,6 +1558,35 @@ password: "123456,
       res.json(RESPONSE);
     }
   },
+  findCitizen: async function(req, res) {
+    let RESPONSE = {
+      error: true,
+      data: null,
+      msg: null,
+      token: null
+    };
+    const { dni } = req.params;
+    try {
+      const citizen = await models.Citizen.findOne({
+        where: {
+          dni
+        }
+      });
+      if (citizen) {
+        (RESPONSE.error = false),
+          (RESPONSE.data = citizen),
+          (RESPONSE.msg = "Busqueda exitosa!");
+        res.json(RESPONSE);
+      }else{
+        RESPONSE.msg = 'dni no registrado'
+        res.json(RESPONSE)
+      }
+    } catch (error) {
+      RESPONSE.msg = error.message;
+      res.json(RESPONSE);
+    }
+  },
+  //CREATE VISIT
   createVisits: async function(req, res) {
     let RESPONSE = {
       error: true,
@@ -1566,92 +1594,146 @@ password: "123456,
       data: null,
       tokn: null
     };
+    //console.log("headers---",req.headers)
     console.log("BODY--", req.body);
-    console.log("varias fotos----", req.files);
+    console.log("fotos----", req.file);
     const {
-      dni,
-      name,
-      lastName,
       entryDate,
       descriptionEntry,
       departureDate,
       descriptionDeparture,
       userZoneId,
-      destinyId
+      destinyId,
+      citizenId
     } = req.body;
-    
-    // try {
-    //   let person = await models.Citizen.findOne({
-    //     where: {
-    //       dni
-    //     }
-    //   });
-    //   if (person) {
-    //     let visit = await models.Visits.create(
-    //       {
-    //         entryDate,
-    //         descriptionEntry,
-    //         departureDate,
-    //         descriptionDeparture,
-    //         destinationId: destinyId,
-    //         UserZoneId: userZoneId,
-    //         citizenId: person.id,
-    //         Fotos: {
-    //           picture: req.files[0].filename,
-    //           entry: "algo"
-    //         }
-    //       },
-    //       {
-    //         include: {
-    //           model: models.Picture,
-    //           as: "Fotos"
-    //         }
-    //       }
-    //     );
-    //     //console.log("visita con dni ya registrado", visit)
-    //     RESPONSE.msg = "Registro Exitoso!";
-    //     RESPONSE.data = visit;
-    //     res.status(200).json(RESPONSE);
-    //   } else {
-    //     let visits = await models.Citizen.create(
-    //       {
-    //         dni,
-    //         name,
-    //         lastName,
-    //         picture: req.files[0].filename,
-    //         Visitas: {
-    //           entryDate,
-    //           descriptionEntry,
-    //           departureDate,
-    //           descriptionDeparture,
-    //           destinationId: id,
-    //           UserZoneId: userZoneId,
-    //           Fotos: {
-    //             picture: req.files[1].filename,
-    //             entry: "algo"
-    //           }
-    //         }
-    //       },
-    //       {
-    //         include: [
-    //           {
-    //             model: models.Visits,
-    //             as: "Visitas",
-    //             include: { model: models.Picture, as: "Fotos" }
-    //           }
-    //         ]
-    //       }
-    //     );
-    //     RESPONSE.error = false;
-    //     RESPONSE.msg = "Registro Exitoso";
-    //     RESPONSE.data = visits;
-    //     res.json(RESPONSE);
-    //   }
-    // } catch (error) {
-    //   RESPONSE.msg = error.message;
-    //   console.log(error.message);
-    //   res.json(RESPONSE);
-    // }
+
+    try {
+      const visit = await models.Visits.create(
+        {
+          entryDate,
+          descriptionEntry,
+          departureDate,
+          descriptionDeparture,
+          UserZoneId: userZoneId,
+          destinationId: destinyId,
+          citizenId,
+          Fotos: {
+            picture: req.file.filename,
+            entry: "algo"
+          }
+        },
+        {
+          include: {
+            model: models.Picture,
+            as: "Fotos"
+          }
+        }
+      );
+      if (visit) {
+        RESPONSE.error = false;
+        RESPONSE.data = visit;
+        RESPONSE.msg = "Registro exitoso!";
+        res.json(RESPONSE);
+      }
+    } catch (error) {
+      RESPONSE.msg = error.message;
+      res.json(RESPONSE);
+    }
+   
+  },
+
+  //CREATE NEW CITIZEN AND VISIT
+  createCitizen: async function(req, res){
+    let RESPONSE = {
+      error: true,
+      data: null,
+      msg: null,
+      token: null
+    }
+    const {
+      name,
+      lastName,
+      dni,
+      entryDate,
+      descriptionEntry,
+      departureDate,
+      descriptionDeparture,
+      userZoneId,
+      destinyId,
+    } = req.body;
+    console.log("req.body create citizen--",req.body)
+    try {
+      let person = await models.Citizen.findOne({
+        where: {
+          dni
+        }
+      });
+      if (person) {
+        let visit = await models.Visits.create(
+          {
+            entryDate,
+            descriptionEntry,
+            departureDate,
+            descriptionDeparture,
+            destinationId: destinyId,
+            UserZoneId: userZoneId,
+            citizenId: person.id,
+            Fotos: {
+              picture: req.files[0].filename,
+              entry: "algo"
+            }
+          },
+          {
+            include: {
+              model: models.Picture,
+              as: "Fotos"
+            }
+          }
+        );
+        //console.log("visita con dni ya registrado", visit)
+        RESPONSE.msg = "Registro Exitoso!";
+        RESPONSE.data = visit;
+        res.status(200).json(RESPONSE);
+      } else {
+        let visits = await models.Citizen.create(
+          {
+            dni,
+            name,
+            lastName,
+            picture: req.files[0].filename,
+            Visitas: {
+              entryDate,
+              descriptionEntry,
+              departureDate,
+              descriptionDeparture,
+              destinationId: destinyId,
+              UserZoneId: userZoneId,
+              Fotos: {
+                picture: req.files[1].filename,
+                entry: "algo"
+              }
+            }
+          },
+          {
+            include: [
+              {
+                model: models.Visits,
+                as: "Visitas",
+                include: { model: models.Picture, as: "Fotos" }
+              }
+            ]
+          }
+        );
+        RESPONSE.error = false;
+        RESPONSE.msg = "Registro Exitoso";
+        RESPONSE.data = visits;
+        res.json(RESPONSE);
+      }
+    } catch (error) {
+      RESPONSE.msg = error.message;
+      console.log(error.message);
+      res.json(RESPONSE);
+    }
   },
   //DELETE Visits
   deleteVisit: async function(req, res) {
@@ -1773,7 +1855,6 @@ password: "123456,
     };
 
     const { dni } = req.params;
-    console.log("VISIT BY DNI----", req.params);
 
     try {
       let visit = await models.Visits.findOne({
@@ -1803,9 +1884,8 @@ password: "123456,
           // ]
         ]
       });
-      console.log("VISIT BY DNI------", visit);
+
       if (visit) {
-        console.log(visit);
         RESPONSE.error = false;
         RESPONSE.msg = "Consulta Exitosa";
         RESPONSE.data = visit;
@@ -1827,21 +1907,21 @@ password: "123456,
       data: null,
       tokn: null
     };
-    
-    const { id } = req.body
-    console.log("body----",req.body)
+
+    const { id } = req.body;
+    console.log("body----", req.body);
     try {
       let visits = await models.Visits.findAll({
         where: {
           UserZoneId: id
         },
         //where: {
-          //   entryDate: {
-          //     [Op.between]: [
-          //       `${moment().format("YYYY-MM-DD")} 00:00:00`,
-          //       `${moment().format("YYYY-MM-DD")} 23:59:00`
-          //     ]
-          // }
+        //   entryDate: {
+        //     [Op.between]: [
+        //       `${moment().format("YYYY-MM-DD")} 00:00:00`,
+        //       `${moment().format("YYYY-MM-DD")} 23:59:00`
+        //     ]
+        // }
         //},
         include: [
           { model: models.Citizen, as: "Visitante" },
@@ -1865,7 +1945,7 @@ password: "123456,
               },
               {
                 model: models.Zone,
-                as: "Zona",
+                as: "Zona"
                 // where: {
                 //   companyId
                 // }

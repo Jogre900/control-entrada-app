@@ -1,10 +1,15 @@
 import { useState } from "react";
 import axios from "axios";
 import { API_PORT } from "../config/index";
-import { LoadingModal } from "../components/loadingModal";
-let check = false;
-let msg = "";
-let item = null;
+import { createCitizen, findCitizendni } from './citizen'
+import { createVisit, findVisitdni } from './visit'
+
+export const helpers = {
+  createCitizen,
+  findCitizendni,
+  createVisit,
+  findVisitdni
+}
 
 //DELETE ANYTHING FROM API
 export async function deleteInfo(url, arrayIds) {
@@ -67,74 +72,7 @@ export async function fetchDestiny(companyId) {
   }
 }
 
-//CREATE VISIT
-export async function createVisit(visitData, token) {
-  const {
-    name,
-    lastName,
-    dni,
-    profileUri,
-    profileFileName,
-    profileFileType,
-    entryDate,
-    departureDate,
-    descriptionEntry,
-    visitUri,
-    visitFileName,
-    visitFileType,
-    userZoneId,
-    destinyId
-  } = visitData;
-  let data = new FormData();
-  data.append('name', name)
-  data.append('lastName', lastName)
-  data.append('dni', dni)
-  data.append('file', {uri: profileUri, name: profileFileName, type: profileFileType})
-  data.append('descriptionEntry', descriptionEntry)
-  data.append('entryDate', entryDate.toISOString())
-  data.append('departureDate', departureDate.toISOString())
-  data.append('file', {uri: visitUri, name: visitFileName, type: visitFileType})
-  data.append('userZoneId', userZoneId)
-  data.append('destinyId', destinyId)
-  try {
-    const res = await axios.post(`${API_PORT()}/api/visit`, data, {
-      headers: {
-        "content-type": "multipart/form-data",
-        Authorization: `bearer ${token}`,
-      },
-    });
-    return res
-  } catch (error) {
-    console.log(`Error: ${error.message}`)
-  }
-}
 
-//FIND VISIT BY DNI
-export async function findVisitdni(dni){
-  try {
-    const res = await axios.get(`${API_PORT()}/api/visit/${dni}`)
-    return res
-  } catch (error) {
-    console.log(`Error: ${error.message}`)
-  }
-}
-//TODAY VISITS
-export async function fetchTodayVisist(companyId, employee) {
-  console.log("uzid helper----", employee);
-  try {
-    let res = await axios({
-      method: "POST",
-      url: `${API_PORT()}/api/visits`,
-      data: { id: employee },
-    });
-    // `${API_PORT()}/api/findTodayVisits/${companyId}`, {data: employee});
-    console.log(res.data);
-
-    return res;
-  } catch (error) {
-    return error.message;
-  }
-}
 
 //ALL EMPLOYEES BY COMPANY
 export async function fetchAllEmployee(companyId) {
