@@ -1828,11 +1828,14 @@ password: "123456,
       data: null,
       tokn: null
     };
-    const { companyId } = req.params;
-
-    console.log(req.params);
+    
+    const { id } = req.body
+    console.log("body----",req.body)
     try {
       let visits = await models.Visits.findAll({
+        where: {
+          UserZoneId: id
+        },
         //where: {
           //   entryDate: {
           //     [Op.between]: [
@@ -1864,9 +1867,9 @@ password: "123456,
               {
                 model: models.Zone,
                 as: "Zona",
-                where: {
-                  companyId
-                }
+                // where: {
+                //   companyId
+                // }
                 // include: {
                 //   model: models.Company,
                 //   as: "companyZone",

@@ -68,12 +68,20 @@ export async function fetchDestiny(companyId) {
 }
 
 //TODAY VISITS
-export async function fetchTodayVisist(companyId) {
+export async function fetchTodayVisist(companyId, employee) {
+  console.log("uzid helper----",employee)
   try {
-    let res = await axios.get(`${API_PORT()}/api/findTodayVisits/${companyId}`);
-    if (!res.data.error) {
-      return res.data.data;
-    }
+    let res = await axios(
+      {
+        method: 'POST',
+        url: `${API_PORT()}/api/visits`,
+        data: {id: employee} 
+      })
+      // `${API_PORT()}/api/findTodayVisits/${companyId}`, {data: employee});
+    console.log(res.data)
+      
+      return res
+    
   } catch (error) {
     return error.message;
   }
@@ -82,10 +90,8 @@ export async function fetchTodayVisist(companyId) {
 //ALL EMPLOYEES BY COMPANY
 export async function fetchAllEmployee(companyId) {
   try {
-    const res = await axios.get(`${API_PORT()}/api/findUsers/${companyId}`);
-    if (!res.data.error) {
-      return res.data.data;
-    }
+    const res = await axios.get(`${API_PORT()}/api/user/${companyId}`);
+    return res
   } catch (error) {
     return error.message;
   }
@@ -94,10 +100,8 @@ export async function fetchAllEmployee(companyId) {
 //ALL EMPLOYEE FROM 1 ZONE
 export async function fetchEmployeeByZone(zoneId) {
   try {
-    const res = await axios.get(`${API_PORT()}/api/findUsersByZone/${zoneId}`);
-    if (!res.data.error) {
-      return res.data.data;
-    }
+    const res = await axios.get(`${API_PORT()}/api/user/${zoneId}`);
+   return res
   } catch (error) {
     return error.message;
   }

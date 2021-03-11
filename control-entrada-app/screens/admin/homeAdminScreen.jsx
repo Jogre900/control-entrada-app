@@ -44,7 +44,8 @@ const HomeAdminScreen = ({
   const [selectItem, setSeletedItem] = useState([]);
   const [loading, setLoading] = useState(true);
   const [visits, setVisits] = useState([]);
-
+  const [employee, setEmployee] = useState([]);
+  const [hasVisit, setHasVisit] = useState(true)
   //REQUEST ZONE BY ID
   const requestZone = async () => {
     setLoading(true);
@@ -54,6 +55,7 @@ const HomeAdminScreen = ({
   };
   //REQUEST ZONES
   const requestZones = async () => {
+    console.log("zonas");
     setLoading(true);
     const res = await fetchAllZones(company.id);
     saveZones(res);
@@ -61,6 +63,7 @@ const HomeAdminScreen = ({
   };
   //REQUEST ALL DESTINY BY COMPANY
   const requestAllDestiny = async () => {
+    console.log("destinos");
     setLoading(true);
 
     const res = await fetchDestiny(company.id);
@@ -68,32 +71,56 @@ const HomeAdminScreen = ({
     saveDestiny(res);
     setLoading(false);
   };
-  //VISITS
-  const requestVisits = async () => {
-    if (company) {
-      setLoading(true);
-      const res = await fetchTodayVisist(company.id);
-      saveTodayVisits(res);
-      setVisits(res);
-      setLoading(false);
-    }
-  };
 
   //REQUEST ALL EMPLOYEE FROM COMPANY
   const requestEmployee = async () => {
+    let uzArray = [];
+    let employee = []
     if (company) {
+      console.log("empleados");
       setLoading(true);
       const res = await fetchAllEmployee(company.id);
-      saveEmployee(res);
-      setLoading(false);
+      //console.log(res.data)
+      if (!res.data.error) {
+        res.data.data.map((e) => {
+          //console.log("map---", e.userZone);
+          uzArray.push(e.userZone[0]);
+        });
+        console.log("uzArray-------", uzArray);
+        uzArray.map(
+          (uz) => (
+            console.log("userZId------", uz.id),
+            employee.push(uz.id)
+          )
+        );
+        saveEmployee(res.data.data);
+        if (employee.length) {
+          const res = await fetchTodayVisist(company.id, employee);
+          if (!res.data.error && res.data.data.length) {
+            saveTodayVisits(res.data.data);
+            setVisits(res.data.data);
+            setLoading(false);
+            //setHasVisit(false)
+          }else if(!res.data.data.length){
+            setHasVisit(false)
+          }
+        }
+      } else {
+        console.log(res.data.msg);
+      }
     }
   };
   //REQUEST ALL EMPLOYEES FORM ONE ZONE
   const requestEmployeeByZone = async () => {
     setLoading(true);
     const res = await fetchEmployeeByZone(profile.userZone[0].ZoneId);
-    setLoading(false);
-    saveEmployee(res);
+    if (!res.data.error) {
+      saveEmployee(res.data.data);
+      setLoading(false);
+      
+    } else {
+      console.log(res.data.msg);
+    }
   };
 
   //REQUEST AVAILABLE
@@ -113,6 +140,21 @@ const HomeAdminScreen = ({
         setLoading(false);
         console.log(error.message);
       }
+    }
+  };
+
+  //VISITS
+  const requestVisits = async () => {
+    if (company) {
+      console.log("visits");
+      setLoading(true);
+      if (employee.length) {
+        console.log("empleados---", employee);
+      }
+      const res = await fetchTodayVisist(company.id, employee);
+      saveTodayVisits(res);
+      setVisits(res);
+      setLoading(false);
     }
   };
   //ONLONGPRESS
@@ -157,9 +199,9 @@ const HomeAdminScreen = ({
     privilege === "Admin" && requestAllDestiny();
   }, []);
 
-  useEffect(() => {
-    requestVisits();
-  }, []);
+  // useEffect(() => {
+  //   requestVisits();
+  // }, [employee]);
   useFocusEffect(
     React.useCallback(() => {
       BackHandler.addEventListener("hardwareBackPress", backAction);
@@ -185,10 +227,10 @@ const HomeAdminScreen = ({
           rightControl={Notifications(navigation)}
         />
       )}
-      {loading && <Spinner message='Cargando...'/>}
+      {loading && <Spinner message="Cargando..." />}
       {visits.length > 0 && (
         <ScrollView>
-          {visits.map((elem, i) => (
+          {visits.map((elem) => (
             <TouchableOpacity
               key={elem.id}
               onPress={
@@ -199,7 +241,6 @@ const HomeAdminScreen = ({
               onLongPress={() => onLong(elem.id)}
               delayLongPress={200}
             >
-              {/* <Text>algodon!!!</Text> */}
               <VisitCard
                 data={elem}
                 selected={selectItem.includes(elem.id) ? true : false}
@@ -208,6 +249,7 @@ const HomeAdminScreen = ({
           ))}
         </ScrollView>
       )}
+      {!hasVisit && <NotFound message="No hay visitas." />}
       <LogOutModal
         status={visible}
         navigation={navigation}

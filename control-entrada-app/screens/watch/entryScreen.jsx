@@ -32,11 +32,35 @@ import Avatar from "../../components/avatar.component";
 
 let destinyCaption, imageCaption, imageVisitCaption;
 
+let statusModalValues = {
+  visible: false,
+  message: "",
+  status: null,
+};
+
+let visitInitialValues = {
+  name: null,
+  lastName: null,
+  dni: null,
+  descriptionEntry: null,
+  entryDate: new Date(),
+  departureDate: new Date(),
+  userZoneId: null,
+  profileUri: null,
+  profileFileName: null,
+  profileFyleType: null,
+  visitUri: null,
+  visitFileName: null,
+  visitFyleType: null,
+};
+
 const EntryScreen = ({ navigation, profile, saveVisit }) => {
   //console.log("profile from redux---", profile);
 
   const destinys = profile.userZone[0].Zona.Destinos;
   const userZoneId = profile.userZone[0].id;
+
+  const [visitData, setVisitData] = useState(visitInitialValues);
 
   const [camera, setCamera] = useState(false);
   const [type, setType] = useState("");
@@ -164,14 +188,22 @@ const EntryScreen = ({ navigation, profile, saveVisit }) => {
     );
   };
   const profilePic = (uri, fileName, fileType, caption, changeImg) => {
-    setImgUrl(uri),
-      setFileName(fileName),
-      setFileType(fileType),
-      //imageCaption = caption,
-      setChangeImg(changeImg);
+    setVisitData((values) => ({
+      ...values,
+      profileUri: uri,
+      profileFileName: fileName,
+      profileFyleType: fileType,
+    }));
+    //imageCaption = caption,
+    setChangeImg(changeImg);
   };
   const visitPic = (uri, fileName, fileType, caption) => {
-    setVisitImg(uri), setFileName2(fileName), setFileType2(fileType);
+    setVisitData((values) => ({
+      ...values,
+      visitUri: uri,
+      visitFileName: fileName,
+      visitFyleType: fileType,
+    }));
     //imageVisitCaption = caption,
   };
   useEffect(() => {
@@ -193,55 +225,41 @@ const EntryScreen = ({ navigation, profile, saveVisit }) => {
         <TopNavigation title="Entrada" leftControl={goBackAction()} />
         <ScrollView contentContainerStyle={{ alignItems: "center" }}>
           <View style={styles.pickPictureContainer}>
-            <View style={styles.profilePicBox}>
-              {imgUrl ? (
-                 <Avatar.Picture size={120} uri={!editable ? `${API_PORT()}/public/imgs/${imgUrl}`
-                : imgUrl}/>
-              //   <Image style={{
-              //     height: 120,
-              //     width: 120,
-              //     borderRadius: 120/2
-              //   }} source={{uri: `${API_PORT()}/public/imgs/${imgUrl}`}}/>
-               ) : (
-                <TouchableOpacity
-                  onPress={() => {
-                    setCamera(true), setType("profile");
-                  }}
-                >
-                  <Avatar.Icon name="ios-camera" size={32} color="#8e8e8e" />
-                </TouchableOpacity>
-              )}
-
-              {changeImg && editable &&(
-                <TouchableOpacity
-                  onPress={() => {
-                    setCamera(true), setType("profile");
-                  }}
-                  style={styles.openCameraButton}
-                >
-                  <Ionicons name="ios-camera" size={48} color="#fff" />
-                </TouchableOpacity>
-              )}
-            </View>
-
             <View>
               <Text style={styles.captionText}>{imageCaption}</Text>
             </View>
           </View>
 
           <FormContainer title="Datos Personales">
+            <View style={styles.profilePicBox}>
+              {visitData.profileUri ? (
+                <Avatar.Picture
+                  size={120}
+                  uri={`${API_PORT()}/public/imgs/${visitData.profileUri}`}
+                />
+              ) : (
+                <Avatar.Icon size={32} name="md-photos" color="#8e8e8e" />
+              )}
+
+              <TouchableOpacity
+                onPress={() => {
+                  setCamera(true), setType("profile");
+                }}
+                style={styles.openCameraButton}
+              >
+                <Ionicons name="ios-camera" size={48} color="#fff" />
+              </TouchableOpacity>
+            </View>
             <Input
               title="Nombre"
               secureTextEntry={false}
-              shape="flat"
               icon="ios-person"
               returnKeyType="next"
               onSubmitEditing={() => lastNameRef.current.focus()}
               onChangeText={(name) => {
-                setName(name);
+                setVisitData((values) => ({ ...values, name }));
               }}
               editable={editable}
-              value={name}
               ref={nameRef}
             />
             <Input
@@ -251,24 +269,26 @@ const EntryScreen = ({ navigation, profile, saveVisit }) => {
               icon="ios-person"
               returnKeyType="next"
               onSubmitEditing={() => dniRef.current.focus()}
-              onChangeText={(lastname) => {
-                setLastName(lastname);
+              onChangeText={(lastName) => {
+                setVisitData((values) => ({ ...values, lastName }));
               }}
               editable={editable}
-              value={lastName}
+              
               ref={lastNameRef}
             />
             <View>
               <Input
-                title="DNI"
+                title="dni"
                 secureTextEntry={false}
                 shape="flat"
                 icon="ios-card"
                 keyBoradType="numeric"
                 returnKeyType="next"
                 onSubmitEditing={() => destinyRef.current.focus()}
-                onChangeText={(dni) => setDni(dni)}
-                value={dni}
+                onChangeText={(dni) => {
+                  setVisitData((values) => ({ ...values, dni }));
+                }}
+                
                 ref={dniRef}
               />
               <TouchableOpacity onPress={() => checkDni()}>
@@ -305,9 +325,9 @@ const EntryScreen = ({ navigation, profile, saveVisit }) => {
                 <Text style={styles.captionText}>{imageVisitCaption}</Text>
               </View>
               <View>
-                {visitImg ? (
+                {visitData.visitUri ? (
                   <Image
-                    source={{ uri: visitImg }}
+                    source={{ uri: visitData.visitUri }}
                     style={{
                       width: "100%",
                       height: 250,
@@ -334,7 +354,9 @@ const EntryScreen = ({ navigation, profile, saveVisit }) => {
               secureTextEntry={false}
               shape="flat"
               icon="md-create"
-              onChangeText={(entry) => setEntry(entry)}
+              onChangeText={(descriptionEntry) => {
+                setVisitData((values) => ({ ...values, descriptionEntry }));
+              }}
               value={entry}
             />
             <View>
@@ -358,7 +380,12 @@ const EntryScreen = ({ navigation, profile, saveVisit }) => {
         type={type}
       />
       <LoadingModal status={loading} message="Guardando..." />
-      <StatusModal status={success} onClose={() => setSuccess(false)} />
+      <StatusModal
+        {...statusModalProps}
+        onClose={() =>
+          setStatusModalProps((values) => ({ ...values, visible: false }))
+        }
+      />
     </View>
   );
 };

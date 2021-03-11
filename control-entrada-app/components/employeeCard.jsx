@@ -6,7 +6,6 @@ import { MainColor, ThirdColor, lightColor } from "../assets/colors";
 import moment from "moment";
 
 export const EmployeeCard = ({ data, key, zone }) => {
-  console.log("employee card------", data);
   return (
     <View style={styles.listEmployeBox} key={key}>
       <Avatar.Picture

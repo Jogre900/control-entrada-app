@@ -59,19 +59,22 @@ router.post(
 router.put("/updateAdmin/:companyId", Controllers.updateAdminId);
 router.post("/login", Controllers.login);
 router.get("/findUser/:id", Controllers.findUser)
-router.get("/findUsers/:companyId", Controllers.findUsers);
-router.get("/findUsersByZone/:zoneId", Controllers.findUsersByZone);
+router.get("/user/:companyId", Controllers.findUsers);
+router.get("/user/:zoneId", Controllers.findUsersByZone);
 router.get("/findAvailableUsers/:companyId", Controllers.findAvailableUsers);
 router.delete("/deleteUser/:id", Controllers.deleteUser);
 router.get("/findCompany/:id", Controllers.findCompany);
+//ZONES
+router.post("/createZone/:id", Controllers.createZone);
 router.get("/findZones/:companyId", Controllers.findZones);
 router.get("/findZone/:zoneId", Controllers.findZone);
-router.post("/createZone/:id", Controllers.createZone);
 router.delete("/zone", Controllers.deleteZone);
+//DESTINY
 router.post("/createDestiny/:id", Controllers.createDestiny);
 router.get("/findDestiny/:id", Controllers.findDestinyByZone);
 router.get("/findAllDestiny/:id", Controllers.findAllDestiny)
 router.delete("/deleteDestiny", Controllers.deleteDestiny);
+//ROUTAS PARA BORRAR
 router.post("/createEmployee", Controllers.createEmployee);
 router.get("/findEmployees", Controllers.findEmployees);
 router.post("/createUserZone", Controllers.createUserZone);
@@ -83,8 +86,9 @@ router.post("/password/:email", Controllers.recoverPassword)
 
 router.get("/findUserZone/:id", Controllers.findUserZone);
 router.get("/verifyToken", Controllers.verifyExpToken);
+//VISIT ROUTES
 router.post(
-  "/createVisit/:id",
+  "/visit/:id",
   middleware.verifyToken,
   uploadImg.array("file"),
   Controllers.createVisits
@@ -92,11 +96,14 @@ router.post(
 router.get("/findVisit/:dni", Controllers.findVisit);
 router.get("/findVisitId/:id", Controllers.findVisitId);
 router.put("/updateVisit/:id", middleware.verifyToken, Controllers.updateVisit);
-router.get("/findTodayVisits/:companyId", Controllers.findTodayVisits);
+
+
+router.post("/visits", Controllers.findTodayVisits);
 router.get("/findTodayVisitsByZone/:zoneId", Controllers.findTodayVisitsByZone);
 router.get("/findTodayVisitsByUser/:id", Controllers.findTodayVisitsByUser);
 router.get("/findWeekVisits/", Controllers.findWeekVisits);
 router.delete("/visit/", Controllers.deleteVisit);
+
 // NUEVAS RUTA AJUSTE SISTEMA
 router.post("/company", 
 uploadImg.array('file'),
@@ -111,8 +118,5 @@ router.post(
   uploadImg.single("file"),
   Controllers.createUserWatchman
 );
-//PRUEBAS
-router.get("/test", (req, res) => {
-  res.send("hello world");
-});
+
 module.exports = router;
