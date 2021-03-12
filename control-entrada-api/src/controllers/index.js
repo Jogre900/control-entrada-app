@@ -1136,7 +1136,7 @@ password: "123456,
       data: null,
       token: null
     };
-    
+
     const token = req.headers.authorization.split(" ")[1];
 
     let decode = jwt.verify(token, SECRETKEY);
@@ -1358,9 +1358,9 @@ password: "123456,
       data: null,
       token: null
     };
-    
+
     const token = req.headers.authorization.split(" ")[1];
-   
+
     try {
       let decode = jwt.verify(token, SECRETKEY);
       if (decode) {
@@ -1577,9 +1577,9 @@ password: "123456,
           (RESPONSE.data = citizen),
           (RESPONSE.msg = "Busqueda exitosa!");
         res.json(RESPONSE);
-      }else{
-        RESPONSE.msg = 'dni no registrado'
-        res.json(RESPONSE)
+      } else {
+        RESPONSE.msg = "dni no registrado";
+        res.json(RESPONSE);
       }
     } catch (error) {
       RESPONSE.msg = error.message;
@@ -1639,17 +1639,16 @@ password: "123456,
       RESPONSE.msg = error.message;
       res.json(RESPONSE);
     }
-   
   },
 
   //CREATE NEW CITIZEN AND VISIT
-  createCitizen: async function(req, res){
+  createCitizen: async function(req, res) {
     let RESPONSE = {
       error: true,
       data: null,
       msg: null,
       token: null
-    }
+    };
     const {
       name,
       lastName,
@@ -1659,9 +1658,9 @@ password: "123456,
       departureDate,
       descriptionDeparture,
       userZoneId,
-      destinyId,
+      destinyId
     } = req.body;
-    console.log("req.body create citizen--",req.body)
+    console.log("req.body create citizen--", req.body);
     try {
       let person = await models.Citizen.findOne({
         where: {
@@ -1810,13 +1809,9 @@ password: "123456,
           id
         },
         include: [
-          { model: models.Citizen, as: "Visitante" },
-          { model: models.Picture, as: "Fotos" },
-          {
-            model: models.Destination,
-            as: "Destino",
-            attributes: ["id", "name"]
-          },
+          { model: models.Citizen, as: "Visitante",},
+          { model: models.Destination, as: "Destino" },
+          { model: models.Picture, as: "Fotos"},
           {
             model: models.UserZone,
             as: "UserZone",
@@ -1855,12 +1850,14 @@ password: "123456,
     };
 
     const { dni } = req.params;
+    console.log(dni)
 
     try {
-      let visit = await models.Visits.findOne({
+      let visit = await models.Visits.findAll({
         include: [
           { model: models.Citizen, as: "Visitante", where: { dni } },
           { model: models.Destination, as: "Destino" },
+          { model: models.Picture, as: "Fotos"},
           {
             model: models.UserZone,
             as: "UserZone",
@@ -1876,16 +1873,10 @@ password: "123456,
               }
             ]
           }
-
-          // {model: models.UserZone, as: 'UserZone', include: [
-          //   {model: models.Zone, as: 'Zona'},
-          //   {model: models.User, as: 'User'}
-
-          // ]
         ]
       });
-
-      if (visit) {
+      console.log(visit)
+      if (visit.length > 0) {
         RESPONSE.error = false;
         RESPONSE.msg = "Consulta Exitosa";
         RESPONSE.data = visit;
@@ -1979,12 +1970,12 @@ password: "123456,
       data: null,
       tokn: null
     };
-    const { id } = req.params;
-    console.log(req.params);
+    const { userzoneId } = req.params;
+    console.log("VISIT BY USERZONE--", req.params);
     try {
       let visits = await models.Visits.findAll({
         where: {
-          UserZoneId: id
+          UserZoneId: userzoneId
           // entryDate: {
           //   [Op.between]: [
           //     `${moment().format("YYYY MM D, HH:mm:ss")} 00:00:00`,
@@ -1994,23 +1985,15 @@ password: "123456,
         },
         include: [
           { model: models.Citizen, as: "Visitante" },
-          {
-            model: models.Destination,
-            as: "Destino",
-            include: {
-              model: models.Zone,
-              as: "Zona",
-              attributes: ["id", "zone"]
-            }
-          },
-          { model: models.Picture, as: "Fotos" },
+          { model: models.Destination, as: "Destino" },
+          { model: models.Picture, as: "Fotos"},
           {
             model: models.UserZone,
-            attributes: ["id", "changeTurnDate", "assignationDate"],
+            as: "UserZone",
             include: [
+              { model: models.Zone, as: "Zona" },
               {
                 model: models.User,
-                attributes: ["email"],
                 as: "User",
                 include: {
                   model: models.Employee,

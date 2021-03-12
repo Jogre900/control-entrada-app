@@ -2,62 +2,35 @@ import React, { useState } from "react";
 import { FormContainer } from "./formContainer";
 import Input from "./input.component";
 import { MainButton } from "./mainButton.component";
-import { API_PORT } from "../config/index";
-import axios from "axios";
 import Modal from "react-native-modal";
-import { LoadingModal } from './loadingModal'
+import { LoadingModal } from "./loadingModal";
+import { helpers } from "../helpers";
+import { storage } from "../helpers/asyncStorage";
 
-export const SearchVisitModal = ({ status, search, onClose}) => {
-  const [dni, setDni] = useState()
-  const [dniVisit, setDniVisit] = useState()
+export const SearchVisitModal = ({ status, search, onClose }) => {
+  const [dni, setDni] = useState();
+  const [dniVisit, setDniVisit] = useState();
   const [loading, setLoading] = useState(false);
 
-  
   const requestVisit = async () => {
-    setLoading(true)
-    if (!dni) {
-        setLoading(false)
-        Alert.alert("Debe ingresar un DNI valido.");
-    } else {
-      try {
-        let res = await axios.get(`${API_PORT()}/api/findVisit/${dni}`);
-        console.log("busqueda por dni:----- ", res.data);
-        if (!res.data.error) {
-            setLoading(false)
-
-          
-          //console.log("Visitas//----", res.data.data.Visitas[0]);
-        }else{
-            setLoading(false)
-            alert(res.data.msg)
-        }
-      } catch (error) {
-        setLoading(false)
-        console.log(error.message);
-      }
-    }
-  };
-  
-  //CREATE DESTINY
-  const createDestiny = async () => {
     setLoading(true);
-    create(false);
-    try {
-      let res = await axios.post(`${API_PORT()}/api/createDestiny/${zoneId}`, {
-        name: destinyName,
-      });
-      if (!res.data.error) {
-        console.log(res.data.data);
-        setDestinyName("");
-        setLoading(false);
-        create(true);
-        onClose();
-      }
-    } catch (error) {
+    if (!dni) {
       setLoading(false);
-      console.log(error.message);
+      Alert.alert("Debe ingresar un DNI valido.");
+    } else {
+      const token = await storage.getItem("userToken");
+      const res = await helpers.findVisitdni(dni, token);
+      if (!res.data.error && res.data.data.length) {
+        setDni('')
+        search(res.data.data, true, res.data.msg);
+        setLoading(false);
+      } else {
+        setLoading(false);
+        search(res.data.data, false, res.data.msg);
+      }
     }
   };
+
   return (
     <Modal
       isVisible={status}
@@ -66,7 +39,7 @@ export const SearchVisitModal = ({ status, search, onClose}) => {
       useNativeDriver={true}
       animationIn="fadeInUp"
       animationInTiming={300}
-      onBackdropPress={onClose}
+      onBackdropPress={() => {onClose(), setDni('')}}
       animationOut="fadeOutDown"
       animationOutTiming={300}
       style={{
@@ -75,7 +48,10 @@ export const SearchVisitModal = ({ status, search, onClose}) => {
         alignItems: "center",
       }}
     >
-      <FormContainer style={{ padding: 20, elevation: 0 }} title="Busqueda por dni">
+      <FormContainer
+        style={{ padding: 20, elevation: 0 }}
+        title="Busqueda por dni"
+      >
         <Input
           style={{ borderColor: "black", marginBottom: 10 }}
           styleInput={{ color: "black" }}
@@ -83,17 +59,12 @@ export const SearchVisitModal = ({ status, search, onClose}) => {
           shape="square"
           icon="ios-card"
           returnKeyType="search"
-          returnKeyType='search'
+          returnKeyType="search"
           onSubmitEditing={() => requestVisit()}
           onChangeText={(valor) => setDni(valor)}
-            value={dni}
+          value={dni}
         />
-        <MainButton
-          title="Buscar"
-          onPress={() => {
-            alert("Hola");
-          }}
-        />
+        <MainButton title="Buscar" onPress={requestVisit} />
       </FormContainer>
       <LoadingModal status={loading} message="Buscando..." />
     </Modal>

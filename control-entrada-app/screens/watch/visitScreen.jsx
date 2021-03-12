@@ -1,42 +1,48 @@
 import React, { useState, useRef, useEffect } from "react";
 import {
   View,
-  Text,
   StyleSheet,
-  Animated,
   Dimensions,
   TouchableOpacity,
   ScrollView,
-  Image,
   Vibration,
-  ActivityIndicator,
 } from "react-native";
-import { RectButton } from "react-native-gesture-handler";
+
 import { TopNavigation } from "../../components/TopNavigation.component";
-import Input from "../../components/input.component";
-import { MainButton } from "../../components/mainButton.component";
+
 import { Ionicons } from "@expo/vector-icons";
-import FireMethods from "../../lib/methods.firebase";
-import * as ImagePicker from "expo-image-picker";
-import moment from "moment";
+
 import axios from "axios";
 import { API_PORT } from "../../config/index";
 import { MainColor, lightColor } from "../../assets/colors.js";
-import Modal from "react-native-modal";
+
 import { VisitCard } from "../../components/visitCard";
 import { FloatingBotton } from "../../components/floatingBotton";
 import { Spinner } from "../../components/spinner";
 import { SearchVisitModal } from "../../components/searchVisitModal";
 import { Header } from "../../components/header.component";
+import { helpers } from "../../helpers";
+import { storage } from "../../helpers/asyncStorage";
+import { StatusModal } from "../../components/statusModal";
+import { PrompModal } from "../../components/prompModal";
+import { NotFound } from "../../components/NotFound";
 import { connect } from "react-redux";
-const { width } = Dimensions.get("window");
+
+let statusModalValues = {
+  visible: false,
+  message: "",
+  status: null,
+};
 
 const VisitScreen = ({ navigation, profile }) => {
-  console.log("profile----", profile);
+  const [statusModalProps, setStatusModalProps] = useState(statusModalValues);
   const [loading, setLoading] = useState(false);
   const [selectItem, setSeletedItem] = useState([]);
   const [active, setActive] = useState(false);
   const [findIt, setFindIt] = useState(false);
+  const [promp, setPromp] = useState(false);
+  const [hasVisit, setHasVisit] = useState(true);
+
   const [citizen, setCitizen] = useState();
   const [showList, setShowList] = useState(false);
   const [dni, setDni] = useState("");
@@ -70,17 +76,14 @@ const VisitScreen = ({ navigation, profile }) => {
   const todayVisit = async () => {
     setVisits([]);
     setLoading(true);
-    try {
-      let res = await axios.get(
-        `${API_PORT()}/api/findTodayVisitsByUser/${profile.userZone[0].id}`
-      );
-      if (!res.data.error) {
-        setLoading(false);
-        setVisits(res.data.data);
-      }
-    } catch (error) {
+    const token = await storage.getItem("userToken");
+    const res = await helpers.findVisitUser(profile.userZone[0].id, token);
+    if (!res.data.error && res.data.data.length) {
       setLoading(false);
-      console.log("error: ", error);
+      setVisits(res.data.data);
+    } else if (!res.data.data.length) {
+      setLoading(false);
+      setHasVisit(false);
     }
   };
 
@@ -154,6 +157,32 @@ const VisitScreen = ({ navigation, profile }) => {
   //   </View>
   // )}
 
+  //CHECK SEARCH
+  const checkSearch = (data, status, message) => {
+    if (!status) {
+      setStatusModalProps((values) => ({
+        ...values,
+        visible: true,
+        status: false,
+        message,
+      }));
+    } else {
+      setActive(false)
+      setFindIt(true);
+      setvisitsDni(data);
+    }
+  };
+  //CHECK DELETE
+  const checkDeleted = (status, message) => {
+    setStatusModalProps((values) => ({
+      ...values,
+      visible: true,
+      status,
+      message,
+    }));
+    clearList();
+  };
+
   useEffect(() => {
     todayVisit();
   }, []);
@@ -168,7 +197,7 @@ const VisitScreen = ({ navigation, profile }) => {
         <Header
           value={selectItem.length}
           clearAction={clearList}
-          //deleteAction={() => deleteZones(selectItem)}
+          deleteAction={() => setPromp(true)}
           selectAction={selectAll}
         />
       ) : (
@@ -181,7 +210,7 @@ const VisitScreen = ({ navigation, profile }) => {
 
       {loading && <Spinner message="Cargando..." />}
 
-      {visits && !loading &&
+      {visits.length > 0 && !loading && !findIt && (
         <ScrollView>
           {visits.map((elem) => (
             <TouchableOpacity
@@ -194,14 +223,54 @@ const VisitScreen = ({ navigation, profile }) => {
               onLongPress={() => onLong(elem.id)}
               delayLongPress={200}
             >
-              <VisitCard data={elem} selected={selectItem.includes(elem.id) ? true : false}/>
+              <VisitCard
+                data={elem}
+                selected={selectItem.includes(elem.id) ? true : false}
+              />
             </TouchableOpacity>
           ))}
         </ScrollView>
-      }
+      )}
+
+      {findIt && visitsDni &&
+        visitsDni.map((elem) => (
+          <TouchableOpacity
+            key={elem.id}
+            onPress={
+              selectItem.length > 0
+                ? () => onLong(elem.id)
+                : () => navigation.navigate("departure", { id: elem.id })
+            }
+            onLongPress={() => onLong(elem.id)}
+            delayLongPress={200}
+          >
+            <VisitCard
+              data={elem}
+              selected={selectItem.includes(elem.id) ? true : false}
+            />
+          </TouchableOpacity>
+        ))}
 
       <FloatingBotton icon="ios-search" onPress={() => setActive(true)} />
-      <SearchVisitModal status={active} onClose={() => setActive(false)} />
+      <SearchVisitModal
+        status={active}
+        onClose={() => setActive(false)}
+        search={checkSearch}
+      />
+      <StatusModal
+        {...statusModalProps}
+        onClose={() =>
+          setStatusModalProps((values) => ({ ...values, visible: false }))
+        }
+      />
+      <PrompModal
+        visible={promp}
+        onClose={() => setPromp(false)}
+        deleted={checkDeleted}
+        data={selectItem}
+        url="visit"
+      />
+      {!hasVisit && !loading && <NotFound message="No hay visitas." />}
     </View>
   );
 };

@@ -23,12 +23,18 @@ import { LoadingModal } from "../../components/loadingModal";
 import { StatusModal } from "../../components/statusModal";
 import { FormContainer } from "../../components/formContainer";
 import { Spinner } from "../../components/spinner";
+import { helpers } from "../../helpers";
 import Avatar from "../../components/avatar.component";
 
-export const DepartureScreen = (props) => {
-  console.log("PARAMETROS----", props.route.params);
-  const { id } = props.route.params;
+let statusModalValues = {
+  visible: false,
+  message: "",
+  status: null,
+};
 
+export const DepartureScreen = (props) => {
+  const { id } = props.route.params;
+  const [statusModalProps, setStatusModalProps] = useState(statusModalValues);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -55,7 +61,7 @@ export const DepartureScreen = (props) => {
     setLoading(true);
     try {
       let res = await axios.get(`${API_PORT()}/api/findVisitId/${id}`);
-
+      console.log(res.data);
       if (!res.data.error) {
         setLoading(false);
         setVisit(res.data.data);
@@ -68,29 +74,24 @@ export const DepartureScreen = (props) => {
   //UPDATE ENTRY
   const updateEntry = async () => {
     let data = {
-      departureDate: moment(),
+      departureDate: new Date().toISOString(),
       descriptionDeparture: departureText,
     };
     setSuccess(false);
     setSaving(true);
     const token = await storage.getItem("userToken");
-    try {
-      let res = await axios.put(`${API_PORT()}/api/updateVisit/${id}`, data, {
-        headers: {
-          Authorization: `bearer ${token}`,
-        },
-      });
-
-      if (!res.data.error) {
-        console.log(res.data);
-        setEntryCheck(true);
-        setUpdateVisit(res.data.data);
-        setSuccess(true);
-        setSaving(false);
-      }
-    } catch (error) {
-      console.log("error: ", error.message);
+    const res = await helpers.updateVisit(id, data, token);
+    if (!res.data.error) {
+      console.log(res.data);
+      setEntryCheck(true);
+      setUpdateVisit(res.data.data);
       setSaving(false);
+      setStatusModalProps((values) => ({
+        ...values,
+        visible: true,
+        status: true,
+        message: res.data.msg,
+      }));
     }
   };
 
@@ -226,7 +227,12 @@ export const DepartureScreen = (props) => {
         </ScrollView>
       )}
       <LoadingModal status={saving} message="Guardando..." />
-      <StatusModal status={success} onClose={() => setSuccess(false)} />
+      <StatusModal
+        {...statusModalProps}
+        onClose={() =>
+          setStatusModalProps((values) => ({ ...values, visible: false }))
+        }
+      />
     </View>
   );
 };

@@ -95,15 +95,15 @@ router.post(
   Controllers.createVisits
 );
 router.get("/visit/:dni", Controllers.findVisit);
+router.get("/visits/:userzoneId", Controllers.findTodayVisitsByUser);
 router.get("/findVisitId/:id", Controllers.findVisitId);
-router.put("/updateVisit/:id", middleware.verifyToken, Controllers.updateVisit);
+router.get("/visit/:zoneId", Controllers.findTodayVisitsByZone);
+router.put("/visit/:id", middleware.verifyToken, Controllers.updateVisit);
+router.delete("/visit/", Controllers.deleteVisit);
 
 
 router.post("/visits", Controllers.findTodayVisits);
-router.get("/findTodayVisitsByZone/:zoneId", Controllers.findTodayVisitsByZone);
-router.get("/findTodayVisitsByUser/:id", Controllers.findTodayVisitsByUser);
 router.get("/findWeekVisits/", Controllers.findWeekVisits);
-router.delete("/visit/", Controllers.deleteVisit);
 
 //CITIZEN
 router.get("/citizen/:dni", middleware.verifyToken, Controllers.findCitizen)

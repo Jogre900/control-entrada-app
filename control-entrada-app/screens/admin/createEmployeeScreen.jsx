@@ -59,8 +59,7 @@ const CreateEmployeScreen = ({
     lastName: "",
     email: "",
     dni: "",
-    password: null,
-    privilege: null,
+    password: "",
     assignationDate: new Date(),
     changeTurnDate: new Date(),
     uri: null,
@@ -73,7 +72,7 @@ const CreateEmployeScreen = ({
   const [alertModal, setAlertModal] = useState(alertModalValues);
   const [statusModalProps, setStatusModalProps] = useState(statusModalValues);
   const [employeeData, setEmployeeData] = useState(employeeValues);
-  const [privilege, setPrivilege] = useState("supervisor");
+  const [privilege, setPrivilege] = useState("Supervisor");
 
   const [caption, setCaption] = useState("");
   const [timeCaption, setTimeCaption] = useState("");
@@ -189,7 +188,8 @@ const CreateEmployeScreen = ({
     //   setVisible(false);
     //   return;
     // }
-    setEmployeeData((values) => ({ ...values, privilege: privilege }));
+    console.log("privilege on CREATE SCREEN--", privilege)
+    employeeData.privilege = privilege
     try {
       if (privilege === "Supervisor") {
         const res = await createSupervisor(employeeData);

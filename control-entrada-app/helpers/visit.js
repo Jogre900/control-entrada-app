@@ -57,7 +57,20 @@ export async function createVisit(visitData, token) {
       console.log(`Error: ${error.message}`);
     }
   }
-  //TODAY VISITS
+  //TODAY VISITS BY USERZONE, ONE EMPLOYEE
+  export async function findVisitUser(userzoneId, token){
+    try {
+      const res = await axios.get(`${API_PORT()}/api/visits/${userzoneId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+      return res
+    } catch (error) {
+      console.log(error.message)
+    }
+  }
+  //TODAY VISITS FROM ALL EMPLOYEE
   export async function fetchTodayVisist(companyId, employee) {
     console.log("uzid helper----", employee);
     try {
@@ -72,5 +85,19 @@ export async function createVisit(visitData, token) {
       return res;
     } catch (error) {
       return error.message;
+    }
+  }
+
+  //UPDATE VISIT WITH DEPARTURE
+  export async function updateVisit(id, data, token){
+    try {
+      const res = await axios.put(`${API_PORT()}/api/visit/${id}`, data, {
+        headers: {
+          Authorization: `bearer ${token}`,
+        },
+      });
+      return res
+    } catch (error) {
+      console.log(error.message)
     }
   }

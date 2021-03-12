@@ -2,13 +2,16 @@ import { useState } from "react";
 import axios from "axios";
 import { API_PORT } from "../config/index";
 import { createCitizen, findCitizendni } from './citizen'
-import { createVisit, findVisitdni } from './visit'
+import { createVisit, findVisitdni, findVisitUser, updateVisit, fetchTodayVisist } from './visit'
 
 export const helpers = {
   createCitizen,
   findCitizendni,
   createVisit,
-  findVisitdni
+  fetchTodayVisist,
+  findVisitdni,
+  findVisitUser,
+  updateVisit
 }
 
 //DELETE ANYTHING FROM API
@@ -288,13 +291,13 @@ export async function createSupervisor(employeeData) {
     zoneId,
     companyId,
   } = employeeData;
-
+  console.log("privilege FETCH SUPER--",privilege)
   let data = new FormData();
   data.append("name", name);
   data.append("lastName", lastName);
   data.append("dni", dni);
   data.append("email", email);
-  data.append("password", password);
+  data.append("password", '12345');
   data.append("privilege", privilege);
   data.append("assignationDate", assignationDate.toISOString());
   data.append("changeTurnDate", changeTurnDate.toISOString());
@@ -330,13 +333,13 @@ export async function createWatchman(employeeData) {
     zoneId,
     companyId,
   } = employeeData;
-
+  console.log("privilege FETCH WACT--",privilege)
   let data = new FormData();
   data.append("name", name);
   data.append("lastName", lastName);
   data.append("dni", dni);
   data.append("email", email);
-  data.append("password", password);
+  data.append("password", '12345');
   data.append("privilege", privilege);
   data.append("assignationDate", assignationDate.toISOString());
   data.append("changeTurnDate", changeTurnDate.toISOString());

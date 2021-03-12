@@ -26,7 +26,7 @@ import {
   fetchDestiny,
   fetchAllEmployee,
   fetchEmployeeByZone,
-  fetchTodayVisist,
+  helpers
 } from "../../helpers/";
 
 const HomeAdminScreen = ({
@@ -80,13 +80,11 @@ const HomeAdminScreen = ({
       console.log("empleados");
       setLoading(true);
       const res = await fetchAllEmployee(company.id);
-      //console.log(res.data)
       if (!res.data.error) {
         res.data.data.map((e) => {
-          //console.log("map---", e.userZone);
           uzArray.push(e.userZone[0]);
         });
-        console.log("uzArray-------", uzArray);
+        // console.log("uzArray-------", uzArray);
         uzArray.map(
           (uz) => (
             console.log("userZId------", uz.id),
@@ -95,7 +93,7 @@ const HomeAdminScreen = ({
         );
         saveEmployee(res.data.data);
         if (employee.length) {
-          const res = await fetchTodayVisist(company.id, employee);
+          const res = await helpers.fetchTodayVisist(company.id, employee);
           if (!res.data.error && res.data.data.length) {
             saveTodayVisits(res.data.data);
             setVisits(res.data.data);
