@@ -27,12 +27,10 @@ import HomeAdminScreen from "../screens/admin/homeAdminScreen";
 import { DetailViewScreen } from "../screens/admin/detailViewScreen";
 import ZonasScreen from "../screens/admin/zonesScreen";
 import ZoneDetailScreen from "../screens/admin/zoneDetailScreen";
-import SuperZoneDetailScreen from "../screens/admin/superZoneDetailScreen";
 import AsignEmployee from "../screens/admin/asignEmployeeScreen";
 import { NotificationScreen } from "../screens/admin/notificationScreen";
 import CompanyScreen from "../screens/admin/createCompanyScreen";
 import DestinyScreen from "../screens/admin/destinyScreen";
-import SuperDestinyScreen from "../screens/admin/superDestinyScreen";
 import HistorialScreen from "../screens/admin/historialScreen";
 import PerfilScreen from "../screens/admin/perfilScreen";
 import EditProfileScreen from "../screens/admin/editProfileScreen";
@@ -190,13 +188,11 @@ const AdminNavigator = () => {
       {privilege === "Admin" ? (
         <drawer.Screen name="Zones" component={ZonasScreen} />
       ) : (
-        <drawer.Screen name="Zones" component={SuperZoneDetailScreen} />
+        <drawer.Screen name="Zones" component={ZoneDetailScreen} />
       )}
-      {privilege === "Admin" ? (
+     
         <drawer.Screen name="Destiny" component={DestinyScreen} />
-      ) : (
-        <drawer.Screen name="Destiny" component={SuperDestinyScreen} />
-      )}
+      
     </drawer.Navigator>
   );
 };

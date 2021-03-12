@@ -208,7 +208,7 @@ const HomeAdminScreen = ({
     }
   }, []);
   useEffect(() => {
-    privilege === "Admin" && requestAllDestiny();
+    requestAllDestiny();
   }, []);
 
   // useEffect(() => {

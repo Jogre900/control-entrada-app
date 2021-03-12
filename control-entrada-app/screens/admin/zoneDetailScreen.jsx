@@ -3,32 +3,20 @@ import {
   View,
   Text,
   StyleSheet,
-  TouchableHighlight,
-  FlatList,
   ScrollView,
   TouchableOpacity,
-  Alert,
-  Image,
-  ActivityIndicator,
   Vibration,
 } from "react-native";
 import axios from "axios";
 import { connect } from "react-redux";
-import { useFocusEffect } from "@react-navigation/native";
+
 
 //componentes
 import { API_PORT } from "../../config/index.js";
 import { TopNavigation } from "../../components/TopNavigation.component.jsx";
-import Input from "../../components/input.component";
 import { MainButton } from "../../components/mainButton.component";
 import { Ionicons } from "@expo/vector-icons";
-import moment from "moment";
-import { Divider } from "../../components/Divider";
 import { MainColor, lightColor } from "../../assets/colors";
-import CheckBox from "@react-native-community/checkbox";
-import Avatar from "../../components/avatar.component";
-import DateTimePicker from "@react-native-community/datetimepicker";
-import Modal from "react-native-modal";
 import { EmployeeCard } from "../../components/employeeCard";
 import { DestinyCard } from "../../components/destinyCard";
 import { ZoneDetailCard } from "../../components/zoneDetailCard";
@@ -45,28 +33,21 @@ const ZoneDetailScreen = ({
   availableU,
   setNewEmployee,
 }) => {
-  const { zoneId } = route?.params;
+  const  zoneId  = privilege === 'Admin' ? route?.params : userZone[0].ZoneId;
   const [selectItem, setSeletedItem] = useState([]);
   const [loading, setLoading] = useState(false);
-  //const [zoneId, setZoneId] = useState(route.params.zoneId)
-  //const [params, setParams] = useState()
-  const [destiny, setDestiny] = useState();
-  const [zoneEmployee, setZoneEmployee] = useState();
   //const [availableU, setAvailableU] = useState([]);
-  const [user, setUser] = useState();
-  const [modalVisible, setModalVisible] = useState(false);
-  const [show, setShow] = useState(false);
-  const [changeTurn, setChangeTurn] = useState(new Date());
   const [listVisible, setListVisible] = useState(false);
-  const [check, setCheck] = useState(false);
   const [zoneApi, setZoneApi] = useState();
+  const [destiny, setDestiny] = useState()
+  const [zoneEmployee, setZoneEmployee] = useState()
   // const zoneId = id;
   const goBackAction = () => {
     return (
       <View>
         <TouchableOpacity
           onPress={() => {
-            navigation.navigate("Zones");
+            navigation.navigate(privilege === 'Admin' ? "Zones" : "admin-home");
           }}
         >
           <Ionicons name="ios-arrow-back" size={28} color="white" />

@@ -32,6 +32,8 @@ let statusModalValues = {
 const DestinyScreen = ({
   navigation,
   zonesRedux,
+  privilege,
+  userZone,
   destinos,
   addDestiny,
   removeDestiny,
@@ -108,7 +110,16 @@ const DestinyScreen = ({
   };
   useEffect(() => {
     let filterDestiny = [];
-    filterDestiny = destinos.filter((elem) => elem.zoneId === zoneId);
+    console.log("destinos REdix---", destinos);
+    if (privilege === "Admin") {
+      filterDestiny = destinos.filter((elem) => elem.zoneId === zoneId);
+    } else {
+      filterDestiny = destinos.filter(
+        (elem) => elem.zoneId === userZone[0].ZoneId
+      );
+    }
+    console.log("filter---", filterDestiny);
+
     setDestinys(filterDestiny);
   }, [zoneId]);
 
@@ -132,26 +143,28 @@ const DestinyScreen = ({
         <TopNavigation title="Destinos" leftControl={goBackAction()} />
       )}
       {loading && <Spinner />}
-      {zonesRedux.length ? (
+      {zonesRedux.length || zonesRedux ? (
         <ScrollView contentContainerStyle={{ alignItems: "center" }}>
-          <FormContainer title="Seleccione la Zona" style={{ marginTop: 10 }}>
-            <Picker
-              mode="dropdown"
-              selectedValue={zoneId}
-              onValueChange={(value) => {
-                setZoneId(value);
-              }}
-            >
-              {zonesRedux.map((item) => {
-                return (
-                  <Picker.Item
-                    label={item.zone}
-                    value={item.id}
-                    key={item.id}
-                  />
-                );
-              })}
-            </Picker>
+          <FormContainer title={privilege === 'Admin' ? "Selecione la zona" : zonesRedux.zone} style={{ marginTop: 10 }}>
+            {privilege === "Admin" && (
+              <Picker
+                mode="dropdown"
+                selectedValue={zoneId}
+                onValueChange={(value) => {
+                  setZoneId(value);
+                }}
+              >
+                {zonesRedux.map((item) => {
+                  return (
+                    <Picker.Item
+                      label={item.zone}
+                      value={item.id}
+                      key={item.id}
+                    />
+                  );
+                })}
+              </Picker>
+            )}
             {destinys.length ? (
               <>
                 {destinys.map((item) => (
@@ -184,7 +197,7 @@ const DestinyScreen = ({
       )}
 
       <CreateDestinyModal
-        zoneId={zoneId}
+        zoneId={privilege === 'Admin' ? zoneId : userZone[0].ZoneId}
         status={visible}
         create={checkCreate}
         onClose={() => setVisible(false)}
@@ -202,7 +215,7 @@ const DestinyScreen = ({
           setStatusModalProps((values) => ({ ...values, visible: false }))
         }
       />
-      {zonesRedux.length ? (
+      {zonesRedux.length || zonesRedux ? (
         <FloatingBotton icon="ios-add" onPress={() => setVisible(true)} />
       ) : null}
     </View>
@@ -212,6 +225,8 @@ const DestinyScreen = ({
 const mapStateToProps = (state) => ({
   zonesRedux: state.zones.zones,
   destinos: state.destiny.destinys,
+  userZone: state.profile.profile.userZone,
+  privilege: state.profile.login.privilege,
 });
 
 const mapDispatchToProps = (dispatch) => ({

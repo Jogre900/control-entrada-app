@@ -39,8 +39,8 @@ export const CreateDestinyModal = ({ status, create, onClose, zoneId }) => {
         setDestinyName("");
         setCaption("");
         setLoading(false);
-        create(true, res.data.msg, res.data.data);
         onClose();
+        create(true, res.data.msg, res.data.data);
       }
     } catch (error) {
       setLoading(false);
