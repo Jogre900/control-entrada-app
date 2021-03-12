@@ -16,6 +16,10 @@ export default (state = initialState, action = {}) => {
           ...state,
           today: newVisits 
         }
+        case "CLEAR_STORAGE":
+      return {
+        today: []
+      }  
     default:
       return state;
   }

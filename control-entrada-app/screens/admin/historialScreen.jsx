@@ -5,7 +5,7 @@ import {
   StyleSheet,
   Vibration,
   TouchableOpacity,
-  ScrollView
+  ScrollView,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -15,15 +15,15 @@ import { VisitCard } from "../../components/visitCard";
 import { Header } from "../../components/header.component";
 import { StatusModal } from "../../components/statusModal";
 import { PrompModal } from "../../components/prompModal";
+import { NotFound } from "../../components/NotFound";
 import { connect } from "react-redux";
 
 const HistorialScreen = ({ navigation, visits, removeVisit }) => {
- 
   const [selectItem, setSeletedItem] = useState([]);
-  const [message, setMessage] = useState("")
-  const [create, setCreate] = useState(false)
-  const [promp, setPromp] = useState(false)
-  const [status, setStatus] = useState(false)
+  const [message, setMessage] = useState("");
+  const [create, setCreate] = useState(false);
+  const [promp, setPromp] = useState(false);
+  const [status, setStatus] = useState(false);
   const goBackAction = () => {
     return (
       <View>
@@ -55,9 +55,9 @@ const HistorialScreen = ({ navigation, visits, removeVisit }) => {
     setSeletedItem(array);
   };
 
-   //CHECK DELETE
+  //CHECK DELETE
   const checkDeleted = (status, message) => {
-    setStatus(status)
+    setStatus(status);
     setMessage(message), setCreate(true);
     if (status) {
       removeVisit(selectItem);
@@ -66,7 +66,7 @@ const HistorialScreen = ({ navigation, visits, removeVisit }) => {
   };
 
   return (
-    <View>
+    <View style={{flex: 1}}>
       {selectItem.length > 0 ? (
         <Header
           value={selectItem.length}
@@ -77,25 +77,29 @@ const HistorialScreen = ({ navigation, visits, removeVisit }) => {
       ) : (
         <TopNavigation title="Historial" leftControl={goBackAction()} />
       )}
-      <ScrollView>
-        {visits.map((elem) => (
-          <TouchableOpacity
-            key={elem.id}
-            onPress={
-              selectItem.length > 0
-                ? () => onLong(elem.id)
-                : () => navigation.navigate("detail-view", { id: elem.id })
-            }
-            onLongPress={() => onLong(elem.id)}
-            delayLongPress={200}
-          >
-            <VisitCard
-              data={elem}
-              selected={selectItem.includes(elem.id) ? true : false}
-            />
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
+      {visits.length > 0 && (
+        <ScrollView>
+          {visits.map((elem) => (
+            <TouchableOpacity
+              key={elem.id}
+              onPress={
+                selectItem.length > 0
+                  ? () => onLong(elem.id)
+                  : () => navigation.navigate("detail-view", { id: elem.id })
+              }
+              onLongPress={() => onLong(elem.id)}
+              delayLongPress={200}
+            >
+              <VisitCard
+                data={elem}
+                selected={selectItem.includes(elem.id) ? true : false}
+              />
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      )}
+
+      {!visits.length && <NotFound message="No hay visitas." />}
       <PrompModal
         visible={promp}
         onClose={() => setPromp(false)}
@@ -117,13 +121,13 @@ const mapStateToProps = (state) => ({
   visits: state.visits.today,
 });
 const mapDispatchToPros = (dispatch) => ({
-  removeVisit(visits){
+  removeVisit(visits) {
     dispatch({
-      type: 'REMOVE_VISIT',
-      payload: visits
-    })
-  }
-})
+      type: "REMOVE_VISIT",
+      payload: visits,
+    });
+  },
+});
 
 export default connect(mapStateToProps, mapDispatchToPros)(HistorialScreen);
 

@@ -26,8 +26,7 @@ import { FormContainer } from "../../components/formContainer";
 import Avatar from "../../components/avatar.component";
 
 const WatchProfileScreen = ({ navigation, profile }) => {
-  console.log("redux:----", profile);
-  const destiny = profile.userZone[0].Zona.Destinos;
+  
   const [editVisibility, setEditVisibility] = useState(false);
   const [passChange, setPassChange] = useState("");
   const [repeatPass, setRepeatPass] = useState("");
@@ -38,30 +37,6 @@ const WatchProfileScreen = ({ navigation, profile }) => {
   const [loading, setLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
 
-  // //GET PROFILE
-  // const getProfile = async () => {
-  //   setLoading(true);
-  //   const token = await AsyncStorage.getItem("watchToken");
-  //   console.log("token del local storage:---", token);
-  //   if (token) {
-  //     try {
-  //       let res = await axios.get(`${API_PORT()}/api/profile`, {
-  //         headers: {
-  //           Authorization: `bearer ${token}`,
-  //         },
-  //       });
-  //       if (res) {
-  //         console.log("Profile:--", res.data);
-  //         setLoading(false);
-  //         setProfile(res.data.data);
-  //         setDestiny(res.data.data.userZone[0].Zone.Destinos);
-  //       }
-  //     } catch (error) {
-  //       console.log("error: ", error.response);
-  //     }
-  //   }
-  // };
-  
   const goBackAction = () => {
     return (
       <View>
@@ -243,7 +218,7 @@ const WatchProfileScreen = ({ navigation, profile }) => {
                   />
                 </TouchableOpacity>
               </View>
-              {destinyvisibility && <DestinyList destiny={destiny} />}
+              {destinyvisibility && <DestinyList destiny={profile.userZone[0].Zona.Destinos} />}
             </View>
           </FormContainer>
           {/* <View style={styles.editContainer}>

@@ -7,7 +7,7 @@ import {
   TouchableWithoutFeedback,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { MainColor } from "../assets/colors.js";
+import { MainColor, Danger } from "../assets/colors.js";
 
 const Input = (props, ref) => {
   // ----LA REF NO ME LLEGA POR PROPS----!!!
@@ -28,7 +28,7 @@ const Input = (props, ref) => {
     autoCorrect,
     onSubmitEditing,
     caption,
-    editable
+    editable,
   } = props;
   const [eyeIcon, setEyeIcon] = React.useState(true);
   const [iconInput, setIconInput] = React.useState("ios-eye-off");
@@ -60,20 +60,27 @@ const Input = (props, ref) => {
   });
 
   const renderCaption = () => {
-    if(caption){
+    if (caption) {
       //setCaptionVisibily(!captionVisibily)
       return (
         <View>
           <Text style={styles.captionText}>{caption}</Text>
         </View>
-      )
-    }else return null
-  }
+      );
+    } else return null;
+  };
 
   return (
     <View style={{ marginBottom: 10 }}>
       <TouchableWithoutFeedback onPress={() => focus()}>
-        <View style={[style, styles.flatShape, styleRound]}>
+        <View
+          style={[
+            style,
+            {borderColor: caption ? Danger : '#8e8e8e'},
+            !shape && styles.squareShape,
+            shape === "flat" && styles.flatShape,
+          ]}
+        >
           {shape != "round" ? (
             <TouchableWithoutFeedback
               onPress={() => showPass()}
@@ -81,7 +88,7 @@ const Input = (props, ref) => {
             >
               <Ionicons
                 name={secureTextEntry ? iconInput : icon}
-                size={28}
+                size={26}
                 color="grey"
                 style={{ marginRight: 12 }}
               />
@@ -120,21 +127,32 @@ const styles = StyleSheet.create({
     height: 40,
     borderColor: MainColor,
   },
-  squareShape: {
-    borderRadius: 3,
-    borderWidth: 0.5,
-    height: 40,
-    //width: '100%'
-  },
   flatShape: {
     flexDirection: "row",
     alignItems: "center",
     borderBottomWidth: 0.5,
     height: 40,
+    //borderColor: "#8e8e8e",
+    padding: 5
+  },
+  squareShape: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderWidth: 0.5,
+    height: 40,
+    //borderColor: "#8e8e8e",
+    padding: 5,
+    borderRadius: 5,
+    backgroundColor: "#eee",
+  },
+  caption: {
+    borderWidth: 0.5,
+    borderColor: Danger
   },
   captionText: {
-    color: "red",
-    alignSelf: "center",
+    color: Danger,
+    //alignSelf: "center",
     fontSize: 14,
+    fontWeight: '600'
   },
 });

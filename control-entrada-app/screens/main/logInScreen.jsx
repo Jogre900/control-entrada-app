@@ -15,13 +15,18 @@ import { login } from "../../helpers/";
 import { FormContainer } from "../../components/formContainer";
 import { RecoverPassModal } from "../../components/recoverPassModal";
 import { StatusModal } from "../../components/statusModal";
-import { validateForm } from '../../helpers/forms'
+import { validateEmail, validatePass } from '../../helpers/forms'
 import { storage } from "../../helpers/asyncStorage";
 
 let passModalValues = {
   visible: false,
   onClose: false,
 };
+
+let captionInitialValues = {
+  email: null,
+  password: null
+}
 
 let statusModalValues = {
   visible: false,
@@ -30,8 +35,8 @@ let statusModalValues = {
 };
 
 let loginInitialValues = {
-  email: null,
-  password: null
+  email: '',
+  password: ''
 }
 
 const LoginScreen = ({
@@ -43,14 +48,12 @@ const LoginScreen = ({
 }) => {
   
   const [loginData, setLoginData] = useState(loginInitialValues)
+  const [captionValues, setCaptionValues] = useState(captionInitialValues)
   
-  const [email, setEmail] = useState("");
-  const [pass, setPass] = useState("");
 
 
   const [caption, setCaption] = useState("");
-  const [emailCaption, setEmailCaption] = useState("");
-  const [passCaption, setPassCaption] = useState("");
+  
   const [modalVisible, setModalVisible] = useState(false);
   const [passModal, setPassModal] = useState(passModalValues);
   const [modalProps, setModalProps] = useState(statusModalValues);
@@ -83,6 +86,14 @@ const LoginScreen = ({
     //     return;
     //   }
     // }
+
+    const emailError = validateEmail(loginData.email)
+    const passError = validatePass(loginData.password)
+    if(emailError || passError){
+      setCaptionValues(() => ({email: emailError, password: passError})) 
+      setModalVisible(false)
+      return
+    }
     
     try {
       const res = await login(loginData);
@@ -191,10 +202,10 @@ const LoginScreen = ({
               shape="flat"
               keyboardType="email-address"
               returnKeyType="next"
-              caption={emailCaption}
+              caption={captionValues.email}
               onSubmitEditing={() => nextInput.current.focus()}
               onChangeText={(email) => {
-                setLoginData(values => ({...values, email})), setEmailCaption(""), setCaption("");
+                setLoginData(values => ({...values, email})), setCaptionValues(values => ({...values, email: ''}))
               }}
               
             />
@@ -205,10 +216,10 @@ const LoginScreen = ({
               shape="flat"
               returnKeyType="done"
               secureTextEntry={true}
-              caption={passCaption}
+              caption={captionValues.password}
               onSubmitEditing={() => signIn()}
               onChangeText={(password) => {
-                setLoginData(values => ({...values, password})), setPassCaption(""), setCaption("");
+                setLoginData(values => ({...values, password})), setCaptionValues(values => ({...values, password: ''}))
               }}
               
               ref={nextInput}

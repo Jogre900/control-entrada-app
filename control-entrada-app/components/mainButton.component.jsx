@@ -4,7 +4,7 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  TouchableHighlight,
+  ActivityIndicator
 } from "react-native";
 import { MainColor } from "../assets/colors";
 import { Ionicons } from "@expo/vector-icons";
@@ -16,19 +16,29 @@ const Icon = ({ size, name, color, onPress, style }) => {
   );
 };
 
-export const MainButton = ({ title, onPress, textStyle, style, outline, rounded }) => {
+export const MainButton = ({ title, onPress, textStyle, style, outline, rounded, loading }) => {
   return (
     <TouchableOpacity
       style={[
-        rounded ? styles.rounded : styles.square,
-        outline ? styles.outline : styles.filled,
+        styles.square,
+        // rounded ? styles.rounded : styles.square,
+        // outline ? styles.outline : styles.filled,
         style,
       ]}
       onPress={onPress}
     >
+      <View style={{ width: '70%', }}>
+
       <Text style={[outline ? styles.outlineText : styles.text, textStyle]}>
         {title}
       </Text>
+      </View>
+      {/* {
+        //loading &&
+        <View style={{ width:'30%', }}>
+        <ActivityIndicator size='small' color='#fff'/>
+      </View>
+      } */}
     </TouchableOpacity>
   );
 };
@@ -37,13 +47,13 @@ MainButton.Icon = Icon;
 const styles = StyleSheet.create({
   square: {
     borderRadius: 5,
-    borderWidth: 1,
-    height: 40,
-    justifyContent: "center",
+    height: 45,
     alignItems: "center",
     backgroundColor: MainColor,
     borderColor: MainColor,
     borderWidth: 1,
+    flexDirection: 'row',
+    justifyContent: 'center'
   },
   rounded: {
     borderRadius: 20,
@@ -64,8 +74,9 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 16,
-    color: "white",
-    fontWeight: "500",
+    color: "#fff",
+    fontWeight: "600",
+    alignSelf: 'center'
     // letterSpacing: 2,
   },
   outlineText: {

@@ -11,7 +11,8 @@ import { StatusModal } from "../../components/statusModal";
 import { LoadingModal } from "../../components/loadingModal";
 import { Ionicons } from "@expo/vector-icons";
 import { MainColor } from "../../assets/colors";
-import { updateProfile } from "../../helpers/index";
+import { updateProfile } from "../../helpers";
+import { storage } from '../../helpers/asyncStorage'
 import { connect } from "react-redux";
 
 let initialValues = {
@@ -49,25 +50,41 @@ const EditWatchProfileScreen = ({
   const updateWatchProfile = async () => {
     setLoading(true);
     const { pass, repPass } = formValues;
-    if (pass !== repPass) {
-      alert("las contraseña deben ser iguales");
-      return;
-    }
+    // if (pass === repPass) {
+    //   alert("las contraseña deben ser iguales");
+    //   return;
+    // }
     try {
-      const { slogin, sprofile, res } = await updateProfile(
-        formValues,
-        fileValues,
-        profile.id
-      );
-      saveLogin(slogin);
-      saveProfile(sprofile);
-      setLoading(false);
-      setModalProps((values) => ({
-        ...values,
-        visible: true,
-        message: res.data.msg,
-        status: true,
-      }));
+      const res = await updateProfile(formValues, fileValues, profile.id);
+      if (!res.data.error) {
+        let slogin = {
+          token: res.data.token,
+          userId: res.data.data.id,
+          privilege: res.data.data.UserCompany[0].privilege,
+        };
+        let sprofile = {
+          id: res.data.data.Employee.id,
+          dni: res.data.data.Employee.dni,
+          name: res.data.data.Employee.name,
+          lastName: res.data.data.Employee.lastName,
+          picture: res.data.data.Employee.picture,
+          email: res.data.data.email,
+          userZone: res.data.data.userZone
+        };
+
+        await storage.removeItem("userToken");
+        await storage.setItem("userToken", res.data.token);
+
+        saveLogin(slogin);
+        saveProfile(sprofile);
+        setLoading(false);
+        setModalProps((values) => ({
+          ...values,
+          visible: true,
+          message: res.data.msg,
+          status: true,
+        }));
+      }
     } catch (error) {
       setLoading(false);
       setModalProps((values) => ({

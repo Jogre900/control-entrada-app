@@ -1,34 +1,35 @@
 const messages = {
 require: 'El campo es requerido',
-minLength: 'El valor es muy corto'
+minLength: 'Formato de email erroneo',
+maxLength: 'Formato de email erroneo'
 }
 
-export function validateForm(datos, rules){
-    console.log(datos)
-    console.log(rules)
-    let rulesArray = []
-    let errors = {
-        message: ''
+export function validateEmail(email){
+    let errors = null    
+    if(!email){
+        errors = messages.require
+        return errors
     }
-    Object.values(rules).map((value) => {
-        switch (value) {
-            case 'email':
-                console.log("es un email")
-                if(email === ''){
-                    return errors.message= messages.require
-                }else if(email.length <= 3){
-                    return errors.message = messages.minLength 
-                }
-                console.log(errors)
-                break;
-        case 'password':
-            console.log("es un password")
-            break
-            default:
-                break;
-        }
-})
+    if(email.length < 4){
+        errors = messages.minLength
+        return errors
+    }
+    if(email.length > 15){
+        errors = messages.maxLength
+        return errors
+    }
+    return errors
+}
 
-    
-    
+export function validatePass(pass){
+    let errors = null
+    if(pass.length === 0){
+        errors = messages.require
+        return errors
+    }
+    if(pass.length < 4){
+        errors = messages.minLength
+        return errors
+    }
+    return errors
 }

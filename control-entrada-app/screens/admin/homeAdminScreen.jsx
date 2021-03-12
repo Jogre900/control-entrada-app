@@ -26,7 +26,7 @@ import {
   fetchDestiny,
   fetchAllEmployee,
   fetchEmployeeByZone,
-  helpers
+  helpers,
 } from "../../helpers/";
 
 const HomeAdminScreen = ({
@@ -45,11 +45,12 @@ const HomeAdminScreen = ({
   const [loading, setLoading] = useState(true);
   const [visits, setVisits] = useState([]);
   const [employee, setEmployee] = useState([]);
-  const [hasVisit, setHasVisit] = useState(true)
+  const [hasVisit, setHasVisit] = useState(true);
   //REQUEST ZONE BY ID
   const requestZone = async () => {
     setLoading(true);
     const res = await fetchZonyById(profile.userZone[0].ZoneId);
+    console.log("supervisor zone", res);
     setLoading(false);
     saveZones(res);
   };
@@ -75,21 +76,17 @@ const HomeAdminScreen = ({
   //REQUEST ALL EMPLOYEE FROM COMPANY
   const requestEmployee = async () => {
     let uzArray = [];
-    let employee = []
+    let employee = [];
     if (company) {
-      console.log("empleados");
       setLoading(true);
       const res = await fetchAllEmployee(company.id);
-      if (!res.data.error) {
+      if (!res.data.error && res.data.data.length) {
         res.data.data.map((e) => {
           uzArray.push(e.userZone[0]);
         });
         // console.log("uzArray-------", uzArray);
         uzArray.map(
-          (uz) => (
-            console.log("userZId------", uz.id),
-            employee.push(uz.id)
-          )
+          (uz) => (console.log("userZId------", uz.id), employee.push(uz.id))
         );
         saveEmployee(res.data.data);
         if (employee.length) {
@@ -99,8 +96,8 @@ const HomeAdminScreen = ({
             setVisits(res.data.data);
             setLoading(false);
             //setHasVisit(false)
-          }else if(!res.data.data.length){
-            setHasVisit(false)
+          } else if (!res.data.data.length) {
+            setHasVisit(false);
           }
         }
       } else {
@@ -110,12 +107,29 @@ const HomeAdminScreen = ({
   };
   //REQUEST ALL EMPLOYEES FORM ONE ZONE
   const requestEmployeeByZone = async () => {
+    let uzArray = [];
+    let employee = [];
     setLoading(true);
     const res = await fetchEmployeeByZone(profile.userZone[0].ZoneId);
-    if (!res.data.error) {
+    if (!res.data.error && res.data.data.length) {
       saveEmployee(res.data.data);
-      setLoading(false);
-      
+      res.data.data.map((e) => {
+        uzArray.push(e.userZone[0]);
+      });
+      uzArray.map(
+        (uz) => (employee.push(uz.id))
+      );
+      if (employee.length) {
+        const res = await helpers.fetchTodayVisist(company.id, employee);
+        if (!res.data.error && res.data.data.length) {
+          saveTodayVisits(res.data.data);
+          setVisits(res.data.data);
+          setLoading(false);
+          //setHasVisit(false)
+        } else if (!res.data.data.length) {
+          setHasVisit(false);
+        }
+      }
     } else {
       console.log(res.data.msg);
     }

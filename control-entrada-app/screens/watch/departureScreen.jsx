@@ -6,7 +6,6 @@ import {
   ScrollView,
   TouchableOpacity,
   Image,
-  ActivityIndicator,
 } from "react-native";
 
 import { TopNavigation } from "../../components/TopNavigation.component";
@@ -14,8 +13,6 @@ import axios from "axios";
 import moment from "moment";
 import { API_PORT } from "../../config/index";
 import { Ionicons } from "@expo/vector-icons";
-import { MainColor } from "../../assets/colors";
-import { Divider } from "../../components/Divider";
 import { MainButton } from "../../components/mainButton.component";
 import Input from "../../components/input.component";
 import { storage } from "../../helpers/asyncStorage";
@@ -36,12 +33,10 @@ export const DepartureScreen = (props) => {
   const { id } = props.route.params;
   const [statusModalProps, setStatusModalProps] = useState(statusModalValues);
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
   const [saving, setSaving] = useState(false);
   const [visit, setVisit] = useState();
   const [departureText, setDepartureText] = useState("");
   const [entryCheck, setEntryCheck] = useState(false);
-  const [updateVisit, setUpdateVisit] = useState();
   //GO BACK
   const goBackAction = () => {
     return (
@@ -100,15 +95,6 @@ export const DepartureScreen = (props) => {
   }, [id, entryCheck]);
 
   return (
-    // <>
-    // {console.log("render"),
-    //   visit ?
-    //   <Text>{visit.Visitante.name}</Text>
-    //   :
-    //   <ActivityIndicator size="large" color={MainColor}/>
-    // }
-    // </>
-
     <View style={{ flex: 1 }}>
       <TopNavigation
         title={

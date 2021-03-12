@@ -2,20 +2,14 @@ import React, { useState, useRef, useEffect } from "react";
 import {
   View,
   StyleSheet,
-  Dimensions,
   TouchableOpacity,
   ScrollView,
   Vibration,
 } from "react-native";
 
 import { TopNavigation } from "../../components/TopNavigation.component";
-
 import { Ionicons } from "@expo/vector-icons";
-
-import axios from "axios";
-import { API_PORT } from "../../config/index";
 import { MainColor, lightColor } from "../../assets/colors.js";
-
 import { VisitCard } from "../../components/visitCard";
 import { FloatingBotton } from "../../components/floatingBotton";
 import { Spinner } from "../../components/spinner";
@@ -34,7 +28,7 @@ let statusModalValues = {
   status: null,
 };
 
-const VisitScreen = ({ navigation, profile }) => {
+const VisitScreen = ({ navigation, profile, saveVisit,  visitsRedux, removeVisit }) => {
   const [statusModalProps, setStatusModalProps] = useState(statusModalValues);
   const [loading, setLoading] = useState(false);
   const [selectItem, setSeletedItem] = useState([]);
@@ -42,20 +36,8 @@ const VisitScreen = ({ navigation, profile }) => {
   const [findIt, setFindIt] = useState(false);
   const [promp, setPromp] = useState(false);
   const [hasVisit, setHasVisit] = useState(true);
-
-  const [citizen, setCitizen] = useState();
-  const [showList, setShowList] = useState(false);
-  const [dni, setDni] = useState("");
-  const [visitId, setVisitId] = useState("");
   const [visits, setVisits] = useState([]);
   const [visitsDni, setvisitsDni] = useState();
-  const [updateVisit, setUpdateVisit] = useState();
-  const [destiny, setDestiny] = useState({});
-  const [watchman, setWatchman] = useState();
-  const [entryCheck, setEntryCheck] = useState(false);
-  const [saved, setSaved] = useState(false);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [departure, setDeparture] = useState();
 
   const searchRef = useRef();
 
@@ -78,9 +60,11 @@ const VisitScreen = ({ navigation, profile }) => {
     setLoading(true);
     const token = await storage.getItem("userToken");
     const res = await helpers.findVisitUser(profile.userZone[0].id, token);
+    console.log(res.data.data)
     if (!res.data.error && res.data.data.length) {
       setLoading(false);
-      setVisits(res.data.data);
+      //setVisits(res.data.data);
+      saveVisit(res.data.data)
     } else if (!res.data.data.length) {
       setLoading(false);
       setHasVisit(false);
@@ -103,60 +87,9 @@ const VisitScreen = ({ navigation, profile }) => {
 
   const selectAll = () => {
     let array = [];
-    visits.map(({ id }) => array.push(id));
-    console.log(array);
+    visitsRedux.map(({ id }) => array.push(id));
     setSeletedItem(array);
   };
-
-  // {findIt && (
-  //   <View style={{ flex: 1 }}>
-  //     {visitsDni.map((elem, i) => (
-  //       <TouchableOpacity
-  //         onPress={() =>
-  //           navigation.navigate("departure", { id: elem.id })
-  //         }
-  //         style={styles.listItemBox}
-  //         key={elem.id}
-  //       >
-  //         <View>
-  //           {elem.Fotos.map((foto) => (
-  //             <Image
-  //               key={foto.id}
-  //               source={{
-  //                 uri: `${API_PORT()}/public/imgs/${foto.picture}`,
-  //               }}
-  //               style={styles.profilePic}
-  //             />
-  //           ))}
-  //         </View>
-  //         <View style={styles.subItemBox}>
-  //           <Text style={styles.nameText}>
-  //             {citizen.name} {citizen.lastName}
-  //           </Text>
-  //           <Text style={styles.dataText}>{citizen.dni}</Text>
-  //         </View>
-  //         <View style={styles.subItemBox}>
-  //           <Ionicons name="ios-pin" size={22} color="grey" />
-  //           <Text style={styles.dataText}>{elem.Destino.name}</Text>
-  //         </View>
-  //         <View style={styles.subItemBox}>
-  //           <Text style={styles.labelText}>Entrada:</Text>
-  //           <Text style={styles.dataText}>
-  //             {moment(elem.entryDate).format("MMM D, HH:mm a")}
-  //           </Text>
-  //         </View>
-  //         <View style={styles.subItemBox}>
-  //           <Text style={styles.labelText}>Salida:</Text>
-  //           <Text style={styles.dataText}>
-  //             {moment(elem.departureDate).format("MMM D, HH:mm a")}
-  //           </Text>
-  //         </View>
-
-  //       </TouchableOpacity>
-  //     ))}
-  //   </View>
-  // )}
-
   //CHECK SEARCH
   const checkSearch = (data, status, message) => {
     if (!status) {
@@ -167,7 +100,7 @@ const VisitScreen = ({ navigation, profile }) => {
         message,
       }));
     } else {
-      setActive(false)
+      setActive(false);
       setFindIt(true);
       setvisitsDni(data);
     }
@@ -180,6 +113,9 @@ const VisitScreen = ({ navigation, profile }) => {
       status,
       message,
     }));
+    if(status){
+      removeVisit(selectItem)
+    }
     clearList();
   };
 
@@ -210,9 +146,9 @@ const VisitScreen = ({ navigation, profile }) => {
 
       {loading && <Spinner message="Cargando..." />}
 
-      {visits.length > 0 && !loading && !findIt && (
+      {visitsRedux.length > 0 && !loading && !findIt && (
         <ScrollView>
-          {visits.map((elem) => (
+          {visitsRedux.map((elem) => (
             <TouchableOpacity
               key={elem.id}
               onPress={
@@ -232,7 +168,8 @@ const VisitScreen = ({ navigation, profile }) => {
         </ScrollView>
       )}
 
-      {findIt && visitsDni &&
+      {findIt &&
+        visitsDni &&
         visitsDni.map((elem) => (
           <TouchableOpacity
             key={elem.id}
@@ -276,77 +213,26 @@ const VisitScreen = ({ navigation, profile }) => {
 };
 const mapStateToProps = (state) => ({
   profile: state.profile.profile,
+  visitsRedux: state.visits.today
 });
 
-export default connect(mapStateToProps, {})(VisitScreen);
+const mapDispatchToProps = dispatch => ({
+  saveVisit(visits){
+    dispatch({
+      type: 'SAVE_VISITS',
+      payload: visits
+    }) 
+  },
+  removeVisit(visits){
+    dispatch({
+      type: 'REMOVE_VISIT',
+      payload: visits
+    })
+  }
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(VisitScreen);
 
 const styles = StyleSheet.create({
-  imgBackground: {
-    flex: 1,
-    resizeMode: "cover",
-    justifyContent: "center",
-  },
-  searchBox: {
-    width: "100%",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    paddingHorizontal: 5,
-    paddingBottom: 5,
-    alignItems: "center",
-    backgroundColor: MainColor,
-  },
-  cover: {
-    backgroundColor: "#fff",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  profilePic: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-  },
-  cameraIcon: {
-    position: "absolute",
-    bottom: 0,
-    right: 5,
-  },
-  nameBox: {
-    justifyContent: "center",
-  },
-  nameText: {
-    textAlign: "center",
-    fontSize: 14,
-  },
-
-  //elemento 1
-  dataBox: {
-    marginVertical: 10,
-    flexDirection: "row",
-    alignItems: "center",
-    //width:'75%'
-    //justifyContent:'space-between'
-  },
-  labelText: {
-    fontSize: 14,
-  },
-  dataText: {
-    fontSize: 12,
-  },
-  //TODAY LIST STYLE
-  listItemBox: {
-    flexDirection: "row",
-    paddingHorizontal: 12,
-    paddingVertical: 5,
-    justifyContent: "space-between",
-    alignItems: "center",
-    backgroundColor: "#fff",
-    marginVertical: 10,
-  },
-  subItemBox: {
-    alignItems: "center",
-  },
-  subItemTitle: {
-    fontWeight: "bold",
-  },
+  
 });

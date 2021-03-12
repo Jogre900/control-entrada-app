@@ -22,7 +22,7 @@ import { Ionicons } from "@expo/vector-icons";
 const DEVICE_WIDTH = Dimensions.get("window").width;
 
 const SuperDestinyScreen = ({ navigation, zonesRedux, company, saveDestiny }) => {
-  console.log("zones in Destiny from redux---", zonesRedux);
+  //console.log("zones in Destiny from redux---", zonesRedux);
   //console.log("company from redux---", company);
   const [zones, setZones] = useState([]);
   const [zoneId, setZoneId] = useState(zonesRedux.id);

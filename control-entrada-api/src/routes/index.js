@@ -61,7 +61,7 @@ router.put("/updateAdmin/:companyId", Controllers.updateAdminId);
 router.post("/login", Controllers.login);
 router.get("/findUser/:id", Controllers.findUser)
 router.get("/user/:companyId", Controllers.findUsers);
-router.get("/user/:zoneId", Controllers.findUsersByZone);
+router.get("/user/zone/:zoneId", Controllers.findUsersByZone);
 router.get("/findAvailableUsers/:companyId", Controllers.findAvailableUsers);
 router.delete("/deleteUser/:id", Controllers.deleteUser);
 router.get("/findCompany/:id", Controllers.findCompany);
@@ -82,7 +82,7 @@ router.post("/createUserZone", Controllers.createUserZone);
 //router.post("/uploadImage", uploadImg.single('file'), Controllers.uploadImage)
 router.get("/displayPicture", Controllers.displayPicture);
 router.get("/profile", Controllers.getProfile);
-router.post("/profile/:id", uploadImg.single("file"), Controllers.updateProfile);
+router.put("/profile/:id", uploadImg.single("file"), Controllers.updateProfile);
 router.post("/password/:email", Controllers.recoverPassword)
 
 router.get("/findUserZone/:id", Controllers.findUserZone);

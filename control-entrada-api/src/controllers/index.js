@@ -1228,7 +1228,18 @@ password: "123456,
               id
             }
           },
-          { model: models.UserZone, as: "userZone" },
+          {
+            model: models.UserZone,
+            as: "userZone",
+            include: {
+              model: models.Zone,
+              as: "Zona",
+              include: {
+                model: models.Destination,
+                as: "Destinos"
+              }
+            }
+          },
           {
             model: models.UserCompany,
             as: "UserCompany",
@@ -1239,22 +1250,24 @@ password: "123456,
           }
         ]
       });
-      if (user) {
-        if (password) {
-          let hash = await bcrypt.hash(password, 10);
-          user.password = hash;
-          await user.save();
-        }
-        if (email) {
-          user.email = email.toLowerCase();
-          await user.save();
-        }
+      console.log(user.UserCompany[0].privilege);
 
-        if (req.file) {
-          user.Employee.picture = req.file.filename;
-          await user.Employee.save();
-        }
+      if (req.file) {
+        user.Employee.picture = req.file.filename;
+        await user.Employee.save();
+      }
 
+      if (password) {
+        let hash = await bcrypt.hash(password, 10);
+        user.password = hash;
+        await user.save();
+      }
+      if (email) {
+        user.email = email.toLowerCase();
+        await user.save();
+      }
+
+      if (user.UserCompany[0].privilege === "Admin") {
         if (nic) {
           user.UserCompany[0].Company.nic = nic;
           await user.UserCompany[0].Company.save();
@@ -1267,17 +1280,15 @@ password: "123456,
           user.UserCompany[0].Company.phoneNumberOther = numberTwo;
           await user.UserCompany[0].Company.save();
         }
-        // await user.save();
-        // await user.Employee.save();
-        // await user.UserCompany[0].Company.save();
-        const token = jwt.sign(user.dataValues, SECRETKEY, { expiresIn: "1d" });
-        RESPONSE.error = false;
-        RESPONSE.msg = "Datos actualizados!";
-        RESPONSE.data = user;
-        RESPONSE.token = token;
-        res.status(200).json(RESPONSE);
       }
+      const token = jwt.sign(user.dataValues, SECRETKEY, { expiresIn: "1d" });
+      RESPONSE.error = false;
+      RESPONSE.msg = "Datos actualizados!";
+      RESPONSE.data = user;
+      RESPONSE.token = token;
+      res.status(200).json(RESPONSE);
     } catch (error) {
+      console.log(error.message);
       RESPONSE.msg = error;
       res.json(RESPONSE);
     }
@@ -1809,9 +1820,9 @@ password: "123456,
           id
         },
         include: [
-          { model: models.Citizen, as: "Visitante",},
+          { model: models.Citizen, as: "Visitante" },
           { model: models.Destination, as: "Destino" },
-          { model: models.Picture, as: "Fotos"},
+          { model: models.Picture, as: "Fotos" },
           {
             model: models.UserZone,
             as: "UserZone",
@@ -1850,14 +1861,14 @@ password: "123456,
     };
 
     const { dni } = req.params;
-    console.log(dni)
+    console.log(dni);
 
     try {
       let visit = await models.Visits.findAll({
         include: [
           { model: models.Citizen, as: "Visitante", where: { dni } },
           { model: models.Destination, as: "Destino" },
-          { model: models.Picture, as: "Fotos"},
+          { model: models.Picture, as: "Fotos" },
           {
             model: models.UserZone,
             as: "UserZone",
@@ -1875,7 +1886,7 @@ password: "123456,
           }
         ]
       });
-      console.log(visit)
+      console.log(visit);
       if (visit.length > 0) {
         RESPONSE.error = false;
         RESPONSE.msg = "Consulta Exitosa";
@@ -1986,7 +1997,7 @@ password: "123456,
         include: [
           { model: models.Citizen, as: "Visitante" },
           { model: models.Destination, as: "Destino" },
-          { model: models.Picture, as: "Fotos"},
+          { model: models.Picture, as: "Fotos" },
           {
             model: models.UserZone,
             as: "UserZone",

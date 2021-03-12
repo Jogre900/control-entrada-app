@@ -90,7 +90,7 @@ export async function fetchAllEmployee(companyId) {
 //ALL EMPLOYEE FROM 1 ZONE
 export async function fetchEmployeeByZone(zoneId) {
   try {
-    const res = await axios.get(`${API_PORT()}/api/user/${zoneId}`);
+    const res = await axios.get(`${API_PORT()}/api/user/zone/${zoneId}`);
     return res;
   } catch (error) {
     return error.message;
@@ -103,14 +103,26 @@ export async function updateProfile(formData, fileData, profileId) {
   const { uri, fileName, fileType } = fileData;
   let data = new FormData();
 
-  data.append("email", email);
-  data.append("password", repPass);
-  data.append("nic", nic);
-  data.append("number", number);
-  data.append("numberTwo", numberTwo);
-  data.append("file", { uri, name: fileName, type: fileType });
+  if (email) {
+    data.append("email", email);
+  }
+  if (repPass) {
+    data.append("password", repPass);
+  }
+  if (nic) {
+    data.append("nic", nic);
+  }
+  if (number) {
+    data.append("number", number);
+  }
+  if (numberTwo) {
+    data.append("numberTwo", numberTwo);
+  }
+  if (uri) {
+    data.append("file", { uri, name: fileName, type: fileType });
+  }
   try {
-    const res = await axios.post(
+    const res = await axios.put(
       `${API_PORT()}/api/profile/${profileId}`,
       data,
       {
@@ -119,41 +131,8 @@ export async function updateProfile(formData, fileData, profileId) {
         },
       }
     );
-    if (!res.data.error) {
-      let slogin = {
-        token: res.data.token,
-        userId: res.data.data.id,
-        privilege: res.data.data.UserCompany[0].privilege,
-      };
-      let sprofile = {
-        id: res.data.data.Employee.id,
-        dni: res.data.data.Employee.dni,
-        name: res.data.data.Employee.name,
-        lastName: res.data.data.Employee.lastName,
-        picture: res.data.data.Employee.picture,
-        email: res.data.data.email,
-      };
-      let company = [];
-      res.data.data.UserCompany.map((comp) => {
-        company.push({
-          id: comp.Company.id,
-          companyName: comp.Company.companyName,
-          businessName: comp.Company.businessName,
-          nic: comp.Company.nic,
-          city: comp.Company.city,
-          address: comp.Company.address,
-          phoneNumber: comp.Company.phoneNumber,
-          phoneNumberOther: comp.Company.phoneNumberOther,
-          logo: comp.Company.logo,
-          privilege: comp.privilege,
-          select: true,
-        });
-      });
-
-      await storage.removeItem("userToken");
-      await storage.setItem("userToken", res.data.token);
-      return { slogin, sprofile, company, res };
-    }
+      return res;
+    
   } catch (error) {
     return { error };
   }

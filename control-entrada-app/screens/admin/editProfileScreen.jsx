@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import {
   View,
-  Text,
   TouchableOpacity,
   ScrollView,
   StyleSheet,
@@ -14,7 +13,7 @@ import { MainButton } from "../../components/mainButton.component";
 import { API_PORT } from "../../config/index";
 import { TopNavigation } from "../../components/TopNavigation.component";
 import { StatusModal } from "../../components/statusModal";
-import { LoadingModal } from '../../components/loadingModal'
+import { LoadingModal } from "../../components/loadingModal";
 import { Ionicons } from "@expo/vector-icons";
 import { MainColor } from "../../assets/colors";
 import { storage } from "../../helpers/asyncStorage";
@@ -22,17 +21,17 @@ import { connect } from "react-redux";
 import axios from "axios";
 
 let formInitialValues = {
-  email: undefined,
-  pass: undefined,
-  repPass: undefined,
-  nic: undefined,
-  number: undefined,
-  numberTwo: undefined,
+  email: null,
+  pass: null,
+  repPass: null,
+  nic: null,
+  number: null,
+  numberTwo: null,
 };
 let fileInitialValues = {
-  uri: undefined,
-  fileName: undefined,
-  fileType: undefined,
+  uri: null,
+  fileName: null,
+  fileType: null,
 };
 let statusModalValues = {
   visible: false,
@@ -50,8 +49,8 @@ const EditProfileScreen = ({
   const [formValues, setFormValues] = useState(formInitialValues);
   const [fileValues, setFileValues] = useState(fileInitialValues);
   const [modalProps, setModalProps] = useState(statusModalValues);
-  const [visible, setVisible] = useState(false)
-  const [loading, setLoading] = useState(false)
+  const [visible, setVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [type, setType] = useState("");
 
   const profilePic = (uri, fileName, fileType, caption, changeImg) => {
@@ -59,24 +58,36 @@ const EditProfileScreen = ({
   };
 
   const updateProfile = async () => {
-    setLoading(true)
+    setLoading(true);
     const { email, pass, repPass, nic, number, numberTwo } = formValues;
     const { uri, fileName, fileType } = fileValues;
 
-    if (pass !== repPass) {
-      alert("las contraseña deben ser iguales");
-      return;
-    }
+    // if (pass !== repPass) {
+    //   alert("las contraseña deben ser iguales");
+    //   return;
+    // }
     let data = new FormData();
-
-    data.append("email", email);
-    data.append("password", repPass);
-    data.append("nic", nic);
-    data.append("number", number);
-    data.append("numberTwo", numberTwo);
-    data.append("file", { uri, name: fileName, type: fileType });
+    if (email) {
+      data.append("email", email);
+    }
+    if (repPass) {
+      data.append("password", repPass);
+    }
+    if (nic) {
+      data.append("nic", nic);
+    }
+    if (number) {
+      data.append("number", number);
+    }
+    if (numberTwo) {
+      data.append("numberTwo", numberTwo);
+    }
+    if (uri) {
+      data.append("file", { uri, name: fileName, type: fileType });
+    }
+    console.log(data);
     try {
-      const res = await axios.post(
+      const res = await axios.put(
         `${API_PORT()}/api/profile/${profile.id}`,
         data,
         {
@@ -98,6 +109,7 @@ const EditProfileScreen = ({
           lastName: res.data.data.Employee.lastName,
           picture: res.data.data.Employee.picture,
           email: res.data.data.email,
+          userZone: res.data.data.userZone
         };
         let company = [];
         res.data.data.UserCompany.map((comp) => {
@@ -120,7 +132,7 @@ const EditProfileScreen = ({
         saveLogin(slogin);
         saveProfile(sprofile);
         saveCompany(company);
-        setLoading(false)
+        setLoading(false);
         setModalProps((values) => ({
           ...values,
           visible: true,
@@ -128,9 +140,8 @@ const EditProfileScreen = ({
           status: true,
         }));
       }
-      
     } catch (error) {
-      setLoading(false)
+      setLoading(false);
       setModalProps((values) => ({
         ...values,
         visible: true,
@@ -153,8 +164,8 @@ const EditProfileScreen = ({
       <TopNavigation title="Editar" leftControl={goBackAction()} />
       <ScrollView>
         <View style={{ alignItems: "center" }}>
-          <View style={styles.profileTopContainer}>
-            <View style={styles.pictureContainer}>
+          <FormContainer title="Perfil">
+          <View style={styles.pictureContainer}>
               <Avatar.Picture
                 size={120}
                 uri={
@@ -171,8 +182,6 @@ const EditProfileScreen = ({
                 <Avatar.Icon name="ios-camera" size={32} color="#fff" />
               </TouchableOpacity>
             </View>
-          </View>
-          <FormContainer title="Perfil">
             <Input
               title="Email"
               icon="ios-mail"
@@ -250,7 +259,7 @@ const EditProfileScreen = ({
         }
         {...modalProps}
       />
-      <LoadingModal visible={loading} message='Guardando...'/>
+      <LoadingModal visible={loading} message="Guardando..." />
     </View>
   );
 };
