@@ -213,8 +213,8 @@ export async function createCompany(companyData, profilePic, companyLogo) {
 }
 
 //LOGIN
-export async function login(loginData) {
-  const { email, password } = loginData;
+export async function login(email, password) {
+  console.log(email, password)
   try {
     const res = await axios.post(`${API_PORT()}/api/login`, {
       email,

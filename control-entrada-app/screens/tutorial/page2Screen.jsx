@@ -5,7 +5,7 @@ import { useDispatch } from "react-redux";
 export const Page2Screen = ({ navigation }) => {
   const dispatch = useDispatch({ type: "TURN_OFF", payload: false });
   return (
-    <View style={Styles.container}>
+    <View style={styles.container}>
       <View style={styles.textContainer}>
         <Text>Zonas y Destinos</Text>
         <Text>
@@ -21,8 +21,14 @@ export const Page2Screen = ({ navigation }) => {
           barra lateral.
         </Text>
         <View style={styles.buttonContainer}>
-          <MainButton title="Atras" onPress={() => navigation.navigate("PAGE_1")} outline />
           <MainButton
+            style={styles.button}
+            title="Atras"
+            onPress={() => navigation.navigate("PAGE_1")}
+            outline
+          />
+          <MainButton
+            style={[styles.button, {marginLeft: 20}]}
             title="Siguiente"
             onPress={() => navigation.navigate("PAGE_3")}
           />
@@ -37,11 +43,21 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "rgba(0,0,0,.5)",
     padding: 20,
+    justifyContent: "center",
   },
   textContainer: {
     backgroundColor: "#fff",
+    borderRadius: 5,
+    padding: 10,
   },
   buttonContainer: {
+    width: "100%",
     flexDirection: "row",
+    //backgroundColor: "red",
+    justifyContent: "flex-end",
+    marginTop: 50,
+  },
+  button: {
+    width: "30%",
   },
 });

@@ -54,9 +54,7 @@ function AdminNav() {
       headerMode="none"
       initialRouteName={tutorial ? "TUTORIAL" : "admin-home"}
     >
-      {tutorial && (
-        <Stack.Screen name="TUTORIAL" component={<TutorialNavigator />} />
-      )}
+      <Stack.Screen name="TUTORIAL" component={TutorialNavigator} />
       <Stack.Screen name="admin-home" component={HomeAdminScreen} />
       <Stack.Screen
         name="detail-view"
@@ -93,6 +91,7 @@ const adminDrawerData = [
   { label: "Crear Empleado", route: "CreateEmployee", icon: "ios-person-add" },
   { label: "Zonas", route: "Zones", icon: "md-globe" },
   { label: "Destinos", route: "Destiny", icon: "ios-pin" },
+  { label: "Tutorial", route: "TUTORIAL", icon: "md-document", params: true },
 ];
 const superDrawerData = [
   { label: "Inicio", route: "admin-home", icon: "ios-home" },
@@ -101,6 +100,8 @@ const superDrawerData = [
   { label: "Zona", route: "Zones", icon: "md-globe" },
   { label: "Destinos", route: "Destiny", icon: "ios-pin" },
 ];
+
+const TUTO = 123
 const DrawerContent = (props) => {
   const dispatch = useDispatch();
   const privilege = useSelector((state) => state.profile.login.privilege);
@@ -138,10 +139,14 @@ const DrawerContent = (props) => {
                   icon={({ size, color }) => (
                     <Ionicons name={data.icon} size={size} color={color} />
                   )}
-                  onPress={() => props.navigation.navigate(data.route)}
+                  onPress={() => props.navigation.navigate(data.route, data.params && {
+                    screen: 'PAGE_1',
+                    params: {TUTO}
+                  })}
                   key={i}
                 />
               ))
+              
             : superDrawerData.map((data, i) => (
                 <DrawerItem
                   label={data.label}
@@ -197,8 +202,8 @@ const AdminNavigator = () => {
       ) : (
         <drawer.Screen name="Zones" component={ZoneDetailScreen} />
       )}
-
       <drawer.Screen name="Destiny" component={DestinyScreen} />
+      <Stack.Screen name="TUTORIAL" component={TutorialNavigator} />
     </drawer.Navigator>
   );
 };

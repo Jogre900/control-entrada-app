@@ -76,7 +76,8 @@ const Input = (props, ref) => {
         <View
           style={[
             style,
-            {borderColor: caption ? Danger : '#8e8e8e'},
+            caption && {borderColor: Danger},
+            
             !shape && styles.squareShape,
             shape === "flat" && styles.flatShape,
           ]}
@@ -130,7 +131,7 @@ const styles = StyleSheet.create({
   flatShape: {
     flexDirection: "row",
     alignItems: "center",
-    borderBottomWidth: 0.5,
+    borderBottomWidth: .5,
     height: 40,
     //borderColor: "#8e8e8e",
     padding: 5

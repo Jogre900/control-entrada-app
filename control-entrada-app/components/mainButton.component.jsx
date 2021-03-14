@@ -22,17 +22,17 @@ export const MainButton = ({ title, onPress, textStyle, style, outline, rounded,
       style={[
         styles.square,
         // rounded ? styles.rounded : styles.square,
-        // outline ? styles.outline : styles.filled,
+        outline ? styles.outline : styles.filled,
         style,
       ]}
       onPress={onPress}
     >
-      <View style={{ width: '70%', }}>
+      {/* <View style={{ width: '70%', }}> */}
 
       <Text style={[outline ? styles.outlineText : styles.text, textStyle]}>
         {title}
       </Text>
-      </View>
+      {/* </View> */}
       {/* {
         //loading &&
         <View style={{ width:'30%', }}>
@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
   },
   outline: {
     borderColor: MainColor,
-    backgroundColor: '#eee',
+    backgroundColor: '#fff',
     borderWidth: 1,
   },
   text: {

@@ -11,7 +11,7 @@ import CheckBox from "@react-native-community/checkbox";
 import Input from "../../components/input.component";
 import { TopNavigation } from "../../components/TopNavigation.component";
 import { MainButton } from "../../components/mainButton.component";
-import { MainColor } from "../../assets/colors";
+import { MainColor, Success } from "../../assets/colors";
 import * as ImagePicker from "expo-image-picker";
 // import * as ImagePicker from 'react-native-image-picker'
 import { Ionicons } from "@expo/vector-icons";
@@ -22,6 +22,17 @@ import Avatar from "../../components/avatar.component";
 import { createCompany, login } from "../../helpers";
 import { StatusModal } from "../../components/statusModal";
 import { LoadingModal } from "../../components/loadingModal";
+import {
+  validateName,
+  validateEmail,
+  validatePass,
+  validatePhone,
+  validateDni,
+  validateLastName,
+  validateRepPass,
+  validateBusiness,
+  validateCompany,
+} from "../../helpers/forms";
 import { connect } from "react-redux";
 
 const inputProps = {
@@ -65,13 +76,26 @@ let loadingModalValues = {
   message: null,
 };
 
+let captionInitialValues = {
+  name: null,
+  lastName: null,
+  email: null,
+  dni: null,
+  password: null,
+  repPass: null,
+  companyName: null,
+  businessName: null,
+  nic: null,
+  phoneNumber: null,
+};
+
 const RegisterScreen = ({
   navigation,
   saveProfile,
   saveCompany,
   saveLogin,
   savePrivilege,
-  activeTutorial
+  activeTutorial,
 }) => {
   const [dataComp, setDataComp] = useState(registerValues);
   const [profilePicData, setProfilePicData] = useState(profilePicValues);
@@ -80,11 +104,11 @@ const RegisterScreen = ({
   const [type, setType] = useState("");
   const [statusModal, setStatusModal] = useState(statusModalValues);
   const [loadingModal, setLoadingModal] = useState(loadingModalValues);
+  const [registerCaption, setRegisterCaption] = useState(captionInitialValues);
+  const [passEqual, setPassEqual] = useState(false);
 
   const [caption, setCaption] = useState("");
-  const [dniCaption, setDniCaption] = useState("");
-  const [emailCaption, setEmailCaption] = useState("");
-  const [passCaption, setPassCaption] = useState("");
+
   const [repeatCaption, setRepeatCaption] = useState("");
   const [check, setCheck] = useState(false);
   //GOBACK
@@ -109,20 +133,52 @@ const RegisterScreen = ({
     }));
   };
 
-  const clearCaption = () => {
-    setCaption("");
-    setEmailCaption("");
-    setDniCaption("");
-    setPassCaption("");
-    setRepeatCaption("");
+  const validateForm = (data) => {
+    const nameError = validateName(data.name);
+    const lastNameError = validateLastName(data.lastName);
+    const emailError = validateEmail(data.email);
+    const dniError = validateDni(data.dni);
+    const passError = validatePass(data.password);
+    const repPassError = validateRepPass(data.repPass);
+    const companyError = validateCompany(data.companyName);
+    const businessError = validateBusiness(data.businessName);
+    const phoneError = validatePhone(data.phoneNumber);
+    if (
+      nameError ||
+      lastNameError ||
+      emailError ||
+      dniError ||
+      passError ||
+      repPassError ||
+      companyError ||
+      businessError ||
+      phoneError
+    ) {
+      setRegisterCaption((values) => ({
+        ...values,
+        name: nameError,
+        lastName: lastNameError,
+        email: emailError,
+        password: passError,
+        repPass: repPassError,
+        dni: dniError,
+        companyName: companyError,
+        businessName: businessError,
+        phoneError: phoneError,
+      }));
+      return true;
+    }
   };
 
   //CREATE USER
   const createAdmin = async () => {
+    // if (validateForm(dataComp)) {
+    //   return;
+    // }
     setLoadingModal({ status: true, message: "Guardando..." });
     //clearCaption();
     const res = await createCompany(dataComp, profilePicData, compPicData);
-    console.log("RES DE CREAT----", res.data);
+    //console.log("RES DE CREAT----", res.data);
     if (!res.data.error) {
       setLoadingModal((values) => ({ ...values, status: false }));
       setStatusModal((values) => ({
@@ -131,12 +187,13 @@ const RegisterScreen = ({
         status: true,
         message: res.data.msg,
       }));
+      //console.log(dataComp.email, dataComp.repPass)
       setLoadingModal({ visible: true, message: "Iniciando Sesión..." });
       const resLogin = await login(dataComp.email, dataComp.repPass);
 
+      
       if (!resLogin.data.error) {
-        console.log("RES DE LOGIN---------", resLogin.data);
-
+        console.log("RES DE LOGIN---------", resLogin.data.data.UserCompany[0].privilege);
         let slogin = {
           token: resLogin.data.token,
           userId: resLogin.data.data.id,
@@ -170,14 +227,14 @@ const RegisterScreen = ({
             select: true,
           });
         });
-        let privilege = res.data.data.UserCompany[0].privilege;
+        let privilege = resLogin.data.data.UserCompany[0].privilege;
 
-        await storage.setItem("userToken", token);
+        await storage.setItem("userToken", resLogin.data.token,);
         saveLogin(slogin);
         saveProfile(sprofile);
         saveCompany(company);
         savePrivilege(privilege);
-        activeTutorial(true)
+        activeTutorial(true);
 
         switch (privilege) {
           case "Watchman":
@@ -216,6 +273,14 @@ const RegisterScreen = ({
     })();
   }, []);
 
+  useEffect(() => {
+    if (dataComp.password && dataComp.repPass) {
+      if (dataComp.password === dataComp.repPass) {
+        setPassEqual(true);
+      } else setPassEqual(false);
+    }
+  }, [dataComp.password, dataComp.repPass]);
+
   return (
     <View style={{ flex: 1 }}>
       <TopNavigation title="Registro" leftControl={goBackAction()} />
@@ -244,6 +309,7 @@ const RegisterScreen = ({
                 setDataComp((values) => ({ ...values, name }))
               }
               {...inputProps}
+              caption={registerCaption.name}
             />
             <Input
               title="Apellidos"
@@ -252,6 +318,7 @@ const RegisterScreen = ({
                 setDataComp((values) => ({ ...values, lastName }))
               }
               {...inputProps}
+              caption={registerCaption.lastName}
             />
             <Input
               title="DNI"
@@ -259,7 +326,7 @@ const RegisterScreen = ({
               onChangeText={(dni) =>
                 setDataComp((values) => ({ ...values, dni }))
               }
-              caption={dniCaption}
+              caption={registerCaption.dni}
               {...inputProps}
             />
             <Input
@@ -268,24 +335,26 @@ const RegisterScreen = ({
               onChangeText={(email) =>
                 setDataComp((values) => ({ ...values, email }))
               }
-              caption={emailCaption}
+              caption={registerCaption.email}
               {...inputProps}
             />
             <Input
+              style={{ borderColor: passEqual && Success }}
               title="Contraseña"
               onChangeText={(password) =>
                 setDataComp((values) => ({ ...values, password }))
               }
-              caption={passCaption}
+              caption={registerCaption.password}
               secureTextEntry
               {...inputProps}
             />
             <Input
+              style={{ borderColor: passEqual && Success }}
               title="Repetir Contraseña"
               onChangeText={(repPass) =>
                 setDataComp((values) => ({ ...values, repPass }))
               }
-              caption={repeatCaption}
+              caption={registerCaption.repPass}
               secureTextEntry
               {...inputProps}
             />
@@ -294,7 +363,9 @@ const RegisterScreen = ({
             </View>
           </FormContainer>
           <FormContainer title="Datos de la empresa">
-            <Text style={styles.labelText}>Puedes agregar un logo para tu empresa</Text>
+            <Text style={styles.labelText}>
+              Puedes agregar un logo para tu empresa
+            </Text>
             <View style={styles.pictureContainer}>
               {compPicData.uriLogo ? (
                 <Avatar.Picture size={120} uri={compPicData.uriLogo} />
@@ -312,19 +383,21 @@ const RegisterScreen = ({
             </View>
             <Input
               title="Empresa"
-              icon='md-business'
+              icon="md-business"
               onChangeText={(companyName) =>
                 setDataComp((values) => ({ ...values, companyName }))
               }
               {...inputProps}
+              caption={registerCaption.companyName}
             />
             <Input
               title="Razon social"
-              icon='ios-briefcase'
+              icon="ios-briefcase"
               onChangeText={(businessName) =>
                 setDataComp((values) => ({ ...values, businessName }))
               }
               {...inputProps}
+              caption={registerCaption.businessName}
             />
             <Input
               title="nic"
@@ -332,10 +405,11 @@ const RegisterScreen = ({
                 setDataComp((values) => ({ ...values, nic }))
               }
               {...inputProps}
+              caption={registerCaption.nic}
             />
             <Input
               title="Direccion (Opcional)"
-              icon='ios-pin'
+              icon="ios-pin"
               onChangeText={(address) =>
                 setDataComp((values) => ({ ...values, address }))
               }
@@ -343,7 +417,7 @@ const RegisterScreen = ({
             />
             <Input
               title="Ciudad (Opcional)"
-              icon='ios-home'
+              icon="ios-home"
               onChangeText={(city) =>
                 setDataComp((values) => ({ ...values, city }))
               }
@@ -351,19 +425,19 @@ const RegisterScreen = ({
             />
             <Input
               title="Telefono"
-              icon='md-call'
+              icon="md-call"
               onChangeText={(phoneNumber) =>
                 setDataComp((values) => ({ ...values, phoneNumber }))
               }
               {...inputProps}
+              caption={registerCaption.phoneNumber}
             />
             <Input
               title="Telefono adicional (Opcional)"
-              icon='md-call'
+              icon="md-call"
               onChangeText={(phoneNumberOther) =>
                 setDataComp((values) => ({ ...values, phoneNumberOther }))
               }
-              caption={repeatCaption}
               {...inputProps}
             />
           </FormContainer>
@@ -429,12 +503,12 @@ const mapDispatchToProps = (dispatch) => ({
       payload: privilege,
     });
   },
-  activeTutorial(value){
+  activeTutorial(value) {
     dispatch({
       type: "TUTORIAL",
-      payload: value
-    })
-  }
+      payload: value,
+    });
+  },
 });
 
 export default connect(null, mapDispatchToProps)(RegisterScreen);
@@ -497,8 +571,8 @@ const styles = StyleSheet.create({
     marginLeft: 5,
   },
   labelText: {
-    color: '#8e8e8e',
+    color: "#8e8e8e",
     fontSize: 14,
-    fontWeight: '600'
-  }
+    fontWeight: "600",
+  },
 });

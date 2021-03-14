@@ -76,7 +76,7 @@ const LoginScreen = ({
   //SIGN IN
   const signIn = async () => {
     
-    setModalVisible(true);
+    
     setCaption("");
     
     // }else{
@@ -91,10 +91,9 @@ const LoginScreen = ({
     const passError = validatePass(loginData.password)
     if(emailError || passError){
       setCaptionValues(() => ({email: emailError, password: passError})) 
-      setModalVisible(false)
       return
     }
-    
+    setModalVisible(true);
     try {
       const res = await login(loginData);
       if (!res.data.error) {

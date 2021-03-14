@@ -76,6 +76,11 @@ export default (state = initialState, action = {}) => {
         login: { ...state.login, privilege: action.payload },
         companySelect: companySelect(state),
       };
+      case "TUTORIAL":
+        return {
+          ...state,
+          tutorial: action.payload
+        }
       case "CLEAR_STORAGE":
       return {
         company: [],
