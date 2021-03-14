@@ -1,8 +1,14 @@
 import { useState } from "react";
 import axios from "axios";
 import { API_PORT } from "../config/index";
-import { createCitizen, findCitizendni } from './citizen'
-import { createVisit, findVisitdni, findVisitUser, updateVisit, fetchTodayVisist } from './visit'
+import { createCitizen, findCitizendni } from "./citizen";
+import {
+  createVisit,
+  findVisitdni,
+  findVisitUser,
+  updateVisit,
+  fetchTodayVisist,
+} from "./visit";
 
 export const helpers = {
   createCitizen,
@@ -11,8 +17,8 @@ export const helpers = {
   fetchTodayVisist,
   findVisitdni,
   findVisitUser,
-  updateVisit
-}
+  updateVisit,
+};
 
 //DELETE ANYTHING FROM API
 export async function deleteInfo(url, arrayIds) {
@@ -75,8 +81,6 @@ export async function fetchDestiny(companyId) {
   }
 }
 
-
-
 //ALL EMPLOYEES BY COMPANY
 export async function fetchAllEmployee(companyId) {
   try {
@@ -131,8 +135,7 @@ export async function updateProfile(formData, fileData, profileId) {
         },
       }
     );
-      return res;
-    
+    return res;
   } catch (error) {
     return { error };
   }
@@ -178,12 +181,24 @@ export async function createCompany(companyData, profilePic, companyLogo) {
   data.append("companyName", companyName);
   data.append("businessName", businessName);
   data.append("nic", nic);
-  data.append("address", address);
-  data.append("city", city);
+  if (address) {
+    data.append("address", address);
+  }
+  if (city) {
+    data.append("city", city);
+  }
+  if (phoneNumberOther) {
+    data.append("phoneNumberOther", phoneNumberOther);
+  }
   data.append("phoneNumber", phoneNumber);
-  data.append("phoneNumberOther", phoneNumberOther);
   data.append("file", { uri, name: fileName, type: fileType });
-  data.append("file", { uri: uriLogo, name: fileNameLogo, type: fileTypeLogo });
+  if (uriLogo) {
+    data.append("file", {
+      uri: uriLogo,
+      name: fileNameLogo,
+      type: fileTypeLogo,
+    });
+  }
 
   try {
     const res = await axios.post(`${API_PORT()}/api/company`, data, {
@@ -270,13 +285,13 @@ export async function createSupervisor(employeeData) {
     zoneId,
     companyId,
   } = employeeData;
-  console.log("privilege FETCH SUPER--",privilege)
+  console.log("privilege FETCH SUPER--", privilege);
   let data = new FormData();
   data.append("name", name);
   data.append("lastName", lastName);
   data.append("dni", dni);
   data.append("email", email);
-  data.append("password", '12345');
+  data.append("password", "12345");
   data.append("privilege", privilege);
   data.append("assignationDate", assignationDate.toISOString());
   data.append("changeTurnDate", changeTurnDate.toISOString());
@@ -312,13 +327,13 @@ export async function createWatchman(employeeData) {
     zoneId,
     companyId,
   } = employeeData;
-  console.log("privilege FETCH WACT--",privilege)
+  console.log("privilege FETCH WACT--", privilege);
   let data = new FormData();
   data.append("name", name);
   data.append("lastName", lastName);
   data.append("dni", dni);
   data.append("email", email);
-  data.append("password", '12345');
+  data.append("password", "12345");
   data.append("privilege", privilege);
   data.append("assignationDate", assignationDate.toISOString());
   data.append("changeTurnDate", changeTurnDate.toISOString());

@@ -29,7 +29,6 @@ import ZonasScreen from "../screens/admin/zonesScreen";
 import ZoneDetailScreen from "../screens/admin/zoneDetailScreen";
 import AsignEmployee from "../screens/admin/asignEmployeeScreen";
 import { NotificationScreen } from "../screens/admin/notificationScreen";
-import CompanyScreen from "../screens/admin/createCompanyScreen";
 import DestinyScreen from "../screens/admin/destinyScreen";
 import HistorialScreen from "../screens/admin/historialScreen";
 import PerfilScreen from "../screens/admin/perfilScreen";
@@ -37,7 +36,8 @@ import EditProfileScreen from "../screens/admin/editProfileScreen";
 import EmployeeScreen from "../screens/admin/employeeScreen";
 import CreateEmployeScreen from "../screens/admin/createEmployeeScreen";
 import { EmployeeDetailScreen } from "../screens/admin/employeeDetailScreen";
-import CreateZoneScreen from '../screens/admin/createZoneScreen'
+import { TutorialNavigator } from "./tutorial.navigator";
+import CreateZoneScreen from "../screens/admin/createZoneScreen";
 const drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
 
@@ -48,8 +48,15 @@ const options = {
 };
 
 function AdminNav() {
+  const tutorial = useSelector((state) => state.profile.tutorial);
   return (
-    <Stack.Navigator headerMode="none" initialRouteName="admin-home">
+    <Stack.Navigator
+      headerMode="none"
+      initialRouteName={tutorial ? "TUTORIAL" : "admin-home"}
+    >
+      {tutorial && (
+        <Stack.Screen name="TUTORIAL" component={<TutorialNavigator />} />
+      )}
       <Stack.Screen name="admin-home" component={HomeAdminScreen} />
       <Stack.Screen
         name="detail-view"
@@ -163,9 +170,9 @@ const DrawerContent = (props) => {
           )}
           onPress={() => {
             //logOut().then(() => alert("SE BORRO EL STORE DE REDUX!!!"));
-            storage.removeItem('userToken').then(() =>
-              props.navigation.navigate("Main", { logOut: true })
-            );
+            storage
+              .removeItem("userToken")
+              .then(() => props.navigation.navigate("Main", { logOut: true }));
           }}
         />
       </View>
@@ -190,9 +197,8 @@ const AdminNavigator = () => {
       ) : (
         <drawer.Screen name="Zones" component={ZoneDetailScreen} />
       )}
-     
-        <drawer.Screen name="Destiny" component={DestinyScreen} />
-      
+
+      <drawer.Screen name="Destiny" component={DestinyScreen} />
     </drawer.Navigator>
   );
 };

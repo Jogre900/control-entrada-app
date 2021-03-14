@@ -30,6 +30,7 @@ const initialState = {
       select: false,
     },
   ],
+  tutorial: false
 };
 
 const companySelect = (state) => {

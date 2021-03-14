@@ -15,13 +15,13 @@ import { MainColor } from "../../assets/colors";
 import * as ImagePicker from "expo-image-picker";
 // import * as ImagePicker from 'react-native-image-picker'
 import { Ionicons } from "@expo/vector-icons";
-import { storage } from '../../helpers/asyncStorage'
+import { storage } from "../../helpers/asyncStorage";
 import { FormContainer } from "../../components/formContainer";
 import { CameraModal } from "../../components/cameraModal";
 import Avatar from "../../components/avatar.component";
 import { createCompany, login } from "../../helpers";
 import { StatusModal } from "../../components/statusModal";
-import { LoadingModal } from '../../components/loadingModal'
+import { LoadingModal } from "../../components/loadingModal";
 import { connect } from "react-redux";
 
 const inputProps = {
@@ -62,8 +62,8 @@ let statusModalValues = {
 };
 let loadingModalValues = {
   status: false,
-  message: null
-}
+  message: null,
+};
 
 const RegisterScreen = ({
   navigation,
@@ -71,6 +71,7 @@ const RegisterScreen = ({
   saveCompany,
   saveLogin,
   savePrivilege,
+  activeTutorial
 }) => {
   const [dataComp, setDataComp] = useState(registerValues);
   const [profilePicData, setProfilePicData] = useState(profilePicValues);
@@ -78,9 +79,7 @@ const RegisterScreen = ({
   const [camera, setCamera] = useState(false);
   const [type, setType] = useState("");
   const [statusModal, setStatusModal] = useState(statusModalValues);
-  const [loadingModal, setLoadingModal] = useState(loadingModalValues)
-
-
+  const [loadingModal, setLoadingModal] = useState(loadingModalValues);
 
   const [caption, setCaption] = useState("");
   const [dniCaption, setDniCaption] = useState("");
@@ -120,51 +119,84 @@ const RegisterScreen = ({
 
   //CREATE USER
   const createAdmin = async () => {
-    setLoadingModal(({status: true, message: 'Guardando...'}))
+    setLoadingModal({ status: true, message: "Guardando..." });
     //clearCaption();
-    const res = await createCompany(
-      dataComp,
-      profilePicData,
-      compPicData
-    );
-    console.log("RES DE CREAT----",res.data);
+    const res = await createCompany(dataComp, profilePicData, compPicData);
+    console.log("RES DE CREAT----", res.data);
     if (!res.data.error) {
-      
-      
-      setLoadingModal((values => ({...values, status: false})))
+      setLoadingModal((values) => ({ ...values, status: false }));
       setStatusModal((values) => ({
         ...values,
         visible: true,
         status: true,
         message: res.data.msg,
       }));
-      setLoadingModal(({visible: true, message: 'Iniciando Sesión...'}))
-      const { slogin, sprofile, company, privilege, token } = await login(
-        dataComp.email, dataComp.repPass
-      );
-      console.log("VISTA-----",slogin, sprofile, company, privilege)
-      await storage.setItem('userToken', token)
-      saveLogin(slogin);
-      saveProfile(sprofile);
-      saveCompany(company);
-      savePrivilege(privilege);
-      switch (privilege) {
-        case "Watchman":
-          setLoadingModal((values => ({...values, visible: false})))
-          navigation.navigate("watch", {
-            screen: "watch-home",
+      setLoadingModal({ visible: true, message: "Iniciando Sesión..." });
+      const resLogin = await login(dataComp.email, dataComp.repPass);
+
+      if (!resLogin.data.error) {
+        console.log("RES DE LOGIN---------", resLogin.data);
+
+        let slogin = {
+          token: resLogin.data.token,
+          userId: resLogin.data.data.id,
+        };
+
+        let sprofile = {
+          id: resLogin.data.data.Employee.id,
+          dni: resLogin.data.data.Employee.dni,
+          name: resLogin.data.data.Employee.name,
+          lastName: resLogin.data.data.Employee.lastName,
+          picture: resLogin.data.data.Employee.picture,
+          email: resLogin.data.data.email,
+          userZone: resLogin.data.data.userZone[0],
+        };
+        if (resLogin.data.data.userZone.length > 0) {
+          sprofile.userZone = resLogin.data.data.userZone;
+        }
+        let company = [];
+        resLogin.data.data.UserCompany.map((comp) => {
+          company.push({
+            id: comp.Company.id,
+            companyName: comp.Company.companyName,
+            businessName: comp.Company.businessName,
+            nic: comp.Company.nic,
+            city: comp.Company.city,
+            address: comp.Company.address,
+            phoneNumber: comp.Company.phoneNumber,
+            phoneNumberOther: comp.Company.phoneNumberOther,
+            logo: comp.Company.logo,
+            privilege: comp.privilege,
+            select: true,
           });
-          break;
-        case "Admin":
-        case "Supervisor":
-          setLoadingModal((values => ({...values, visible: false})))
-          navigation.navigate("admin");
-          break;
-        default:
-          break;
+        });
+        let privilege = res.data.data.UserCompany[0].privilege;
+
+        await storage.setItem("userToken", token);
+        saveLogin(slogin);
+        saveProfile(sprofile);
+        saveCompany(company);
+        savePrivilege(privilege);
+        activeTutorial(true)
+
+        switch (privilege) {
+          case "Watchman":
+            setLoadingModal((values) => ({ ...values, visible: false }));
+            navigation.navigate("watch", {
+              screen: "watch-home",
+            });
+            break;
+          case "Admin":
+          case "Supervisor":
+            setLoadingModal((values) => ({ ...values, visible: false }));
+            navigation.navigate("admin");
+            break;
+          default:
+            break;
+        }
       }
     } else {
-      setLoadingModal((values => ({...values, status: false})))
+      setLoadingModal((values) => ({ ...values, status: false }));
       setStatusModal((values) => ({
         ...values,
         visible: true,
@@ -262,6 +294,7 @@ const RegisterScreen = ({
             </View>
           </FormContainer>
           <FormContainer title="Datos de la empresa">
+            <Text style={styles.labelText}>Puedes agregar un logo para tu empresa</Text>
             <View style={styles.pictureContainer}>
               {compPicData.uriLogo ? (
                 <Avatar.Picture size={120} uri={compPicData.uriLogo} />
@@ -279,6 +312,7 @@ const RegisterScreen = ({
             </View>
             <Input
               title="Empresa"
+              icon='md-business'
               onChangeText={(companyName) =>
                 setDataComp((values) => ({ ...values, companyName }))
               }
@@ -286,6 +320,7 @@ const RegisterScreen = ({
             />
             <Input
               title="Razon social"
+              icon='ios-briefcase'
               onChangeText={(businessName) =>
                 setDataComp((values) => ({ ...values, businessName }))
               }
@@ -299,14 +334,16 @@ const RegisterScreen = ({
               {...inputProps}
             />
             <Input
-              title="Direccion"
+              title="Direccion (Opcional)"
+              icon='ios-pin'
               onChangeText={(address) =>
                 setDataComp((values) => ({ ...values, address }))
               }
               {...inputProps}
             />
             <Input
-              title="Ciudad"
+              title="Ciudad (Opcional)"
+              icon='ios-home'
               onChangeText={(city) =>
                 setDataComp((values) => ({ ...values, city }))
               }
@@ -314,6 +351,7 @@ const RegisterScreen = ({
             />
             <Input
               title="Telefono"
+              icon='md-call'
               onChangeText={(phoneNumber) =>
                 setDataComp((values) => ({ ...values, phoneNumber }))
               }
@@ -321,6 +359,7 @@ const RegisterScreen = ({
             />
             <Input
               title="Telefono adicional (Opcional)"
+              icon='md-call'
               onChangeText={(phoneNumberOther) =>
                 setDataComp((values) => ({ ...values, phoneNumberOther }))
               }
@@ -355,7 +394,7 @@ const RegisterScreen = ({
         anotherPic={companyPic}
         type={type}
       />
-      <LoadingModal {...loadingModal}/>
+      <LoadingModal {...loadingModal} />
       <StatusModal
         {...statusModal}
         onClose={() =>
@@ -390,6 +429,12 @@ const mapDispatchToProps = (dispatch) => ({
       payload: privilege,
     });
   },
+  activeTutorial(value){
+    dispatch({
+      type: "TUTORIAL",
+      payload: value
+    })
+  }
 });
 
 export default connect(null, mapDispatchToProps)(RegisterScreen);
@@ -451,4 +496,9 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
     marginLeft: 5,
   },
+  labelText: {
+    color: '#8e8e8e',
+    fontSize: 14,
+    fontWeight: '600'
+  }
 });
