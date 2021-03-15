@@ -213,13 +213,11 @@ export async function createCompany(companyData, profilePic, companyLogo) {
 }
 
 //LOGIN
-export async function login(email, password) {
-  console.log(email, password)
+export async function login(data) {
+  
+  console.log(data)
   try {
-    const res = await axios.post(`${API_PORT()}/api/login`, {
-      email,
-      password,
-    });
+    const res = await axios.post(`${API_PORT()}/api/login`, data);
     // if (!res.data.error) {
     //   console.log("RES DE LOGIN---------", res.data);
 
@@ -263,6 +261,7 @@ export async function login(email, password) {
     // } else {
     //   return res;
     // }
+    console.log("LOGIN----",res.data)
     return res;
   } catch (error) {
     return error;
@@ -305,6 +304,7 @@ export async function createSupervisor(employeeData) {
         "content-type": "multipart/form-data",
       },
     });
+    console.log("RES DE CREAR SUPER--------",res.data)
     return res;
   } catch (error) {
     console.log(error);

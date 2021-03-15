@@ -41,14 +41,13 @@ const DestinyScreen = ({
   const [statusModalProps, setStatusModalProps] = useState(statusModalValues);
 
   const [visible, setVisible] = useState(false);
-  const [zoneId, setZoneId] = useState(
-    zonesRedux.length ? zonesRedux[0].id : null
-  );
+  const [zoneId, setZoneId] = useState();
   const [destinys, setDestinys] = useState([]);
   const [promp, setPromp] = useState(false);
   const [loading, setLoading] = useState(false);
   const [selectItem, setSeletedItem] = useState([]);
-
+  console.log("zoneRedux----", zonesRedux);
+  console.log(zoneId);
   const goBackAction = () => {
     return (
       <View>
@@ -110,7 +109,7 @@ const DestinyScreen = ({
   };
   useEffect(() => {
     let filterDestiny = [];
-    console.log("destinos REdix---", destinos);
+
     if (privilege === "Admin") {
       filterDestiny = destinos.filter((elem) => elem.zoneId === zoneId);
     } else {
@@ -118,7 +117,6 @@ const DestinyScreen = ({
         (elem) => elem.zoneId === userZone[0].ZoneId
       );
     }
-    console.log("filter---", filterDestiny);
 
     setDestinys(filterDestiny);
   }, [zoneId]);
@@ -129,6 +127,10 @@ const DestinyScreen = ({
       setSeletedItem([]);
     }, [])
   );
+
+  useEffect(() => {
+    setZoneId(zonesRedux.length ? zonesRedux[0].id : zonesRedux.id);
+  }, [zonesRedux]);
 
   return (
     <View style={{ flex: 1 }}>
@@ -143,9 +145,14 @@ const DestinyScreen = ({
         <TopNavigation title="Destinos" leftControl={goBackAction()} />
       )}
       {loading && <Spinner />}
-      {zonesRedux.length || zonesRedux ? (
+      {zonesRedux.length > 0 || zonesRedux ? (
         <ScrollView contentContainerStyle={{ alignItems: "center" }}>
-          <FormContainer title={privilege === 'Admin' ? "Selecione la zona" : zonesRedux.zone} style={{ marginTop: 10 }}>
+          <FormContainer
+            title={
+              privilege === "Admin" ? "Selecione la zona" : zonesRedux.zone
+            }
+            style={{ marginTop: 10 }}
+          >
             {privilege === "Admin" && (
               <Picker
                 mode="dropdown"
@@ -197,7 +204,7 @@ const DestinyScreen = ({
       )}
 
       <CreateDestinyModal
-        zoneId={privilege === 'Admin' ? zoneId : userZone[0].ZoneId}
+        zoneId={privilege === "Admin" ? zoneId : userZone[0].ZoneId}
         status={visible}
         create={checkCreate}
         onClose={() => setVisible(false)}
@@ -215,7 +222,7 @@ const DestinyScreen = ({
           setStatusModalProps((values) => ({ ...values, visible: false }))
         }
       />
-      {zonesRedux.length || zonesRedux ? (
+      {zonesRedux.length > 0 || zonesRedux ? (
         <FloatingBotton icon="ios-add" onPress={() => setVisible(true)} />
       ) : null}
     </View>

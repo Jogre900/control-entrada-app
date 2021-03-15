@@ -89,8 +89,10 @@ const HomeAdminScreen = ({
           (uz) => (console.log("userZId------", uz.id), employee.push(uz.id))
         );
         saveEmployee(res.data.data);
+
         if (employee.length) {
           const res = await helpers.fetchTodayVisist(company.id, employee);
+
           if (!res.data.error && res.data.data.length) {
             saveTodayVisits(res.data.data);
             setVisits(res.data.data);
@@ -99,9 +101,10 @@ const HomeAdminScreen = ({
           } else if (!res.data.data.length) {
             setHasVisit(false);
           }
-        }
+        } else setHasVisit(false);
       } else {
         console.log(res.data.msg);
+        setHasVisit(false);
       }
     }
   };
@@ -116,11 +119,10 @@ const HomeAdminScreen = ({
       res.data.data.map((e) => {
         uzArray.push(e.userZone[0]);
       });
-      uzArray.map(
-        (uz) => (employee.push(uz.id))
-      );
+      uzArray.map((uz) => employee.push(uz.id));
       if (employee.length) {
         const res = await helpers.fetchTodayVisist(company.id, employee);
+
         if (!res.data.error && res.data.data.length) {
           saveTodayVisits(res.data.data);
           setVisits(res.data.data);
@@ -129,9 +131,10 @@ const HomeAdminScreen = ({
         } else if (!res.data.data.length) {
           setHasVisit(false);
         }
-      }
+      } else setHasVisit(false);
     } else {
       console.log(res.data.msg);
+      setHasVisit(false);
     }
   };
 
@@ -222,7 +225,7 @@ const HomeAdminScreen = ({
       };
     }, [])
   );
-
+  console.log("hasVisit----", hasVisit);
   return (
     <View style={{ flex: 1 }}>
       {selectItem.length > 0 ? (

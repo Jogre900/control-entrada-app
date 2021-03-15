@@ -81,6 +81,11 @@ export default (state = initialState, action = {}) => {
           ...state,
           tutorial: action.payload
         }
+        case "TURN_OFF":
+          return {
+            ...state,
+            tutorial: action.payload
+          }
       case "CLEAR_STORAGE":
       return {
         company: [],

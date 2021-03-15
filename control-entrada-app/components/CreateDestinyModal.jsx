@@ -16,6 +16,7 @@ export const CreateDestinyModal = ({ status, create, onClose, zoneId }) => {
 
   //CREATE DESTINY
   const createDestiny = async () => {
+    console.log("zoneid from destinyScreen", zoneId)
     setLoading(true);
     if (destinyName.length === 0) {
       setCaption("Debe ingresar un nombre.");
