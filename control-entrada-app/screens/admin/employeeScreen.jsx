@@ -28,6 +28,7 @@ import { connect } from "react-redux";
 const companyId = "9a28095a-9029-40ec-88c2-30e3fac69bc5";
 
 const EmployeeScreen = ({ navigation, employee, removeEmployee }) => {
+  console.log("EMPLOYEE FROM REDUX--",employee)
   const [employeeId, setEmployeeId] = useState("");
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(false);

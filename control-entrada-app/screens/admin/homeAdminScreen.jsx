@@ -80,6 +80,7 @@ const HomeAdminScreen = ({
     if (company) {
       setLoading(true);
       const res = await fetchAllEmployee(company.id);
+      console.log("EMPLOYE FROM API---",res.data)
       if (!res.data.error && res.data.data.length) {
         res.data.data.map((e) => {
           uzArray.push(e.userZone[0]);

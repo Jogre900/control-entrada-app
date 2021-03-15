@@ -155,13 +155,21 @@ export async function recoverPass(email, data) {
   }
 }
 //CREATE COMPANY AND ADMIN
-export async function createCompany(companyData, profilePic, companyLogo) {
+export async function createCompany(adminData, companyData) {
   const {
     name,
     lastName,
     dni,
     email,
     repPass,
+    uri,
+    fileName,
+    fileType,
+  } = adminData;
+  const {
+    uriLogo,
+    fileNameLogo,
+    fileTypeLogo,
     companyName,
     businessName,
     nic,
@@ -170,8 +178,7 @@ export async function createCompany(companyData, profilePic, companyLogo) {
     phoneNumber,
     phoneNumberOther,
   } = companyData;
-  const { uri, fileName, fileType } = profilePic;
-  const { uriLogo, fileNameLogo, fileTypeLogo } = companyLogo;
+
   let data = new FormData();
   data.append("name", name);
   data.append("lastName", lastName);
@@ -213,11 +220,10 @@ export async function createCompany(companyData, profilePic, companyLogo) {
 }
 
 //LOGIN
-export async function login(data) {
-  
-  console.log(data)
+export async function login(email, password) {
+  // console.log(data);
   try {
-    const res = await axios.post(`${API_PORT()}/api/login`, data);
+    const res = await axios.post(`${API_PORT()}/api/login`, {email, password});
     // if (!res.data.error) {
     //   console.log("RES DE LOGIN---------", res.data);
 
@@ -261,7 +267,7 @@ export async function login(data) {
     // } else {
     //   return res;
     // }
-    console.log("LOGIN----",res.data)
+    console.log("LOGIN----", res.data);
     return res;
   } catch (error) {
     return error;
@@ -304,7 +310,7 @@ export async function createSupervisor(employeeData) {
         "content-type": "multipart/form-data",
       },
     });
-    console.log("RES DE CREAR SUPER--------",res.data)
+    console.log("RES DE CREAR SUPER--------", res.data);
     return res;
   } catch (error) {
     console.log(error);

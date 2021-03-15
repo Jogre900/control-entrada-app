@@ -49,7 +49,7 @@ const LoginScreen = ({
   
   const [loginData, setLoginData] = useState(loginInitialValues)
   const [captionValues, setCaptionValues] = useState(captionInitialValues)
-  
+  const [prueba, setprueba] = useState({})
 
 
   const [caption, setCaption] = useState("");
@@ -87,15 +87,15 @@ const LoginScreen = ({
     //   }
     // }
 
-    const emailError = validateEmail(loginData.email)
-    const passError = validatePass(loginData.password)
-    if(emailError || passError){
-      setCaptionValues(() => ({email: emailError, password: passError})) 
-      return
-    }
+    // const emailError = validateEmail(prueba.email)
+    // const passError = validatePass(prueba.password)
+    // if(emailError || passError){
+    //   setCaptionValues(() => ({email: emailError, password: passError})) 
+    //   return
+    // }
     setModalVisible(true);
     try {
-      const res = await login(loginData);
+      const res = await login(prueba.email, prueba.password);
       if (!res.data.error) {
         let slogin = {
           token: res.data.token,
@@ -187,7 +187,10 @@ const LoginScreen = ({
       setPassModal((values) => ({ ...values, visible: false }));
     }
   };
-
+const handleChange = (name, value) => {
+  console.log(name, value)
+  setprueba((values) => ({...values, [name]: value}))
+}
   return (
     <View style={{ flex: 1 }}>
       <TopNavigation title="Inicio" leftControl={goBackAction()} />
@@ -203,9 +206,11 @@ const LoginScreen = ({
               returnKeyType="next"
               caption={captionValues.email}
               onSubmitEditing={() => nextInput.current.focus()}
-              onChangeText={(email) => {
-                setLoginData(values => ({...values, email})), setCaptionValues(values => ({...values, email: ''}))
-              }}
+              onChangeText={email => handleChange("email", email)}
+              // onChangeText={(email) => {
+              //   setLoginData(values => ({...values, email})), setCaptionValues(values => ({...values, email: ''}))
+              // }}
+              //onChange={handleChange}
               
             />
             <Input
@@ -217,10 +222,11 @@ const LoginScreen = ({
               secureTextEntry={true}
               caption={captionValues.password}
               onSubmitEditing={() => signIn()}
-              onChangeText={(password) => {
-                setLoginData(values => ({...values, password})), setCaptionValues(values => ({...values, password: ''}))
-              }}
-              
+              // onChangeText={(password) => {
+              //   setLoginData(values => ({...values, password})), setCaptionValues(values => ({...values, password: ''}))
+              // }}
+              onChangeText={password => handleChange("password", password)}
+              value={prueba.password}
               ref={nextInput}
             />
           </View>
@@ -239,6 +245,7 @@ const LoginScreen = ({
           <MainButton
             style={{ marginTop: 20, marginBottom: 5 }}
             title="Iniciar Sesion"
+            // onPress={() => console.log(prueba)}
             onPress={() => {
               signIn();
             }}

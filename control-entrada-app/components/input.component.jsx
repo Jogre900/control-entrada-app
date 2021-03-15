@@ -29,6 +29,7 @@ const Input = (props, ref) => {
     onSubmitEditing,
     caption,
     editable,
+    onChange
   } = props;
   const [eyeIcon, setEyeIcon] = React.useState(true);
   const [iconInput, setIconInput] = React.useState("ios-eye-off");
@@ -105,6 +106,7 @@ const Input = (props, ref) => {
             placeholderTextColor={textColor}
             autoCorrect={autoCorrect}
             onChangeText={onChangeText}
+            onChange={onChange}
             editable={editable}
             value={value}
             onSubmitEditing={onSubmitEditing}

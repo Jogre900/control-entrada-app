@@ -22,6 +22,8 @@ import Avatar from "../../components/avatar.component";
 import { createCompany, login } from "../../helpers";
 import { StatusModal } from "../../components/statusModal";
 import { LoadingModal } from "../../components/loadingModal";
+import { AdminForm } from '../../components/forms/adminForm'
+import { CompanyForm } from '../../components/forms/companyForm'
 import {
   validateName,
   validateEmail,
@@ -34,37 +36,6 @@ import {
   validateCompany,
 } from "../../helpers/forms";
 import { connect } from "react-redux";
-
-const inputProps = {
-  shape: "flat",
-  textColor: "grey",
-};
-
-let registerValues = {
-  companyName: null,
-  businessName: null,
-  nic: null,
-  city: null,
-  address: null,
-  phoneNumber: null,
-  phoneNumberOther: null,
-  dni: null,
-  name: null,
-  lastName: null,
-  email: null,
-  password: null,
-  repPass: null,
-};
-let profilePicValues = {
-  uri: null,
-  fileName: null,
-  fileType: null,
-};
-let compLogoValues = {
-  uriLogo: null,
-  fileNameLogo: null,
-  fileTypeLogo: null,
-};
 
 let statusModalValues = {
   visible: false,
@@ -97,15 +68,12 @@ const RegisterScreen = ({
   savePrivilege,
   activeTutorial,
 }) => {
-  const [dataComp, setDataComp] = useState(registerValues);
-  const [profilePicData, setProfilePicData] = useState(profilePicValues);
-  const [compPicData, setCompPicData] = useState(compLogoValues);
-  const [camera, setCamera] = useState(false);
-  const [type, setType] = useState("");
+  const [adminData, setAdminData] = useState({});
+  const [companyData, setCompanyData] = useState({});
   const [statusModal, setStatusModal] = useState(statusModalValues);
   const [loadingModal, setLoadingModal] = useState(loadingModalValues);
-  const [registerCaption, setRegisterCaption] = useState(captionInitialValues);
-  const [passEqual, setPassEqual] = useState(false);
+  const [registerCaption, setRegisterCaption] = useState({});
+  //const [passEqual, setPassEqual] = useState(false);
 
   const [caption, setCaption] = useState("");
 
@@ -121,18 +89,25 @@ const RegisterScreen = ({
       </View>
     );
   };
-  const profilePic = (uri, fileName, fileType) => {
-    setProfilePicData((values) => ({ ...values, uri, fileName, fileType }));
-  };
-  const companyPic = (uri, fileName, fileType) => {
-    setCompPicData((values) => ({
-      ...values,
-      uriLogo: uri,
-      fileNameLogo: fileName,
-      fileTypeLogo: fileType,
-    }));
-  };
+  // const profilePic = (uri, fileName, fileType) => {
+  //   setProfilePicData((values) => ({ ...values, uri, fileName, fileType }));
+  // };
+  // const companyPic = (uri, fileName, fileType) => {
+  //   setCompPicData((values) => ({
+  //     ...values,
+  //     uriLogo: uri,
+  //     fileNameLogo: fileName,
+  //     fileTypeLogo: fileType,
+  //   }));
+  // };
 
+const adminHandleChange = (name, value) => {
+    setAdminData(values => ({...values, [name]: value}))
+}
+
+const companyHandleChange = (name, value) => {
+  setCompanyData(values => ({...values, [name]: value}))
+}
   const validateForm = (data) => {
     const nameError = validateName(data.name);
     const lastNameError = validateLastName(data.lastName);
@@ -177,7 +152,7 @@ const RegisterScreen = ({
     // }
     setLoadingModal({ status: true, message: "Guardando..." });
     //clearCaption();
-    const res = await createCompany(dataComp, profilePicData, compPicData);
+    const res = await createCompany(adminData, companyData);
     //console.log("RES DE CREAT----", res.data);
     if (!res.data.error) {
       setLoadingModal((values) => ({ ...values, status: false }));
@@ -189,7 +164,7 @@ const RegisterScreen = ({
       }));
       //console.log(dataComp.email, dataComp.repPass)
       setLoadingModal({ visible: true, message: "Iniciando Sesión..." });
-      const resLogin = await login(dataComp.email, dataComp.repPass);
+      const resLogin = await login(adminData.email, adminData.repPass);
 
       
       if (!resLogin.data.error) {
@@ -273,174 +248,28 @@ const RegisterScreen = ({
     })();
   }, []);
 
-  useEffect(() => {
-    if (dataComp.password && dataComp.repPass) {
-      if (dataComp.password === dataComp.repPass) {
-        setPassEqual(true);
-      } else setPassEqual(false);
-    }
-  }, [dataComp.password, dataComp.repPass]);
+  // useEffect(() => {
+  //   if (dataComp.password && dataComp.repPass) {
+  //     if (dataComp.password === dataComp.repPass) {
+  //       setPassEqual(true);
+  //     } else setPassEqual(false);
+  //   }
+  // }, [dataComp.password, dataComp.repPass]);
 
   return (
     <View style={{ flex: 1 }}>
       <TopNavigation title="Registro" leftControl={goBackAction()} />
       <ScrollView>
         <View style={{ alignItems: "center" }}>
-          <FormContainer title="Datos Personales">
-            <View style={styles.pictureContainer}>
-              {profilePicData.uri ? (
-                <Avatar.Picture size={120} uri={profilePicData.uri} />
-              ) : (
-                <Avatar.Icon size={32} name="md-photos" color="#8e8e8e" />
-              )}
-              <TouchableOpacity
-                onPress={() => {
-                  setCamera(true), setType("profile");
-                }}
-                style={styles.openCameraButton}
-              >
-                <Ionicons name="ios-camera" size={32} color="#fff" />
-              </TouchableOpacity>
-            </View>
-            <Input
-              title="Nombres"
-              icon="ios-person"
-              onChangeText={(name) =>
-                setDataComp((values) => ({ ...values, name }))
-              }
-              {...inputProps}
-              caption={registerCaption.name}
-            />
-            <Input
-              title="Apellidos"
-              icon="ios-person"
-              onChangeText={(lastName) =>
-                setDataComp((values) => ({ ...values, lastName }))
-              }
-              {...inputProps}
-              caption={registerCaption.lastName}
-            />
-            <Input
-              title="DNI"
-              icon="ios-card"
-              onChangeText={(dni) =>
-                setDataComp((values) => ({ ...values, dni }))
-              }
-              caption={registerCaption.dni}
-              {...inputProps}
-            />
-            <Input
-              title="Correo"
-              icon="ios-mail"
-              onChangeText={(email) =>
-                setDataComp((values) => ({ ...values, email }))
-              }
-              caption={registerCaption.email}
-              {...inputProps}
-            />
-            <Input
-              style={{ borderColor: passEqual && Success }}
-              title="Contraseña"
-              onChangeText={(password) =>
-                setDataComp((values) => ({ ...values, password }))
-              }
-              caption={registerCaption.password}
-              secureTextEntry
-              {...inputProps}
-            />
-            <Input
-              style={{ borderColor: passEqual && Success }}
-              title="Repetir Contraseña"
-              onChangeText={(repPass) =>
-                setDataComp((values) => ({ ...values, repPass }))
-              }
-              caption={registerCaption.repPass}
-              secureTextEntry
-              {...inputProps}
-            />
-            <View>
-              <Text style={styles.caption}>{caption}</Text>
-            </View>
-          </FormContainer>
-          <FormContainer title="Datos de la empresa">
-            <Text style={styles.labelText}>
-              Puedes agregar un logo para tu empresa
-            </Text>
-            <View style={styles.pictureContainer}>
-              {compPicData.uriLogo ? (
-                <Avatar.Picture size={120} uri={compPicData.uriLogo} />
-              ) : (
-                <Avatar.Icon size={32} name="md-photos" color="#8e8e8e" />
-              )}
-              <TouchableOpacity
-                onPress={() => {
-                  setCamera(true), setType("logo");
-                }}
-                style={styles.openCameraButton}
-              >
-                <Ionicons name="ios-camera" size={32} color="#fff" />
-              </TouchableOpacity>
-            </View>
-            <Input
-              title="Empresa"
-              icon="md-business"
-              onChangeText={(companyName) =>
-                setDataComp((values) => ({ ...values, companyName }))
-              }
-              {...inputProps}
-              caption={registerCaption.companyName}
-            />
-            <Input
-              title="Razon social"
-              icon="ios-briefcase"
-              onChangeText={(businessName) =>
-                setDataComp((values) => ({ ...values, businessName }))
-              }
-              {...inputProps}
-              caption={registerCaption.businessName}
-            />
-            <Input
-              title="nic"
-              onChangeText={(nic) =>
-                setDataComp((values) => ({ ...values, nic }))
-              }
-              {...inputProps}
-              caption={registerCaption.nic}
-            />
-            <Input
-              title="Direccion (Opcional)"
-              icon="ios-pin"
-              onChangeText={(address) =>
-                setDataComp((values) => ({ ...values, address }))
-              }
-              {...inputProps}
-            />
-            <Input
-              title="Ciudad (Opcional)"
-              icon="ios-home"
-              onChangeText={(city) =>
-                setDataComp((values) => ({ ...values, city }))
-              }
-              {...inputProps}
-            />
-            <Input
-              title="Telefono"
-              icon="md-call"
-              onChangeText={(phoneNumber) =>
-                setDataComp((values) => ({ ...values, phoneNumber }))
-              }
-              {...inputProps}
-              caption={registerCaption.phoneNumber}
-            />
-            <Input
-              title="Telefono adicional (Opcional)"
-              icon="md-call"
-              onChangeText={(phoneNumberOther) =>
-                setDataComp((values) => ({ ...values, phoneNumberOther }))
-              }
-              {...inputProps}
-            />
-          </FormContainer>
+          <AdminForm
+            handleChange={adminHandleChange}
+            value={adminData}
+            //caption={registerCaption}
+          />
+          <CompanyForm
+            handleChange={companyHandleChange}
+            value={companyData}
+          />
           <View
             style={{ width: "90%", flexDirection: "row", alignItems: "center" }}
           >
@@ -456,18 +285,13 @@ const RegisterScreen = ({
             </View>
           </View>
           <View style={{ width: "90%" }}>
-            <MainButton title="Enviar" onPress={createAdmin} />
+            <MainButton title="Enviar" 
+            // onPress={() => console.log(adminData, companyData)}
+            onPress={createAdmin} 
+            />
           </View>
         </View>
       </ScrollView>
-
-      <CameraModal
-        status={camera}
-        onClose={() => setCamera(false)}
-        profile={profilePic}
-        anotherPic={companyPic}
-        type={type}
-      />
       <LoadingModal {...loadingModal} />
       <StatusModal
         {...statusModal}
@@ -513,66 +337,3 @@ const mapDispatchToProps = (dispatch) => ({
 
 export default connect(null, mapDispatchToProps)(RegisterScreen);
 
-const styles = StyleSheet.create({
-  pickPictureContainer: {
-    backgroundColor: "#fff",
-    width: "90%",
-    borderRadius: 5,
-    marginVertical: 5,
-    padding: 8,
-    elevation: 5,
-  },
-  pictureContainer: {
-    height: 120,
-    width: 120,
-    alignSelf: "center",
-    position: "relative",
-    marginVertical: 10,
-    borderColor: "#fff",
-    borderWidth: 2,
-    elevation: 10,
-    borderRadius: 120 / 2,
-    backgroundColor: "#fff",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  openCameraButton: {
-    position: "absolute",
-    bottom: 0,
-    right: -15,
-    backgroundColor: MainColor,
-    justifyContent: "center",
-    alignItems: "center",
-    width: 40,
-    height: 40,
-    borderRadius: 40 / 2,
-    borderColor: "#fff",
-    borderWidth: 2,
-    elevation: 10,
-  },
-  buttonContainer: {
-    backgroundColor: "#fff",
-    width: "90%",
-    borderRadius: 5,
-    marginVertical: 2.5,
-    padding: 8,
-  },
-  containerTitle: {
-    fontSize: 16,
-    fontWeight: "700",
-    letterSpacing: 2,
-    color: MainColor,
-  },
-  caption: {
-    fontSize: 16,
-    fontWeight: "500",
-    color: "red",
-    letterSpacing: 0.5,
-    marginLeft: 5,
-  },
-  labelText: {
-    color: "#8e8e8e",
-    fontSize: 14,
-    fontWeight: "600",
-  },
-});
