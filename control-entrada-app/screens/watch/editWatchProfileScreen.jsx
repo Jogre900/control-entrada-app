@@ -12,7 +12,7 @@ import { LoadingModal } from "../../components/loadingModal";
 import { Ionicons } from "@expo/vector-icons";
 import { MainColor } from "../../assets/colors";
 import { updateProfile } from "../../helpers";
-import { storage } from '../../helpers/asyncStorage'
+import { storage } from "../../helpers/asyncStorage";
 import { connect } from "react-redux";
 
 let initialValues = {
@@ -69,7 +69,7 @@ const EditWatchProfileScreen = ({
           lastName: res.data.data.Employee.lastName,
           picture: res.data.data.Employee.picture,
           email: res.data.data.email,
-          userZone: res.data.data.userZone
+          userZone: res.data.data.userZone,
         };
 
         await storage.removeItem("userToken");
@@ -132,6 +132,7 @@ const EditWatchProfileScreen = ({
             <Input
               title="Email"
               icon="ios-mail"
+              shape="flat"
               onChangeText={(email) =>
                 setFormValues((value) => ({ ...value, email }))
               }

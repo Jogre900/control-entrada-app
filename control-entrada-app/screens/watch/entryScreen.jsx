@@ -260,6 +260,7 @@ const EntryScreen = ({ navigation, profile, saveVisit }) => {
             <Input
               title="Nombre"
               icon="ios-person"
+              shape="flat"
               returnKeyType="next"
               onSubmitEditing={() => lastNameRef.current.focus()}
               onChangeText={(name) => {
@@ -272,6 +273,7 @@ const EntryScreen = ({ navigation, profile, saveVisit }) => {
             <Input
               title="Apellido"
               icon="ios-person"
+              shape="flat"
               returnKeyType="next"
               onSubmitEditing={() => dniRef.current.focus()}
               onChangeText={(lastName) => {
@@ -285,6 +287,7 @@ const EntryScreen = ({ navigation, profile, saveVisit }) => {
               <Input
                 title="dni"
                 icon="ios-card"
+                shape="flat"
                 keyBoradType="numeric"
                 returnKeyType="next"
                 onSubmitEditing={() => destinyRef.current.focus()}
@@ -356,6 +359,7 @@ const EntryScreen = ({ navigation, profile, saveVisit }) => {
             <Input
               title="Descipcion Entrada (opcional)"
               icon="md-create"
+              shape="flat"
               onChangeText={(descriptionEntry) => {
                 setVisitData((values) => ({ ...values, descriptionEntry }));
                 setShortVisitData((values) => ({

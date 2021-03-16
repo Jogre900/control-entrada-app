@@ -194,6 +194,7 @@ export const DepartureScreen = (props) => {
                 <Input
                   title="Descripcion Salida (Opcional)"
                   icon="md-create"
+                  shape="flat"
                   value={departureText}
                   onChangeText={(value) => setDepartureText(value)}
                   shape="flat"

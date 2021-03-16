@@ -294,6 +294,7 @@ const CreateEmployeScreen = ({
               title="Nombre"
               icon="ios-person"
               returnKeyType="next"
+              shape='flat'
               onChangeText={(name) => {
                 setEmployeeData((values) => ({ ...values, name })),
                   setCaption("");
@@ -304,6 +305,7 @@ const CreateEmployeScreen = ({
               styleInput={{ color: "black" }}
               icon="ios-people"
               title="Apellido"
+              shape='flat'
               returnKeyType="next"
               onChangeText={(lastName) => {
                 setEmployeeData((values) => ({ ...values, lastName })),
@@ -315,6 +317,7 @@ const CreateEmployeScreen = ({
               styleInput={{ color: "black" }}
               title="DNI"
               icon="ios-card"
+              shape='flat'
               returnKeyType="next"
               onChangeText={(dni) => {
                 setEmployeeData((values) => ({ ...values, dni })),
@@ -326,6 +329,7 @@ const CreateEmployeScreen = ({
               styleInput={{ color: "black" }}
               title="Email"
               icon="ios-mail"
+              shape='flat'
               returnKeyType="next"
               onChangeText={(email) => {
                 setEmployeeData((values) => ({ ...values, email })),

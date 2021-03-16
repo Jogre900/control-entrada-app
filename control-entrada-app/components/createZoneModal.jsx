@@ -156,6 +156,7 @@ const CreateZoneModal = ({
         <Input
           title="Nombre"
           icon="md-globe"
+          shape="flat"
           returnKeyType="next"
           onChangeText={(nombre) => {
             setZoneName(nombre);

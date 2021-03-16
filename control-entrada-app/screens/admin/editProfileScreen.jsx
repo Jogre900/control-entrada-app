@@ -1,10 +1,5 @@
 import React, { useState } from "react";
-import {
-  View,
-  TouchableOpacity,
-  ScrollView,
-  StyleSheet,
-} from "react-native";
+import { View, TouchableOpacity, ScrollView, StyleSheet } from "react-native";
 import { FormContainer } from "../../components/formContainer";
 import Input from "../../components/input.component";
 import Avatar from "../../components/avatar.component";
@@ -109,7 +104,7 @@ const EditProfileScreen = ({
           lastName: res.data.data.Employee.lastName,
           picture: res.data.data.Employee.picture,
           email: res.data.data.email,
-          userZone: res.data.data.userZone
+          userZone: res.data.data.userZone,
         };
         let company = [];
         res.data.data.UserCompany.map((comp) => {
@@ -165,7 +160,7 @@ const EditProfileScreen = ({
       <ScrollView>
         <View style={{ alignItems: "center" }}>
           <FormContainer title="Perfil">
-          <View style={styles.pictureContainer}>
+            <View style={styles.pictureContainer}>
               <Avatar.Picture
                 size={120}
                 uri={
@@ -185,6 +180,7 @@ const EditProfileScreen = ({
             <Input
               title="Email"
               icon="ios-mail"
+              shape="flat"
               onChangeText={(email) =>
                 setFormValues((value) => ({ ...value, email }))
               }
@@ -214,6 +210,7 @@ const EditProfileScreen = ({
               <Input
                 title="Rif"
                 icon="ios-card"
+                shape="flat"
                 onChangeText={(nic) =>
                   setFormValues((value) => ({ ...value, nic }))
                 }
@@ -221,6 +218,7 @@ const EditProfileScreen = ({
               <Input
                 title="Telefono"
                 icon="md-call"
+                shape="flat"
                 onChangeText={(number) =>
                   setFormValues((value) => ({ ...value, number }))
                 }
@@ -228,6 +226,7 @@ const EditProfileScreen = ({
               <Input
                 title="Telefono Adicional"
                 icon="md-call"
+                shape="flat"
                 onChangeText={(numberTwo) =>
                   setFormValues((value) => ({ ...value, numberTwo }))
                 }
