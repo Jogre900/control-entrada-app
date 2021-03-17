@@ -1,12 +1,30 @@
 {
   "serverPort": 8000,
   "db": {
-    "host": "localhost",
-    "dialect": "postgres",
-    "database": "control_entrada",
-    "username": "postgres",
-    "password": "12345",
-    "logging": false
+    "development": {
+      "host": "localhost",
+      "dialect": "postgres",
+      "database": "control_entrada",
+      "username": "postgres",
+      "password": "12345",
+      "logging": false
+    },
+    "testing": {
+      "host": "localhost",
+      "dialect": "postgres",
+      "database": "control_entrada",
+      "username": "control_user",
+      "password": "123456",
+      "logging": false
+    },
+    "production": {
+      "host": "localhost",
+      "dialect": "postgres",
+      "database": "control_entrada",
+      "username": "postgres",
+      "password": "12345",
+      "logging": false
+    }
   },
   "security": {
     "secretKey": ")]3;N*|m:z+R%<Nk}5Bc",
