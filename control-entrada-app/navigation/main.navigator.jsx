@@ -5,8 +5,6 @@ import {
 } from "@react-navigation/stack";
 
 //screens
-import { SplashScreen } from "../components/splashScreen.component";
-import { ProfileComponent } from "../components/profile.component";
 import LoadingScreen from '../screens/main/loadingScreen' 
 import MainScreen from "../screens/main/mainScreen";
 import LoginScreen from "../screens/main/logInScreen";
@@ -14,7 +12,7 @@ import RegisterScreen from "../screens/main/registerScreen";
 import { WatchNavigator } from "./watch.navigator";
 import AdminNavigator from "./admin.navigator";
 import { TermsScreen } from "../screens/main/termsAndConditionsScreen";
-import { storage } from "../helpers/asyncStorage";
+import { routes } from '../assets/routes'
 
 const stack = createStackNavigator();
 
@@ -29,17 +27,17 @@ export const MainNavigator = (props) => {
   return (
     <stack.Navigator
       headerMode="none"
-      initialRouteName="loading"
+      initialRouteName={routes.LOADING}
     >
-      <stack.Screen name="Main" component={MainScreen} />
-      <stack.Screen name="loading" component={LoadingScreen} />
-      <stack.Screen name="LogIn" component={LoginScreen} />
-      <stack.Screen name="watch">
+      <stack.Screen name={routes.MAIN} component={MainScreen} />
+      <stack.Screen name={routes.LOADING} component={LoadingScreen} />
+      <stack.Screen name={routes.LOGIN} component={LoginScreen} />
+      <stack.Screen name={routes.WATCH}>
         {() => <WatchNavigator {...props} />}
       </stack.Screen>
-      <stack.Screen name="register" component={RegisterScreen} />
-      <stack.Screen name="terms" component={TermsScreen} options={options} />
-      <stack.Screen name="admin">
+      <stack.Screen name={routes.REGISTER} component={RegisterScreen} />
+      <stack.Screen name={routes.TERMS} component={TermsScreen} options={options} />
+      <stack.Screen name={routes.ADMIN}>
         {() => <AdminNavigator {...props} />}
       </stack.Screen>
     </stack.Navigator>

@@ -4,6 +4,7 @@ import { MainColor } from '../../assets/colors'
 import { MainButton } from "../../components/mainButton.component";
 import { Ionicons } from '@expo/vector-icons'
 import { useDispatch } from "react-redux";
+import { routes } from '../../assets/routes'
 export const Page3Screen = ({ navigation }) => {
   const dispatch = useDispatch({ type: "TURN_OFF", payload: false });
   return (
@@ -30,13 +31,13 @@ export const Page3Screen = ({ navigation }) => {
         <MainButton
             style={styles.button}
             title="Atras"
-            onPress={() => navigation.navigate("PAGE_2")}
+            onPress={() => navigation.navigate(routes.PAGE_2)}
             outline
           />
           <MainButton
             style={[styles.button, {marginLeft: 20}]}
             title="Entiendo"
-            onPress={() => navigation.navigate("admin-home")}
+            onPress={() => navigation.navigate(routes.ADMIN_HOME)}
           />
         </View>
       </View>

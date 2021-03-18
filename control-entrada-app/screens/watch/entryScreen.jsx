@@ -28,6 +28,8 @@ import { StatusModal } from "../../components/statusModal";
 import { FormContainer } from "../../components/formContainer";
 import { CameraModal } from "../../components/cameraModal";
 import { helpers } from "../../helpers";
+import { BackAction } from '../../helpers/ui/ui'
+import { routes } from '../../assets/routes'
 import Avatar from "../../components/avatar.component";
 
 let destinyCaption, imageCaption, imageVisitCaption;
@@ -182,15 +184,6 @@ const EntryScreen = ({ navigation, profile, saveVisit }) => {
     }
   };
 
-  const goBackAction = () => {
-    return (
-      <View>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Ionicons name="ios-arrow-back" size={28} color="white" />
-        </TouchableOpacity>
-      </View>
-    );
-  };
   const profilePic = (uri, fileName, fileType, caption, changeImg) => {
     setVisitData((values) => ({
       ...values,
@@ -230,7 +223,7 @@ const EntryScreen = ({ navigation, profile, saveVisit }) => {
 
   return (
     <View style={{ flex: 1 }}>
-      <TopNavigation title="Entrada" leftControl={goBackAction()} />
+      <TopNavigation title="Entrada" leftControl={BackAction(navigation)} />
       <KeyboardAvoidingView style={styles.containerKeyboard} behavior="padding">
         <ScrollView contentContainerStyle={{ alignItems: "center" }}>
           <FormContainer title="Datos Personales">

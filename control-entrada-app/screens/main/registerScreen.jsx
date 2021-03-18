@@ -3,22 +3,18 @@ import {
   View,
   Text,
   ScrollView,
-  StyleSheet,
   TouchableOpacity,
 } from "react-native";
 import CheckBox from "@react-native-community/checkbox";
 
-import Input from "../../components/input.component";
+
 import { TopNavigation } from "../../components/TopNavigation.component";
 import { MainButton } from "../../components/mainButton.component";
-import { MainColor, Success } from "../../assets/colors";
+import { MainColor } from "../../assets/colors";
 import * as ImagePicker from "expo-image-picker";
 // import * as ImagePicker from 'react-native-image-picker'
 import { Ionicons } from "@expo/vector-icons";
 import { storage } from "../../helpers/asyncStorage";
-import { FormContainer } from "../../components/formContainer";
-import { CameraModal } from "../../components/cameraModal";
-import Avatar from "../../components/avatar.component";
 import { createCompany, login } from "../../helpers";
 import { StatusModal } from "../../components/statusModal";
 import { LoadingModal } from "../../components/loadingModal";
@@ -36,6 +32,8 @@ import {
   validateCompany,
 } from "../../helpers/forms";
 import { connect } from "react-redux";
+import { routes } from '../../assets/routes'
+import { BackAction } from '../../helpers/ui/ui'
 
 let statusModalValues = {
   visible: false,
@@ -79,16 +77,7 @@ const RegisterScreen = ({
 
   const [repeatCaption, setRepeatCaption] = useState("");
   const [check, setCheck] = useState(false);
-  //GOBACK
-  const goBackAction = () => {
-    return (
-      <View>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Ionicons name="ios-arrow-back" size={28} color="white" />
-        </TouchableOpacity>
-      </View>
-    );
-  };
+ 
   // const profilePic = (uri, fileName, fileType) => {
   //   setProfilePicData((values) => ({ ...values, uri, fileName, fileType }));
   // };
@@ -258,7 +247,7 @@ const companyHandleChange = (name, value) => {
 
   return (
     <View style={{ flex: 1 }}>
-      <TopNavigation title="Registro" leftControl={goBackAction()} />
+      <TopNavigation title="Registro" leftControl={BackAction(navigation, routes.MAIN)} />
       <ScrollView>
         <View style={{ alignItems: "center" }}>
           <AdminForm
@@ -278,7 +267,7 @@ const companyHandleChange = (name, value) => {
               <Text>Acepto los</Text>
               <TouchableOpacity
                 style={{ marginLeft: 2 }}
-                onPress={() => navigation.navigate("terms")}
+                onPress={() => navigation.navigate(routes.TERMS)}
               >
                 <Text style={{ color: MainColor }}>Terminos y Condiciones</Text>
               </TouchableOpacity>

@@ -12,6 +12,8 @@ import { LoadingModal } from "../../components/loadingModal";
 import { Ionicons } from "@expo/vector-icons";
 import { MainColor } from "../../assets/colors";
 import { storage } from "../../helpers/asyncStorage";
+import { routes } from '../../assets/routes'
+import { BackAction } from '../../helpers/ui/ui'
 import { connect } from "react-redux";
 import axios from "axios";
 
@@ -145,18 +147,10 @@ const EditProfileScreen = ({
       }));
     }
   };
-  const goBackAction = () => {
-    return (
-      <View>
-        <TouchableOpacity onPress={() => navigation.navigate("Profile")}>
-          <Ionicons name="ios-arrow-back" size={28} color="white" />
-        </TouchableOpacity>
-      </View>
-    );
-  };
+  
   return (
     <View style={{ flex: 1 }}>
-      <TopNavigation title="Editar" leftControl={goBackAction()} />
+      <TopNavigation title="Editar" leftControl={BackAction(navigation, routes.PROFILE)} />
       <ScrollView>
         <View style={{ alignItems: "center" }}>
           <FormContainer title="Perfil">

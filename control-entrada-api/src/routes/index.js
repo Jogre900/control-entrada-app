@@ -68,7 +68,7 @@ router.get("/findCompany/:id", Controllers.findCompany);
 //ZONES
 router.post("/createZone/:id", Controllers.createZone);
 router.get("/findZones/:companyId", Controllers.findZones);
-router.get("/findZone/:zoneId", Controllers.findZone);
+router.get("/zone/:zoneId", Controllers.findZone);
 router.delete("/zone", Controllers.deleteZone);
 //DESTINY
 router.post("/createDestiny/:id", Controllers.createDestiny);

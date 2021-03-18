@@ -14,6 +14,8 @@ import { Ionicons } from "@expo/vector-icons";
 import { connect, useDispatch } from "react-redux";
 import { storage } from "../../helpers/asyncStorage";
 import { useFocusEffect } from "@react-navigation/native";
+import { BackAction } from '../../helpers/ui/ui'
+import { routes } from '../../assets/routes'
 
 //components
 import { TopNavigation } from "../../components/TopNavigation.component";
@@ -51,12 +53,12 @@ export const HomeScreen = (props) => {
     return true;
   };
 
-  const goBackAction = () => {
+  const goToProfile = () => {
     return (
       <View>
         <TouchableOpacity
           onPress={() => {
-            props.navigation.navigate("watch-profile");
+            props.navigation.navigate(routes.WATCH_PROFILE);
           }}
         >
           <Ionicons name="ios-person" size={28} color="white" />
@@ -86,7 +88,7 @@ export const HomeScreen = (props) => {
     <View style={styles.container}>
       <TopNavigation
         title="Control de visitas"
-        leftControl={goBackAction()}
+        leftControl={goToProfile()}
         rightControl={rightControls()}
       />
       <View style={styles.contentContainer}>
@@ -97,14 +99,14 @@ export const HomeScreen = (props) => {
                 title="Entrada"
                 style={styles.button}
                 onPress={() => {
-                  props.navigation.navigate("entrada");
+                  props.navigation.navigate(routes.ENTRY);
                 }}
               />
               <MainButton
                 title="Salida"
                 style={styles.button}
                 onPress={() => {
-                  props.navigation.navigate("salida");
+                  props.navigation.navigate(routes.EXIT);
                 }}
               />
             </View>

@@ -20,6 +20,8 @@ import { storage } from "../../helpers/asyncStorage";
 import { StatusModal } from "../../components/statusModal";
 import { PrompModal } from "../../components/prompModal";
 import { NotFound } from "../../components/NotFound";
+import { BackAction } from '../../helpers/ui/ui'
+import { routes } from '../../assets/routes'
 import { connect } from "react-redux";
 
 let statusModalValues = {
@@ -41,19 +43,6 @@ const VisitScreen = ({ navigation, profile, saveVisit,  visitsRedux, removeVisit
 
   const searchRef = useRef();
 
-  const goBackAction = () => {
-    return (
-      <View>
-        <TouchableOpacity
-          onPress={() => {
-            navigation.goBack();
-          }}
-        >
-          <Ionicons name="ios-arrow-back" size={28} color="white" />
-        </TouchableOpacity>
-      </View>
-    );
-  };
   //REQUEST TODAY VISITS
   const todayVisit = async () => {
     setVisits([]);
@@ -140,7 +129,7 @@ const VisitScreen = ({ navigation, profile, saveVisit,  visitsRedux, removeVisit
         <TopNavigation
           style={{ elevation: 0 }}
           title="Salida"
-          leftControl={goBackAction()}
+          leftControl={BackAction(navigation)}
         />
       )}
 
@@ -154,7 +143,7 @@ const VisitScreen = ({ navigation, profile, saveVisit,  visitsRedux, removeVisit
               onPress={
                 selectItem.length > 0
                   ? () => onLong(elem.id)
-                  : () => navigation.navigate("departure", { id: elem.id })
+                  : () => navigation.navigate(routes.DEPARTURE, { id: elem.id })
               }
               onLongPress={() => onLong(elem.id)}
               delayLongPress={200}

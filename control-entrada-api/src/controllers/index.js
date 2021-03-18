@@ -276,6 +276,7 @@ password: "123456,
       token: null
     };
     const { zoneId } = req.params;
+    console.log(zoneId)
     try {
       let zones = await models.Zone.findOne({
         where: {

@@ -1,167 +1,27 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect} from "react";
 import {
   View,
-  Text,
   StyleSheet,
   StatusBar,
-  BackHandler,
-  Alert,
   Image,
   Dimensions,
-  Animated,
   ImageBackground,
   KeyboardAvoidingView,
   TouchableWithoutFeedback,
   Keyboard,
-  ActivityIndicator,
+
 } from "react-native";
 import { connect, useDispatch } from "react-redux";
-import axios from "axios";
-import AsyncStorage from "@react-native-community/async-storage";
-import { useFocusEffect } from "@react-navigation/native";
+
+import { routes } from '../../assets/routes'
 
 //components
-import { MainColor } from "../../assets/colors";
-import { SplashScreen } from "../../components/splashScreen.component";
 import { MainButton } from "../../components/mainButton.component";
-import Modal from "react-native-modal";
-import { API_PORT } from "../../config/index";
-import { storage } from "../../helpers/asyncStorage";
 
 const { width, height } = Dimensions.get("window");
 
-const backAction = () => {
-  Alert.alert("", "Cerrar App?", [
-    {
-      text: "No",
-      onPress: () => null,
-      style: "cancel",
-    },
-    { text: "Cerrar", onPress: () => BackHandler.exitApp() },
-  ]);
-  return true;
-};
-
 const MainScreen = ({ navigation, saveProfile, saveCompany, saveLogin, route, isToken, token, privilege }) => {
   const dispatch = useDispatch()
-  const [email, setEmail] = useState("");
-  const [pass, setPass] = useState("");
-  const [modalVisible, setModalVisible] = useState(false);
-  const [passCaption, setPassCaption] = useState("");
-  const [emailCaption, setEmailCaption] = useState("");
-  const [isSplash, setIsSplash] = useState(true);
-  const [payload, setPayload] = useState();
-
-  const backHandler = useRef(null);
-  const translate = new Animated.Value(1);
-
-  const activeSplash = () => {
-    setTimeout(() => {
-      setIsSplash(false);
-    }, 500);
-  };
-  //LOADING
-  const LoadingModal = () => {
-    return (
-      <Modal isVisible={modalVisible} onBackdropPress={() => setModalVisible(!modalVisible)}>
-        <View
-          style={{
-            flex: 1,
-            backgroundColor: "transparent",
-            justifyContent: "center",
-          }}
-        >
-          <ActivityIndicator size="large" color={MainColor} />
-        </View>
-      </Modal>
-    );
-  };
-
-  //VALIDAR EMAIL
-  const validateEmail = (email) => {
-    var re = /^(([^<>()\[\]\\.,;:\s@”]+(\.[^<>()\[\]\\.,;:\s@”]+)*)|(“.+”))@((\[[0–9]{1,3}\.[0–9]{1,3}\.[0–9]{1,3}\.[0–9]{1,3}])|(([a-zA-Z\-0–9]+\.)+[a-zA-Z]{2,}))$/;
-    return re.test(email);
-  };
-
-  const signInStatus = async () => {
-    const token = await storage.getItem("userToken")
-    if (token) {
-      setModalVisible(true);
-      try {
-        //TODO verificar esta ruta en la api para que de la estructura nueva
-        let res = await axios.get(`${API_PORT()}/api/verifyToken`, {
-          headers: {
-            Authorization: `bearer ${token}`,
-          },
-        });
-        
-        //console.log("RES DE TOKEN----", res.data.data.UserCompany[0].privilege)
-        if (res.data.error && res.data.msg === "jwt expired") {
-          setModalVisible(false);
-          return;
-        }
-        if (!res.data.error) {
-          let slogin = {
-            token: res.data.token,
-            userId: res.data.data.id,
-            privilege: res.data.data.UserCompany[0].privilege
-          };
-          let sprofile = {
-            id: res.data.data.Employee.id,
-            dni: res.data.data.Employee.dni,
-            name: res.data.data.Employee.name,
-            lastName: res.data.data.Employee.lastName,
-            picture: res.data.data.Employee.picture,
-            email: res.data.data.email,
-          };
-          if(res.data.data.userZone.length > 0){
-            sprofile.userZone = res.data.data.userZone
-          }
-          let company = [];
-          res.data.data.UserCompany.map((comp) => {
-            company.push({
-              id: comp.Company.id,
-              companyName: comp.Company.companyName,
-              businessName: comp.Company.businessName,
-              nic: comp.Company.nic,
-              city: comp.Company.city,
-              address: comp.Company.address,
-              phoneNumber: comp.Company.phoneNumber,
-              phoneNumberOther: comp.Company.phoneNumberOther,
-              logo: comp.Company.logo,
-              privilege: comp.privilege,
-              select: true,
-            });
-          });
-  
-          saveLogin(slogin);
-          saveProfile(sprofile);
-          saveCompany(company);
-          setModalVisible(false);
-          switch (res.data.data.UserCompany[0].privilege) {
-            case "Admin":
-              navigation.navigate("admin", { screen: "admin-home" });
-            case "Supervisor":
-              navigation.navigate("admin", { screen: "admin-home" });
-              break;
-            case "Watchman":
-              navigation.navigate("watch", { screen: "watch-home" });
-              break;
-            default:
-              break;
-          }
-        }
-      } catch (error) {
-        setModalVisible(false);
-        alert(error.message);
-      }
-    }
-  };
-
-
-  // useEffect(() => {
-  //   signInStatus();
-  // }, []);
 
   useEffect(() => {
     if(route.params?.logOut){
@@ -180,20 +40,20 @@ const MainScreen = ({ navigation, saveProfile, saveCompany, saveLogin, route, is
           <KeyboardAvoidingView style={styles.backCover} behavior="padding">
             <Image style={styles.logo} source={require("../../assets/images/security-logo.png")} />
             <View style={styles.buttonBox}>
-              <LoadingModal />
+
 
               <MainButton
                 title="Ingresar"
                 style={styles.input}
                 onPress={() => {
-                  navigation.navigate("LogIn");
+                  navigation.navigate(routes.LOGIN);
                 }}
               />
               <MainButton
                 title="Registrate"
                 style={styles.input}
                 onPress={() => {
-                  navigation.navigate("register");
+                  navigation.navigate(routes.REGISTER);
                 }}
               />
             </View>

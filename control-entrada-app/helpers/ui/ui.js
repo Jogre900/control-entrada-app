@@ -3,6 +3,7 @@ import { TouchableOpacity, View } from "react-native";
 
 import { Ionicons } from "@expo/vector-icons";
 import { MainButton } from "../../components/mainButton.component";
+import { routes } from '../../assets/routes'
 const size = 28;
 
 export const DrawerAction = (navigation) => {
@@ -38,7 +39,7 @@ export const Notifications = (navigation) => {
     <View>
       <TouchableOpacity
         onPress={() => {
-          navigation.navigate("notification");
+          navigation.navigate(routes.NOTIFICATION);
         }}
       >
         <Ionicons name="md-notifications" size={28} color="white" />

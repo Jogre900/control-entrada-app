@@ -8,14 +8,15 @@ import {
 } from "react-native";
 import { connect } from "react-redux";
 import { Ionicons } from "@expo/vector-icons";
+import { routes } from '../../assets/routes'
+import { BackAction } from '../../helpers/ui/ui'
 
 //components
 import { TopNavigation } from "../../components/TopNavigation.component";
-import axios from "axios";
 import { API_PORT } from "../../config/index";
-import AsyncStorage from "@react-native-community/async-storage";
 import { FormContainer } from "../../components/formContainer";
 import Avatar from "../../components/avatar.component";
+
 
 const PerfilScreen = ({ navigation, profile, company }) => {
   console.log("profile-redux:  ", profile);
@@ -25,25 +26,12 @@ const PerfilScreen = ({ navigation, profile, company }) => {
   const [passChange, setPassChange] = React.useState("");
   const [repeatPass, setRepeatPass] = React.useState("");
 
-  const goBackAction = () => {
-    return (
-      <View>
-        <TouchableOpacity
-          onPress={() => {
-            navigation.navigate('admin-home');
-          }}
-        >
-          <Ionicons name="ios-arrow-back" size={28} color="white" />
-        </TouchableOpacity>
-      </View>
-    );
-  };
   const editAction = () => {
     return (
       <View>
         <TouchableOpacity
           onPress={() => {
-            navigation.navigate("edit_profile");
+            navigation.navigate(routes.EDIT_PROFILE);
           }}
         >
           <Ionicons name="md-create" size={28} color="white" />
@@ -55,7 +43,7 @@ const PerfilScreen = ({ navigation, profile, company }) => {
     <View style={styles.container}>
       <TopNavigation
         title="Perfil"
-        leftControl={goBackAction()}
+        leftControl={BackAction(navigation, routes.ADMIN_HOME)}
         rightControl={editAction()}
       />
 
@@ -104,14 +92,14 @@ const PerfilScreen = ({ navigation, profile, company }) => {
           <FormContainer title="Negocio">
             {company.map((elem, index) => (
               <View key={index}>
-                <Text style={styles.contentText}>{elem.companyName}</Text>
-                <Text style={styles.contentText}>{elem.businessName}</Text>
+                <Text style={styles.contentText}>Compañia: {elem.companyName}</Text>
+                <Text style={styles.contentText}>Razon Social: {elem.businessName}</Text>
                 {/* <Text style={styles.contentText}>{elem.logo}</Text> */}
-                <Text style={styles.contentText}>{elem.city}</Text>
-                <Text style={styles.contentText}>{elem.address}</Text>
-                <Text style={styles.contentText}>{elem.nic}</Text>
-                <Text style={styles.contentText}>{elem.phoneNumber}</Text>
-                <Text style={styles.contentText}>{elem.phoneNumberOther}</Text>
+                <Text style={styles.contentText}>Ciudad: {elem.city}</Text>
+                <Text style={styles.contentText}>Direccion: {elem.address}</Text>
+                <Text style={styles.contentText}>NIC: {elem.nic}</Text>
+                <Text style={styles.contentText}>Telefono: {elem.phoneNumber}</Text>
+                <Text style={styles.contentText}>Telefono Adicional: {elem.phoneNumberOther}</Text>
               </View>
             ))}
             <Avatar.Picture

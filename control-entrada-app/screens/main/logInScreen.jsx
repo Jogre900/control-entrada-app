@@ -17,6 +17,8 @@ import { RecoverPassModal } from "../../components/recoverPassModal";
 import { StatusModal } from "../../components/statusModal";
 import { validateEmail, validatePass } from '../../helpers/forms'
 import { storage } from "../../helpers/asyncStorage";
+import { routes } from '../../assets/routes'
+import { BackAction } from '../../helpers/ui/ui'
 
 let passModalValues = {
   visible: false,
@@ -59,20 +61,7 @@ const LoginScreen = ({
   const [modalProps, setModalProps] = useState(statusModalValues);
 
   const nextInput = useRef(null);
-  const goBackAction = () => {
-    return (
-      <View>
-        <TouchableOpacity
-          onPress={() => {
-            navigation.goBack();
-          }}
-        >
-          <Ionicons name="ios-arrow-back" size={28} color="white" />
-        </TouchableOpacity>
-      </View>
-    );
-  };
-
+  
   //SIGN IN
   const signIn = async () => {
     
@@ -146,14 +135,14 @@ const LoginScreen = ({
         switch (privilege) {
           case "Watchman":
             setModalVisible(false);
-            navigation.navigate("watch", {
+            navigation.navigate(routes.WATCH , {
               screen: "watch-home",
             });
             break;
           case "Admin":
           case "Supervisor":
             setModalVisible(false);
-            navigation.navigate("admin");
+            navigation.navigate(routes.ADMIN);
             break;
           default:
             break;
@@ -193,7 +182,7 @@ const handleChange = (name, value) => {
 }
   return (
     <View style={{ flex: 1 }}>
-      <TopNavigation title="Inicio" leftControl={goBackAction()} />
+      <TopNavigation title="Inicio" leftControl={BackAction(navigation)} />
       <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
         <FormContainer title="Ingrese Datos de Usuario">
           <View style={styles.subContainer}>

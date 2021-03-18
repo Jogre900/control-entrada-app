@@ -13,6 +13,8 @@ import { Ionicons } from "@expo/vector-icons";
 import { MainColor } from "../../assets/colors";
 import { updateProfile } from "../../helpers";
 import { storage } from "../../helpers/asyncStorage";
+import { BackAction } from '../../helpers/ui/ui'
+import { routes } from '../../assets/routes'
 import { connect } from "react-redux";
 
 let initialValues = {
@@ -95,18 +97,10 @@ const EditWatchProfileScreen = ({
       }));
     }
   };
-  const goBackAction = () => {
-    return (
-      <View>
-        <TouchableOpacity onPress={() => navigation.navigate("watch-profile")}>
-          <Ionicons name="ios-arrow-back" size={28} color="white" />
-        </TouchableOpacity>
-      </View>
-    );
-  };
+ 
   return (
     <View style={{ flex: 1 }}>
-      <TopNavigation title="Editar" leftControl={goBackAction()} />
+      <TopNavigation title="Editar" leftControl={BackAction(navigation)} />
       <ScrollView>
         <View style={{ alignItems: "center" }}>
           <View style={styles.profileTopContainer}>

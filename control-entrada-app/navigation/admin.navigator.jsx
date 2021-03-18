@@ -10,17 +10,13 @@ import {
 } from "@react-navigation/stack";
 import {
   View,
-  Text,
-  Image,
-  TouchableOpacity,
   StyleSheet,
-  Alert,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { Ionicons } from "@expo/vector-icons";
 import { storage } from "../helpers/asyncStorage";
 import DrawerHeader from "./drawerHeader";
-import { MainColor, lightColor } from "../assets/colors";
+import { routes } from '../assets/routes'
 
 //screens
 import HomeAdminScreen from "../screens/admin/homeAdminScreen";
@@ -37,7 +33,7 @@ import EmployeeScreen from "../screens/admin/employeeScreen";
 import CreateEmployeScreen from "../screens/admin/createEmployeeScreen";
 import { EmployeeDetailScreen } from "../screens/admin/employeeDetailScreen";
 import { TutorialNavigator } from "./tutorial.navigator";
-import CreateZoneScreen from "../screens/admin/createZoneScreen";
+
 const drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
 
@@ -52,30 +48,29 @@ function AdminNav() {
   return (
     <Stack.Navigator
       headerMode="none"
-      initialRouteName={tutorial ? "TUTORIAL" : "admin-home"}
+      initialRouteName={tutorial ? routes.TUTORIAL : routes.ADMIN_HOME}
     >
-      <Stack.Screen name="TUTORIAL" component={TutorialNavigator} />
-      <Stack.Screen name="admin-home" component={HomeAdminScreen} />
+      <Stack.Screen name={routes.TUTORIAL} component={TutorialNavigator} />
+      <Stack.Screen name={routes.ADMIN_HOME} component={HomeAdminScreen} />
       <Stack.Screen
-        name="detail-view"
+        name={routes.DETAIL_VIEW}
         component={DetailViewScreen}
         options={options}
       />
-      <Stack.Screen name="notification" component={NotificationScreen} />
+      <Stack.Screen name={routes.NOTIFICATION} component={NotificationScreen} />
       <Stack.Screen
-        name="edit_profile"
+        name={routes.EDIT_PROFILE}
         component={EditProfileScreen}
         options={options}
       />
       <Stack.Screen
-        name="zone_detail"
+        name={routes.ZONE_DETAIL}
         component={ZoneDetailScreen}
         options={options}
       />
-      <Stack.Screen name="CREATE_ZONE" component={CreateZoneScreen} />
       <Stack.Screen name="asign_employee" component={AsignEmployee} />
       <Stack.Screen
-        name="employee_detail"
+        name={routes.EMPLOYEE_DETAIL}
         component={EmployeeDetailScreen}
         options={options}
       />
@@ -84,21 +79,21 @@ function AdminNav() {
 }
 
 const adminDrawerData = [
-  { label: "Inicio", route: "admin-home", icon: "ios-home" },
+  { label: "Inicio", route: routes.ADMIN_HOME, icon: "ios-home" },
   //{ label: "Empresa", route: "Company", icon: "ios-business" },
-  { label: "Historial", route: "Historial", icon: "ios-calendar" },
-  { label: "Empleados", route: "Employee", icon: "ios-people" },
-  { label: "Crear Empleado", route: "CreateEmployee", icon: "ios-person-add" },
-  { label: "Zonas", route: "Zones", icon: "md-globe" },
-  { label: "Destinos", route: "Destiny", icon: "ios-pin" },
-  { label: "Tutorial", route: "TUTORIAL", icon: "md-document", params: true },
+  { label: "Historial", route: routes.HISTORIAL, icon: "ios-calendar" },
+  { label: "Empleados", route: routes.EMPLOYEE, icon: "ios-people" },
+  { label: "Crear Empleado", route: routes.CREATE_EMPLOYEE, icon: "ios-person-add" },
+  { label: "Zonas", route: routes.ZONES, icon: "md-globe" },
+  { label: "Destinos", route: routes.DESTINY, icon: "ios-pin" },
+  { label: "Tutorial", route: routes.TUTORIAL, icon: "md-document", params: true },
 ];
 const superDrawerData = [
-  { label: "Inicio", route: "admin-home", icon: "ios-home" },
-  { label: "Historial", route: "Historial", icon: "ios-calendar" },
-  { label: "Empleados", route: "Employee", icon: "ios-people" },
-  { label: "Zona", route: "Zones", icon: "md-globe" },
-  { label: "Destinos", route: "Destiny", icon: "ios-pin" },
+  { label: "Inicio", route: routes.ADMIN_HOME, icon: "ios-home" },
+  { label: "Historial", route: routes.HISTORIAL, icon: "ios-calendar" },
+  { label: "Empleados", route: routes.EMPLOYEE, icon: "ios-people" },
+  { label: "Zona", route: routes.ZONES, icon: "md-globe" },
+  { label: "Destinos", route: routes.DESTINY, icon: "ios-pin" },
 ];
 
 const TUTO = 123
@@ -177,7 +172,7 @@ const DrawerContent = (props) => {
             //logOut().then(() => alert("SE BORRO EL STORE DE REDUX!!!"));
             storage
               .removeItem("userToken")
-              .then(() => props.navigation.navigate("Main", { logOut: true }));
+              .then(() => props.navigation.navigate(routes.MAIN, { logOut: true }));
           }}
         />
       </View>
@@ -190,20 +185,20 @@ const AdminNavigator = () => {
   return (
     <drawer.Navigator drawerContent={(props) => <DrawerContent {...props} />}>
       <drawer.Screen name="Home" component={AdminNav} />
-      <drawer.Screen name="Profile" component={PerfilScreen} />
+      <drawer.Screen name={routes.PROFILE} component={PerfilScreen} />
       {/* <drawer.Screen name="Company" component={CompanyScreen} /> */}
-      <drawer.Screen name="Historial" component={HistorialScreen} />
+      <drawer.Screen name={routes.HISTORIAL} component={HistorialScreen} />
       {privilege === "Admin" && (
-        <drawer.Screen name="CreateEmployee" component={CreateEmployeScreen} />
+        <drawer.Screen name={routes.CREATE_EMPLOYEE} component={CreateEmployeScreen} />
       )}
-      <drawer.Screen name="Employee" component={EmployeeScreen} />
+      <drawer.Screen name={routes.EMPLOYEE} component={EmployeeScreen} />
       {privilege === "Admin" ? (
-        <drawer.Screen name="Zones" component={ZonasScreen} />
+        <drawer.Screen name={routes.ZONES} component={ZonasScreen} />
       ) : (
-        <drawer.Screen name="Zones" component={ZoneDetailScreen} />
+        <drawer.Screen name={routes.ZONE_DETAIL} component={ZoneDetailScreen} />
       )}
-      <drawer.Screen name="Destiny" component={DestinyScreen} />
-      <Stack.Screen name="TUTORIAL" component={TutorialNavigator} />
+      <drawer.Screen name={routes.DESTINY} component={DestinyScreen} />
+      <Stack.Screen name={routes.TUTORIAL} component={TutorialNavigator} />
     </drawer.Navigator>
   );
 };

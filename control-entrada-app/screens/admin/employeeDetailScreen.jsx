@@ -1,11 +1,8 @@
 import React, { useEffect, useState } from "react";
 import {
   View,
-  TouchableOpacity,
-  Image,
   Text,
   StyleSheet,
-  ActivityIndicator,
 } from "react-native";
 
 //COMPONENT
@@ -16,6 +13,8 @@ import { Divider } from "../../components/Divider";
 import { FormContainer } from "../../components/formContainer";
 import { Spinner } from "../../components/spinner";
 import { MainColor, ThirdColor } from "../../assets/colors";
+import { routes } from '../../assets/routes'
+import { BackAction } from '../../helpers/ui/ui'
 import Avatar from "../../components/avatar.component";
 import axios from "axios";
 import moment from "moment";
@@ -23,21 +22,8 @@ import moment from "moment";
 export const EmployeeDetailScreen = ({ route, navigation }) => {
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState();
-  console.log("DETAIL EMPLOYEE-----", route.params);
+  //console.log("DETAIL EMPLOYEE-----", route.params);
   const { id } = route.params;
-  const goBackAction = () => {
-    return (
-      <View>
-        <TouchableOpacity
-          onPress={() => {
-            navigation.navigate("Employee");
-          }}
-        >
-          <Ionicons name="ios-arrow-back" size={28} color="white" />
-        </TouchableOpacity>
-      </View>
-    );
-  };
 
   const requestUser = async () => {
     setLoading(true);
@@ -59,7 +45,7 @@ export const EmployeeDetailScreen = ({ route, navigation }) => {
   }, [id]);
   return (
     <View style={{ flex: 1 }}>
-      <TopNavigation title="Perfil" leftControl={goBackAction()} />
+      <TopNavigation title="Perfil" leftControl={BackAction(navigation, routes.EMPLOYEE)} />
       {loading && <Spinner message="Cargando..." />}
       {user && (
         <View style={{alignItems: 'center'}}>

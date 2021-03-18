@@ -4,6 +4,7 @@ import {SplashScreen} from '../../components/splashScreen.component'
 import {storage} from '../../helpers/asyncStorage'
 import axios from 'axios'
 import {API_PORT} from '../../config/index'
+import { routes } from '../../assets/routes'
 import {connect} from 'react-redux'
 const LoadingScreen = ({navigation, saveProfile, saveCompany, saveLogin}) => {
     
@@ -62,12 +63,12 @@ const LoadingScreen = ({navigation, saveProfile, saveCompany, saveLogin}) => {
               saveCompany(company);
               switch (res.data.data.UserCompany[0].privilege) {
                 case "Admin":
-                  navigation.navigate("admin", { screen: "admin-home" });
+                  navigation.navigate(routes.ADMIN, { screen: routes.ADMIN_HOME });
                 case "Supervisor":
-                  navigation.navigate("admin", { screen: "admin-home" });
+                  navigation.navigate(routes.ADMIN, { screen: routes.ADMIN_HOME });
                   break;
                 case "Watchman":
-                  navigation.navigate("watch", { screen: "watch-home" });
+                  navigation.navigate(routes.WATCH, { screen: routes.WATCH_HOME });
                   break;
                 default:
                   break;
@@ -76,7 +77,7 @@ const LoadingScreen = ({navigation, saveProfile, saveCompany, saveLogin}) => {
           } catch (error) {
             alert(error.message);
           }
-        }else navigation.navigate('Main')
+        }else navigation.navigate(routes.MAIN)
       };
 
     useEffect(() => {

@@ -2,12 +2,13 @@ import { useState } from "react";
 import axios from "axios";
 import { API_PORT } from "../config/index";
 import { createCitizen, findCitizendni } from "./citizen";
+import { fetchAllZones,fetchZoneById } from './zones'
 import {
   createVisit,
   findVisitdni,
   findVisitUser,
   updateVisit,
-  fetchTodayVisist,
+  fetchTodayVisist
 } from "./visit";
 
 export const helpers = {
@@ -18,6 +19,8 @@ export const helpers = {
   findVisitdni,
   findVisitUser,
   updateVisit,
+  fetchZoneById,
+  fetchAllZones
 };
 
 //DELETE ANYTHING FROM API
@@ -39,29 +42,6 @@ export async function createInfo(url, params, data) {
   try {
     const res = await axios.post(`${API_PORT()}/api/${url}/${params}`, data);
     return res.data;
-  } catch (error) {
-    return error.message;
-  }
-}
-//ZONES BY ID
-export async function fetchZonyById(id) {
-  try {
-    const res = await axios.get(`${API_PORT()}/api/findZone/${id}`);
-    if (!res.data.error) {
-      return res.data.data;
-    }
-  } catch (error) {
-    return error.message;
-  }
-}
-
-//ZONES FROM COMPANY
-export async function fetchAllZones(companyId) {
-  try {
-    const res = await axios.get(`${API_PORT()}/api/findZones/${companyId}`);
-    if (!res.data.error) {
-      return res.data.data;
-    }
   } catch (error) {
     return error.message;
   }

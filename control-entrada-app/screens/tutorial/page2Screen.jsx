@@ -2,6 +2,7 @@ import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { MainButton } from "../../components/mainButton.component";
 import { useDispatch } from "react-redux";
+import { routes } from '../../assets/routes'
 export const Page2Screen = ({ navigation }) => {
   const dispatch = useDispatch({ type: "TURN_OFF", payload: false });
   return (
@@ -24,13 +25,13 @@ export const Page2Screen = ({ navigation }) => {
           <MainButton
             style={styles.button}
             title="Atras"
-            onPress={() => navigation.navigate("PAGE_1")}
+            onPress={() => navigation.navigate(routes.PAGE_1)}
             outline
           />
           <MainButton
             style={[styles.button, {marginLeft: 20}]}
             title="Siguiente"
-            onPress={() => navigation.navigate("PAGE_3")}
+            onPress={() => navigation.navigate(routes.PAGE_3)}
           />
         </View>
       </View>

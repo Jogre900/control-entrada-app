@@ -9,6 +9,7 @@ import {
 } from "react-native";
 
 import { useFocusEffect } from "@react-navigation/native";
+import { routes } from '../../assets/routes'
 //components
 import { TopNavigation } from "../../components/TopNavigation.component";
 
@@ -21,8 +22,6 @@ import { VisitCard } from "../../components/visitCard";
 import { Header } from "../../components/header.component";
 import { LogOutModal } from "../../components/logOutModal";
 import {
-  fetchZonyById,
-  fetchAllZones,
   fetchDestiny,
   fetchAllEmployee,
   fetchEmployeeByZone,
@@ -49,7 +48,7 @@ const HomeAdminScreen = ({
   //REQUEST ZONE BY ID
   const requestZone = async () => {
     setLoading(true);
-    const res = await fetchZonyById(profile.userZone[0].ZoneId);
+    const res = await helpers.fetchZoneById(profile.userZone[0].ZoneId);
     console.log("supervisor zone", res);
     setLoading(false);
     saveZones(res);
@@ -58,7 +57,7 @@ const HomeAdminScreen = ({
   const requestZones = async () => {
     console.log("zonas");
     setLoading(true);
-    const res = await fetchAllZones(company.id);
+    const res = await helpers.fetchAllZones(company.id);
     saveZones(res);
     setLoading(false);
   };
@@ -226,7 +225,7 @@ const HomeAdminScreen = ({
       };
     }, [])
   );
-  console.log("hasVisit----", hasVisit);
+
   return (
     <View style={{ flex: 1 }}>
       {selectItem.length > 0 ? (
@@ -252,7 +251,7 @@ const HomeAdminScreen = ({
               onPress={
                 selectItem.length > 0
                   ? () => onLong(elem.id)
-                  : () => navigation.navigate("detail-view", { id: elem.id })
+                  : () => navigation.navigate(routes.DETAIL_VIEW, { id: elem.id })
               }
               onLongPress={() => onLong(elem.id)}
               delayLongPress={200}

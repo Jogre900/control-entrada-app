@@ -21,6 +21,8 @@ import { StatusModal } from "../../components/statusModal";
 import { FormContainer } from "../../components/formContainer";
 import { Spinner } from "../../components/spinner";
 import { helpers } from "../../helpers";
+import { BackAction } from '../../helpers/ui/ui'
+import { routes } from '../../assets/routes'
 import Avatar from "../../components/avatar.component";
 
 let statusModalValues = {
@@ -37,20 +39,7 @@ export const DepartureScreen = (props) => {
   const [visit, setVisit] = useState();
   const [departureText, setDepartureText] = useState("");
   const [entryCheck, setEntryCheck] = useState(false);
-  //GO BACK
-  const goBackAction = () => {
-    return (
-      <View>
-        <TouchableOpacity
-          onPress={() => {
-            props.navigation.goBack();
-          }}
-        >
-          <Ionicons name="ios-arrow-back" size={28} color="white" />
-        </TouchableOpacity>
-      </View>
-    );
-  };
+  
   //FIND VISIT BY ID
   const findVisitId = async () => {
     setLoading(true);
@@ -102,7 +91,7 @@ export const DepartureScreen = (props) => {
             ? "Visita"
             : "Marcar Salida"
         }
-        leftControl={goBackAction()}
+        leftControl={BackAction(props.navigation, routes.EXIT)}
       />
       {loading && <Spinner message="Cargando..." />}
       {visit && !loading && (

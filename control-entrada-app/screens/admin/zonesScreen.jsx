@@ -11,7 +11,8 @@ import {
 import { connect } from "react-redux";
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
-
+import { routes } from '../../assets/routes'
+import { BackAction } from '../../helpers/ui/ui'
 //componentes
 
 import { TopNavigation } from "../../components/TopNavigation.component.jsx";
@@ -131,7 +132,7 @@ const ZonasScreen = ({
           selectAction={selectAll}
         />
       ) : (
-        <TopNavigation title="Zonas" leftControl={goBackAction()} />
+        <TopNavigation title="Zonas" leftControl={BackAction(navigation, routes.ADMIN_HOME)} />
       )}
 
       {zonesRedux.length ? (
@@ -143,7 +144,7 @@ const ZonasScreen = ({
                 selectItem.length > 0
                   ? () => onLong(item.id)
                   : () =>
-                      navigation.navigate("zone_detail", {
+                      navigation.navigate(routes.ZONE_DETAIL, {
                         zoneId: item.id,
                       })
               }

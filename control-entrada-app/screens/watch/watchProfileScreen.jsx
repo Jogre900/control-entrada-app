@@ -3,59 +3,35 @@ import {
   View,
   Text,
   StyleSheet,
-  Image,
-  TextInput,
-  Alert,
+
   ActivityIndicator,
   ScrollView,
   TouchableOpacity,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import axios from "axios";
 import { API_PORT } from "../../config/index";
-import AsyncStorage from "@react-native-community/async-storage";
 import moment from "moment";
 import { connect } from "react-redux";
 //components
 import { TopNavigation } from "../../components/TopNavigation.component";
-import { MainButton } from "../../components/mainButton.component";
-import Input from "../../components/input.component";
 import { MainColor, lightColor } from "../../assets/colors.js";
 import Modal from "react-native-modal";
 import { FormContainer } from "../../components/formContainer";
 import Avatar from "../../components/avatar.component";
+import { BackAction } from '../../helpers/ui/ui'
+import { routes } from '../../assets/routes'
 
 const WatchProfileScreen = ({ navigation, profile }) => {
-  
-  const [editVisibility, setEditVisibility] = useState(false);
-  const [passChange, setPassChange] = useState("");
-  const [repeatPass, setRepeatPass] = useState("");
-  const [passCaption, setPassCaption] = useState("");
-  //const [profile, setProfile] = useState();
-  //const [destiny, setDestiny] = useState();
   const [destinyvisibility, setDestinyvisibility] = useState(false);
   const [loading, setLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
 
-  const goBackAction = () => {
-    return (
-      <View>
-        <TouchableOpacity
-          onPress={() => {
-            navigation.goBack();
-          }}
-        >
-          <Ionicons name="ios-arrow-back" size={28} color="white" />
-        </TouchableOpacity>
-      </View>
-    );
-  };
   const editAction = () => {
     return (
       <View>
         <TouchableOpacity
           onPress={() => {
-            navigation.navigate("EDIT_PROFILE");
+            navigation.navigate(routes.EDIT_WATCH_PROFILE);
           }}
         >
           <Ionicons name="md-create" size={28} color="white" />
@@ -110,7 +86,7 @@ const WatchProfileScreen = ({ navigation, profile }) => {
 
   return (
     <View style={styles.container}>
-      <TopNavigation title="Mi Perfil" leftControl={goBackAction()} rightControl={editAction()}/>
+      <TopNavigation title="Mi Perfil" leftControl={BackAction(navigation, routes.WATCH_HOME)} rightControl={editAction()}/>
       {profile ? (
         <ScrollView contentContainerStyle={{ alignItems: "center" }}>
           <View style={styles.profileContainer}>

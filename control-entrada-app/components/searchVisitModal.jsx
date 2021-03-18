@@ -53,10 +53,9 @@ export const SearchVisitModal = ({ status, search, onClose }) => {
         title="Busqueda por dni"
       >
         <Input
-          style={{ borderColor: "black", marginBottom: 10 }}
-          styleInput={{ color: "black" }}
+          style={{marginBottom: 10 }}
           title="dni"
-          shape="square"
+          shape='flat'
           icon="ios-card"
           returnKeyType="search"
           returnKeyType="search"

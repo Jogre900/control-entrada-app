@@ -4,19 +4,14 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  Image,
-  ActivityIndicator,
   Alert,
   TouchableOpacity,
-  TouchableWithoutFeedback,
 } from "react-native";
 
-import axios from "axios";
-import { API_PORT } from "../../config/index.js";
+
 import {
   MainColor,
   ThirdColor,
-  lightColor,
   Danger,
 } from "../../assets/colors.js";
 import Input from "../../components/input.component";
@@ -35,6 +30,8 @@ import Avatar from "../../components/avatar.component";
 import { CameraModal } from "../../components/cameraModal";
 import { MessageModal } from "../../components/messageModal";
 import { createSupervisor, createWatchman } from "../../helpers";
+import { routes } from '../../assets/routes'
+import { BackAction } from '../../helpers/ui/ui'
 import { connect } from "react-redux";
 
 let alertModalValues = {
@@ -85,20 +82,6 @@ const CreateEmployeScreen = ({
   const [show2, setShow2] = useState(false);
   const [camera, setCamera] = useState(false);
   const [visible, setVisible] = useState(false);
-
-  const goBackAction = () => {
-    return (
-      <View>
-        <TouchableOpacity
-          onPress={() => {
-            navigation.navigate("admin-home");
-          }}
-        >
-          <Ionicons name="ios-arrow-back" size={28} color="white" />
-        </TouchableOpacity>
-      </View>
-    );
-  };
 
   //REGISTER
   const saveSuccess = () => {
@@ -265,7 +248,7 @@ const CreateEmployeScreen = ({
 
   return (
     <View style={{ flex: 1 }}>
-      <TopNavigation title="Crear Empleado" leftControl={goBackAction()} />
+      <TopNavigation title="Crear Empleado" leftControl={BackAction(navigation, routes.ADMIN_HOME)} />
       <ScrollView contentContainerStyle={styles.container}>
         <View
           style={{

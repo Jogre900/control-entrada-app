@@ -1,37 +1,26 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   View,
-  Text,
   StyleSheet,
-  TouchableHighlight,
-  FlatList,
-  Image,
   RefreshControl,
   ScrollView,
-  Alert,
-  ActivityIndicator,
   TouchableOpacity,
-  TouchableOpacityBase,
 } from "react-native";
 
 import axios from "axios";
 import { API_PORT } from "../../config/index.js";
-import Input from "../../components/input.component";
+
 import { TopNavigation } from "../../components/TopNavigation.component";
-import { MainButton } from "../../components/mainButton.component";
-import { Ionicons } from "@expo/vector-icons";
-import Avatar from "../../components/avatar.component";
 import { EmployeeCard } from "../../components/employeeCard";
-import { Spinner } from "../../components/spinner";
 import { NotFound } from "../../components/NotFound";
+import { routes } from '../../assets/routes'
+import { BackAction } from '../../helpers/ui/ui'
 import { connect } from "react-redux";
-const companyId = "9a28095a-9029-40ec-88c2-30e3fac69bc5";
+
 
 const EmployeeScreen = ({ navigation, employee, removeEmployee }) => {
   console.log("EMPLOYEE FROM REDUX--",employee)
-  const [employeeId, setEmployeeId] = useState("");
   const [refreshing, setRefreshing] = useState(false);
-  const [loading, setLoading] = useState(false);
 
   //REFRESH CONTROL
   const wait = (timeout) => {
@@ -45,28 +34,6 @@ const EmployeeScreen = ({ navigation, employee, removeEmployee }) => {
 
     requestEmployee().then(() => setRefreshing(false));
   }, []);
-
-  //LOADING
-  const splash = () => {
-    return (
-      <View>
-        <ActivityIndicator size="large" color="#ff7e00" />
-      </View>
-    );
-  };
-  const goBackAction = () => {
-    return (
-      <View>
-        <TouchableOpacity
-          onPress={() => {
-            navigation.navigate("admin-home");
-          }}
-        >
-          <Ionicons name="ios-arrow-back" size={28} color="white" />
-        </TouchableOpacity>
-      </View>
-    );
-  };
 
   //DELETE EMPLOYEE
   const deleteEmployee = async (id) => {
@@ -82,26 +49,9 @@ const EmployeeScreen = ({ navigation, employee, removeEmployee }) => {
     }
   };
 
-  // const requestEmployee = async () => {
-  //   setLoading(true);
-  //   try {
-  //     let res = await axios.get(`${API_PORT()}/api/findUsers/${companyId}`);
-  //     if (!res.data.error) {
-  //       console.log(res.data.data);
-  //       setEmployee(res.data.data);
-  //       setLoading(false);
-  //     }
-  //   } catch (error) {
-  //     console.log("error: ", error.message);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   requestEmployee();
-  // }, []);
   return (
     <View style={{flex:1}}>
-      <TopNavigation title="Empleados" leftControl={goBackAction()} />
+      <TopNavigation title="Empleados" leftControl={BackAction(navigation, routes.ADMIN_HOME)} />
       <ScrollView
         contentContainerStyle={styles.scrollView}
         refreshControl={
@@ -118,7 +68,7 @@ const EmployeeScreen = ({ navigation, employee, removeEmployee }) => {
               <TouchableOpacity
                 style={styles.listItemBox}
                 onPress={() =>
-                  navigation.navigate("employee_detail", { id: item.id })
+                  navigation.navigate(routes.EMPLOYEE_DETAIL, { id: item.id })
                 }
                 key={item.id}
               >
@@ -151,18 +101,6 @@ const styles = StyleSheet.create({
     flex: 1,
     //marginTop: Constants.statusBarHeight,
   },
-  scrollView: {
-    //flex: 1,
-  },
-  // listItemBox: {
-  //   //flexDirection: "row",
-  //   paddingHorizontal: 12,
-  //   paddingVertical: 5,
-  //   justifyContent: "space-between",
-  //   alignItems: "center",
-  //   backgroundColor: "#fff",
-  //   marginVertical: 10,
-  // },
   privilegeBox: {
     backgroundColor: "orange",
     width: 50,

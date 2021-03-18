@@ -5,6 +5,7 @@ import { API_PORT } from "../config/index";
 import { connect } from "react-redux";
 import Constants from "expo-constants";
 import { MainColor } from "../assets/colors";
+import { routes } from '../assets/routes'
 
 const DrawerHeader = ({ navigation, profile, login, company }) => {
   
@@ -18,7 +19,7 @@ const DrawerHeader = ({ navigation, profile, login, company }) => {
       <View>
         <TouchableOpacity
           onPress={() => {
-            navigation.navigate("Profile");
+            navigation.navigate(routes.PROFILE);
           }}
         >
           <View>

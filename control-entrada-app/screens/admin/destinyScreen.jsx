@@ -12,7 +12,6 @@ import { connect } from "react-redux";
 import { useFocusEffect } from "@react-navigation/native";
 
 import { TopNavigation } from "../../components/TopNavigation.component";
-import { Ionicons } from "@expo/vector-icons";
 import { FloatingBotton } from "../../components/floatingBotton";
 import { FormContainer } from "../../components/formContainer";
 import { DestinyCard } from "../../components/destinyCard";
@@ -22,6 +21,8 @@ import { StatusModal } from "../../components/statusModal";
 import { Spinner } from "../../components/spinner";
 import { PrompModal } from "../../components/prompModal";
 import { NotFound } from "../../components/NotFound";
+import { routes } from '../../assets/routes'
+import { BackAction } from '../../helpers/ui/ui'
 
 let statusModalValues = {
   visible: false,
@@ -48,19 +49,6 @@ const DestinyScreen = ({
   const [selectItem, setSeletedItem] = useState([]);
   console.log("zoneRedux----", zonesRedux);
   console.log(zoneId);
-  const goBackAction = () => {
-    return (
-      <View>
-        <TouchableOpacity
-          onPress={() => {
-            navigation.goBack();
-          }}
-        >
-          <Ionicons name="ios-arrow-back" size={28} color="white" />
-        </TouchableOpacity>
-      </View>
-    );
-  };
 
   //CHEKC CREATE
   const checkCreate = (status, message, data) => {
@@ -142,7 +130,7 @@ const DestinyScreen = ({
           selectAction={selectAll}
         />
       ) : (
-        <TopNavigation title="Destinos" leftControl={goBackAction()} />
+        <TopNavigation title="Destinos" leftControl={BackAction(navigation, routes.ADMIN_HOME)} />
       )}
       {loading && <Spinner />}
       {zonesRedux.length > 0 || zonesRedux ? (
