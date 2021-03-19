@@ -8,14 +8,13 @@ import {
   BackHandler,
   Alert
 } from "react-native";
-import axios from "axios";
-import { API_PORT } from "../../config/index";
 import { Ionicons } from "@expo/vector-icons";
-import { connect, useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 import { storage } from "../../helpers/asyncStorage";
 import { useFocusEffect } from "@react-navigation/native";
-import { BackAction } from '../../helpers/ui/ui'
+
 import { routes } from '../../assets/routes'
+import { LogOutModal } from "../../components/logOutModal";
 
 //components
 import { TopNavigation } from "../../components/TopNavigation.component";
@@ -28,7 +27,8 @@ const cover = require("../../assets/images/background.jpg");
 
 const { width, height } = Dimensions.get("window");
 
-export const HomeScreen = (props) => {
+export const HomeScreen = ({navigation}) => {
+  const [logModal, setLogModal] = useState(false)
   const dispatch = useDispatch();
   const logOut = () => {
     return new Promise((resolve, reject) => {
@@ -38,18 +38,11 @@ export const HomeScreen = (props) => {
   const deleteToken = async () => {
     logOut()
       .then(() => storage.removeItem("userToken"))
-      .then(() => props.navigation.navigate("Main"));
+      .then(() => navigation.navigate(routes.MAIN));
   };
 
   const backAction = () => {
-    Alert.alert("", "Cerrar Sesion?", [
-      {
-        text: "No",
-        onPress: () => null,
-        style: "cancel",
-      },
-      { text: "Si", onPress: () => deleteToken() },
-    ]);
+    setLogModal(true)
     return true;
   };
 
@@ -58,7 +51,7 @@ export const HomeScreen = (props) => {
       <View>
         <TouchableOpacity
           onPress={() => {
-            props.navigation.navigate(routes.WATCH_PROFILE);
+            navigation.navigate(routes.WATCH_PROFILE);
           }}
         >
           <Ionicons name="ios-person" size={28} color="white" />
@@ -99,20 +92,25 @@ export const HomeScreen = (props) => {
                 title="Entrada"
                 style={styles.button}
                 onPress={() => {
-                  props.navigation.navigate(routes.ENTRY);
+                  navigation.navigate(routes.ENTRY);
                 }}
               />
               <MainButton
                 title="Salida"
                 style={styles.button}
                 onPress={() => {
-                  props.navigation.navigate(routes.EXIT);
+                  navigation.navigate(routes.EXIT);
                 }}
               />
             </View>
           </View>
         </ImageBackground>
       </View>
+      <LogOutModal
+        status={logModal}
+        navigation={navigation}
+        onClose={() => setLogModal(false)}
+      />
     </View>
   );
 };

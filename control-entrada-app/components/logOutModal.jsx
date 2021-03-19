@@ -1,13 +1,27 @@
 import React, { useState } from "react";
 import { View, StyleSheet } from "react-native";
 import { FormContainer } from "./formContainer";
-import Input from "./input.component";
 import { MainButton } from "./mainButton.component";
-import { API_PORT } from "../config/index";
-import axios from "axios";
+import { routes } from '../assets/routes'
+import { storage } from '../helpers/asyncStorage'
+import { useDispatch } from 'react-redux'
 import Modal from "react-native-modal";
 
 export const LogOutModal = ({ status, navigation, onClose }) => {
+  const dispatch = useDispatch();
+  const logOut = () => {
+    return new Promise((resolve, reject) => {
+      resolve(dispatch({ type: "CLEAR_STORAGE" }));
+    });
+  };
+  const deleteToken = async () => {
+    onClose()
+    logOut()
+      .then(() => storage.removeItem("userToken"))
+      .then(() => navigation.navigate(routes.MAIN));
+  };
+
+  
   return (
     <Modal
       isVisible={status}
@@ -37,9 +51,7 @@ export const LogOutModal = ({ status, navigation, onClose }) => {
           <MainButton
             style={styles.button}
             title="Si"
-            onPress={() => {
-              alert("si!");
-            }}
+            onPress={deleteToken}
           />
         </View>
       </FormContainer>

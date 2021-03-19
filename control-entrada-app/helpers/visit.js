@@ -82,7 +82,7 @@ export async function fetchTodayVisist(employee) {
       data: { id: employee },
     });
     // `${API_PORT()}/api/findTodayVisits/${companyId}`, {data: employee});
-    console.log(res.data);
+    //console.log(res.data);
 
     return res;
   } catch (error) {

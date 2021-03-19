@@ -53,7 +53,7 @@ export const DetailViewScreen = ({ route, navigation }) => {
     setLoading(true);
     try {
       const res = await axios.get(`${API_PORT()}/api/findVisitId/${id}`);
-      console.log(res.data);
+      //console.log(res.data);
       if (!res.data.error) {
         setLoading(false);
         setVisit(res.data.data);

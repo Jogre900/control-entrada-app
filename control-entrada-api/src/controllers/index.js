@@ -901,10 +901,36 @@ password: "123456,
         );
 
         if (employee) {
-          RESPONSE.error = false;
-          RESPONSE.msg = "Registro Exitoso!";
-          RESPONSE.data = employee;
-          res.status(200).json(RESPONSE);
+          const userC = await models.User.findOne({
+            where: {
+              id: employee.dataValues.id
+            },
+
+            include: [
+              {
+                model: models.Employee,
+                as: "Employee"
+              },
+              {
+                model: models.UserCompany,
+                as: "UserCompany"
+              },
+              {
+                model: models.UserZone,
+                as: "userZone",
+                include: {
+                  model: models.Zone,
+                  as: "Zona"
+                }
+              }
+            ]
+          });
+          if (userC) {
+            RESPONSE.error = false;
+            RESPONSE.msg = "Registro Exitoso!";
+            RESPONSE.data = userC;
+            res.json(RESPONSE);
+          }
         } else {
           RESPONSE.msg = "Error al registrar";
           res.json(RESPONSE);
