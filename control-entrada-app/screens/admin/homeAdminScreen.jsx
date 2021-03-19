@@ -161,10 +161,10 @@ const HomeAdminScreen = ({
   //VISITS
   const requestVisits = async () => {
     if (company) {
-      console.log("visits");
+      //console.log("visits");
       setLoading(true);
       if (employee.length) {
-        console.log("empleados---", employee);
+        //console.log("empleados---", employee);
       }
       const res = await fetchTodayVisist(company.id, employee);
       saveTodayVisits(res);
@@ -214,9 +214,9 @@ const HomeAdminScreen = ({
     requestAllDestiny();
   }, []);
 
-  // useEffect(() => {
-  //   requestVisits();
-  // }, [employee]);
+  useEffect(() => {
+    requestVisits();
+  }, [employee]);
   useFocusEffect(
     React.useCallback(() => {
       BackHandler.addEventListener("hardwareBackPress", backAction);
