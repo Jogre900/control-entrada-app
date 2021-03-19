@@ -62,7 +62,7 @@ export const PrompModal = ({ visible, deleted, onClose, data, url }) => {
           />
         </View>
       </FormContainer>
-      <LoadingModal status={loading} message="Borrando..." />
+      <LoadingModal visible={loading} message="Borrando..." />
     </Modal>
   );
 };

@@ -65,7 +65,7 @@ export const SearchVisitModal = ({ status, search, onClose }) => {
         />
         <MainButton title="Buscar" onPress={requestVisit} />
       </FormContainer>
-      <LoadingModal status={loading} message="Buscando..." />
+      <LoadingModal visible={loading} message="Buscando..." />
     </Modal>
   );
 };

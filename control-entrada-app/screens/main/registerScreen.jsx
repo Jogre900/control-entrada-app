@@ -41,7 +41,7 @@ let statusModalValues = {
   message: null,
 };
 let loadingModalValues = {
-  status: false,
+  visible: false,
   message: null,
 };
 
@@ -139,12 +139,12 @@ const companyHandleChange = (name, value) => {
     // if (validateForm(dataComp)) {
     //   return;
     // }
-    setLoadingModal({ status: true, message: "Guardando..." });
+    setLoadingModal({ visible: true, message: "Guardando..." });
     //clearCaption();
     const res = await createCompany(adminData, companyData);
     //console.log("RES DE CREAT----", res.data);
     if (!res.data.error) {
-      setLoadingModal((values) => ({ ...values, status: false }));
+      setLoadingModal((values) => ({ ...values, visible: false }));
       setStatusModal((values) => ({
         ...values,
         visible: true,
@@ -217,7 +217,7 @@ const companyHandleChange = (name, value) => {
         }
       }
     } else {
-      setLoadingModal((values) => ({ ...values, status: false }));
+      setLoadingModal((values) => ({ ...values, visible: false }));
       setStatusModal((values) => ({
         ...values,
         visible: true,

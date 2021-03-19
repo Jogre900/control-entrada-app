@@ -10,7 +10,7 @@ import WatchProfileScreen from "../screens/watch/watchProfileScreen.jsx";
 import EntryScreen from "../screens/watch/entryScreen";
 import VisitScreen from "../screens/watch/visitScreen";
 import EditWatchProfileScreen from "../screens/watch/editWatchProfileScreen";
-import { DepartureScreen } from "../screens/watch/departureScreen";
+import DepartureScreen from "../screens/watch/departureScreen";
 const Stack = createStackNavigator();
 
 const options = {

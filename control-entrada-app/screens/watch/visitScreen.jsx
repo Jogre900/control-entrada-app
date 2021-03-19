@@ -20,8 +20,8 @@ import { storage } from "../../helpers/asyncStorage";
 import { StatusModal } from "../../components/statusModal";
 import { PrompModal } from "../../components/prompModal";
 import { NotFound } from "../../components/NotFound";
-import { BackAction } from '../../helpers/ui/ui'
-import { routes } from '../../assets/routes'
+import { BackAction } from "../../helpers/ui/ui";
+import { routes } from "../../assets/routes";
 import { connect } from "react-redux";
 
 let statusModalValues = {
@@ -30,7 +30,13 @@ let statusModalValues = {
   status: null,
 };
 
-const VisitScreen = ({ navigation, profile, saveVisit,  visitsRedux, removeVisit }) => {
+const VisitScreen = ({
+  navigation,
+  profile,
+  saveVisit,
+  visitsRedux,
+  removeVisit,
+}) => {
   const [statusModalProps, setStatusModalProps] = useState(statusModalValues);
   const [loading, setLoading] = useState(false);
   const [selectItem, setSeletedItem] = useState([]);
@@ -45,16 +51,17 @@ const VisitScreen = ({ navigation, profile, saveVisit,  visitsRedux, removeVisit
 
   //REQUEST TODAY VISITS
   const todayVisit = async () => {
-    setVisits([]);
+    //setVisits([]);
     setLoading(true);
     const token = await storage.getItem("userToken");
     const res = await helpers.findVisitUser(profile.userZone[0].id, token);
-    console.log(res.data.data)
+    //console.log(res.data.data);
     if (!res.data.error && res.data.data.length) {
       setLoading(false);
       //setVisits(res.data.data);
-      saveVisit(res.data.data)
+      saveVisit(res.data.data);
     } else if (!res.data.data.length) {
+      console.log("no hay visitas")
       setLoading(false);
       setHasVisit(false);
     }
@@ -96,17 +103,19 @@ const VisitScreen = ({ navigation, profile, saveVisit,  visitsRedux, removeVisit
   };
   //CHECK DELETE
   const checkDeleted = (status, message) => {
+    if (status) {
+      removeVisit(selectItem);
+      clearList();
+      setHasVisit(false)
+    }
     setStatusModalProps((values) => ({
       ...values,
       visible: true,
       status,
       message,
     }));
-    if(status){
-      removeVisit(selectItem)
-    }
-    clearList();
   };
+  
 
   useEffect(() => {
     todayVisit();
@@ -196,32 +205,28 @@ const VisitScreen = ({ navigation, profile, saveVisit,  visitsRedux, removeVisit
         data={selectItem}
         url="visit"
       />
-      {!hasVisit && !loading && <NotFound message="No hay visitas." />}
+      {!hasVisit && <NotFound message="No hay visitas." />}
     </View>
   );
 };
 const mapStateToProps = (state) => ({
   profile: state.profile.profile,
-  visitsRedux: state.visits.today
+  visitsRedux: state.visits.today,
 });
 
-const mapDispatchToProps = dispatch => ({
-  saveVisit(visits){
+const mapDispatchToProps = (dispatch) => ({
+  saveVisit(visits) {
     dispatch({
-      type: 'SAVE_VISITS',
-      payload: visits
-    }) 
+      type: "SAVE_VISITS",
+      payload: visits,
+    });
   },
-  removeVisit(visits){
+  removeVisit(visits) {
     dispatch({
-      type: 'REMOVE_VISIT',
-      payload: visits
-    })
-  }
-})
+      type: "REMOVE_VISIT",
+      payload: visits,
+    });
+  },
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(VisitScreen);
-
-const styles = StyleSheet.create({
-  
-});

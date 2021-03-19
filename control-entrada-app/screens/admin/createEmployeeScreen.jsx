@@ -458,7 +458,7 @@ const CreateEmployeScreen = ({
         }
         navigation={navigation}
       />
-      <LoadingModal status={visible} message="Guardando..." />
+      <LoadingModal visible={visible} message="Guardando..." />
       <StatusModal
         {...statusModalProps}
         onClose={() =>

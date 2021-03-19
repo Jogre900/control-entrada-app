@@ -143,7 +143,7 @@ export const RecoverPassModal = ({ visible, onClose, checkNewPass }) => {
           onPress={recoverPassword}
         />
       </FormContainer>
-      <LoadingModal status={loading} message="Guardando..." />
+      <LoadingModal visible={loading} message="Guardando..." />
     </Modal>
   );
 };

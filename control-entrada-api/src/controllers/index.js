@@ -1619,17 +1619,18 @@ password: "123456,
       destinyId,
       citizenId
     } = req.body;
-
+    let visitInput = {
+      entryDate,
+      departureDate,
+      UserZoneId: userZoneId,
+      destinationId: destinyId,
+      citizenId
+    }
+    if(descriptionEntry) visitInput.descriptionEntry = descriptionEntry
     try {
       const visit = await models.Visits.create(
         {
-          entryDate,
-          descriptionEntry,
-          departureDate,
-          descriptionDeparture,
-          UserZoneId: userZoneId,
-          destinationId: destinyId,
-          citizenId,
+          ...visitInput,
           Fotos: {
             picture: req.file.filename,
             entry: "algo"
@@ -1681,30 +1682,30 @@ password: "123456,
         }
       });
       if (person) {
-        let visit = await models.Visits.create(
-          {
-            entryDate,
-            descriptionEntry,
-            departureDate,
-            descriptionDeparture,
-            destinationId: destinyId,
-            UserZoneId: userZoneId,
-            citizenId: person.id,
-            Fotos: {
-              picture: req.files[0].filename,
-              entry: "algo"
-            }
-          },
-          {
-            include: {
-              model: models.Picture,
-              as: "Fotos"
-            }
-          }
-        );
+        // let visit = await models.Visits.create(
+        //   {
+        //     entryDate,
+        //     descriptionEntry,
+        //     departureDate,
+        //     descriptionDeparture,
+        //     destinationId: destinyId,
+        //     UserZoneId: userZoneId,
+        //     citizenId: person.id,
+        //     Fotos: {
+        //       picture: req.files[0].filename,
+        //       entry: "algo"
+        //     }
+        //   },
+        //   {
+        //     include: {
+        //       model: models.Picture,
+        //       as: "Fotos"
+        //     }
+        //   }
+        // );
         //console.log("visita con dni ya registrado", visit)
-        RESPONSE.msg = "Registro Exitoso!";
-        RESPONSE.data = visit;
+        RESPONSE.msg = "Usuario ya registrado";
+        RESPONSE.data = person;
         res.status(200).json(RESPONSE);
       } else {
         let visits = await models.Citizen.create(
@@ -1789,14 +1790,33 @@ password: "123456,
       let visit = await models.Visits.findOne({
         where: {
           id
-        }
+        },
+        include: [
+          { model: models.Citizen, as: "Visitante" },
+          { model: models.Destination, as: "Destino" },
+          { model: models.Picture, as: "Fotos" },
+          {
+            model: models.UserZone,
+            as: "UserZone",
+            include: [
+              { model: models.Zone, as: "Zona" },
+              {
+                model: models.User,
+                as: "User",
+                include: {
+                  model: models.Employee,
+                  as: "Employee"
+                }
+              }
+            ]
+          }
+        ]
       });
       if (visit) {
         //console.log(visit);
         visit.departureDate = departureDate;
         visit.descriptionDeparture = descriptionDeparture;
         await visit.save();
-        console.log(visit);
         RESPONSE.error = false;
         RESPONSE.msg = "Actualizacion Existosa";
         RESPONSE.data = visit;
@@ -1984,7 +2004,6 @@ password: "123456,
       tokn: null
     };
     const { userzoneId } = req.params;
-    console.log("VISIT BY USERZONE--", req.params);
     try {
       let visits = await models.Visits.findAll({
         where: {
@@ -2018,7 +2037,6 @@ password: "123456,
         ]
       });
       if (visits) {
-        console.log("visits", visits);
         RESPONSE.error = false;
         RESPONSE.msg = "Busqueda Exitosa!";
         RESPONSE.data = visits;

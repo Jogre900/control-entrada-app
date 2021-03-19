@@ -21,8 +21,9 @@ import { StatusModal } from "../../components/statusModal";
 import { FormContainer } from "../../components/formContainer";
 import { Spinner } from "../../components/spinner";
 import { helpers } from "../../helpers";
-import { BackAction } from '../../helpers/ui/ui'
-import { routes } from '../../assets/routes'
+import { BackAction } from "../../helpers/ui/ui";
+import { routes } from "../../assets/routes";
+import { connect } from "react-redux";
 import Avatar from "../../components/avatar.component";
 
 let statusModalValues = {
@@ -31,15 +32,15 @@ let statusModalValues = {
   status: null,
 };
 
-export const DepartureScreen = (props) => {
-  const { id } = props.route.params;
+const DepartureScreen = ({ navigation, route, updateVisit }) => {
+  const { id } = route.params;
   const [statusModalProps, setStatusModalProps] = useState(statusModalValues);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [visit, setVisit] = useState();
   const [departureText, setDepartureText] = useState("");
   const [entryCheck, setEntryCheck] = useState(false);
-  
+
   //FIND VISIT BY ID
   const findVisitId = async () => {
     setLoading(true);
@@ -61,19 +62,27 @@ export const DepartureScreen = (props) => {
       departureDate: new Date().toISOString(),
       descriptionDeparture: departureText,
     };
-    setSuccess(false);
+    //setSuccess(false);
     setSaving(true);
     const token = await storage.getItem("userToken");
     const res = await helpers.updateVisit(id, data, token);
     if (!res.data.error) {
-      console.log(res.data);
       setEntryCheck(true);
-      setUpdateVisit(res.data.data);
+      //setUpdateVisit(res.data.data);
+      updateVisit(res.data.data);
       setSaving(false);
       setStatusModalProps((values) => ({
         ...values,
         visible: true,
         status: true,
+        message: res.data.msg,
+      }));
+    } else {
+      setSaving(false);
+      setStatusModalProps((values) => ({
+        ...values,
+        visible: true,
+        status: false,
         message: res.data.msg,
       }));
     }
@@ -91,7 +100,7 @@ export const DepartureScreen = (props) => {
             ? "Visita"
             : "Marcar Salida"
         }
-        leftControl={BackAction(props.navigation, routes.EXIT)}
+        leftControl={BackAction(navigation, routes.EXIT)}
       />
       {loading && <Spinner message="Cargando..." />}
       {visit && !loading && (
@@ -142,11 +151,6 @@ export const DepartureScreen = (props) => {
           </View>
 
           <FormContainer title="Entrada">
-            <View style={{ flexDirection: "row" }}>
-              <Text style={styles.labelText}>Entrada: </Text>
-              <Text>{moment(visit.entryDate).format("D MMM YY, HH:mm a")}</Text>
-            </View>
-
             <Image
               style={{
                 width: "100%",
@@ -159,10 +163,14 @@ export const DepartureScreen = (props) => {
                 uri: `${API_PORT()}/public/imgs/${visit.Fotos[0].picture}`,
               }}
             />
-            <Text style={styles.contentText}>{visit.descriptionEntry}</Text>
-          </FormContainer>
-          <FormContainer title="Salida">
-            {visit.entryDate !== visit.departureDate ? (
+            <View style={{ flexDirection: "row" }}>
+              <Text style={styles.labelText}>Entrada: </Text>
+              <Text>{moment(visit.entryDate).format("D MMM YY, HH:mm a")}</Text>
+            </View>
+            <Text style={styles.contentText}>
+              {visit.descriptionEntry ? visit.descriptionEntry : ""}
+            </Text>
+            {visit.entryDate !== visit.departureDate && (
               <>
                 <View style={{ flexDirection: "row" }}>
                   <Text style={styles.labelText}>Salida: </Text>
@@ -178,19 +186,20 @@ export const DepartureScreen = (props) => {
                   </Text>
                 </>
               </>
-            ) : (
-              <>
-                <Input
-                  title="Descripcion Salida (Opcional)"
-                  icon="md-create"
-                  shape="flat"
-                  value={departureText}
-                  onChangeText={(value) => setDepartureText(value)}
-                  shape="flat"
-                />
-              </>
             )}
           </FormContainer>
+          {visit.entryDate === visit.departureDate && (
+            <FormContainer title="Salida">
+              <Input
+                title="Descripcion Salida (Opcional)"
+                icon="md-create"
+                shape="flat"
+                value={departureText}
+                onChangeText={(value) => setDepartureText(value)}
+                shape="flat"
+              />
+            </FormContainer>
+          )}
           {visit.entryDate === visit.departureDate ? (
             <View style={{ width: "90%" }}>
               <MainButton
@@ -202,7 +211,7 @@ export const DepartureScreen = (props) => {
           ) : null}
         </ScrollView>
       )}
-      <LoadingModal status={saving} message="Guardando..." />
+      <LoadingModal visible={saving} message="Guardando..." />
       <StatusModal
         {...statusModalProps}
         onClose={() =>
@@ -212,6 +221,16 @@ export const DepartureScreen = (props) => {
     </View>
   );
 };
+const mapDispatchToProps = (dispatch) => ({
+  updateVisit(visit) {
+    dispatch({
+      type: "UPDATE_VISIT",
+      payload: visit,
+    });
+  },
+});
+
+export default connect(null, mapDispatchToProps)(DepartureScreen);
 
 const styles = StyleSheet.create({
   profileContainer: {

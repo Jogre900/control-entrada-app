@@ -2,10 +2,10 @@ import React from "react";
 import { View } from "react-native";
 import { Spinner } from "./spinner";
 import Modal from 'react-native-modal'
-export const LoadingModal = ({ status, message }) => {
+export const LoadingModal = ({ visible, message }) => {
   return (
     <Modal
-      isVisible={status}
+      isVisible={visible}
       //onBackdropPress={() => setModalVisible(!modalVisible)}
     >
       <View

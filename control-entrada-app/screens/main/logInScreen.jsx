@@ -1,8 +1,6 @@
 import React, { useState, useRef } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { connect } from "react-redux";
-import axios from "axios";
-import { API_PORT } from "../../config/index";
 import { TopNavigation } from "../../components/TopNavigation.component";
 import { Divider } from "../../components/Divider";
 import { MainButton } from "../../components/mainButton.component";
@@ -149,11 +147,21 @@ const LoginScreen = ({
         }
       }else{
         setModalVisible(false);
-        setCaption(res.data.msg)
+        setModalProps((values) => ({
+          ...values,
+          visible: true,
+          status: false,
+          message: res.data.msg
+        }));
       }
     } catch (error) {
       setModalVisible(false);
-      setCaption(error.message);
+      setModalProps((values) => ({
+        ...values,
+        visible: true,
+        status: false,
+        message: error.message
+      }));
     }
   };
 
@@ -259,7 +267,7 @@ const handleChange = (name, value) => {
           }
           checkNewPass={checkNewPass}
         />
-        <LoadingModal status={modalVisible} message="Iniciando Sesión.." />
+        <LoadingModal visible={modalVisible} message="Iniciando Sesión.." />
         <StatusModal
           onClose={() =>
             setModalProps((values) => ({ ...values, visible: false }))

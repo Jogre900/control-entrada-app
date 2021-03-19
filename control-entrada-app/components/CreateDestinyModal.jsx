@@ -99,7 +99,7 @@ export const CreateDestinyModal = ({ status, create, onClose, zoneId }) => {
           }}
         />
       </FormContainer>
-      <LoadingModal status={loading} message="Guardando..." />
+      <LoadingModal visible={loading} message="Guardando..." />
     </Modal>
   );
 };

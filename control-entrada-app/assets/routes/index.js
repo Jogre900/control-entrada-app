@@ -1,4 +1,3 @@
-//ZONES
 export const routes = {
     //MAIN
     MAIN:'MAIN',

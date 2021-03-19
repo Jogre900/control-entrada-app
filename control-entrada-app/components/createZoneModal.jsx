@@ -239,7 +239,7 @@ const CreateZoneModal = ({
             createZone();
           }}
         />
-        <LoadingModal status={loading} message="Guardando..." />
+        <LoadingModal visible={loading} message="Guardando..." />
       </FormContainer>
     </Modal>
   );

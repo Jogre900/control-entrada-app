@@ -114,7 +114,6 @@ const DrawerContent = (props) => {
     >
       <DrawerHeader {...props} />
       <DrawerContentScrollView
-        conte
         contentContainerStyle={{
           flex: 1,
           //backgroundColor: 'red'
@@ -204,25 +203,3 @@ const AdminNavigator = () => {
 };
 
 export default AdminNavigator;
-
-const styles = StyleSheet.create({
-  headerDrawerContainer: {
-    justifyContent: "center",
-    alignItems: "center",
-    borderBottomWidth: 0.5,
-    borderColor: "grey",
-    paddingVertical: 10,
-  },
-  drawerLogo: {
-    width: 60,
-    height: 60,
-    borderRadius: 60 / 2,
-  },
-  footerDrawerContainer: {
-    paddingTop: 10,
-    justifyContent: "center",
-    alignItems: "center",
-    borderTopWidth: 0.5,
-    borderColor: "grey",
-  },
-});
