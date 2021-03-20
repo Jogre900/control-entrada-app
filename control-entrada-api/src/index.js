@@ -148,9 +148,3 @@ db.sequelize.sync({ logging, force, alter }).then(() => {
   app.listen(PORT, () => console.log(`Server Runing on port: ${PORT}`));
 });
 
-// models.sequelize.sync({ alter, force }).then(() => {
-//   console.log("paso laog!!!!!")
-//   app.listen(PORT, function() {
-//     console.log("Running!!! Port: ", PORT);
-//   });
-// });

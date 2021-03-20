@@ -81,8 +81,8 @@ export default (state = initialState, action = {}) => {
           ...state,
           tutorial: action.payload
         }
-        case "TURN_OFF":
-          return {
+        case "TURN_OFF": 
+        return {
             ...state,
             tutorial: action.payload
           }

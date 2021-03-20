@@ -11,9 +11,9 @@ export const NotFound = ({ message, navigation, route }) => {
       />
       <Text style={styles.title}>Oops tenemos un problema.</Text>
       <Text style={styles.loadingText}>{message}</Text>
-      <View style={styles.buttonContainer}>
+      {/* <View style={styles.buttonContainer}>
         <MainButton title="Volver" onPress={() => navigation.navigate(route)}/>
-      </View>
+      </View> */}
     </View>
   );
 };

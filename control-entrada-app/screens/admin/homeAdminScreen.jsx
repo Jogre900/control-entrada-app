@@ -81,7 +81,7 @@ const HomeAdminScreen = ({
       setLoading(true);
       const res = await fetchAllEmployee(company.id);
 
-      if (!res.data.error && res.data.data.length) {
+      if (res.data.data.length > 0) {
         res.data.data.map((e) => {
           uzArray.push(e.userZone[0]);
         });
@@ -93,14 +93,16 @@ const HomeAdminScreen = ({
         if (employee.length > 0) {
           const res = await helpers.fetchTodayVisist(employee);
 
-          if (!res.data.error && res.data.data.length) {
+          if (res.data.data.length > 0) {
             saveTodayVisits(res.data.data);
             setVisits(res.data.data);
             setLoading(false);
-          } else if (res.data.data.length === 0) {
+          } else{
             setHasVisit(false);
           }
         }
+      }else{
+        setHasVisit(false);
       }
     }
   };
@@ -110,69 +112,68 @@ const HomeAdminScreen = ({
     let employee = [];
     setLoading(true);
     const res = await fetchEmployeeByZone(profile.userZone[0].ZoneId);
-    if (!res.data.error && res.data.data.length) {
+    if (res.data.data.length > 0) {
       saveEmployee(res.data.data);
       res.data.data.map((e) => {
         uzArray.push(e.userZone[0]);
       });
       uzArray.map((uz) => employee.push(uz.id));
-      if (employee.length) {
+      if (employee.length > 0) {
         const res = await helpers.fetchTodayVisist(employee);
 
-        if (!res.data.error && res.data.data.length) {
+        if (!res.data.error && res.data.data.length > 0) {
           saveTodayVisits(res.data.data);
           setVisits(res.data.data);
           setLoading(false);
-        } else if (!res.data.data.length) {
+        } else{
           setHasVisit(false);
         }
       }
+    }else {
+      setHasVisit(false);
     }
   };
 
   //REQUEST AVAILABLE
-  const findAvailableUsers = async () => {
-    if (company) {
-      setLoading(true);
-      try {
-        /*let res = await axios.get(`${API_PORT()}/api/findAvailableUsers/${company.id}`);
-        console.log("User Avai--", res.data);
-        if (!res.data.error) {
-          saveAvailable(res.data.data);
-          setModalVisible(false);
-        }*/
-        saveAvailable([]);
-        setLoading(false);
-      } catch (error) {
-        setLoading(false);
-        console.log(error.message);
-      }
-    }
-  };
+  // const findAvailableUsers = async () => {
+  //   if (company) {
+  //     setLoading(true);
+  //     try {
+  //       /*let res = await axios.get(`${API_PORT()}/api/findAvailableUsers/${company.id}`);
+  //       console.log("User Avai--", res.data);
+  //       if (!res.data.error) {
+  //         saveAvailable(res.data.data);
+  //         setModalVisible(false);
+  //       }*/
+  //       saveAvailable([]);
+  //       setLoading(false);
+  //     } catch (error) {
+  //       setLoading(false);
+  //       console.log(error.message);
+  //     }
+  //   }
+  // };
 
   //VISITS
-  const requestVisits = async () => {
-    if (company) {
-      setLoading(true);
-      if (employee.length) {
-      }
-      const res = await helpers.fetchTodayVisist(employee);
-      saveTodayVisits(res);
-      setVisits(res);
-      setLoading(false);
-      setHasVisit(false);
-    }
-  };
+  // const requestVisits = async () => {
+  //   if (company) {
+  //     setLoading(true);
+  //     if (employee.length) {
+  //     }
+  //     const res = await helpers.fetchTodayVisist(employee);
+  //     saveTodayVisits(res);
+  //     setVisits(res);
+  //     setLoading(false);
+  //     setHasVisit(false);
+  //   }
+  // };
   //ONLONGPRESS
   const onLong = (id) => {
     if (selectItem.includes(id)) {
       setSeletedItem((value) => value.filter((elem) => elem !== id));
-      //hideCheckMark();
       return;
     }
     Vibration.vibrate(100), setSeletedItem(selectItem.concat(id));
-    //showCheckMark();
-    //setChangeStyle(!changeStyle);
   };
 
   const clearList = () => setSeletedItem([]);

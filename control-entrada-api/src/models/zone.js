@@ -55,6 +55,10 @@ module.exports = (sequelize, DataTypes) => {
       SecondDepartureTime: {
         type: DataTypes.TIME,
         allowNull: true
+      },
+      visits: {
+        type: DataTypes.STRING,
+        allowNull: false
       }
     },
     {

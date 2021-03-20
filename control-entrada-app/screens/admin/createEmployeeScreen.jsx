@@ -7,13 +7,9 @@ import {
   Alert,
   TouchableOpacity,
 } from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
 
-
-import {
-  MainColor,
-  ThirdColor,
-  Danger,
-} from "../../assets/colors.js";
+import { MainColor, ThirdColor, Danger } from "../../assets/colors.js";
 import Input from "../../components/input.component";
 import { TopNavigation } from "../../components/TopNavigation.component";
 import { MainButton } from "../../components/mainButton.component";
@@ -30,14 +26,14 @@ import Avatar from "../../components/avatar.component";
 import { CameraModal } from "../../components/cameraModal";
 import { MessageModal } from "../../components/messageModal";
 import { createSupervisor, createWatchman } from "../../helpers";
-import { routes } from '../../assets/routes'
-import { BackAction } from '../../helpers/ui/ui'
+import { routes } from "../../assets/routes";
+import { BackAction } from "../../helpers/ui/ui";
 import { connect } from "react-redux";
 
 let alertModalValues = {
   visible: false,
   message: null,
-  route: "admin-home",
+  route: routes.ADMIN_HOME,
 };
 let statusModalValues = {
   visible: false,
@@ -62,14 +58,17 @@ const CreateEmployeScreen = ({
     uri: null,
     fileName: null,
     fileType: null,
-    zoneId: zonesRedux.length ? zonesRedux[0].id : null,
+    //zoneId: zonesRedux.length ? zonesRedux[0].id : null,
     companyId: companyRedux[0].id,
   };
-
+  console.log("zones from redux--", zonesRedux.length);
+  console.log("zones from redux--", zonesRedux);
   const [alertModal, setAlertModal] = useState(alertModalValues);
   const [statusModalProps, setStatusModalProps] = useState(statusModalValues);
   const [employeeData, setEmployeeData] = useState(employeeValues);
   const [privilege, setPrivilege] = useState("Supervisor");
+const [zoneId, setZoneId] = useState(zonesRedux.length > 0 ? zonesRedux[0].id : '')
+
 
   const [caption, setCaption] = useState("");
   const [timeCaption, setTimeCaption] = useState("");
@@ -171,8 +170,10 @@ const CreateEmployeScreen = ({
     //   setVisible(false);
     //   return;
     // }
-    console.log("privilege on CREATE SCREEN--", privilege)
-    employeeData.privilege = privilege
+    console.log("zoneId on CREATE SCREEN--", zoneId);
+    
+    employeeData.privilege = privilege;
+    employeeData.zoneId = zoneId
     try {
       if (privilege === "Supervisor") {
         const res = await createSupervisor(employeeData);
@@ -236,19 +237,36 @@ const CreateEmployeScreen = ({
     }
   };
 
-  useEffect(() => {
-    !zonesRedux.length &&
-      setAlertModal((values) => ({
-        ...values,
-        visible: true,
-        message:
-          "Parece que aun no tienes zonas creadas, para registrar personal crea al menos una.",
-      }));
-  }, []);
+  useFocusEffect(
+    React.useCallback(() => {
+      if (zoneId) {
+        alert("si hay zone id", zoneId)
+        // setAlertModal((values) => ({
+        //   ...values,
+        //   visible: true,
+        //   message:
+        //     "Parece que aun no tienes zonas creadas, para registrar personal crea al menos una.",
+        // }));
+      }
+    }, [])
+  );
+
+  // useEffect(() => {
+  //   !zonesRedux.length &&
+  //     setAlertModal((values) => ({
+  //       ...values,
+  //       visible: true,
+  //       message:
+  //         "Parece que aun no tienes zonas creadas, para registrar personal crea al menos una.",
+  //     }));
+  // }, []);
 
   return (
     <View style={{ flex: 1 }}>
-      <TopNavigation title="Crear Empleado" leftControl={BackAction(navigation, routes.ADMIN_HOME)} />
+      <TopNavigation
+        title="Crear Empleado"
+        leftControl={BackAction(navigation, routes.ADMIN_HOME)}
+      />
       <ScrollView contentContainerStyle={styles.container}>
         <View
           style={{
@@ -277,7 +295,7 @@ const CreateEmployeScreen = ({
               title="Nombre"
               icon="ios-person"
               returnKeyType="next"
-              shape='flat'
+              shape="flat"
               onChangeText={(name) => {
                 setEmployeeData((values) => ({ ...values, name })),
                   setCaption("");
@@ -288,7 +306,7 @@ const CreateEmployeScreen = ({
               styleInput={{ color: "black" }}
               icon="ios-people"
               title="Apellido"
-              shape='flat'
+              shape="flat"
               returnKeyType="next"
               onChangeText={(lastName) => {
                 setEmployeeData((values) => ({ ...values, lastName })),
@@ -300,7 +318,7 @@ const CreateEmployeScreen = ({
               styleInput={{ color: "black" }}
               title="DNI"
               icon="ios-card"
-              shape='flat'
+              shape="flat"
               returnKeyType="next"
               onChangeText={(dni) => {
                 setEmployeeData((values) => ({ ...values, dni })),
@@ -312,7 +330,7 @@ const CreateEmployeScreen = ({
               styleInput={{ color: "black" }}
               title="Email"
               icon="ios-mail"
-              shape='flat'
+              shape="flat"
               returnKeyType="next"
               onChangeText={(email) => {
                 setEmployeeData((values) => ({ ...values, email })),
@@ -347,9 +365,9 @@ const CreateEmployeScreen = ({
               {zonesRedux.length ? (
                 <Picker
                   mode="dropdown"
-                  selectedValue={employeeData.zoneId}
-                  onValueChange={(zoneId) =>
-                    setEmployeeData((values) => ({ ...values, zoneId }))
+                  selectedValue={zoneId}
+                  onValueChange={(value) =>
+                    setZoneId(value)
                   }
                 >
                   {zonesRedux.map((item) => (

@@ -5,7 +5,7 @@ import jwt from "jsonwebtoken";
 import { $security, $serverPort } from "@config";
 import options from "dotenv/lib/env-options";
 import moment from "moment";
-import { Op } from "sequelize";
+import { Op, literal } from "sequelize";
 const SECRETKEY = process.env.SECRETKEY || $security().secretKey;
 
 const Controllers = {
@@ -98,6 +98,7 @@ password: "123456,
       address,
       phoneNumber,
       phoneNumberOther,
+      visits,
       dni,
       name,
       lastName,
@@ -149,8 +150,11 @@ password: "123456,
         city,
         address,
         phoneNumber,
-        logo: req.files[1].filename
       };
+
+      if(req.files.length > 1){
+        inputCompany.logo = req.files[1].filename
+      }
 
       if (phoneNumberOther) {
         inputCompany.phoneNumberOther = phoneNumberOther;
@@ -161,7 +165,8 @@ password: "123456,
       let inputUserCompany = {
         companyId: newCompany.id,
         userId: NewUser.id,
-        privilege: "Admin"
+        privilege: "Admin",
+        visits: 0
       };
 
       if (NewUser && newCompany) {
@@ -236,7 +241,8 @@ password: "123456,
     try {
       let inputZone = {
         zone,
-        companyId: id
+        companyId: id,
+        visits: 0
       };
 
       if (firsEntryTime) {
@@ -258,7 +264,6 @@ password: "123456,
       let zoneC = await models.Zone.create({
         ...inputZone
       });
-
       RESPONSE.error = false;
       RESPONSE.msg = "Creacion de Zona Exitasa!";
       RESPONSE.data = zoneC;
@@ -276,7 +281,7 @@ password: "123456,
       token: null
     };
     const { zoneId } = req.params;
-    console.log(zoneId)
+    console.log(zoneId);
     try {
       let zones = await models.Zone.findOne({
         where: {
@@ -431,7 +436,8 @@ password: "123456,
     try {
       let destiny = await models.Destination.create({
         name,
-        zoneId: id
+        zoneId: id,
+        visits: 0
       });
       RESPONSE.error = false;
       RESPONSE.msg = "Creacion de Destino Exitosa!";
@@ -724,7 +730,8 @@ password: "123456,
           },
           UserCompany: {
             companyId,
-            privilege
+            privilege,
+            visits: 0
           }
         };
 
@@ -874,7 +881,8 @@ password: "123456,
           },
           UserCompany: {
             companyId,
-            privilege
+            privilege,
+            visits: 0
           }
         };
 
@@ -1651,8 +1659,8 @@ password: "123456,
       UserZoneId: userZoneId,
       destinationId: destinyId,
       citizenId
-    }
-    if(descriptionEntry) visitInput.descriptionEntry = descriptionEntry
+    };
+    if (descriptionEntry) visitInput.descriptionEntry = descriptionEntry;
     try {
       const visit = await models.Visits.create(
         {
@@ -1670,6 +1678,19 @@ password: "123456,
         }
       );
       if (visit) {
+        const zone = await models.Zone.findOne({
+          include: {
+            model: models.UserZone,
+            as: "encargado_zona",
+            where: {
+              id: userZoneId
+            }
+          }
+        });
+        console.log(zone);
+        zone.visits.literal("visits + 1");
+        await zone.save();
+        console.log(zone.dataValues.visits);
         RESPONSE.error = false;
         RESPONSE.data = visit;
         RESPONSE.msg = "Registro exitoso!";

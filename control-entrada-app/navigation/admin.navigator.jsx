@@ -45,6 +45,7 @@ const options = {
 
 function AdminNav() {
   const tutorial = useSelector((state) => state.profile.tutorial);
+  console.log("tutorial--",tutorial)
   return (
     <Stack.Navigator
       headerMode="none"

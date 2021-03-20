@@ -203,14 +203,14 @@ const companyHandleChange = (name, value) => {
         switch (privilege) {
           case "Watchman":
             setLoadingModal((values) => ({ ...values, visible: false }));
-            navigation.navigate("watch", {
-              screen: "watch-home",
+            navigation.navigate(routes.WATCH, {
+              screen: routes.WATCH_HOME,
             });
             break;
           case "Admin":
           case "Supervisor":
             setLoadingModal((values) => ({ ...values, visible: false }));
-            navigation.navigate("admin");
+            navigation.navigate(routes.ADMIN);
             break;
           default:
             break;

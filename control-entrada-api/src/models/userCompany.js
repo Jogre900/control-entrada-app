@@ -35,6 +35,10 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.BOOLEAN,
         allowNull: false,
         defaultValue: true
+      },
+      visits: {
+        type: DataTypes.STRING,
+        allowNull: false
       }
     },
     {

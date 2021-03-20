@@ -8,8 +8,8 @@ import {
 } from "react-native";
 import { connect } from "react-redux";
 import { Ionicons } from "@expo/vector-icons";
-import { routes } from '../../assets/routes'
-import { BackAction } from '../../helpers/ui/ui'
+import { routes } from "../../assets/routes";
+import { BackAction } from "../../helpers/ui/ui";
 
 //components
 import { TopNavigation } from "../../components/TopNavigation.component";
@@ -17,11 +17,9 @@ import { API_PORT } from "../../config/index";
 import { FormContainer } from "../../components/formContainer";
 import Avatar from "../../components/avatar.component";
 
-
 const PerfilScreen = ({ navigation, profile, company }) => {
   console.log("profile-redux:  ", profile);
   console.log("company-redux:  ", company);
-
 
   const [passChange, setPassChange] = React.useState("");
   const [repeatPass, setRepeatPass] = React.useState("");
@@ -90,29 +88,44 @@ const PerfilScreen = ({ navigation, profile, company }) => {
             </View>
           </View>
           <FormContainer title="Negocio">
+            {company[0].logo ? (
+              <Avatar.Picture
+                size={60}
+                uri={`${API_PORT()}/public/imgs/${company[0].logo}`}
+              />
+            ) : (
+              <View style={styles.logoContainer}>
+                <Avatar.Icon size={28} name="md-photos" color="#8e8e8e" />
+              </View>
+            )}
             {company.map((elem, index) => (
               <View key={index}>
-                <Text style={styles.contentText}>Compañia: {elem.companyName}</Text>
-                <Text style={styles.contentText}>Razon Social: {elem.businessName}</Text>
+                <Text style={styles.contentText}>
+                  Compañia: {elem.companyName}
+                </Text>
+                <Text style={styles.contentText}>
+                  Razon Social: {elem.businessName}
+                </Text>
                 {/* <Text style={styles.contentText}>{elem.logo}</Text> */}
                 <Text style={styles.contentText}>Ciudad: {elem.city}</Text>
-                <Text style={styles.contentText}>Direccion: {elem.address}</Text>
+                <Text style={styles.contentText}>
+                  Direccion: {elem.address}
+                </Text>
                 <Text style={styles.contentText}>NIC: {elem.nic}</Text>
-                <Text style={styles.contentText}>Telefono: {elem.phoneNumber}</Text>
-                <Text style={styles.contentText}>Telefono Adicional: {elem.phoneNumberOther}</Text>
+                <Text style={styles.contentText}>
+                  Telefono: {elem.phoneNumber}
+                </Text>
+                <Text style={styles.contentText}>
+                  Telefono Adicional: {elem.phoneNumberOther}
+                </Text>
               </View>
             ))}
-            <Avatar.Picture
-              size={60}
-              uri={`${API_PORT()}/public/imgs/${company[0].logo}`}
-            />
           </FormContainer>
         </ScrollView>
       ) : null}
     </View>
   );
 };
-
 
 const mapStateToProps = (state) => ({
   profile: state.profile.profile,
@@ -145,6 +158,20 @@ const styles = StyleSheet.create({
     elevation: 10,
     borderRadius: 120 / 2,
     backgroundColor: "#fff",
+  },
+  logoContainer: {
+    //alignSelf: "center",
+    position: "relative",
+    marginVertical: 10,
+    borderColor: "#ccc",
+    borderWidth: 2,
+    elevation: 10,
+    backgroundColor: "#fff",
+    height: 46,
+    width: 46,
+    borderRadius: 46 / 2,
+    justifyContent: "center",
+    alignItems: "center",
   },
   perfilLogo: {
     width: 120,
@@ -180,4 +207,3 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
 });
-

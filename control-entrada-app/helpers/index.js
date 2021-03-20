@@ -178,6 +178,7 @@ export async function createCompany(adminData, companyData) {
     data.append("phoneNumberOther", phoneNumberOther);
   }
   data.append("phoneNumber", phoneNumber);
+  data.append("visits", 0);
   data.append("file", { uri, name: fileName, type: fileType });
   if (uriLogo) {
     data.append("file", {

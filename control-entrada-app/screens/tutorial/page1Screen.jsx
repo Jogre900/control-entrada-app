@@ -4,7 +4,7 @@ import { MainButton } from "../../components/mainButton.component";
 import { useDispatch } from "react-redux";
 import { routes } from '../../assets/routes'
 export const Page1Screen = ({ navigation, route }) => {
-  const dispatch = useDispatch({ type: "TURN_OFF", payload: false });
+  const dispatch = useDispatch();
   return (
     <View style={styles.container}>
       <View style={styles.textContainer}>
@@ -32,7 +32,7 @@ export const Page1Screen = ({ navigation, route }) => {
               style={styles.button}
               title="Omitir"
               onPress={() => {
-                dispatch, navigation.navigate(routes.ADMIN_HOME);
+                dispatch({ type: "TURN_OFF", payload: false }), navigation.navigate(routes.ADMIN_HOME);
               }}
               outline
             />

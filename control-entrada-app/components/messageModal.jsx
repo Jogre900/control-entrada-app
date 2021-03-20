@@ -12,7 +12,7 @@ import { MainButton } from "./mainButton.component";
 import { MainColor, ThirdColor } from '../assets/colors'
 const { width, height } = Dimensions.get("screen");
 export const MessageModal = ({ visible, status, onClose, navigation , route, message }) => {
-  console.log(status);
+  console.log(route);
   const [succes, setSuccess] = useState(false);
   return (
     <Modal
