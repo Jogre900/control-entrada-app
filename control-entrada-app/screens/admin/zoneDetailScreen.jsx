@@ -1,13 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  Vibration,
-  BackHandler,
-} from "react-native";
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Vibration, BackHandler } from "react-native";
 import { connect } from "react-redux";
 import { useFocusEffect } from "@react-navigation/native";
 
@@ -15,7 +7,7 @@ import { useFocusEffect } from "@react-navigation/native";
 
 import { TopNavigation } from "../../components/TopNavigation.component.jsx";
 import { MainButton } from "../../components/mainButton.component";
-import { MainColor} from "../../assets/colors";
+import { MainColor } from "../../assets/colors";
 import { EmployeeCard } from "../../components/employeeCard";
 import { DestinyCard } from "../../components/destinyCard";
 import { ZoneDetailCard } from "../../components/zoneDetailCard";
@@ -23,20 +15,11 @@ import { FormContainer } from "../../components/formContainer";
 import { Header } from "../../components/header.component";
 import { Spinner } from "../../components/spinner";
 import { helpers } from "../../helpers";
-import { routes } from '../../assets/routes'
-import { BackAction } from '../../helpers/ui/ui'
+import { routes } from "../../assets/routes";
+import { BackAction } from "../../helpers/ui/ui";
 
-const ZoneDetailScreen = ({
-  route,
-  navigation,
-  privilege,
-  userZone,
-  zoneRedux,
-  availableU,
-  setNewEmployee,
-}) => {
-  const zoneId =
-    privilege === "Admin" ? route?.params.zoneId : userZone[0].ZoneId;
+const ZoneDetailScreen = ({ route, navigation, privilege, userZone, zoneRedux, availableU, setNewEmployee }) => {
+  const zoneId = privilege === "Admin" ? route?.params.zoneId : userZone[0].ZoneId;
   const [selectItem, setSeletedItem] = useState([]);
   const [loading, setLoading] = useState(false);
   //const [availableU, setAvailableU] = useState([]);
@@ -90,9 +73,7 @@ const ZoneDetailScreen = ({
     setZoneApi();
     setLoading(true);
     try {
-      const res = await helpers.fetchZoneById(
-        privilege === "Admin" ? zoneId : userZone[0].ZoneId
-      );
+      const res = await helpers.fetchZoneById(privilege === "Admin" ? zoneId : userZone[0].ZoneId);
       if (!res.data.error) {
         setLoading(false);
         setZoneApi(res.data.data);
@@ -175,7 +156,8 @@ const ZoneDetailScreen = ({
   };
 
   const goBackHardware = () => {
-    navigation.navigate(routes.ZONES);
+    //TODO aqui y abajo debes poner segun rol
+    navigation.navigate(routes.ADMIN_HOME);
     return true;
   };
 
@@ -206,10 +188,7 @@ const ZoneDetailScreen = ({
           selectAction={selectAll}
         />
       ) : (
-        <TopNavigation
-          title={zoneApi ? zoneApi.zone : null}
-          leftControl={BackAction(navigation, routes.ZONES)}
-        />
+        <TopNavigation title={zoneApi ? zoneApi.zone : null} leftControl={BackAction(navigation, routes.ADMIN_HOME)} />
       )}
       {loading && <Spinner message="Cargando..." />}
       {zoneApi && (
@@ -219,24 +198,12 @@ const ZoneDetailScreen = ({
             <FormContainer title="Destinos">
               {zoneApi.Destinos.length > 0 ? (
                 zoneApi.Destinos.map((elem) => (
-                  <TouchableOpacity
-                    key={elem.id}
-                    onPress={
-                      selectItem.length > 0 ? () => onLong(elem.id) : null
-                    }
-                    onLongPress={() => onLong(elem.id)}
-                    delayLongPress={200}
-                  >
-                    <DestinyCard
-                      data={elem}
-                      selected={selectItem.includes(elem.id) ? true : false}
-                    />
+                  <TouchableOpacity key={elem.id} onPress={selectItem.length > 0 ? () => onLong(elem.id) : null} onLongPress={() => onLong(elem.id)} delayLongPress={200}>
+                    <DestinyCard data={elem} selected={selectItem.includes(elem.id) ? true : false} />
                   </TouchableOpacity>
                 ))
               ) : (
-                <Text style={styles.labelText}>
-                  La zona no posee destinos creados
-                </Text>
+                <Text style={styles.labelText}>La zona no posee destinos creados</Text>
               )}
             </FormContainer>
             <FormContainer title="Encargados">
@@ -248,17 +215,10 @@ const ZoneDetailScreen = ({
                 ))
               ) : (
                 <View>
-                  <Text style={styles.labelText}>
-                    La zona no posea Personal Asignado
-                  </Text>
+                  <Text style={styles.labelText}>La zona no posea Personal Asignado</Text>
                   <View>
                     <Text>Agregar Personal</Text>
-                    <MainButton.Icon
-                      onPress={() => setListVisible(!listVisible)}
-                      name={listVisible ? "ios-arrow-up" : "ios-arrow-down"}
-                      size={22}
-                      color="#4f4f4f"
-                    />
+                    <MainButton.Icon onPress={() => setListVisible(!listVisible)} name={listVisible ? "ios-arrow-up" : "ios-arrow-down"} size={22} color="#4f4f4f" />
                   </View>
 
                   {/* { listVisible && (

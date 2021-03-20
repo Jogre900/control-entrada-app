@@ -1,6 +1,6 @@
 {
   "API_PORT": {
-    "development": "http://192.168.10.103:8000",
+    "development": "http://192.168.1.101:8200",
     "testing": "http://192.168.1.101:8200",
     "production": "http://192.168.10.103:8000"
   }
