@@ -304,7 +304,7 @@ const styles = StyleSheet.create({
   },
   labelText: {
     fontSize: 14,
-    color: "grey",
+    color: "#8e8e8e",
   },
   dataText: {
     fontSize: 17,

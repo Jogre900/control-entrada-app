@@ -17,10 +17,6 @@ import { BackAction } from '../../helpers/ui/ui'
 
 import { TopNavigation } from "../../components/TopNavigation.component.jsx";
 import { Header } from "../../components/header.component";
-import Input from "../../components/input.component.jsx";
-import { MainButton } from "../../components/mainButton.component";
-import moment from "moment";
-import { MainColor } from "../../assets/colors";
 import { ZoneCard } from "../../components/zoneCard";
 import { FloatingBotton } from "../../components/floatingBotton";
 import CreateZoneModal from "../../components/createZoneModal";

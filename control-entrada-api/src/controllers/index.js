@@ -149,11 +149,11 @@ password: "123456,
         nic,
         city,
         address,
-        phoneNumber,
+        phoneNumber
       };
 
-      if(req.files.length > 1){
-        inputCompany.logo = req.files[1].filename
+      if (req.files.length > 1) {
+        inputCompany.logo = req.files[1].filename;
       }
 
       if (phoneNumberOther) {
@@ -233,7 +233,8 @@ password: "123456,
       firsEntryTime,
       firsDepartureTime,
       SecondEntryTime,
-      SecondDepartureTime
+      SecondDepartureTime,
+      destiny
     } = req.body;
     const { id } = req.params;
     console.log(req.body);
@@ -264,10 +265,19 @@ password: "123456,
       let zoneC = await models.Zone.create({
         ...inputZone
       });
-      RESPONSE.error = false;
-      RESPONSE.msg = "Creacion de Zona Exitasa!";
-      RESPONSE.data = zoneC;
-      res.json(RESPONSE);
+      if (zoneC) {
+        const destinyC = await models.Destination.create({
+          name: destiny,
+          zoneId: zoneC.dataValues.id,
+          visits: 0
+        });
+        if (destinyC) {
+          RESPONSE.error = false;
+          RESPONSE.msg = "Creacion de Zona Exitosa!";
+          RESPONSE.data = zoneC;
+          res.json(RESPONSE);
+        }
+      }
     } catch (error) {
       RESPONSE.msg = error.message;
       res.json(RESPONSE);

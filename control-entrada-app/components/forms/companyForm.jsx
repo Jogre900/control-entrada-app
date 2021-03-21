@@ -151,6 +151,5 @@ const styles = StyleSheet.create({
     labelText: {
         color: "#8e8e8e",
         fontSize: 14,
-        fontWeight: "600",
       },
   });

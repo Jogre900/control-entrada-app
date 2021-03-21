@@ -60,11 +60,11 @@ export const HomeScreen = ({navigation}) => {
     );
   };
 
-  const rightControls = () => {
+  const leftControls = () => {
     return (
       <View>
-        <TouchableOpacity onPress={() => deleteToken()}>
-          <Ionicons name="ios-log-out" size={28} color="white" />
+        <TouchableOpacity onPress={() => setLogModal(true)}>
+          <Ionicons name="ios-log-out" size={28} color="white" style={{transform:[{rotate: '180deg'}]}}/>
         </TouchableOpacity>
       </View>
     );
@@ -81,8 +81,8 @@ export const HomeScreen = ({navigation}) => {
     <View style={styles.container}>
       <TopNavigation
         title="Control de visitas"
-        leftControl={goToProfile()}
-        rightControl={rightControls()}
+        leftControl={leftControls}
+        rightControl={goToProfile()}
       />
       <View style={styles.contentContainer}>
         <ImageBackground source={cover} style={styles.imageBackground}>

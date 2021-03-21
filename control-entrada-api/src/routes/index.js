@@ -33,7 +33,7 @@ const uploadImg = multer({
 //VERIFY TOKEN MIDDLEWARE
 const middleware = {
   verifyToken: function(req, res, next) {
-    //console.log("req.headers middleware---", req.headers)
+    console.log("req.headers middleware---", req.headers)
     if (!req.headers["authorization"])
       return next(createError(401, "Usuario no Autorizado"));
     const headerToken = req.headers["authorization"];

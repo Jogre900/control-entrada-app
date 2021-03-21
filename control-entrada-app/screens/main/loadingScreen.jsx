@@ -17,9 +17,10 @@ const LoadingScreen = ({ navigation, saveProfile, saveCompany, saveLogin }) => {
             Authorization: `bearer ${token}`,
           },
         });
+        console.log(res.data)
 
         //console.log("RES DE TOKEN----", res.data.data.UserCompany[0].privilege)
-        if (res.data.error && res.data.msg === "jwt expired") {
+        if (res.data.error || res.data.msg === "jwt expired") {
           navigation.navigate(routes.MAIN);
           return;
         }

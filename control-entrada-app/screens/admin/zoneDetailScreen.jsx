@@ -157,7 +157,7 @@ const ZoneDetailScreen = ({ route, navigation, privilege, userZone, zoneRedux, a
 
   const goBackHardware = () => {
     //TODO aqui y abajo debes poner segun rol
-    navigation.navigate(routes.ADMIN_HOME);
+    navigation.navigate(privilege === 'Admin' ?  routes.ZONES : routes.ADMIN_HOME);
     return true;
   };
 
@@ -188,7 +188,7 @@ const ZoneDetailScreen = ({ route, navigation, privilege, userZone, zoneRedux, a
           selectAction={selectAll}
         />
       ) : (
-        <TopNavigation title={zoneApi ? zoneApi.zone : null} leftControl={BackAction(navigation, routes.ADMIN_HOME)} />
+        <TopNavigation title={zoneApi ? zoneApi.zone : null} leftControl={BackAction(navigation, privilege === 'Admin' ?  routes.ZONES : routes.ADMIN_HOME)} />
       )}
       {loading && <Spinner message="Cargando..." />}
       {zoneApi && (
@@ -312,6 +312,5 @@ const styles = StyleSheet.create({
   labelText: {
     fontSize: 14,
     color: "#8e8e8e",
-    fontWeight: "600",
   },
 });

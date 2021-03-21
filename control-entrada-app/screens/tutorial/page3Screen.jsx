@@ -1,18 +1,18 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
-import { MainColor } from '../../assets/colors'
+import { MainColor } from "../../assets/colors";
 import { MainButton } from "../../components/mainButton.component";
-import { Ionicons } from '@expo/vector-icons'
+import { Ionicons } from "@expo/vector-icons";
 import { useDispatch } from "react-redux";
-import { routes } from '../../assets/routes'
+import { routes } from "../../assets/routes";
 export const Page3Screen = ({ navigation }) => {
-  const dispatch = useDispatch({ type: "TURN_OFF", payload: false });
+  const dispatch = useDispatch();
   return (
     <View style={styles.container}>
       <View style={styles.textContainer}>
-    <View>
-        <Ionicons name='ios-close' size={36} color={MainColor}/>
-    </View>
+        <View>
+          <Ionicons name="ios-close" size={36} color={MainColor} />
+        </View>
         <Text>Personal</Text>
         <Text>
           En Security puedes crear personal que te ayudara en la tarea de
@@ -28,16 +28,19 @@ export const Page3Screen = ({ navigation }) => {
           visitantes, cuando ingresan y cuando salen.
         </Text>
         <View style={styles.buttonContainer}>
-        <MainButton
+          <MainButton
             style={styles.button}
             title="Atras"
             onPress={() => navigation.navigate(routes.PAGE_2)}
             outline
           />
           <MainButton
-            style={[styles.button, {marginLeft: 20}]}
+            style={[styles.button, { marginLeft: 20 }]}
             title="Entiendo"
-            onPress={() => navigation.navigate(routes.ADMIN_HOME)}
+            onPress={
+              () => {dispatch({ type: "TURN_OFF", payload: false }),
+              navigation.navigate(routes.ADMIN_HOME)}
+            }
           />
         </View>
       </View>
@@ -46,25 +49,25 @@ export const Page3Screen = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: "rgba(0,0,0,.5)",
-        padding: 20,
-        justifyContent: "center",
-      },
-      textContainer: {
-        backgroundColor: "#fff",
-        borderRadius: 5,
-        padding: 10,
-      },
-      buttonContainer: {
-        width: "100%",
-        flexDirection: "row",
-        //backgroundColor: "red",
-        justifyContent: "flex-end",
-        marginTop: 50,
-      },
-      button: {
-        width: "30%",
-      },
+  container: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,.5)",
+    padding: 20,
+    justifyContent: "center",
+  },
+  textContainer: {
+    backgroundColor: "#fff",
+    borderRadius: 5,
+    padding: 10,
+  },
+  buttonContainer: {
+    width: "100%",
+    flexDirection: "row",
+    //backgroundColor: "red",
+    justifyContent: "flex-end",
+    marginTop: 50,
+  },
+  button: {
+    width: "30%",
+  },
 });

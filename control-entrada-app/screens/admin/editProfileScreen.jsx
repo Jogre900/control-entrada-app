@@ -48,7 +48,6 @@ const EditProfileScreen = ({
   const [modalProps, setModalProps] = useState(statusModalValues);
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [type, setType] = useState("");
 
   const profilePic = (uri, fileName, fileType, caption, changeImg) => {
     setFileValues((values) => ({ ...values, uri, fileName, fileType }));
@@ -165,7 +164,7 @@ const EditProfileScreen = ({
               <TouchableOpacity
                 style={styles.openCameraButton}
                 onPress={() => {
-                  setVisible(true), setType("profile");
+                  setVisible(true)
                 }}
               >
                 <Avatar.Icon name="ios-camera" size={32} color="#fff" />
@@ -231,7 +230,7 @@ const EditProfileScreen = ({
             status={visible}
             onClose={() => setVisible(false)}
             profile={profilePic}
-            type={type}
+            type="profile"
           />
           <View
             style={{

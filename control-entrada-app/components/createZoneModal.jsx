@@ -14,6 +14,7 @@ import { StatusModal } from "./statusModal";
 import { MainColor, ThirdColor, Danger } from "../assets/colors";
 import Modal from "react-native-modal";
 import { createInfo } from "../helpers";
+
 const timeState = {
   entry: false,
   exit: false,
@@ -24,6 +25,7 @@ const CreateZoneModal = ({
   onClose,
   create,
   addZones,
+  addDestiny,
   companyRedux,
 }) => {
   const [displayTime, setDisplayTime] = useState(timeState);
@@ -33,6 +35,7 @@ const CreateZoneModal = ({
   const [entranceTime, setEntranceTime] = useState(new Date());
   const [entry, setEntry] = useState(false);
   const [departureTime, setDepartureTime] = useState(new Date());
+  const [destinyName, setDestinyName] = useState();
   const [exit, setExit] = useState(false);
   const [show1, setShow1] = useState(false);
   const [show2, setShow2] = useState(false);
@@ -101,18 +104,17 @@ const CreateZoneModal = ({
       setLoading(false);
       return;
     }
-
-    const res = await createInfo(
-      "createZone",
-      companyRedux[0].id,
-      (data = {
-        zone: zoneName,
-        firsEntryTime: moment(entranceTime).format("HH:mm").toString(),
-        firsDepartureTime: moment(departureTime).format("HH:mm").toString(),
-      })
-    );
+    let data = {};
+    (data.zone = zoneName),
+      (data.firsEntryTime = moment(entranceTime).format("HH:mm").toString()),
+      (data.firsDepartureTime = moment(departureTime)
+        .format("HH:mm")
+        .toString()),
+      (data.destiny = destinyName);
+    const res = await createInfo("createZone", companyRedux[0].id, data);
     if (!res.error) {
       addZones(res.data);
+      addDestiny(res.data.Destinos)
       setCaption(""),
         setTimeCaption(""),
         setZoneName(""),
@@ -221,6 +223,20 @@ const CreateZoneModal = ({
             )}
           </View>
         </View>
+        <View>
+          <Text style={styles.labelText}>Agrega al menos 1 destino</Text>
+          <Input
+            title="Destino"
+            shape="flat"
+            icon="ios-pin"
+            //alignText="center"
+            returnKeyType="next"
+            onChangeText={(destiny) => {
+              setDestinyName(destiny);
+            }}
+            value={destinyName}
+          />
+        </View>
         <View style={{ marginVertical: 5 }}>
           <Text
             style={{
@@ -256,6 +272,12 @@ const mapDispatchToProps = (dispatch) => ({
       payload: zones,
     });
   },
+  addDestiny(destiny){
+    dispatch({
+      type: 'ADD_DESTINY',
+      payload: destiny
+    })
+  }
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(CreateZoneModal);
@@ -281,5 +303,9 @@ const styles = StyleSheet.create({
     color: "#262626",
     alignSelf: "center",
     letterSpacing: 0.5,
+  },
+  labelText: {
+    fontSize: 14,
+    color: "#8e8e8e",
   },
 });

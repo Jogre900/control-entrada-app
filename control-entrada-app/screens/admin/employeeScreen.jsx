@@ -13,13 +13,13 @@ import { API_PORT } from "../../config/index.js";
 import { TopNavigation } from "../../components/TopNavigation.component";
 import { EmployeeCard } from "../../components/employeeCard";
 import { NotFound } from "../../components/NotFound";
-import { routes } from '../../assets/routes'
-import { BackAction } from '../../helpers/ui/ui'
+import { FloatingBotton } from "../../components/floatingBotton";
+import { routes } from "../../assets/routes";
+import { BackAction } from "../../helpers/ui/ui";
 import { connect } from "react-redux";
 
-
 const EmployeeScreen = ({ navigation, employee, removeEmployee }) => {
-  console.log("EMPLOYEE FROM REDUX--",employee)
+  console.log("EMPLOYEE FROM REDUX--", employee);
   const [refreshing, setRefreshing] = useState(false);
 
   //REFRESH CONTROL
@@ -50,21 +50,24 @@ const EmployeeScreen = ({ navigation, employee, removeEmployee }) => {
   };
 
   return (
-    <View style={{flex:1}}>
-      <TopNavigation title="Empleados" leftControl={BackAction(navigation, routes.ADMIN_HOME)} />
-      <ScrollView
-        contentContainerStyle={styles.scrollView}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            colors={["red", "blue", "green"]}
-          />
-        }
-      >
-        <View>
-          {employee.length > 0 ? (
-            employee.map((item) => (
+    <View style={{ flex: 1 }}>
+      <TopNavigation
+        title="Empleados"
+        leftControl={BackAction(navigation, routes.ADMIN_HOME)}
+      />
+      {employee.length > 0 && (
+        <ScrollView
+          contentContainerStyle={styles.scrollView}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              colors={["red", "blue", "green"]}
+            />
+          }
+        >
+          <View>
+            {employee.map((item) => (
               <TouchableOpacity
                 style={styles.listItemBox}
                 onPress={() =>
@@ -72,14 +75,17 @@ const EmployeeScreen = ({ navigation, employee, removeEmployee }) => {
                 }
                 key={item.id}
               >
-                <EmployeeCard data={item} zone={false}/>
+                <EmployeeCard data={item} zone={false} />
               </TouchableOpacity>
-            ))
-          ) : (
-            <NotFound />
-          )}
-        </View>
-      </ScrollView>
+            ))}
+          </View>
+        </ScrollView>
+      )}
+      {employee.length <= 0 && <NotFound message='No hay empleados registrados'/>}
+      <FloatingBotton
+        icon="ios-add"
+        onPress={() => navigation.navigate(routes.CREATE_EMPLOYEE)}
+      />
     </View>
   );
 };

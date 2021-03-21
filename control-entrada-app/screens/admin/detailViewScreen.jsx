@@ -290,31 +290,7 @@ export const DetailViewScreen = ({ route, navigation }) => {
             </View>
           </View>
           <FormContainer title="Visita">
-            <View
-              style={
-                {
-                  //flexDirection: "row"
-                }
-              }
-            >
-              <Text style={styles.labelText}>Entrada: </Text>
-              <Text>{visit.descriptionEntry}</Text>
-            </View>
-            <View
-              style={
-                {
-                  //flexDirection: "row",
-                  //backgroundColor: 'green'
-                }
-              }
-            >
-              <Text style={styles.labelText}>Salida: </Text>
-              <Text>
-                {visit.descriptionDeparture
-                  ? visit.descriptionDeparture
-                  : "----"}
-              </Text>
-            </View>
+            
             <Image
               style={{
                 height: 250,
@@ -327,41 +303,30 @@ export const DetailViewScreen = ({ route, navigation }) => {
                 uri: `${API_PORT()}/public/imgs/${visit.Fotos[0].picture}`,
               }}
             />
-            <View style={{ flexDirection: "column", marginBottom: 5 }}>
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                }}
-              >
-                <Ionicons
-                  name="ios-timer"
-                  size={20}
-                  color="#8e8e8e"
-                  style={{ marginRight: 4 }}
-                />
-                <Text>
-                  {moment(visit.entryDate).format("D MMM YY, HH:mm a")}
-                </Text>
-              </View>
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  marginLeft: 0,
-                }}
-              >
-                <Ionicons
-                  name="ios-timer"
-                  size={20}
-                  color="#8e8e8e"
-                  style={{ marginRight: 4 }}
-                />
-                <Text>
-                  {moment(visit.departureDate).format("D MMM YY, HH:mm a")}
-                </Text>
-              </View>
+             <View style={{ flexDirection: "row" }}>
+              <Text style={styles.labelText}>Entrada: </Text>
+              <Text>{moment(visit.entryDate).format("D MMM YY, HH:mm a")}</Text>
             </View>
+            <Text style={styles.contentText}>
+              {visit.descriptionEntry ? visit.descriptionEntry : ""}
+            </Text>
+            {visit.entryDate !== visit.departureDate && (
+              <>
+                <View style={{ flexDirection: "row" }}>
+                  <Text style={styles.labelText}>Salida: </Text>
+                  <Text>
+                    {moment(visit.departureDate).format("D MMM YY, HH:mm a")}
+                  </Text>
+                </View>
+                <>
+                  <Text>
+                    {visit.descriptionDeparture
+                      ? visit.descriptionDeparture
+                      : "----"}
+                  </Text>
+                </>
+              </>
+            )}
           </FormContainer>
           <FormContainer title="Seguridad">
             <Avatar.Picture

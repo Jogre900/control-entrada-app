@@ -64,7 +64,6 @@ const HomeAdminScreen = ({
   };
   //REQUEST ALL DESTINY BY COMPANY
   const requestAllDestiny = async () => {
-  
     setLoading(true);
 
     const res = await fetchDestiny(company.id);
@@ -80,14 +79,13 @@ const HomeAdminScreen = ({
     if (company) {
       setLoading(true);
       const res = await fetchAllEmployee(company.id);
-
+      console.log(res.data)
       if (res.data.data.length > 0) {
+        console.log("si hay empleados")
         res.data.data.map((e) => {
           uzArray.push(e.userZone[0]);
         });
-        uzArray.map(
-          (uz) => (console.log("userZId------", uz.id), employee.push(uz.id))
-        );
+        uzArray.map((uz) => employee.push(uz.id));
         saveEmployee(res.data.data);
 
         if (employee.length > 0) {
@@ -97,11 +95,11 @@ const HomeAdminScreen = ({
             saveTodayVisits(res.data.data);
             setVisits(res.data.data);
             setLoading(false);
-          } else{
+          } else {
             setHasVisit(false);
           }
         }
-      }else{
+      } else {
         setHasVisit(false);
       }
     }
@@ -125,11 +123,11 @@ const HomeAdminScreen = ({
           saveTodayVisits(res.data.data);
           setVisits(res.data.data);
           setLoading(false);
-        } else{
+        } else {
           setHasVisit(false);
         }
       }
-    }else {
+    } else {
       setHasVisit(false);
     }
   };

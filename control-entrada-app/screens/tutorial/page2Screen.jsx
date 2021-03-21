@@ -4,7 +4,6 @@ import { MainButton } from "../../components/mainButton.component";
 import { useDispatch } from "react-redux";
 import { routes } from '../../assets/routes'
 export const Page2Screen = ({ navigation }) => {
-  const dispatch = useDispatch({ type: "TURN_OFF", payload: false });
   return (
     <View style={styles.container}>
       <View style={styles.textContainer}>

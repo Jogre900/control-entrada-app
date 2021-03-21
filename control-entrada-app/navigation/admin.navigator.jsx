@@ -44,7 +44,8 @@ function AdminNav() {
       <Stack.Screen name={routes.NOTIFICATION} component={NotificationScreen} />
       <Stack.Screen name={routes.EDIT_PROFILE} component={EditProfileScreen} options={options} />
       <Stack.Screen name={routes.ZONE_DETAIL} component={ZoneDetailScreen} options={options} />
-      <Stack.Screen name="asign_employee" component={AsignEmployee} />
+      {/* <Stack.Screen name="asign_employee" component={AsignEmployee} /> */}
+      <Stack.Screen name={routes.CREATE_EMPLOYEE} component={CreateEmployeScreen} options={options}/>
       <Stack.Screen name={routes.EMPLOYEE_DETAIL} component={EmployeeDetailScreen} options={options} />
     </Stack.Navigator>
   );
@@ -52,10 +53,8 @@ function AdminNav() {
 
 const adminDrawerData = [
   { label: "Inicio", route: routes.ADMIN_HOME, icon: "ios-home" },
-  //{ label: "Empresa", route: "Company", icon: "ios-business" },
   { label: "Historial", route: routes.HISTORIAL, icon: "ios-calendar" },
   { label: "Empleados", route: routes.EMPLOYEE, icon: "ios-people" },
-  { label: "Crear Empleado", route: routes.CREATE_EMPLOYEE, icon: "ios-person-add" },
   { label: "Zonas", route: routes.ZONES, icon: "md-globe" },
   { label: "Destinos", route: routes.DESTINY, icon: "ios-pin" },
   { label: "Tutorial", route: routes.TUTORIAL, icon: "md-document", params: true },
@@ -155,7 +154,7 @@ const AdminNavigator = () => {
       <drawer.Screen name={routes.PROFILE} component={PerfilScreen} />
       {/* <drawer.Screen name="Company" component={CompanyScreen} /> */}
       <drawer.Screen name={routes.HISTORIAL} component={HistorialScreen} />
-      {privilege === "Admin" && <drawer.Screen name={routes.CREATE_EMPLOYEE} component={CreateEmployeScreen} />}
+      
       <drawer.Screen name={routes.EMPLOYEE} component={EmployeeScreen} />
       {privilege === "Admin" ? <drawer.Screen name={routes.ZONES} component={ZonasScreen} /> : <drawer.Screen name={routes.ZONE_DETAIL} component={ZoneDetailScreen} />}
       <drawer.Screen name={routes.DESTINY} component={DestinyScreen} />
