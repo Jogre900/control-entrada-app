@@ -61,15 +61,13 @@ const CreateEmployeScreen = ({
     //zoneId: zonesRedux.length ? zonesRedux[0].id : null,
     companyId: companyRedux[0].id,
   };
-  console.log("zones from redux--", zonesRedux.length);
+  const zones = zonesRedux;
   console.log("zones from redux--", zonesRedux);
   const [alertModal, setAlertModal] = useState(alertModalValues);
   const [statusModalProps, setStatusModalProps] = useState(statusModalValues);
   const [employeeData, setEmployeeData] = useState(employeeValues);
   const [privilege, setPrivilege] = useState("Supervisor");
-  const [zoneId, setZoneId] = useState(
-    zonesRedux.length > 0 && zonesRedux[0].id
-  );
+  const [zoneId, setZoneId] = useState(zonesRedux.length && zones[0].id);
 
   const [caption, setCaption] = useState("");
   const [timeCaption, setTimeCaption] = useState("");
@@ -165,72 +163,72 @@ const CreateEmployeScreen = ({
     //   setVisible(false);
     //   return;
     // }
-    console.log("zoneId on CREATE SCREEN--", zoneId);
+    console.log("zoneId on CREATE SCREEN--", zones[0].id);
 
     employeeData.privilege = privilege;
     employeeData.zoneId = zoneId;
-    console.log(employeeData)
-    // try {
-    //   if (privilege === "Supervisor") {
-    //     const res = await createSupervisor(employeeData);
-    //     console.log("CREATE EMPLOYEE----", res.data);
-    //     if (!res.data.error) {
-    //       console.log(res.data.data);
-    //       addEmployee(res.data.data);
-    //       setVisible(false);
-    //       setStatusModalProps((values) => ({
-    //         ...values,
-    //         visible: true,
-    //         status: true,
-    //         message: res.data.msg,
-    //       }));
-    //       //setCreate(true);
-    //       //setSaving(false);
-    //     } else {
-    //       setVisible(false);
-    //       setStatusModalProps((values) => ({
-    //         ...values,
-    //         visible: true,
-    //         status: false,
-    //         message: res.data.msg,
-    //       }));
-    //     }
-    //   } else {
-    //     const res = await createWatchman(employeeData);
-    //     if (!res.data.error) {
-    //       console.log(res.data.data);
-    //       addEmployee(res.data.data);
+    console.log(employeeData);
+    try {
+      if (privilege === "Supervisor") {
+        const res = await createSupervisor(employeeData);
+        console.log("CREATE EMPLOYEE----", res.data);
+        if (!res.data.error) {
+          console.log(res.data.data);
+          addEmployee(res.data.data);
+          setVisible(false);
+          setStatusModalProps((values) => ({
+            ...values,
+            visible: true,
+            status: true,
+            message: res.data.msg,
+          }));
+          //setCreate(true);
+          //setSaving(false);
+        } else {
+          setVisible(false);
+          setStatusModalProps((values) => ({
+            ...values,
+            visible: true,
+            status: false,
+            message: res.data.msg,
+          }));
+        }
+      } else {
+        const res = await createWatchman(employeeData);
+        if (!res.data.error) {
+          console.log(res.data.data);
+          addEmployee(res.data.data);
 
-    //       setVisible(false);
-    //       setStatusModalProps((values) => ({
-    //         ...values,
-    //         visible: true,
-    //         status: true,
-    //         message: res.data.msg,
-    //       }));
+          setVisible(false);
+          setStatusModalProps((values) => ({
+            ...values,
+            visible: true,
+            status: true,
+            message: res.data.msg,
+          }));
 
-    //       setEntryHolder(false);
-    //       setDepartureHolder(false);
-    //       //setSaving(false);
-    //     } else {
-    //       setVisible(false);
-    //       setStatusModalProps((values) => ({
-    //         ...values,
-    //         visible: true,
-    //         status: false,
-    //         message: res.data.msg,
-    //       }));
-    //     }
-    //   }
-    // } catch (error) {
-    //   setVisible(false);
-    //   setStatusModalProps((values) => ({
-    //     ...values,
-    //     visible: true,
-    //     status: false,
-    //     message: error,
-    //   }));
-    // }
+          setEntryHolder(false);
+          setDepartureHolder(false);
+          //setSaving(false);
+        } else {
+          setVisible(false);
+          setStatusModalProps((values) => ({
+            ...values,
+            visible: true,
+            status: false,
+            message: res.data.msg,
+          }));
+        }
+      }
+    } catch (error) {
+      setVisible(false);
+      setStatusModalProps((values) => ({
+        ...values,
+        visible: true,
+        status: false,
+        message: error,
+      }));
+    }
   };
 
   // useFocusEffect(
@@ -250,240 +248,239 @@ const CreateEmployeScreen = ({
   // );
 
   useEffect(() => {
-    !zonesRedux.length &&
+    if (!zonesRedux.length) {
       setAlertModal((values) => ({
         ...values,
         visible: true,
         message:
           "Parece que aun no tienes zonas creadas, para registrar personal crea al menos una.",
-          route: routes.EMPLOYEE
+        route: routes.EMPLOYEE,
       }));
+    }
   }, []);
 
   return (
-    <>
-    <Text>Zone id from redux{zonesRedux.length && zonesRedux[0].id}</Text>
-    </>
-    // <View style={{ flex: 1 }}>
-    //   <TopNavigation
-    //     title="Crear Empleado"
-    //     leftControl={BackAction(navigation, routes.ADMIN_HOME)}
-    //   />
-    //   <ScrollView contentContainerStyle={styles.container}>
-    //     <View
-    //       style={{
-    //         alignItems: "center",
-    //       }}
-    //     >
-    //       <FormContainer title="Datos Personales">
-    //         <View style={styles.pictureContainer}>
-    //           {employeeData.uri ? (
-    //             <Avatar.Picture size={120} uri={employeeData.uri} />
-    //           ) : (
-    //             <Avatar.Icon size={32} name="md-photos" color="#8e8e8e" />
-    //           )}
-    //           <TouchableOpacity
-    //             onPress={() => {
-    //               setCamera(true);
-    //             }}
-    //             style={styles.openCameraButton}
-    //           >
-    //             <Ionicons name="ios-camera" size={32} color="#fff" />
-    //           </TouchableOpacity>
-    //         </View>
-    //         <Input
-    //           style={{ borderColor: "black", marginBottom: 10 }}
-    //           styleInput={{ color: "black" }}
-    //           title="Nombre"
-    //           icon="ios-person"
-    //           returnKeyType="next"
-    //           shape="flat"
-    //           onChangeText={(name) => {
-    //             setEmployeeData((values) => ({ ...values, name })),
-    //               setCaption("");
-    //           }}
-    //         />
-    //         <Input
-    //           style={{ borderColor: "black", marginBottom: 10 }}
-    //           styleInput={{ color: "black" }}
-    //           icon="ios-people"
-    //           title="Apellido"
-    //           shape="flat"
-    //           returnKeyType="next"
-    //           onChangeText={(lastName) => {
-    //             setEmployeeData((values) => ({ ...values, lastName })),
-    //               setCaption("");
-    //           }}
-    //         />
-    //         <Input
-    //           style={{ borderColor: "black", marginBottom: 10 }}
-    //           styleInput={{ color: "black" }}
-    //           title="DNI"
-    //           icon="ios-card"
-    //           shape="flat"
-    //           returnKeyType="next"
-    //           onChangeText={(dni) => {
-    //             setEmployeeData((values) => ({ ...values, dni })),
-    //               setCaption("");
-    //           }}
-    //         />
-    //         <Input
-    //           style={{ borderColor: "black", marginBottom: 10 }}
-    //           styleInput={{ color: "black" }}
-    //           title="Email"
-    //           icon="ios-mail"
-    //           shape="flat"
-    //           returnKeyType="next"
-    //           onChangeText={(email) => {
-    //             setEmployeeData((values) => ({ ...values, email })),
-    //               setCaption("");
-    //           }}
-    //         />
-    //         <View>
-    //           <Text
-    //             style={{
-    //               color: Danger,
-    //               fontSize: 15,
-    //               fontWeight: "600",
-    //             }}
-    //           >
-    //             {caption}
-    //           </Text>
-    //         </View>
-    //       </FormContainer>
+    <View style={{ flex: 1 }}>
+      <TopNavigation
+        title="Crear Empleado"
+        leftControl={BackAction(navigation, routes.ADMIN_HOME)}
+      />
+      <ScrollView contentContainerStyle={styles.container}>
+        <View
+          style={{
+            alignItems: "center",
+          }}
+        >
+          <FormContainer title="Datos Personales">
+            <View style={styles.pictureContainer}>
+              {employeeData.uri ? (
+                <Avatar.Picture size={120} uri={employeeData.uri} />
+              ) : (
+                <Avatar.Icon size={32} name="md-photos" color="#8e8e8e" />
+              )}
+              <TouchableOpacity
+                onPress={() => {
+                  setCamera(true);
+                }}
+                style={styles.openCameraButton}
+              >
+                <Ionicons name="ios-camera" size={32} color="#fff" />
+              </TouchableOpacity>
+            </View>
+            <Input
+              style={{ borderColor: "black", marginBottom: 10 }}
+              styleInput={{ color: "black" }}
+              title="Nombre"
+              icon="ios-person"
+              returnKeyType="next"
+              shape="flat"
+              onChangeText={(name) => {
+                setEmployeeData((values) => ({ ...values, name })),
+                  setCaption("");
+              }}
+            />
+            <Input
+              style={{ borderColor: "black", marginBottom: 10 }}
+              styleInput={{ color: "black" }}
+              icon="ios-people"
+              title="Apellido"
+              shape="flat"
+              returnKeyType="next"
+              onChangeText={(lastName) => {
+                setEmployeeData((values) => ({ ...values, lastName })),
+                  setCaption("");
+              }}
+            />
+            <Input
+              style={{ borderColor: "black", marginBottom: 10 }}
+              styleInput={{ color: "black" }}
+              title="DNI"
+              icon="ios-card"
+              shape="flat"
+              returnKeyType="next"
+              onChangeText={(dni) => {
+                setEmployeeData((values) => ({ ...values, dni })),
+                  setCaption("");
+              }}
+            />
+            <Input
+              style={{ borderColor: "black", marginBottom: 10 }}
+              styleInput={{ color: "black" }}
+              title="Email"
+              icon="ios-mail"
+              shape="flat"
+              returnKeyType="next"
+              onChangeText={(email) => {
+                setEmployeeData((values) => ({ ...values, email })),
+                  setCaption("");
+              }}
+            />
+            <View>
+              <Text
+                style={{
+                  color: Danger,
+                  fontSize: 15,
+                  fontWeight: "600",
+                }}
+              >
+                {caption}
+              </Text>
+            </View>
+          </FormContainer>
 
-    //       {/* ----ROLL---- */}
-    //       <FormContainer title="Tipo Usuario">
-    //         <Picker
-    //           mode="dropdown"
-    //           selectedValue={privilege}
-    //           onValueChange={(value) => setPrivilege(value)}
-    //         >
-    //           <Picker.Item label={"Supervisor"} value={"Supervisor"} />
-    //           <Picker.Item label={"Vigilante"} value={"Watchman"} />
-    //         </Picker>
-    //         <View>
-    //           <Text>Zonas</Text>
-    //           {zonesRedux.length ? (
-    //             <Picker
-    //               mode="dropdown"
-    //               selectedValue={zoneId}
-    //               onValueChange={(value) => setZoneId(value)}
-    //             >
-    //               {zonesRedux.map((item) => (
-    //                 <Picker.Item
-    //                   label={item.zone}
-    //                   value={item.id}
-    //                   key={item.id}
-    //                 />
-    //               ))}
-    //             </Picker>
-    //           ) : null}
-    //         </View>
-    //       </FormContainer>
+          {/* ----ROLL---- */}
+          <FormContainer title="Tipo Usuario">
+            <Picker
+              mode="dropdown"
+              selectedValue={privilege}
+              onValueChange={(value) => setPrivilege(value)}
+            >
+              <Picker.Item label={"Supervisor"} value={"Supervisor"} />
+              <Picker.Item label={"Vigilante"} value={"Watchman"} />
+            </Picker>
+            <View>
+              <Text>Zonas</Text>
+              <Picker
+                mode="dropdown"
+                selectedValue={zoneId}
+                onValueChange={(value) => setZoneId(value)}
+              >
+                {zonesRedux.length
+                  ? zonesRedux.map((item) => (
+                      <Picker.Item
+                        label={item.zone}
+                        value={item.id}
+                        key={item.id}
+                      />
+                    ))
+                  : null}
+              </Picker>
+            </View>
+          </FormContainer>
 
-    //       <FormContainer title="Horario">
-    //         <View
-    //           style={{
-    //             flexDirection: "row",
-    //             justifyContent: "space-around",
-    //           }}
-    //         >
-    //           <View style={styles.pickerButtonContainer}>
-    //             <MainButton
-    //               style={styles.pickerButton}
-    //               title="Inicio Contrato"
-    //               onPress={() => showDatepicker()}
-    //             />
-    //             <Text style={{ alignSelf: "center" }}>
-    //               {entryHolder
-    //                 ? moment(employeeData.assignationDate).format("D MMM YYYY")
-    //                 : "----"}
-    //             </Text>
-    //           </View>
-    //           <View style={styles.pickerButtonContainer}>
-    //             <MainButton
-    //               style={styles.pickerButton}
-    //               title="Fin Contrato"
-    //               onPress={() => showDatepicker2()}
-    //             />
-    //             <Text style={{ alignSelf: "center" }}>
-    //               {departureHolder
-    //                 ? moment(employeeData.changeTurnDate).format("D MMM YYYY")
-    //                 : "----"}
-    //             </Text>
-    //           </View>
-    //         </View>
-    //         {show && (
-    //           <View>
-    //             <DateTimePicker
-    //               testID="dateTimePicker1"
-    //               value={employeeData.assignationDate}
-    //               mode={mode}
-    //               is24Hour={true}
-    //               display="default"
-    //               onChange={onChange}
-    //             />
-    //           </View>
-    //         )}
+          <FormContainer title="Horario">
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-around",
+              }}
+            >
+              <View style={styles.pickerButtonContainer}>
+                <MainButton
+                  style={styles.pickerButton}
+                  title="Inicio Contrato"
+                  onPress={() => showDatepicker()}
+                />
+                <Text style={{ alignSelf: "center" }}>
+                  {entryHolder
+                    ? moment(employeeData.assignationDate).format("D MMM YYYY")
+                    : "----"}
+                </Text>
+              </View>
+              <View style={styles.pickerButtonContainer}>
+                <MainButton
+                  style={styles.pickerButton}
+                  title="Fin Contrato"
+                  onPress={() => showDatepicker2()}
+                />
+                <Text style={{ alignSelf: "center" }}>
+                  {departureHolder
+                    ? moment(employeeData.changeTurnDate).format("D MMM YYYY")
+                    : "----"}
+                </Text>
+              </View>
+            </View>
+            {show && (
+              <View>
+                <DateTimePicker
+                  testID="dateTimePicker1"
+                  value={employeeData.assignationDate}
+                  mode={mode}
+                  is24Hour={true}
+                  display="default"
+                  onChange={onChange}
+                />
+              </View>
+            )}
 
-    //         {show2 && (
-    //           <DateTimePicker
-    //             value={employeeData.changeTurnDate}
-    //             mode={"date"}
-    //             is24Hour={true}
-    //             display="default"
-    //             onChange={onChange2}
-    //           />
-    //         )}
-    //         <View>
-    //           <Text
-    //             style={{
-    //               color: Danger,
-    //               fontSize: 15,
-    //               fontWeight: "600",
-    //             }}
-    //           >
-    //             {timeCaption}
-    //           </Text>
-    //         </View>
-    //       </FormContainer>
-    //       <View
-    //         style={{
-    //           width: "90%",
-    //         }}
-    //       >
-    //         <MainButton
-    //           style={{ marginVertical: 5 }}
-    //           title="Crear Empleado"
-    //           onPress={() => {
-    //             createEmploye();
-    //           }}
-    //         />
-    //       </View>
-    //     </View>
-    //   </ScrollView>
-    //   <CameraModal
-    //     status={camera}
-    //     onClose={() => setCamera(false)}
-    //     profile={profilePic}
-    //     type={"profile"}
-    //   />
-    //   <MessageModal
-    //     {...alertModal}
-    //     onClose={() =>
-    //       setAlertModal((values) => ({ ...values, visible: false }))
-    //     }
-    //     navigation={navigation}
-    //   />
-    //   <LoadingModal visible={visible} message="Guardando..." />
-    //   <StatusModal
-    //     {...statusModalProps}
-    //     onClose={() =>
-    //       setStatusModalProps((values) => ({ ...values, visible: false }))
-    //     }
-    //   />
-    // </View>
+            {show2 && (
+              <DateTimePicker
+                value={employeeData.changeTurnDate}
+                mode={"date"}
+                is24Hour={true}
+                display="default"
+                onChange={onChange2}
+              />
+            )}
+            <View>
+              <Text
+                style={{
+                  color: Danger,
+                  fontSize: 15,
+                  fontWeight: "600",
+                }}
+              >
+                {timeCaption}
+              </Text>
+            </View>
+          </FormContainer>
+          <View
+            style={{
+              width: "90%",
+            }}
+          >
+            <MainButton
+              style={{ marginVertical: 5 }}
+              title="Crear Empleado"
+              onPress={() => {
+                createEmploye();
+              }}
+            />
+          </View>
+        </View>
+      </ScrollView>
+      <CameraModal
+        status={camera}
+        onClose={() => setCamera(false)}
+        profile={profilePic}
+        type={"profile"}
+      />
+
+      <LoadingModal visible={visible} message="Guardando..." />
+      <StatusModal
+        {...statusModalProps}
+        onClose={() =>
+          setStatusModalProps((values) => ({ ...values, visible: false }))
+        }
+      />
+      <MessageModal
+        {...alertModal}
+        onClose={() =>
+          setAlertModal((values) => ({ ...values, visible: false }))
+        }
+        navigation={navigation}
+      />
+    </View>
   );
 };
 

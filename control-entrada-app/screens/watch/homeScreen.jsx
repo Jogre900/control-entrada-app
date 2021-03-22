@@ -81,7 +81,7 @@ export const HomeScreen = ({navigation}) => {
     <View style={styles.container}>
       <TopNavigation
         title="Control de visitas"
-        leftControl={leftControls}
+        leftControl={leftControls()}
         rightControl={goToProfile()}
       />
       <View style={styles.contentContainer}>

@@ -37,7 +37,7 @@ export const EmployeeCard = ({ data, key, zone }) => {
               {data.userZone[0]?.Zona.zone}
             </Text>
           )}
-          <Text style={styles.labelText}>Asignado:</Text>
+          <Text style={styles.labelText}>Asignado</Text>
         </View>
         {/* <Text>Cambio de Turno: {moment(data.changeTurnDate).format('D MMM YYYY')}</Text> */}
       </View>
