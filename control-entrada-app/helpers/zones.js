@@ -33,7 +33,14 @@ export async function fetchZoneById(id) {
   //DESTINY WITH MAX NUMBER OF VISITS
   export async function destinyMaxVisit(zoneId){
     console.log(zoneId)
-    const res = await axios.get(`${API_PORT()}/api/destinyMaxVisit/${zoneId}`)
+    const res = await axios({
+      method: 'POST',
+      url: `${API_PORT()}/api/destinyMaxVisit`,
+      data: zoneId
+    })
+    
+    
+    //get(`${API_PORT()}/api/destinyMaxVisit` , zoneId)
     if(res){
       return res
     }

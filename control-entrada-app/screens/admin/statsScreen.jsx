@@ -5,16 +5,20 @@ import { TopNavigation } from "../../components/TopNavigation.component";
 import { routes } from "../../assets/routes";
 import { BackAction } from "../../helpers/ui/ui";
 import Avatar from "../../components/avatar.component";
+import { ThreeAvatar } from '../../components/threeAvatar'
 import { useSelector } from "react-redux";
 import { API_PORT } from "../../config";
+import { Ionicons } from '@expo/vector-icons'
+
 export const StatsScreen = ({ navigation }) => {
   const [zoneMax, setZoneMax] = useState();
   const [destinyMax, setDestinyMax] = useState();
   const [visitMax, setVisitMax] = useState();
+  const [photos, setPhotos] = useState()
   const company = useSelector((state) => state.profile.company);
   const zones = useSelector((state) => state.zones.zones);
   const visits = useSelector((state) => state.visits.today);
-  console.log(visits);
+  //console.log(visits);
   let zonesId = [];
   zones.map(({ id }) => zonesId.push(id));
   const fetchZoneMax = async () => {
@@ -22,7 +26,7 @@ export const StatsScreen = ({ navigation }) => {
       const res = await helpers.zoneMaxVisit(company[0].id);
       //console.log("res zone", res.data)
       if (res.data.error) {
-        console.log(res.data.msg);
+        //console.log(res.data.msg);
         return;
       } else {
         setZoneMax(res.data.data);
@@ -48,15 +52,19 @@ export const StatsScreen = ({ navigation }) => {
     try {
       const res = await helpers.maxUserVisit(company[0].id);
       if (res.data.error) {
-        console.log(res.data.msg);
+        //console.log(res.data.msg);
       } else {
-        setVisitMax(res.data.data);
+        setVisitMax(res.data.data); 
       }
     } catch (error) {
       console.log(error);
     }
   };
-
+  useEffect(() => {
+    let pics = []
+    visits.filter((_, index) => index < 3).map(({Visitante}) => pics.push(Visitante.picture))
+    setPhotos(pics)
+  }, [visits]);
   useEffect(() => {
     fetchZoneMax();
   }, []);
@@ -72,21 +80,23 @@ export const StatsScreen = ({ navigation }) => {
         title="Datos Generales"
         leftControl={BackAction(navigation, routes.ADMIN_HOME)}
       />
-      <TouchableOpacity>
+      <TouchableOpacity onPress={() => navigation.navigate(routes.HISTORIAL)}>
         <Text>Visitas totales registradas</Text>
+        <Ionicons name='ios-eye' size={32} color='#8e8e8e'/>
         <Text>{visits.length ? visits.length : "----"}</Text>
-        {visits
-          .filter((_, index) => index < 3)
-          .map((elem) => {
-            return (
-              <Avatar.Picture
-                size={32}
-                uri={`${API_PORT()}/public/imgs/${elem.Visitante.picture}`}
-              />
-            );
-          })}
+          {
+            photos &&
+            <ThreeAvatar data={photos}/>
+          }
       </TouchableOpacity>
-      <TouchableOpacity>
+      <TouchableOpacity
+        onPress={
+          visitMax
+            ? () =>
+                navigation.navigate(routes.EMPLOYEE_DETAIL, { id: visitMax.id })
+            : null
+        }
+      >
         <Text>Seguridad con mas registro de entradas</Text>
         {visitMax && (
           <>
@@ -103,7 +113,14 @@ export const StatsScreen = ({ navigation }) => {
           </>
         )}
       </TouchableOpacity>
-      <TouchableOpacity>
+      <TouchableOpacity
+        onPress={
+          zoneMax
+            ? () =>
+                navigation.navigate(routes.ZONE_DETAIL, { zoneId: zoneMax.id })
+            : null
+        }
+      >
         <Text>Zona con mas visitas</Text>
         {zoneMax && (
           <Text>

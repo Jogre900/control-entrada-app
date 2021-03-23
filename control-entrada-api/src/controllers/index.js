@@ -557,8 +557,8 @@ password: "123456,
       data: null,
       token: null
     };
-    const { zoneId } = req.params;
-    console.log(zoneId);
+    const  zoneId  = req.body;
+    console.log(req.body);
     try {
       const destiny = await models.Destination.findAll({
         where: {
@@ -1886,6 +1886,53 @@ password: "123456,
             ]
           }
         );
+        //INCREMENT USERCOMPANY
+        const user = await models.User.findOne({
+          include: {
+            model: models.UserZone,
+            as: "userZone",
+            where: {
+              id: userZoneId
+            }
+          }
+        });
+        const userId = user.dataValues.id;
+        const userCompany = await models.UserCompany.findOne({
+          where: {
+            userId
+          }
+        });
+        console.log(userCompany.dataValues);
+        await userCompany.increment("visits");
+        await userCompany.reload();
+        await userCompany.save();
+        //console.log(userCompanyU)
+
+        //INCREMENT ZONE
+        const zone = await models.Zone.findOne({
+          include: {
+            model: models.UserZone,
+            as: "encargado_zona",
+            where: {
+              id: userZoneId
+            }
+          }
+        });
+        //console.log("ZONE DATAVA---",zone.dataValues);
+
+        await zone.increment("visits");
+        await zone.reload();
+        await zone.save();
+        //INCREMENT DESTINY
+        console.log("DESTINY ID---", destinyId);
+        const destinyU = await models.Destination.findOne({
+          where: { id: destinyId }
+        });
+        console.log("DESTINY FIND IT--", destinyU.dataValues);
+        await destinyU.increment("visits");
+        await destinyU.reload();
+        await destinyU.save();
+
         RESPONSE.error = false;
         RESPONSE.msg = "Registro Exitoso";
         RESPONSE.data = visits;
@@ -1909,7 +1956,8 @@ password: "123456,
     try {
       const maxVisits = await models.UserCompany.findOne({
         where: {
-          companyId
+          companyId,
+          privilege: 'Watchman'
         },
         attributes: [[fn("max", col("visits")), "visits"]],
         //group: ['id'],

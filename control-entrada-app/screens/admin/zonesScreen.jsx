@@ -62,16 +62,6 @@ const ZonasScreen = ({
     }).start();
   };
 
-  const goBackAction = () => {
-    return (
-      <View>
-        <TouchableOpacity onPress={() => navigation.navigate("admin-home")}>
-          <Ionicons name="ios-arrow-back" size={28} color="white" />
-        </TouchableOpacity>
-      </View>
-    );
-  };
-
   const onLong = (id) => {
     if (selectItem.includes(id)) {
       setSeletedItem((value) => value.filter((elem) => elem !== id));

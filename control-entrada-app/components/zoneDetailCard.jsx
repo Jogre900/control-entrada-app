@@ -69,7 +69,7 @@ export const ZoneDetailCard = ({ data }) => {
               alignItems: "center",
             }}
           >
-            <Text style={styles.contentText}>25</Text>
+            <Text style={styles.contentText}>{data.visits ? data.visits : '0'}</Text>
             <Text style={styles.labelText}>Entradas</Text>
           </View>
         </View>

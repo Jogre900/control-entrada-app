@@ -11,7 +11,7 @@ const iconProps = {
 };
 
 export const DestinyCard = ({ data, selected }) => {
-  const { name } = data;
+  const { name, visits } = data;
   return (
     <View
       style={[
@@ -22,58 +22,28 @@ export const DestinyCard = ({ data, selected }) => {
       <View
         style={{
           flexDirection: "row",
+        }}
+      >
+        <Ionicons name="ios-pin" size={28} color="grey" style={{marginRight: 10}}/>
+        <Text
+          style={{
+            fontSize: 16,
+            fontWeight: "normal",
+            lineHeight: 28,
+          }}
+        >
+          {name}
+        </Text>
+      </View>
+      <View
+        style={{
+          justifyContent: "center",
           alignItems: "center",
         }}
       >
-        <Ionicons name="ios-pin" size={28} color="grey" />
-        <View
-          style={{
-            marginLeft: 15,
-            //backgroundColor: 'red',
-            //width: '100%',
-            //overflow: 'hidden'
-          }}
-        >
-          <Text
-            style={{
-              fontSize: 16,
-              fontWeight: "normal",
-              lineHeight: 28,
-            }}
-          >
-            {name}
-          </Text>
-          {/* <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              //backgroundColor: "beige",
-            }}
-          >
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                //marginHorizontal: 10
-              }}
-            >
-              <Ionicons {...iconProps} />
-              <Text style={{}}>{firsEntryTime}</Text>
-            </View>
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                marginHorizontal: 10,
-              }}
-            >
-              <Ionicons {...iconProps} />
-              <Text style={{}}>{firsDepartureTime}</Text>
-            </View>
-          </View> */}
-        </View>
+        <Text style={styles.contentText}>{visits ? visits : "0"}</Text>
+        <Text style={styles.labelText}>Entradas</Text>
       </View>
-      {/* <Ionicons name="ios-arrow-forward" size={26} color="grey" /> */}
     </View>
   );
 };
@@ -89,6 +59,14 @@ const styles = StyleSheet.create({
     borderColor: "grey",
     marginVertical: 4,
     //borderRadius: 5,
-    backgroundColor: "#09f",
+  },
+  contentText: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#262626",
+  },
+  labelText: {
+    fontSize: 14,
+    color: "#8e8e8e",
   },
 });

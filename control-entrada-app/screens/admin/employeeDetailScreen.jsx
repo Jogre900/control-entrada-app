@@ -22,7 +22,7 @@ import moment from "moment";
 export const EmployeeDetailScreen = ({ route, navigation }) => {
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState();
-  //console.log("DETAIL EMPLOYEE-----", route.params);
+  console.log("DETAIL EMPLOYEE-----", route.params);
   const { id } = route.params;
 
   const requestUser = async () => {
@@ -88,7 +88,7 @@ export const EmployeeDetailScreen = ({ route, navigation }) => {
                   alignItems: "center",
                 }}
               >
-                <Text style={styles.contentText}>0</Text>
+                <Text style={styles.contentText}>{user.UserCompany.length ? user.UserCompany[0].visits : '0'}</Text>
                 <Text style={styles.labelText}>Entradas</Text>
               </View>
             </View>

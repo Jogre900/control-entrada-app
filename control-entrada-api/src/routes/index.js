@@ -75,7 +75,7 @@ router.delete("/zone", Controllers.deleteZone);
 router.post("/createDestiny/:id", Controllers.createDestiny);
 router.get("/findDestiny/:id", Controllers.findDestinyByZone);
 router.get("/findAllDestiny/:id", Controllers.findAllDestiny)
-router.get("/destinyMaxVisit/:zoneId", Controllers.findDestinyMaxVisit)
+router.post("/destinyMaxVisit", Controllers.findDestinyMaxVisit)
 router.delete("/deleteDestiny", Controllers.deleteDestiny);
 //ROUTAS PARA BORRAR
 router.post("/createEmployee", Controllers.createEmployee);
