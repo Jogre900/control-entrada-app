@@ -103,3 +103,10 @@ export async function updateVisit(id, data, token) {
     console.log(error.message);
   }
 }
+//USER WITH MAX VISIT REGISTER
+export async function maxUserVisit(companyId){
+  const res = await axios.get(`${API_PORT()}/api/userCompany/${companyId}`)
+  if(res){
+    return res
+  }
+}

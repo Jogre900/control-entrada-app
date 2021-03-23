@@ -37,7 +37,7 @@ module.exports = (sequelize, DataTypes) => {
         defaultValue: true
       },
       visits: {
-        type: DataTypes.STRING,
+        type: DataTypes.INTEGER,
         allowNull: false
       }
     },

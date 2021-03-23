@@ -2,13 +2,14 @@ import { useState } from "react";
 import axios from "axios";
 import { API_PORT } from "../config/index";
 import { createCitizen, findCitizendni } from "./citizen";
-import { fetchAllZones,fetchZoneById } from './zones'
+import { fetchAllZones,fetchZoneById, zoneMaxVisit, destinyMaxVisit } from './zones'
 import {
   createVisit,
   findVisitdni,
   findVisitUser,
   updateVisit,
-  fetchTodayVisist
+  fetchTodayVisist,
+  maxUserVisit
 } from "./visit";
 
 export const helpers = {
@@ -19,8 +20,11 @@ export const helpers = {
   findVisitdni,
   findVisitUser,
   updateVisit,
+  maxUserVisit,
   fetchZoneById,
-  fetchAllZones
+  fetchAllZones,
+  zoneMaxVisit,
+  destinyMaxVisit
 };
 
 //DELETE ANYTHING FROM API
@@ -339,3 +343,6 @@ export async function createWatchman(employeeData) {
     console.log(error);
   }
 }
+
+
+

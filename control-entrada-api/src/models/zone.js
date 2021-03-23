@@ -57,7 +57,7 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: true
       },
       visits: {
-        type: DataTypes.STRING,
+        type: DataTypes.INTEGER,
         allowNull: false
       }
     },

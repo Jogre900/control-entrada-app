@@ -263,7 +263,7 @@ const CreateEmployeScreen = ({
     <View style={{ flex: 1 }}>
       <TopNavigation
         title="Crear Empleado"
-        leftControl={BackAction(navigation, routes.ADMIN_HOME)}
+        leftControl={BackAction(navigation, routes.EMPLOYEE)}
       />
       <ScrollView contentContainerStyle={styles.container}>
         <View

@@ -33,7 +33,7 @@ const uploadImg = multer({
 //VERIFY TOKEN MIDDLEWARE
 const middleware = {
   verifyToken: function(req, res, next) {
-    console.log("req.headers middleware---", req.headers)
+    //console.log("req.headers middleware---", req.headers)
     if (!req.headers["authorization"])
       return next(createError(401, "Usuario no Autorizado"));
     const headerToken = req.headers["authorization"];
@@ -69,11 +69,13 @@ router.get("/findCompany/:id", Controllers.findCompany);
 router.post("/createZone/:id", Controllers.createZone);
 router.get("/findZones/:companyId", Controllers.findZones);
 router.get("/zone/:zoneId", Controllers.findZone);
+router.get("/zoneMaxVisit/:companyId", Controllers.findZoneMaxVisit)
 router.delete("/zone", Controllers.deleteZone);
 //DESTINY
 router.post("/createDestiny/:id", Controllers.createDestiny);
 router.get("/findDestiny/:id", Controllers.findDestinyByZone);
 router.get("/findAllDestiny/:id", Controllers.findAllDestiny)
+router.get("/destinyMaxVisit/:zoneId", Controllers.findDestinyMaxVisit)
 router.delete("/deleteDestiny", Controllers.deleteDestiny);
 //ROUTAS PARA BORRAR
 router.post("/createEmployee", Controllers.createEmployee);
@@ -108,7 +110,8 @@ router.get("/findWeekVisits/", Controllers.findWeekVisits);
 //CITIZEN
 router.get("/citizen/:dni", middleware.verifyToken, Controllers.findCitizen)
 router.post("/citizen", middleware.verifyToken, uploadImg.array('file'), Controllers.createCitizen)
-
+//FIND MAX VALUE ROUTES
+router.get("/userCompany/:companyId", Controllers.findMaxVisitUser)
 // NUEVAS RUTA AJUSTE SISTEMA
 router.post("/company", 
 uploadImg.array('file'),

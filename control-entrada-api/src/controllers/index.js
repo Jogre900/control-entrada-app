@@ -5,7 +5,7 @@ import jwt from "jsonwebtoken";
 import { $security, $serverPort } from "@config";
 import options from "dotenv/lib/env-options";
 import moment from "moment";
-import { Op, literal } from "sequelize";
+import { Op, fn, col, literal } from "sequelize";
 const SECRETKEY = process.env.SECRETKEY || $security().secretKey;
 
 const Controllers = {
@@ -360,6 +360,34 @@ password: "123456,
       res.json(RESPONSE);
     }
   },
+  findZoneMaxVisit: async function(req, res) {
+    let RESPONSE = {
+      error: true,
+      msg: "",
+      data: null,
+      token: null
+    };
+    const { companyId } = req.params;
+    try {
+      const zones = await models.Zone.findAll({
+        where: {
+          companyId
+        }
+      });
+      if (zones) {
+        const zoneMaxV = zones.reduce((prev, elem) =>
+          prev.visits > elem.visits ? prev : elem
+        );
+        RESPONSE.error = false;
+        RESPONSE.data = zoneMaxV;
+        RESPONSE.msg = "Busqueda exitosa!";
+        res.json(RESPONSE);
+      }
+    } catch (error) {
+      RESPONSE.msg = error.message;
+      res.json(RESPONSE);
+    }
+  },
   deleteZone: async function(req, res) {
     let RESPONSE = {
       error: true,
@@ -515,6 +543,36 @@ password: "123456,
         if (destinos) RESPONSE.error = false;
         RESPONSE.MSG = "Busqueda Exitosa!";
         RESPONSE.data = destinos;
+        res.json(RESPONSE);
+      }
+    } catch (error) {
+      RESPONSE.msg = error.message;
+      res.json(RESPONSE);
+    }
+  },
+  findDestinyMaxVisit: async function(req, res) {
+    let RESPONSE = {
+      error: true,
+      msg: "",
+      data: null,
+      token: null
+    };
+    const { zoneId } = req.params;
+    console.log(zoneId);
+    try {
+      const destiny = await models.Destination.findAll({
+        where: {
+          zoneId
+        },
+        raw: true
+      });
+      if (destiny) {
+        const maxVisitsD = destiny.reduce((prev, elem) =>
+          prev.visits > elem.visits ? prev : elem
+        );
+        RESPONSE.error = false;
+        RESPONSE.data = maxVisitsD;
+        RESPONSE.msg = "Busqueda exitosa!";
         res.json(RESPONSE);
       }
     } catch (error) {
@@ -1652,8 +1710,8 @@ password: "123456,
       tokn: null
     };
     //console.log("headers---",req.headers)
-    console.log("BODY--", req.body);
-    console.log("fotos----", req.file);
+    // console.log("BODY--", req.body);
+    // console.log("fotos----", req.file);
     const {
       entryDate,
       descriptionEntry,
@@ -1688,6 +1746,29 @@ password: "123456,
         }
       );
       if (visit) {
+        //INCREMENT USERCOMPANY
+        const user = await models.User.findOne({
+          include: {
+            model: models.UserZone,
+            as: "userZone",
+            where: {
+              id: userZoneId
+            }
+          }
+        });
+        const userId = user.dataValues.id;
+        const userCompany = await models.UserCompany.findOne({
+          where: {
+            userId
+          }
+        });
+        console.log(userCompany.dataValues);
+        await userCompany.increment("visits");
+        await userCompany.reload();
+        await userCompany.save();
+        //console.log(userCompanyU)
+
+        //INCREMENT ZONE
         const zone = await models.Zone.findOne({
           include: {
             model: models.UserZone,
@@ -1697,10 +1778,21 @@ password: "123456,
             }
           }
         });
-        console.log(zone);
-        zone.visits.literal("visits + 1");
+        //console.log("ZONE DATAVA---",zone.dataValues);
+
+        await zone.increment("visits");
+        await zone.reload();
         await zone.save();
-        console.log(zone.dataValues.visits);
+        //INCREMENT DESTINY
+        console.log("DESTINY ID---", destinyId);
+        const destinyU = await models.Destination.findOne({
+          where: { id: destinyId }
+        });
+        console.log("DESTINY FIND IT--", destinyU.dataValues);
+        await destinyU.increment("visits");
+        await destinyU.reload();
+        await destinyU.save();
+
         RESPONSE.error = false;
         RESPONSE.data = visit;
         RESPONSE.msg = "Registro exitoso!";
@@ -1802,6 +1894,60 @@ password: "123456,
     } catch (error) {
       RESPONSE.msg = error.message;
       console.log(error.message);
+      res.json(RESPONSE);
+    }
+  },
+  //FIND MAX VISITS REGISTER USER
+  findMaxVisitUser: async function(req, res) {
+    let RESPONSE = {
+      error: true,
+      msg: "",
+      data: null,
+      token: null
+    };
+    const { companyId } = req.params;
+    try {
+      const maxVisits = await models.UserCompany.findOne({
+        where: {
+          companyId
+        },
+        attributes: [[fn("max", col("visits")), "visits"]],
+        //group: ['id'],
+        raw: true
+      });
+      const userCompany = await models.UserCompany.findAll({
+        where: {
+          companyId
+        },
+        raw: true
+      });
+      //ENCONTRAR EL VALOR MAS ALTO EN UN ARRAY DE OBJETOS
+      // const prueba = Math.max.apply(Math, userCompany.map(function(o) { return o.visits; }))
+      //DEVUELVE EL OBJETO CON LA PROPIEDAD MAS ALTA
+      // const prueba = userCompany.reduce((prev, current) => (prev.visits > current.visits) ? prev : current)
+      // console.log(prueba)
+
+      const max = userCompany.filter(
+        ({ visits }) => visits === maxVisits.visits
+      );
+      console.log(max);
+      const userWithMax = await models.User.findOne({
+        where: {
+          id: max[0].userId
+        },
+        include: [
+          { model: models.Employee, as: "Employee" },
+          { model: models.UserCompany, as: "UserCompany" },
+          { model: models.UserZone, as: "userZone" }
+        ]
+      });
+      if (userCompany) {
+        RESPONSE.error = false;
+        (RESPONSE.data = userWithMax), (RESPONSE.msg = "Busqueda exitosa!");
+        res.json(RESPONSE);
+      }
+    } catch (error) {
+      RESPONSE.msg = error.message;
       res.json(RESPONSE);
     }
   },

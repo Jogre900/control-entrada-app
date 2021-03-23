@@ -22,3 +22,19 @@ export async function fetchZoneById(id) {
       return error.message;
     }
   }
+//ZONE WITH MAX NUMBER OF VISITS
+  export async function zoneMaxVisit(companyId){
+    const res = await axios.get(`${API_PORT()}/api/zoneMaxVisit/${companyId}`)
+    if(res){
+      return res
+    }
+  }
+
+  //DESTINY WITH MAX NUMBER OF VISITS
+  export async function destinyMaxVisit(zoneId){
+    console.log(zoneId)
+    const res = await axios.get(`${API_PORT()}/api/destinyMaxVisit/${zoneId}`)
+    if(res){
+      return res
+    }
+  }
