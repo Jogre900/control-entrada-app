@@ -6,7 +6,6 @@ export async function createVisit(visitData, token) {
   console.log(visitData);
   const {
     entryDate,
-    departureDate,
     descriptionEntry,
     visitUri,
     visitFileName,
@@ -22,7 +21,6 @@ export async function createVisit(visitData, token) {
     data.append("descriptionEntry", descriptionEntry);
   }
   data.append("entryDate", entryDate.toISOString());
-  data.append("departureDate", departureDate.toISOString());
   data.append("file", {
     uri: visitUri,
     name: visitFileName,
@@ -72,6 +70,11 @@ export async function findVisitUser(userzoneId, token) {
     console.log(error.message);
   }
 }
+//FIND VISIT BY ID
+export async function fetchVisitId(id){
+  const res = await axios.get(`${API_PORT()}/api/visitId/${id}`)
+  return res
+}
 //TODAY VISITS FROM ALL EMPLOYEE
 export async function fetchTodayVisist(employee) {
   console.log("uzid helper----", employee);
@@ -90,10 +93,20 @@ export async function fetchTodayVisist(employee) {
   }
 }
 
-//UPDATE VISIT WITH DEPARTURE
-export async function updateVisit(id, data, token) {
+//FIND ALL VISISTS BY DESTINY ID
+export async function fetchVisitDestiny(id, token){
+  const res = await axios.get(`${API_PORT()}/api/visitsdestiny/${id}`, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  })
+  return res
+}
+
+//CREATE DEPARTURE
+export async function createDeparture(id, data, token) {
   try {
-    const res = await axios.put(`${API_PORT()}/api/visit/${id}`, data, {
+    const res = await axios.post(`${API_PORT()}/api/departure/${id}`, data, {
       headers: {
         Authorization: `bearer ${token}`,
       },

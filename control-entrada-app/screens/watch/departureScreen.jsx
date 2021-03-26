@@ -32,7 +32,7 @@ let statusModalValues = {
   status: null,
 };
 
-const DepartureScreen = ({ navigation, route, updateVisit }) => {
+const DepartureScreen = ({ navigation, route, profile, updateVisit }) => {
   const { id } = route.params;
   const [statusModalProps, setStatusModalProps] = useState(statusModalValues);
   const [loading, setLoading] = useState(false);
@@ -40,12 +40,12 @@ const DepartureScreen = ({ navigation, route, updateVisit }) => {
   const [visit, setVisit] = useState();
   const [departureText, setDepartureText] = useState("");
   const [entryCheck, setEntryCheck] = useState(false);
-
+  const userZoneId = profile.userZone[0].id
   //FIND VISIT BY ID
   const findVisitId = async () => {
     setLoading(true);
     try {
-      let res = await axios.get(`${API_PORT()}/api/findVisitId/${id}`);
+      let res = await axios.get(`${API_PORT()}/api/visitId/${id}`);
       console.log(res.data);
       if (!res.data.error) {
         setLoading(false);
@@ -58,14 +58,18 @@ const DepartureScreen = ({ navigation, route, updateVisit }) => {
   };
   //UPDATE ENTRY
   const updateEntry = async () => {
+
     let data = {
       departureDate: new Date().toISOString(),
       descriptionDeparture: departureText,
+      destinationId: visit.destinationId,
+      userZoneId
+      
     };
-    //setSuccess(false);
+    
     setSaving(true);
     const token = await storage.getItem("userToken");
-    const res = await helpers.updateVisit(id, data, token);
+    const res = await helpers.createDeparture(id, data, token);
     if (!res.data.error) {
       setEntryCheck(true);
       //setUpdateVisit(res.data.data);
@@ -170,25 +174,25 @@ const DepartureScreen = ({ navigation, route, updateVisit }) => {
             <Text style={styles.contentText}>
               {visit.descriptionEntry ? visit.descriptionEntry : ""}
             </Text>
-            {visit.entryDate !== visit.departureDate && (
+            {visit.Salida && (
               <>
                 <View style={{ flexDirection: "row" }}>
                   <Text style={styles.labelText}>Salida: </Text>
                   <Text>
-                    {moment(visit.departureDate).format("D MMM YY, HH:mm a")}
+                    {moment(visit.Salida.departureDate).format("D MMM YY, HH:mm a")}
                   </Text>
                 </View>
                 <>
                   <Text>
-                    {visit.descriptionDeparture
-                      ? visit.descriptionDeparture
+                    {visit.Salida.descriptionDeparture
+                      ? visit.Salida.descriptionDeparture
                       : "----"}
                   </Text>
                 </>
               </>
             )}
           </FormContainer>
-          {visit.entryDate === visit.departureDate && (
+          {!visit.Salida && (
             <FormContainer title="Salida">
               <Input
                 title="Descripcion Salida (Opcional)"
@@ -200,7 +204,7 @@ const DepartureScreen = ({ navigation, route, updateVisit }) => {
               />
             </FormContainer>
           )}
-          {visit.entryDate === visit.departureDate ? (
+          {!visit.Salida ? (
             <View style={{ width: "90%" }}>
               <MainButton
                 style={{ marginBottom: 10 }}
@@ -221,6 +225,10 @@ const DepartureScreen = ({ navigation, route, updateVisit }) => {
     </View>
   );
 };
+
+const mapStateToProps = (state) => ({
+  profile: state.profile.profile,
+});
 const mapDispatchToProps = (dispatch) => ({
   updateVisit(visit) {
     dispatch({
@@ -230,7 +238,7 @@ const mapDispatchToProps = (dispatch) => ({
   },
 });
 
-export default connect(null, mapDispatchToProps)(DepartureScreen);
+export default connect(mapStateToProps, mapDispatchToProps)(DepartureScreen);
 
 const styles = StyleSheet.create({
   profileContainer: {

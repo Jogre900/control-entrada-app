@@ -9,8 +9,9 @@ import {
   Animated,
   TouchableOpacity,
   ScrollView,
+  BackHandler
 } from "react-native";
-import axios from "axios";
+import { useFocusEffect } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import { API_PORT } from "../../config/index";
 import moment from "moment";
@@ -20,7 +21,10 @@ import { ProfileComponent } from "../../components/profile.component";
 import { Spinner } from "../../components/spinner";
 import { FormContainer } from "../../components/formContainer";
 import Avatar from "../../components/avatar.component";
-import { MainColor } from '../../assets/colors'
+import { MainColor } from "../../assets/colors";
+import { routes } from '../../assets/routes'
+import { BackAction } from '../../helpers/ui/ui'
+import { helpers } from '../../helpers'
 
 const { width } = Dimensions.get("window");
 const cover = require("../../assets/images/background.jpg");
@@ -52,8 +56,7 @@ export const DetailViewScreen = ({ route, navigation }) => {
     console.log(id);
     setLoading(true);
     try {
-      const res = await axios.get(`${API_PORT()}/api/findVisitId/${id}`);
-      //console.log(res.data);
+      const res = await helpers.fetchVisitId(id)
       if (!res.data.error) {
         setLoading(false);
         setVisit(res.data.data);
@@ -104,20 +107,6 @@ export const DetailViewScreen = ({ route, navigation }) => {
       //setActiveTab2({color: 'orange'})
       //setActiveTab1({color: 'grey'})
     }
-  };
-
-  const goBackAction = () => {
-    return (
-      <View>
-        <TouchableOpacity
-          onPress={() => {
-            navigation.goBack();
-          }}
-        >
-          <Ionicons name="ios-arrow-back" size={28} color="white" />
-        </TouchableOpacity>
-      </View>
-    );
   };
 
   // const VisitData = () => {
@@ -213,30 +202,44 @@ export const DetailViewScreen = ({ route, navigation }) => {
   //   );
   // };
 
-
   const checkStatusEntry = () => {
-    if(visit.departureDate < visit.UserZone.Zona.firsDepartureTime){
-      return 'md-create'
+    if (visit.departureDate < visit.UserZone.Zona.firsDepartureTime) {
+      return "md-create";
       // if(visit.departureDate <= visit.UserZone.Zona.firsDepartureTime){
       //   return 'md-create'
       //   }else {
       //     return 'ios-card'
-       // }
-    }else if(visit.departureDate === visit.entryDate){
+      // }
+    } else if (visit.departureDate === visit.entryDate) {
       // if(visit.departureDate <= visit.UserZone.Zona.firsDepartureTime){
       //   return 'md-create'
       //   }else {
       //     return 'ios-card'
       //   }
-      return 'ios-card'
+      return "ios-card";
     }
-  }
+  };
+
+  const goBackHardware = () => {
+    //TODO aqui y abajo debes poner segun rol
+    navigation.navigate(privilege === 'Admin' ?  routes.ZONES : routes.ADMIN_HOME);
+    return true;
+  };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      BackHandler.addEventListener("hardwareBackPress", goBackHardware);
+      return () => {
+        BackHandler.removeEventListener("hardwareBackPress", goBackHardware);
+      };
+    }, [])
+  );
   useEffect(() => {
     requestVisitById();
   }, [route.params]);
   return (
     <View style={{ flex: 1 }}>
-      <TopNavigation title="Vista Detallada" leftControl={goBackAction()} />
+      <TopNavigation title="Vista Detallada" leftControl={BackAction(navigation, routes.ADMIN_HOME)} />
       {loading && <Spinner message="Cargando..." />}
       {visit ? (
         <ScrollView contentContainerStyle={{ alignItems: "center" }}>
@@ -247,11 +250,7 @@ export const DetailViewScreen = ({ route, navigation }) => {
                 uri={`${API_PORT()}/public/imgs/${visit.Visitante.picture}`}
               />
               <TouchableOpacity style={styles.openCameraButton}>
-                <Avatar.Icon
-                  name={checkStatusEntry()}
-                  size={32}
-                  color="#fff"
-                />
+                <Avatar.Icon name={checkStatusEntry()} size={32} color="#fff" />
               </TouchableOpacity>
             </View>
             <Text style={styles.nameText}>
@@ -290,7 +289,6 @@ export const DetailViewScreen = ({ route, navigation }) => {
             </View>
           </View>
           <FormContainer title="Visita">
-            
             <Image
               style={{
                 height: 250,
@@ -303,25 +301,27 @@ export const DetailViewScreen = ({ route, navigation }) => {
                 uri: `${API_PORT()}/public/imgs/${visit.Fotos[0].picture}`,
               }}
             />
-             <View style={{ flexDirection: "row" }}>
+            <View style={{ flexDirection: "row" }}>
               <Text style={styles.labelText}>Entrada: </Text>
               <Text>{moment(visit.entryDate).format("D MMM YY, HH:mm a")}</Text>
             </View>
             <Text style={styles.contentText}>
               {visit.descriptionEntry ? visit.descriptionEntry : ""}
             </Text>
-            {visit.entryDate !== visit.departureDate && (
+            {visit.Salida && (
               <>
                 <View style={{ flexDirection: "row" }}>
                   <Text style={styles.labelText}>Salida: </Text>
                   <Text>
-                    {moment(visit.departureDate).format("D MMM YY, HH:mm a")}
+                    {moment(visit.Salida.departureDate).format(
+                      "D MMM YY, HH:mm a"
+                    )}
                   </Text>
                 </View>
                 <>
                   <Text>
-                    {visit.descriptionDeparture
-                      ? visit.descriptionDeparture
+                    {visit.Salida.descriptionDeparture
+                      ? visit.Salida.descriptionDeparture
                       : "----"}
                   </Text>
                 </>
@@ -329,19 +329,34 @@ export const DetailViewScreen = ({ route, navigation }) => {
             )}
           </FormContainer>
           <FormContainer title="Seguridad">
-            <Avatar.Picture
-              size={56}
-              uri={`${API_PORT()}/public/imgs/${
-                visit.UserZone.User.Employee.picture
-              }`}
-            />
-            <Text>
-              {visit.UserZone.User.Employee.name}
-              {visit.UserZone.User.Employee.lastName}
-            </Text>
-            <Text>
-              {moment(visit.UserZone.assignationDate).format("D MMM YYYY")}
-            </Text>
+            <View>
+              <Text>Entrada</Text>
+              <Avatar.Picture
+                size={56}
+                uri={`${API_PORT()}/public/imgs/${
+                  visit.UserZone.User.Employee.picture
+                }`}
+              />
+              <Text>
+                {visit.UserZone.User.Employee.name}
+                {visit.UserZone.User.Employee.lastName}
+              </Text>
+            </View>
+            {visit.Salida ? (
+              <View>
+                <Text>Salida</Text>
+                <Avatar.Picture
+                  size={56}
+                  uri={`${API_PORT()}/public/imgs/${
+                    visit.Salida.UserZone.User.Employee.picture
+                  }`}
+                />
+                <Text>
+                  {visit.Salida.UserZone.User.Employee.name}
+                  {visit.Salida.UserZone.User.Employee.lastName}
+                </Text>
+              </View>
+            ) : null}
           </FormContainer>
 
           {/* -------------TAB BAR----------- */}

@@ -46,7 +46,8 @@ const VisitScreen = ({
   const [hasVisit, setHasVisit] = useState(true);
   const [visits, setVisits] = useState([]);
   const [visitsDni, setvisitsDni] = useState();
-
+  let destinys = []
+  profile.userZone[0].Zona.Destinos.map(({id}) => destinys.push(id))
   const searchRef = useRef();
 
   //REQUEST TODAY VISITS
@@ -54,8 +55,8 @@ const VisitScreen = ({
     //setVisits([]);
     setLoading(true);
     const token = await storage.getItem("userToken");
-    const res = await helpers.findVisitUser(profile.userZone[0].id, token);
-    //console.log(res.data.data);
+    const res = await helpers.fetchVisitDestiny(destinys, token);
+    console.log(res.data)
     if (!res.data.error && res.data.data.length) {
       setLoading(false);
       //setVisits(res.data.data);

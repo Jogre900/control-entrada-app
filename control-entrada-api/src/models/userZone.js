@@ -8,6 +8,13 @@ module.exports = (sequelize, DataTypes) => {
           name: "user_zone_id"
         }
       });
+      this.hasMany(models.Departure, {
+        foreigKey: {
+          field: "userZoneId",
+          name: "user_zone_id"
+        },
+        as: 'Salida'
+      });
       this.belongsTo(models.Zone, {
         foreignKey: {
           name: "ZoneId",

@@ -7,9 +7,11 @@ import {
   createVisit,
   findVisitdni,
   findVisitUser,
-  updateVisit,
+  fetchVisitId,
+  createDeparture,
   fetchTodayVisist,
-  maxUserVisit
+  maxUserVisit,
+  fetchVisitDestiny
 } from "./visit";
 
 export const helpers = {
@@ -18,8 +20,10 @@ export const helpers = {
   createVisit,
   fetchTodayVisist,
   findVisitdni,
+  fetchVisitId,
   findVisitUser,
-  updateVisit,
+  fetchVisitDestiny,
+  createDeparture,
   maxUserVisit,
   fetchZoneById,
   fetchAllZones,

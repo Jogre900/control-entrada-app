@@ -108,12 +108,16 @@ const TUTO = 123;
 const DrawerContent = (props) => {
   const dispatch = useDispatch();
   const privilege = useSelector((state) => state.profile.login.privilege);
-  const logOut = () => {
+  
+  const clearRedux = () => {
     return new Promise((resolve, reject) => {
       resolve(dispatch({ type: "CLEAR_STORAGE" }));
     });
   };
   const deleteToken = async () => await storage.removeItem("userToken");
+  const logOut = () => {
+    deleteToken().then(clearRedux()).then(() => props.navigation.navigate(routes.MAIN))  
+  }
   return (
     <View
       style={{
@@ -179,14 +183,15 @@ const DrawerContent = (props) => {
           icon={({ size, color }) => (
             <Ionicons name="ios-log-out" size={size} color={color} />
           )}
-          onPress={() => {
-            //logOut().then(() => alert("SE BORRO EL STORE DE REDUX!!!"));
-            storage
-              .removeItem("userToken")
-              .then(() =>
-                props.navigation.navigate(routes.MAIN, { logOut: true })
-              );
-          }}
+          onPress={
+            logOut
+            // //logOut().then(() => alert("SE BORRO EL STORE DE REDUX!!!"));
+            // storage
+            //   .removeItem("userToken")
+            //   .then(() =>
+            //     props.navigation.navigate(routes.MAIN, { logOut: true })
+            //   );
+          }
         />
       </View>
     </View>

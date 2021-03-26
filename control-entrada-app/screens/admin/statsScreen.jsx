@@ -8,7 +8,7 @@ import Avatar from "../../components/avatar.component";
 import { ThreeAvatar } from '../../components/threeAvatar'
 import { useSelector } from "react-redux";
 import { API_PORT } from "../../config";
-import { Ionicons } from '@expo/vector-icons'
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons'
 
 export const StatsScreen = ({ navigation }) => {
   const [zoneMax, setZoneMax] = useState();

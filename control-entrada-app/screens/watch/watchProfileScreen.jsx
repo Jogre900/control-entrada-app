@@ -21,7 +21,7 @@ import Avatar from "../../components/avatar.component";
 import { BackAction } from '../../helpers/ui/ui'
 import { routes } from '../../assets/routes'
 
-const WatchProfileScreen = ({ navigation, profile }) => {
+const WatchProfileScreen = ({ navigation, profile, userCompany }) => {
   const [destinyvisibility, setDestinyvisibility] = useState(false);
   const [loading, setLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
@@ -124,8 +124,8 @@ const WatchProfileScreen = ({ navigation, profile }) => {
                   alignItems: "center",
                 }}
               >
-                <Text style={styles.contentText}>0</Text>
-                <Text style={styles.labelText}>Visitas</Text>
+                <Text style={styles.contentText}>{userCompany[0].visits}</Text>
+                <Text style={styles.labelText}>Entradas</Text>
               </View>
             </View>
           </View>
@@ -266,6 +266,7 @@ const WatchProfileScreen = ({ navigation, profile }) => {
 
 const mapStateToPRops = (state) => ({
   profile: state.profile.profile,
+  userCompany: state.profile.company
 });
 
 export default connect(mapStateToPRops, {})(WatchProfileScreen);

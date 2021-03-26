@@ -54,6 +54,7 @@ const LoadingScreen = ({ navigation, saveProfile, saveCompany, saveLogin }) => {
               phoneNumberOther: comp.Company.phoneNumberOther,
               logo: comp.Company.logo,
               privilege: comp.privilege,
+              visits: comp.visits,
               select: true,
             });
           });

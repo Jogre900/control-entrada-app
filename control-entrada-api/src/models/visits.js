@@ -11,6 +11,15 @@ module.exports = (sequelize, DataTypes) => {
         onDelete: "CASCADE",
         onUpdate: "CASCADE"
       });
+      this.hasOne(models.Departure, {
+        foreignKey: {
+          name: 'visitId',
+          field: 'visit_id'
+        },
+        as: 'Salida',
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE'
+      })
       this.belongsTo(models.Destination, {
         foreignKey: {
           name: "destinationId",
@@ -49,14 +58,6 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: true
       },
-      departureDate: {
-        type: DataTypes.DATE,
-        allowNull: false
-      },
-      descriptionDeparture: {
-        type: DataTypes.STRING,
-        allowNull: true
-      }
     },
     {
       sequelize,

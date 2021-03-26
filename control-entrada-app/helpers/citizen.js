@@ -25,7 +25,6 @@ export async function findCitizendni(dni, token) {
       profileFileName,
       profileFileType,
       entryDate,
-      departureDate,
       descriptionEntry,
       visitUri,
       visitFileName,
@@ -45,7 +44,6 @@ export async function findCitizendni(dni, token) {
     });
     data.append("descriptionEntry", descriptionEntry);
     data.append("entryDate", entryDate.toISOString());
-    data.append("departureDate", departureDate.toISOString());
     data.append("file", {
       uri: visitUri,
       name: visitFileName,

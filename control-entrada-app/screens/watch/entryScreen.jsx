@@ -46,7 +46,6 @@ let visitInitialValues = {
   dni: "",
   descriptionEntry: null,
   entryDate: new Date(),
-  departureDate: new Date(),
   userZoneId: null,
   profileUri: null,
   profileFileName: null,
@@ -58,7 +57,6 @@ let visitInitialValues = {
 let shortVisitValues = {
   descriptionEntry: null,
   entryDate: new Date(),
-  departureDate: new Date(),
   visitUri: null,
   visitFileName: null,
   visitFileType: null,

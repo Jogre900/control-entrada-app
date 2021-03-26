@@ -15,10 +15,11 @@ export const LogOutModal = ({ status, navigation, onClose }) => {
     });
   };
   const deleteToken = async () => {
-    onClose()
+   
     logOut()
       .then(() => storage.removeItem("userToken"))
       .then(() => navigation.navigate(routes.MAIN));
+      onClose()
   };
 
   

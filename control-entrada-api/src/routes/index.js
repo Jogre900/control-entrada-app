@@ -96,16 +96,18 @@ router.post(
   uploadImg.single("file"),
   Controllers.createVisits
 );
+router.get("/visitId/:id", Controllers.findVisitId);
 router.get("/visit/:dni", Controllers.findVisit);
-router.get("/visits/:userzoneId", Controllers.findTodayVisitsByUser);
-router.get("/findVisitId/:id", Controllers.findVisitId);
-router.get("/visit/:zoneId", Controllers.findTodayVisitsByZone);
-router.put("/visit/:id", middleware.verifyToken, Controllers.updateVisit);
-router.delete("/visit/", Controllers.deleteVisit);
-
-
+//todas las visitas de hoy por empleados
 router.post("/visits", Controllers.findTodayVisits);
 router.get("/findWeekVisits/", Controllers.findWeekVisits);
+router.get("/visits/:userzoneId", Controllers.findTodayVisitsByUser);
+//todas las visitas de hoy por destino
+router.get("/visitsdestiny/:destinyId/:checked?", middleware.verifyToken, Controllers.findTodayVisitsByDestiny);
+router.delete("/visit/", Controllers.deleteVisit);
+//DEPARTURE ROUTES
+router.post("/departure/:id", middleware.verifyToken, Controllers.createDeparture);
+
 
 //CITIZEN
 router.get("/citizen/:dni", middleware.verifyToken, Controllers.findCitizen)

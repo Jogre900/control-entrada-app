@@ -6,6 +6,7 @@ import { $security, $serverPort } from "@config";
 import options from "dotenv/lib/env-options";
 import moment from "moment";
 import { Op, fn, col, literal } from "sequelize";
+
 const SECRETKEY = process.env.SECRETKEY || $security().secretKey;
 
 const Controllers = {
@@ -557,7 +558,7 @@ password: "123456,
       data: null,
       token: null
     };
-    const  zoneId  = req.body;
+    const zoneId = req.body;
     console.log(req.body);
     try {
       const destiny = await models.Destination.findAll({
@@ -1867,7 +1868,6 @@ password: "123456,
               entryDate,
               descriptionEntry,
               departureDate,
-              descriptionDeparture,
               destinationId: destinyId,
               UserZoneId: userZoneId,
               Fotos: {
@@ -1957,7 +1957,7 @@ password: "123456,
       const maxVisits = await models.UserCompany.findOne({
         where: {
           companyId,
-          privilege: 'Watchman'
+          privilege: "Watchman"
         },
         attributes: [[fn("max", col("visits")), "visits"]],
         //group: ['id'],
@@ -2027,50 +2027,117 @@ password: "123456,
       res.json(RESPONSE);
     }
   },
-  updateVisit: async function(req, res) {
+  //CREATE DEPARTURE
+  createDeparture: async function(req, res) {
     let RESPONSE = {
       error: true,
       msg: "",
       data: null,
       tokn: null
     };
-    const { departureDate, descriptionDeparture } = req.body;
+    const {
+      departureDate,
+      descriptionDeparture,
+      userZoneId,
+      destinationId
+    } = req.body;
     const { id } = req.params;
-    console.log(req.body, req.params);
+    
+    let inputs = {};
+    inputs.visitId = id;
+    inputs.departureDate = departureDate;
+    inputs.UserZoneId = userZoneId;
+    inputs.destinationId = destinationId;
+    if (descriptionDeparture) {
+      inputs.descriptionDeparture = descriptionDeparture;
+    }
+
+    let increment = false;
     try {
       let visit = await models.Visits.findOne({
         where: {
           id
         },
-        include: [
-          { model: models.Citizen, as: "Visitante" },
-          { model: models.Destination, as: "Destino" },
-          { model: models.Picture, as: "Fotos" },
-          {
+        include: {
+          model: models.UserZone
+        },
+        raw: true
+      });
+      console.log(visit.UserZoneId, userZoneId)
+      if (visit.UserZoneId !== userZoneId) {
+        increment = true;
+      }
+      let departure = await models.Departure.create({ ...inputs });
+      
+      if (increment) {
+        console.log("hay que incrementar")
+        const user = await models.User.findOne({
+          include: {
             model: models.UserZone,
-            as: "UserZone",
-            include: [
-              { model: models.Zone, as: "Zona" },
-              {
-                model: models.User,
-                as: "User",
+            as: "userZone",
+            where: {
+              id: userZoneId
+            }
+          }
+        });
+        const userId = user.dataValues.id;
+        console.log("userId----",userId)
+        const userCompany = await models.UserCompany.findOne({
+          where: {
+            userId
+          }
+        });
+        console.log(userCompany.dataValues);
+        await userCompany.increment("visits");
+        await userCompany.reload();
+        await userCompany.save();
+        console.log(userCompany.dataValues);
+      }
+      if (departure) {
+        const visitU = await models.Visits.findOne({
+          where: {
+            id
+          },
+
+          include: [
+            {
+              model: models.Departure,
+              as: "Salida",
+              include: {
+                model: models.UserZone,
                 include: {
-                  model: models.Employee,
-                  as: "Employee"
+                  model: models.User,
+                  as: "User",
+                  include: {
+                    model: models.Employee,
+                    as: "Employee"
+                  }
                 }
               }
-            ]
-          }
-        ]
-      });
-      if (visit) {
-        //console.log(visit);
-        visit.departureDate = departureDate;
-        visit.descriptionDeparture = descriptionDeparture;
-        await visit.save();
+            },
+            { model: models.Citizen, as: "Visitante" },
+            { model: models.Destination, as: "Destino" },
+            { model: models.Picture, as: "Fotos" },
+            {
+              model: models.UserZone,
+              as: "UserZone",
+              include: [
+                { model: models.Zone, as: "Zona" },
+                {
+                  model: models.User,
+                  as: "User",
+                  include: {
+                    model: models.Employee,
+                    as: "Employee"
+                  }
+                }
+              ]
+            }
+          ]
+        });
         RESPONSE.error = false;
         RESPONSE.msg = "Actualizacion Existosa";
-        RESPONSE.data = visit;
+        RESPONSE.data = visitU;
         res.json(RESPONSE);
       }
     } catch (error) {
@@ -2093,6 +2160,21 @@ password: "123456,
           id
         },
         include: [
+          {
+            model: models.Departure,
+            as: "Salida",
+            include: {
+              model: models.UserZone,
+              include: {
+                model: models.User,
+                as: "User",
+                include: {
+                  model: models.Employee,
+                  as: "Employee"
+                }
+              }
+            }
+          },
           { model: models.Citizen, as: "Visitante" },
           { model: models.Destination, as: "Destino" },
           { model: models.Picture, as: "Fotos" },
@@ -2139,6 +2221,21 @@ password: "123456,
     try {
       let visit = await models.Visits.findAll({
         include: [
+          {
+            model: models.Departure,
+            as: "Salida",
+            include: {
+              model: models.UserZone,
+              include: {
+                model: models.User,
+                as: "User",
+                include: {
+                  model: models.Employee,
+                  as: "Employee"
+                }
+              }
+            }
+          },
           { model: models.Citizen, as: "Visitante", where: { dni } },
           { model: models.Destination, as: "Destino" },
           { model: models.Picture, as: "Fotos" },
@@ -2175,6 +2272,7 @@ password: "123456,
       res.json(RESPONSE);
     }
   },
+  //FIND TODAY VISITS FROM ALL EMPLOYEE
   findTodayVisits: async function(req, res) {
     let RESPONSE = {
       error: true,
@@ -2187,9 +2285,6 @@ password: "123456,
     console.log("body----", req.body);
     try {
       let visits = await models.Visits.findAll({
-        where: {
-          UserZoneId: id
-        },
         //where: {
         //   entryDate: {
         //     [Op.between]: [
@@ -2199,6 +2294,21 @@ password: "123456,
         // }
         //},
         include: [
+          {
+            model: models.Departure,
+            as: "Salida",
+            include: {
+              model: models.UserZone,
+              include: {
+                model: models.User,
+                as: "User",
+                include: {
+                  model: models.Employee,
+                  as: "Employee"
+                }
+              }
+            }
+          },
           { model: models.Citizen, as: "Visitante" },
           { model: models.Picture, as: "Fotos" },
           {
@@ -2220,10 +2330,10 @@ password: "123456,
               },
               {
                 model: models.Zone,
-                as: "Zona"
-                // where: {
-                //   companyId
-                // }
+                as: "Zona",
+                where: {
+                  id
+                }
                 // include: {
                 //   model: models.Company,
                 //   as: "companyZone",
@@ -2267,6 +2377,21 @@ password: "123456,
           // }
         },
         include: [
+          {
+            model: models.Departure,
+            as: "Salida",
+            include: {
+              model: models.UserZone,
+              include: {
+                model: models.User,
+                as: "User",
+                include: {
+                  model: models.Employee,
+                  as: "Employee"
+                }
+              }
+            }
+          },
           { model: models.Citizen, as: "Visitante" },
           { model: models.Destination, as: "Destino" },
           { model: models.Picture, as: "Fotos" },
@@ -2302,28 +2427,54 @@ password: "123456,
       res.json(RESPONSE);
     }
   },
-  findTodayVisitsByZone: async function(req, res) {
+  findTodayVisitsByDestiny: async function(req, res) {
     let RESPONSE = {
       error: true,
       msg: "",
       data: null,
       tokn: null
     };
-    const { zoneId } = req.params;
-    console.log("zoneId-----", req.params);
+    console.log(req.params);
+    const { destinyId, checked } = req.params;
+    let array = [];
+    if (destinyId.length) {
+      array = destinyId.split(",");
+    }
+
     try {
       let visits = await models.Visits.findAll({
+        where: {
+          destinationId: array.length ? array : destinyId,
+          // createdAt: {
+          //   [Op.and]: {
+          //     [Op.gt]: moment().format("YYYY-MM-DD 00:00"),
+          //     [Op.lte]: moment().format("YYYY-MM-DD 23:59")
+          //   }
+          // }
+          //createdAt : { [Op.gt] : moment().format('YYYY-MM-DD 00:00')},
+          //createdAt : { [Op.lte] : moment().format('YYYY-MM-DD 23:59')}
+        },
         //where: {
 
         //UserZoneId: id
-        // entryDate: {
-        //   [Op.between]: [
-        //     `${moment().format("YYYY MM D, HH:mm:ss")} 00:00:00`,
-        //     `${moment().format("YYYY MM D, HH:mm:ss")} 23:59:00`
-        //   ]
-        // }
+
         //},
         include: [
+          {
+            model: models.Departure,
+            as: "Salida",
+            include: {
+              model: models.UserZone,
+              include: {
+                model: models.User,
+                as: "User",
+                include: {
+                  model: models.Employee,
+                  as: "Employee"
+                }
+              }
+            }
+          },
           { model: models.Citizen, as: "Visitante" },
           { model: models.Destination, as: "Destino" },
           { model: models.Picture, as: "Fotos" },
@@ -2334,8 +2485,7 @@ password: "123456,
               {
                 model: models.Zone,
                 as: "Zona",
-                attributes: ["id", "zone"],
-                where: { id: zoneId }
+                attributes: ["id", "zone"]
               },
               {
                 model: models.User,
@@ -2351,7 +2501,6 @@ password: "123456,
         ]
       });
       if (visits) {
-        console.log("visits", visits);
         RESPONSE.error = false;
         RESPONSE.msg = "Busqueda Exitosa!";
         RESPONSE.data = visits;
@@ -2387,6 +2536,21 @@ password: "123456,
         //   }
         // },
         include: [
+          {
+            model: models.Departure,
+            as: "Salida",
+            include: {
+              model: models.UserZone,
+              include: {
+                model: models.User,
+                as: "User",
+                include: {
+                  model: models.Employee,
+                  as: "Employee"
+                }
+              }
+            }
+          },
           { model: models.Citizen, as: "Visitante" },
           { model: models.Picture, as: "Fotos" },
           {

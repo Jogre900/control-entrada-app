@@ -15,8 +15,10 @@ const iconProps = {
 };
 
 export const VisitCard = ({ data, selected }) => {
-  const { Fotos, Visitante, Destino } = data;
+  const { Fotos, Visitante, Destino, Salida } = data;
+  console.log("VISIT CARD--",data.Salida)
   return (
+   // <></>
     <View
       style={[
         styles.visitContainer,
@@ -100,7 +102,7 @@ export const VisitCard = ({ data, selected }) => {
             >
               <Text style={styles.dataText} numberOfLines={1}>Salida: </Text>
               <Text style={styles.contentText} numberOfLines={1}>
-                {data.entryDate !== data.departureDate ? moment(data.entryDate).format("D MMM YYYY"): '----'}
+                {Salida ? moment(Salida.departureDate).format("D MMM YYYY"): '----'}
               </Text>
             </View>
       </View>
