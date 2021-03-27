@@ -5,7 +5,9 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  BackHandler
 } from "react-native";
+import { useFocusEffect } from '@react-navigation/native'
 import { connect } from "react-redux";
 import { Ionicons } from "@expo/vector-icons";
 import { routes } from "../../assets/routes";
@@ -25,6 +27,21 @@ const PerfilScreen = ({ navigation, profile, company }) => {
   const [repeatPass, setRepeatPass] = React.useState("");
 
   const editAction = () => {
+    
+    const goBackHardware = () => {
+      //TODO aqui y abajo debes poner segun rol
+      navigation.navigate(routes.ADMIN_HOME);
+      return true;
+    };
+  
+    useFocusEffect(
+      React.useCallback(() => {
+        BackHandler.addEventListener("hardwareBackPress", goBackHardware);
+        return () => {
+          BackHandler.removeEventListener("hardwareBackPress", goBackHardware);
+        };
+      }, [])
+    );
     return (
       <View>
         <TouchableOpacity

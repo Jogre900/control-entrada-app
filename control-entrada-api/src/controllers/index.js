@@ -593,15 +593,36 @@ password: "123456,
     const { id } = req.body;
 
     try {
-      const destiny = await models.Destination.destroy({
+      const destinys = await models.Destination.findAll({
         where: {
           id
+        },
+        raw: true
+      })
+      let deleted = true
+      if(destinys){
+        destinys.map(({visits}) => {
+          if(visits > 0){
+            deleted = false
+            return
+          }
+        })
+        if(deleted){
+          const destiny = await models.Destination.destroy({
+            where: {
+              id
+            }
+          });
+          if(destiny){
+            (RESPONSE.error = false), (RESPONSE.msg = "Borrado Exitoso!");
+            RESPONSE.data = destiny;
+            res.json(RESPONSE);
+          }
+        }else{
+          RESPONSE.msg= 'Error, El destino seleccionado posee entradas'
+          RESPONSE.data = destinys
+          res.json(RESPONSE)
         }
-      });
-      if (destiny) {
-        (RESPONSE.error = false), (RESPONSE.msg = "Borrado Exitoso!");
-        RESPONSE.data = destiny;
-        res.json(RESPONSE);
       }
     } catch (error) {
       RESPONSE.msg = error.message;

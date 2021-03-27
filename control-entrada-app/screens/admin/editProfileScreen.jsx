@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { View, TouchableOpacity, ScrollView, StyleSheet } from "react-native";
+import { View, TouchableOpacity, ScrollView, StyleSheet, BackHandler } from "react-native";
+import { useFocusEffect } from '@react-navigation/native'
 import { FormContainer } from "../../components/formContainer";
 import Input from "../../components/input.component";
 import Avatar from "../../components/avatar.component";

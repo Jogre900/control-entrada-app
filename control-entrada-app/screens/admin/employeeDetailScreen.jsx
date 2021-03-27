@@ -3,8 +3,9 @@ import {
   View,
   Text,
   StyleSheet,
+  BackHandler
 } from "react-native";
-
+import { useFocusEffect } from '@react-navigation/native'
 //COMPONENT
 import { TopNavigation } from "../../components/TopNavigation.component";
 import { API_PORT } from "../../config/index";
@@ -43,6 +44,21 @@ export const EmployeeDetailScreen = ({ route, navigation }) => {
   useEffect(() => {
     requestUser();
   }, [id]);
+
+  const goBackHardware = () => {
+    //TODO aqui y abajo debes poner segun rol
+    navigation.navigate(routes.EMPLOYEE);
+    return true;
+  };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      BackHandler.addEventListener("hardwareBackPress", goBackHardware);
+      return () => {
+        BackHandler.removeEventListener("hardwareBackPress", goBackHardware);
+      };
+    }, [])
+  );
   return (
     <View style={{ flex: 1 }}>
       <TopNavigation title="Perfil" leftControl={BackAction(navigation, routes.EMPLOYEE)} />
@@ -108,15 +124,15 @@ export const EmployeeDetailScreen = ({ route, navigation }) => {
               {user.userZone.length > 0 ? (
                 <View>
                   <Text>
-                    Contratado el:
+                    Hora Entrada:
                     {moment(user.userZone[0].assignationDate).format(
-                      "D MMM YYYY"
+                      "HH: mm a"
                     )}
                   </Text>
                   <Text>
-                    Fin de Contrato:
+                    Hora Salida:
                     {moment(user.userZone[0].changeTurnDate).format(
-                      "D MMM YYYY"
+                      "HH: mm a"
                     )}
                   </Text>
                 </View>

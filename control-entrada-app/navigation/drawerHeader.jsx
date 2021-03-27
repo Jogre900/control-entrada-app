@@ -24,16 +24,16 @@ const DrawerHeader = ({ navigation, profile, login, company }) => {
         >
           <View>
             <Text style={styles.title} numberOfLines={1}>
-              {profile.name} {profile.lastName}
+              {profile ? profile.name : null} {profile ? profile.lastName : null}
             </Text>
             <View>
               {login.privilege === "Admin" ? (
                 <Text style={styles.caption} numberOfLines={1}>
-                  {login.privilege} {company[0].companyName}
+                  {login? login.privilege : null} {company.length ? company[0].companyName : null}
                 </Text>
               ) : (
                 <Text style={styles.caption} numberOfLines={1}>
-                  {login.privilege} - {profile.userZone[0].Zona.zone}
+                  {login ? login.privilege : null} - {profile ? profile.userZone[0].Zona.zone : null}
                 </Text>
               )}
             </View>

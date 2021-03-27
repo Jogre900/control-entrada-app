@@ -1,5 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, Vibration, TouchableOpacity, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Vibration,
+  BackHandler,
+  TouchableOpacity,
+  ScrollView,
+} from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import { routes } from "../../assets/routes";
 
@@ -18,19 +27,6 @@ const HistorialScreen = ({ navigation, visits, removeVisit }) => {
   const [create, setCreate] = useState(false);
   const [promp, setPromp] = useState(false);
   const [status, setStatus] = useState(false);
-  const goBackAction = () => {
-    return (
-      <View>
-        <TouchableOpacity
-          onPress={() => {
-            navigation.navigate(routes.ADMIN_HOME);
-          }}
-        >
-          <Ionicons name="ios-arrow-back" size={28} color="white" />
-        </TouchableOpacity>
-      </View>
-    );
-  };
 
   //ONLONGPRESS
   const onLong = (id) => {
@@ -59,31 +55,72 @@ const HistorialScreen = ({ navigation, visits, removeVisit }) => {
     clearList();
   };
 
+  const goBackHardware = () => {
+    //TODO aqui y abajo debes poner segun rol
+    navigation.navigate(routes.ADMIN_HOME);
+    return true;
+  };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      BackHandler.addEventListener("hardwareBackPress", goBackHardware);
+      return () => {
+        BackHandler.removeEventListener("hardwareBackPress", goBackHardware);
+      };
+    }, [])
+  );
+
   return (
     <View style={{ flex: 1 }}>
       {selectItem.length > 0 ? (
-        <Header value={selectItem.length} clearAction={clearList} deleteAction={() => setPromp(true)} selectAction={selectAll} />
+        <Header
+          value={selectItem.length}
+          clearAction={clearList}
+          deleteAction={() => setPromp(true)}
+          selectAction={selectAll}
+        />
       ) : (
-        <TopNavigation title="Historial" leftControl={goBackAction()} />
+        <TopNavigation
+          title="Historial"
+          leftControl={BackAction(navigation, routes.ADMIN_HOME)}
+        />
       )}
       {visits.length > 0 && (
         <ScrollView>
           {visits.map((elem) => (
             <TouchableOpacity
               key={elem.id}
-              onPress={selectItem.length > 0 ? () => onLong(elem.id) : () => navigation.navigate("detail-view", { id: elem.id })}
+              onPress={
+                selectItem.length > 0
+                  ? () => onLong(elem.id)
+                  : () => navigation.navigate("detail-view", { id: elem.id })
+              }
               onLongPress={() => onLong(elem.id)}
               delayLongPress={200}
             >
-              <VisitCard data={elem} selected={selectItem.includes(elem.id) ? true : false} />
+              <VisitCard
+                data={elem}
+                selected={selectItem.includes(elem.id) ? true : false}
+              />
             </TouchableOpacity>
           ))}
         </ScrollView>
       )}
 
       {!visits.length && <NotFound message="No hay visitas." />}
-      <PrompModal visible={promp} onClose={() => setPromp(false)} deleted={checkDeleted} data={selectItem} url="visit" />
-      <StatusModal visible={create} onClose={() => setCreate(false)} message={message} status={status} />
+      <PrompModal
+        visible={promp}
+        onClose={() => setPromp(false)}
+        deleted={checkDeleted}
+        data={selectItem}
+        url="visit"
+      />
+      <StatusModal
+        visible={create}
+        onClose={() => setCreate(false)}
+        message={message}
+        status={status}
+      />
     </View>
   );
 };

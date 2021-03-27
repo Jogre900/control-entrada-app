@@ -4,7 +4,7 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  Alert,
+  BackHandler,
   TouchableOpacity,
 } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
@@ -259,6 +259,21 @@ const CreateEmployeScreen = ({
     }
   }, []);
 
+  const goBackHardware = () => {
+    //TODO aqui y abajo debes poner segun rol
+    navigation.navigate(routes.ADMIN_HOME);
+    return true;
+  };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      BackHandler.addEventListener("hardwareBackPress", goBackHardware);
+      return () => {
+        BackHandler.removeEventListener("hardwareBackPress", goBackHardware);
+      };
+    }, [])
+  );
+
   return (
     <View style={{ flex: 1 }}>
       <TopNavigation
@@ -388,7 +403,7 @@ const CreateEmployeScreen = ({
               <View style={styles.pickerButtonContainer}>
                 <MainButton
                   style={styles.pickerButton}
-                  title="Inicio Contrato"
+                  title="Hora Entrada"
                   onPress={() => showDatepicker()}
                 />
                 <Text style={{ alignSelf: "center" }}>
@@ -400,7 +415,7 @@ const CreateEmployeScreen = ({
               <View style={styles.pickerButtonContainer}>
                 <MainButton
                   style={styles.pickerButton}
-                  title="Fin Contrato"
+                  title="Hora Salida"
                   onPress={() => showDatepicker2()}
                 />
                 <Text style={{ alignSelf: "center" }}>
@@ -415,7 +430,7 @@ const CreateEmployeScreen = ({
                 <DateTimePicker
                   testID="dateTimePicker1"
                   value={employeeData.assignationDate}
-                  mode={mode}
+                  mode="time"
                   is24Hour={true}
                   display="default"
                   onChange={onChange}
@@ -426,7 +441,7 @@ const CreateEmployeScreen = ({
             {show2 && (
               <DateTimePicker
                 value={employeeData.changeTurnDate}
-                mode={"date"}
+                mode="time"
                 is24Hour={true}
                 display="default"
                 onChange={onChange2}
