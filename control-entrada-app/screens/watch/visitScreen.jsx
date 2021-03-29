@@ -46,8 +46,8 @@ const VisitScreen = ({
   const [hasVisit, setHasVisit] = useState(true);
   const [visits, setVisits] = useState([]);
   const [visitsDni, setvisitsDni] = useState();
-  let destinys = []
-  profile.userZone[0].Zona.Destinos.map(({id}) => destinys.push(id))
+  let destinys = [];
+  profile.userZone[0].Zona.Destinos.map(({ id }) => destinys.push(id));
   const searchRef = useRef();
 
   //REQUEST TODAY VISITS
@@ -55,16 +55,29 @@ const VisitScreen = ({
     //setVisits([]);
     setLoading(true);
     const token = await storage.getItem("userToken");
-    const res = await helpers.fetchVisitDestiny(destinys, token);
-    console.log(res.data)
-    if (!res.data.error && res.data.data.length) {
-      setLoading(false);
-      //setVisits(res.data.data);
-      saveVisit(res.data.data);
-    } else if (!res.data.data.length) {
-      console.log("no hay visitas")
-      setLoading(false);
-      setHasVisit(false);
+    try {
+      const res = await helpers.fetchVisitDestiny(destinys, token);
+      console.log("res de visitas--", res.data);
+      if (res.data.msg === "Cuenta suspendida") {
+        setLoading(false);
+        setStatusModalProps((values) => ({
+          ...values,
+          visible: true,
+          status: false,
+          message: res.data.msg,
+        }));
+        return;
+      } else if (!res.data.error && res.data.data.length) {
+        setLoading(false);
+        //setVisits(res.data.data);
+        saveVisit(res.data.data);
+      } else if (!res.data.data.length) {
+        console.log("no hay visitas");
+        setLoading(false);
+        setHasVisit(false);
+      }
+    } catch (error) {
+      alert(error.message);
     }
   };
 
@@ -107,7 +120,7 @@ const VisitScreen = ({
     if (status) {
       removeVisit(selectItem);
       clearList();
-      setHasVisit(false)
+      setHasVisit(false);
     }
     setStatusModalProps((values) => ({
       ...values,
@@ -116,7 +129,6 @@ const VisitScreen = ({
       message,
     }));
   };
-  
 
   useEffect(() => {
     todayVisit();

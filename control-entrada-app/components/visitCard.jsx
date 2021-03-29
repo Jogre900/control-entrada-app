@@ -16,7 +16,7 @@ const iconProps = {
 
 export const VisitCard = ({ data, selected }) => {
   const { Fotos, Visitante, Destino, Salida } = data;
-  console.log("VISIT CARD--",data.Salida)
+  //console.log("VISIT CARD--",data.Salida)
   return (
    // <></>
     <View

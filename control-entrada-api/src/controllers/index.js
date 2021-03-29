@@ -396,12 +396,16 @@ password: "123456,
       data: null,
       token: null
     };
-    const { id } = req.body;
-    console.log(req.body);
+    const { id } = req.params;
+    console.log(req.params);
+    let array = [];
+    if (id.length > 36) {
+      array = id.split(",");
+    }
     try {
       const zones = await models.Zone.findAll({
         where: {
-          id
+          id: array.length > 0 ? array : id
         },
         include: {
           model: models.UserZone,
@@ -419,7 +423,7 @@ password: "123456,
         if (deleted) {
           const deleteZones = await models.Zone.destroy({
             where: {
-              id
+              id: array.length > 0 ? array : id
             }
           });
           RESPONSE.error = false;
@@ -588,40 +592,44 @@ password: "123456,
       data: null,
       token: null
     };
-    console.log(req.body);
 
-    const { id } = req.body;
+    const { id } = req.params;
+    console.log(id.length);
+    let array = [];
+    if (id.length > 36) {
+      array = id.split(",");
+    }
 
     try {
       const destinys = await models.Destination.findAll({
         where: {
-          id
+          id: array.length ? array : id
         },
         raw: true
-      })
-      let deleted = true
-      if(destinys){
-        destinys.map(({visits}) => {
-          if(visits > 0){
-            deleted = false
-            return
+      });
+      let deleted = true;
+      if (destinys) {
+        destinys.map(({ visits }) => {
+          if (visits > 0) {
+            deleted = false;
+            return;
           }
-        })
-        if(deleted){
+        });
+        if (deleted) {
           const destiny = await models.Destination.destroy({
             where: {
-              id
+              id: array.length ? array : id
             }
           });
-          if(destiny){
+          if (destiny) {
             (RESPONSE.error = false), (RESPONSE.msg = "Borrado Exitoso!");
             RESPONSE.data = destiny;
             res.json(RESPONSE);
           }
-        }else{
-          RESPONSE.msg= 'Error, El destino seleccionado posee entradas'
-          RESPONSE.data = destinys
-          res.json(RESPONSE)
+        } else {
+          RESPONSE.msg = "Error, Destino(s) seleccionado(s) posee entradas";
+          RESPONSE.data = destinys;
+          res.json(RESPONSE);
         }
       }
     } catch (error) {
@@ -1191,10 +1199,10 @@ password: "123456,
       token: null
     };
     const { email, password } = req.body;
-    console.log(req.body.data);
+    console.log(req.body);
     //console.log(email, password)
     try {
-      let user = await models.User.findOne({
+      const user = await models.User.findOne({
         where: {
           email: email.toLowerCase()
         },
@@ -1220,9 +1228,6 @@ password: "123456,
           {
             model: models.UserCompany,
             as: "UserCompany",
-            where: {
-              active: true
-            },
             include: {
               model: models.Company,
               as: "Company",
@@ -1233,18 +1238,27 @@ password: "123456,
           }
         ]
       });
-      console.log("USER LOGIN----", user);
+      let tokenInput = {};
+      console.log("user----", user);
       if (user) {
-        if (bcrypt.compareSync(password, user.password)) {
-          let token = jwt.sign(user.dataValues, SECRETKEY, { expiresIn: "1d" });
-          RESPONSE.error = false;
-          RESPONSE.msg = "Inicio Exitoso";
-          RESPONSE.data = user;
-          RESPONSE.token = token;
+        if (user.dataValues.UserCompany[0].active === false) {
+          RESPONSE.msg = "Cuenta Suspendida";
           res.json(RESPONSE);
         } else {
-          RESPONSE.msg = "Clave Invalida";
-          res.json(RESPONSE);
+          if (bcrypt.compareSync(password, user.password)) {
+            tokenInput.userId = user.dataValues.id;
+            tokenInput.active = user.dataValues.UserCompany[0].active;
+            tokenInput.privilege = user.dataValues.UserCompany[0].privilege;
+            let token = jwt.sign(tokenInput, SECRETKEY, { expiresIn: "1d" });
+            RESPONSE.error = false;
+            RESPONSE.msg = "Inicio Exitoso";
+            RESPONSE.data = user;
+            RESPONSE.token = token;
+            res.json(RESPONSE);
+          } else {
+            RESPONSE.msg = "Clave o Usuario Invalido";
+            res.json(RESPONSE);
+          }
         }
       } else {
         RESPONSE.msg = "Usuario no registrado.";
@@ -1488,24 +1502,67 @@ password: "123456,
       res.json(RESPONSE);
     }
   },
-  verifyExpToken: async function(req, res) {
+  verifyLogin: async function(req, res) {
     let RESPONSE = {
       error: true,
       msg: "",
       data: null,
       token: null
     };
-
+    console.log("REQ.PAYLOAD----",req.payload)
     const token = req.headers.authorization.split(" ")[1];
-
+    console.log(token);
     try {
       let decode = jwt.verify(token, SECRETKEY);
+      console.log(decode);
       if (decode) {
-        RESPONSE.error = false;
-        RESPONSE.data = decode;
-        RESPONSE.msg = "token activo";
-        RESPONSE.token = token;
-        res.status(200).json(RESPONSE);
+        if (decode.active === false) {
+          console.log(decode);
+          RESPONSE.msg = "Cuenta Suspendida";
+          res.json(RESPONSE);
+        } else {
+          console.log(decode.userId);
+          const user = await models.User.findOne({
+            where: {
+              id: decode.userId
+            },
+            include: [
+              {
+                model: models.NotificationRead,
+                as: "notificationUsers",
+                include: { model: models.Notification, as: "notification" }
+              },
+              {
+                model: models.UserZone,
+                as: "userZone",
+                include: {
+                  model: models.Zone,
+                  as: "Zona",
+                  include: { model: models.Destination, as: "Destinos" }
+                }
+              },
+              {
+                model: models.Employee,
+                as: "Employee"
+              },
+              {
+                model: models.UserCompany,
+                as: "UserCompany",
+
+                include: {
+                  model: models.Company,
+                  as: "Company"
+                }
+              }
+            ]
+          });
+          console.log(user);
+          RESPONSE.error = false;
+          RESPONSE.data = user;
+          RESPONSE.msg = "token activo";
+          RESPONSE.token = token;
+          res.status(200).json(RESPONSE);
+        }
       }
     } catch (error) {
       RESPONSE.msg = error.message;
@@ -1678,20 +1735,60 @@ password: "123456,
     };
     console.log(req.params);
     const { id } = req.params;
+    let array = [];
+    if (id.length > 36) {
+      array = id.split(",");
+    }
     try {
-      let user = await models.User.findOne({
+      const userCompany = await models.UserCompany.findAll({
         where: {
-          id
+          userId: array.length ? array : id
         }
       });
-      if (user) {
-        user.destroy();
-        (RESPONSE.error = false), (RESPONSE.msg = "Registro Borrado!");
-        RESPONSE.data = user;
+      //console.log(userCompany);
+      if (userCompany) {
+        userCompany.forEach(async element => {
+            element.active = false;
+            await element.save();  
+            //await element.reload()
+        });
+        // userCompany.map(async elm => {
+        //   elm.active = false;
+        //   await elm.reload()
+        //   await elm.save();
+        // });
+        //console.log(userCompany);
+        // const userS = await models.User.findOne({
+        //   include: [
+        //     {
+        //       model: models.Employee,
+        //       as: "Employee"
+        //     },
+        //     {
+        //       model: models.UserCompany,
+        //       as: "UserCompany",  where: {
+        //         active : 'false'
+        //       },
+              
+        //     },
+        //     {
+        //       model: models.UserZone,
+        //       as: "userZone",
+        //       include: {
+        //         model: models.Zone,
+        //         as: "Zona"
+        //       }
+        //     }
+        //   ]
+        // })
+        // console.log(userS.dataValues)
+        RESPONSE.error = false;
+        RESPONSE.msg = "Usuario(s) suspendido(s)!";
+        RESPONSE.data = userCompany;
         res.json(RESPONSE);
       }
     } catch (error) {
-      RESPONSE.msg = error;
+      RESPONSE.msg = error.message;
       res.json(RESPONSE);
     }
   },
@@ -1703,25 +1800,25 @@ password: "123456,
       token: null
     };
     const { dni } = req.params;
-    try {
-      const citizen = await models.Citizen.findOne({
-        where: {
-          dni
-        }
-      });
-      if (citizen) {
-        (RESPONSE.error = false),
-          (RESPONSE.data = citizen),
-          (RESPONSE.msg = "Busqueda exitosa!");
-        res.json(RESPONSE);
-      } else {
-        RESPONSE.msg = "dni no registrado";
-        res.json(RESPONSE);
-      }
-    } catch (error) {
-      RESPONSE.msg = error.message;
-      res.json(RESPONSE);
-    }
+    // try {
+    //   const citizen = await models.Citizen.findOne({
+    //     where: {
+    //       dni
+    //     }
+    //   });
+    //   if (citizen) {
+    //     (RESPONSE.error = false),
+    //       (RESPONSE.data = citizen),
+    //       (RESPONSE.msg = "Busqueda exitosa!");
+    //     res.json(RESPONSE);
+    //   } else {
+    //     RESPONSE.msg = "dni no registrado";
+    //     res.json(RESPONSE);
+    //   }
+    // } catch (error) {
+    //   RESPONSE.msg = error.message;
+    //   res.json(RESPONSE);
+    // }
   },
   //CREATE VISIT
   createVisits: async function(req, res) {
@@ -1846,6 +1943,7 @@ password: "123456,
       destinyId
     } = req.body;
     console.log("req.body create citizen--", req.body);
+    console.log(req.headers)
     try {
       let person = await models.Citizen.findOne({
         where: {
@@ -1853,27 +1951,27 @@ password: "123456,
         }
       });
       if (person) {
-        // let visit = await models.Visits.create(
-        //   {
-        //     entryDate,
-        //     descriptionEntry,
-        //     departureDate,
-        //     descriptionDeparture,
-        //     destinationId: destinyId,
-        //     UserZoneId: userZoneId,
-        //     citizenId: person.id,
-        //     Fotos: {
-        //       picture: req.files[0].filename,
-        //       entry: "algo"
-        //     }
-        //   },
-        //   {
-        //     include: {
-        //       model: models.Picture,
-        //       as: "Fotos"
-        //     }
-        //   }
-        // );
+        let visit = await models.Visits.create(
+          {
+            entryDate,
+            descriptionEntry,
+            departureDate,
+            descriptionDeparture,
+            destinationId: destinyId,
+            UserZoneId: userZoneId,
+            citizenId: person.id,
+            Fotos: {
+              picture: req.files[0].filename,
+              entry: "algo"
+            }
+          },
+          {
+            include: {
+              model: models.Picture,
+              as: "Fotos"
+            }
+          }
+        );
         //console.log("visita con dni ya registrado", visit)
         RESPONSE.msg = "Usuario ya registrado";
         RESPONSE.data = person;
@@ -2063,7 +2161,7 @@ password: "123456,
       destinationId
     } = req.body;
     const { id } = req.params;
-    
+
     let inputs = {};
     inputs.visitId = id;
     inputs.departureDate = departureDate;
@@ -2084,14 +2182,14 @@ password: "123456,
         },
         raw: true
       });
-      console.log(visit.UserZoneId, userZoneId)
+      console.log(visit.UserZoneId, userZoneId);
       if (visit.UserZoneId !== userZoneId) {
         increment = true;
       }
       let departure = await models.Departure.create({ ...inputs });
-      
+
       if (increment) {
-        console.log("hay que incrementar")
+        console.log("hay que incrementar");
         const user = await models.User.findOne({
           include: {
             model: models.UserZone,
@@ -2102,7 +2200,7 @@ password: "123456,
           }
         });
         const userId = user.dataValues.id;
-        console.log("userId----",userId)
+        console.log("userId----", userId);
         const userCompany = await models.UserCompany.findOne({
           where: {
             userId
@@ -2455,7 +2553,7 @@ password: "123456,
       data: null,
       tokn: null
     };
-    console.log(req.params);
+    console.log("ENTRO--",req.params);
     const { destinyId, checked } = req.params;
     let array = [];
     if (destinyId.length) {
@@ -2465,7 +2563,7 @@ password: "123456,
     try {
       let visits = await models.Visits.findAll({
         where: {
-          destinationId: array.length ? array : destinyId,
+          destinationId: array.length ? array : destinyId
           // createdAt: {
           //   [Op.and]: {
           //     [Op.gt]: moment().format("YYYY-MM-DD 00:00"),

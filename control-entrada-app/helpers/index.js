@@ -3,6 +3,7 @@ import axios from "axios";
 import { API_PORT } from "../config/index";
 import { createCitizen, findCitizendni } from "./citizen";
 import { fetchAllZones,fetchZoneById, zoneMaxVisit, destinyMaxVisit } from './zones'
+import { suspendEmployee } from './users'
 import {
   createVisit,
   findVisitdni,
@@ -28,17 +29,14 @@ export const helpers = {
   fetchZoneById,
   fetchAllZones,
   zoneMaxVisit,
-  destinyMaxVisit
+  destinyMaxVisit,
+  suspendEmployee
 };
 
 //DELETE ANYTHING FROM API
 export async function deleteInfo(url, arrayIds) {
   try {
-    const res = await axios({
-      method: "DELETE",
-      url: url,
-      data: { id: arrayIds },
-    });
+    const res = await axios.delete(`${API_PORT()}/api/${url}/${arrayIds}`)
     return res.data;
   } catch (error) {
     return error.message;

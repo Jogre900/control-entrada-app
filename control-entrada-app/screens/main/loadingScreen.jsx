@@ -12,13 +12,17 @@ const LoadingScreen = ({ navigation, saveProfile, saveCompany, saveLogin }) => {
     if (token) {
       try {
         //TODO verificar esta ruta en la api para que de la estructura nueva
-        let res = await axios.get(`${API_PORT()}/api/verifyToken`, {
+        let res = await axios.get(`${API_PORT()}/api/verifyLogin`, {
           headers: {
             Authorization: `bearer ${token}`,
           },
         });
-        console.log(res.data)
-
+        console.log("res de verifi Token---",res)
+        if(res.data.msg === 'Cuenta suspendida'){
+          alert(res.data.msg)
+          navigation.navigate(routes.MAIN);
+          return;
+        }
         //console.log("RES DE TOKEN----", res.data.data.UserCompany[0].privilege)
         if (res.data.error || res.data.msg === "jwt expired") {
           navigation.navigate(routes.MAIN);
@@ -76,7 +80,7 @@ const LoadingScreen = ({ navigation, saveProfile, saveCompany, saveLogin }) => {
           }
         }
       } catch (error) {
-        alert(error.message);
+        alert(error);
       }
     } else navigation.navigate(routes.MAIN);
   };

@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
   },
   outline: {
     borderColor: MainColor,
-    backgroundColor: '#fff',
+    backgroundColor: 'transparent',
     borderWidth: 1,
   },
   text: {

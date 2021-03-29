@@ -105,16 +105,12 @@ export async function fetchVisitDestiny(id, token){
 
 //CREATE DEPARTURE
 export async function createDeparture(id, data, token) {
-  try {
     const res = await axios.post(`${API_PORT()}/api/departure/${id}`, data, {
       headers: {
         Authorization: `bearer ${token}`,
       },
     });
     return res;
-  } catch (error) {
-    console.log(error.message);
-  }
 }
 //USER WITH MAX VISIT REGISTER
 export async function maxUserVisit(companyId){

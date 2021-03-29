@@ -3,9 +3,10 @@ import {
   View,
   Text,
   StyleSheet,
-  BackHandler
+  BackHandler,
+  TouchableOpacity,
 } from "react-native";
-import { useFocusEffect } from '@react-navigation/native'
+import { useFocusEffect } from "@react-navigation/native";
 //COMPONENT
 import { TopNavigation } from "../../components/TopNavigation.component";
 import { API_PORT } from "../../config/index";
@@ -13,9 +14,9 @@ import { Ionicons } from "@expo/vector-icons";
 import { Divider } from "../../components/Divider";
 import { FormContainer } from "../../components/formContainer";
 import { Spinner } from "../../components/spinner";
-import { MainColor, ThirdColor } from "../../assets/colors";
-import { routes } from '../../assets/routes'
-import { BackAction } from '../../helpers/ui/ui'
+import { MainColor, ThirdColor, Warning } from "../../assets/colors";
+import { routes } from "../../assets/routes";
+import { BackAction } from "../../helpers/ui/ui";
 import Avatar from "../../components/avatar.component";
 import axios from "axios";
 import moment from "moment";
@@ -32,7 +33,7 @@ export const EmployeeDetailScreen = ({ route, navigation }) => {
     try {
       const res = await axios.get(`${API_PORT()}/api/findUser/${id}`);
       if (!res.data.error) {
-        console.log(res.data.data)
+        console.log(res.data.data);
         setUser(res.data.data);
         setLoading(false);
       }
@@ -61,16 +62,24 @@ export const EmployeeDetailScreen = ({ route, navigation }) => {
   );
   return (
     <View style={{ flex: 1 }}>
-      <TopNavigation title="Perfil" leftControl={BackAction(navigation, routes.EMPLOYEE)} />
+      <TopNavigation
+        title="Perfil"
+        leftControl={BackAction(navigation, routes.EMPLOYEE)}
+      />
       {loading && <Spinner message="Cargando..." />}
       {user && (
-        <View style={{alignItems: 'center'}}>
+        <View style={{ alignItems: "center" }}>
           <View style={styles.profileContainer}>
             <View style={styles.pictureContainer}>
               <Avatar.Picture
                 size={120}
                 uri={`${API_PORT()}/public/imgs/${user.Employee.picture}`}
               />
+              {user.UserCompany[0].active === false ? (
+                <TouchableOpacity style={styles.openCameraButton}>
+                  <Avatar.Icon name="ios-warning" size={32} color="#fff" />
+                </TouchableOpacity>
+              ) : null}
             </View>
             <Text style={styles.profileName}>
               {user.Employee.name} {user.Employee.lastName}
@@ -104,7 +113,9 @@ export const EmployeeDetailScreen = ({ route, navigation }) => {
                   alignItems: "center",
                 }}
               >
-                <Text style={styles.contentText}>{user.UserCompany.length ? user.UserCompany[0].visits : '0'}</Text>
+                <Text style={styles.contentText}>
+                  {user.UserCompany.length ? user.UserCompany[0].visits : "0"}
+                </Text>
                 <Text style={styles.labelText}>Entradas</Text>
               </View>
             </View>
@@ -118,7 +129,7 @@ export const EmployeeDetailScreen = ({ route, navigation }) => {
           </View>
           <FormContainer>
             <View>
-            <Text>Email: {user.email}</Text>
+              <Text>Email: {user.email}</Text>
               <Text>DNI: {user.Employee.dni}</Text>
 
               {user.userZone.length > 0 ? (
@@ -131,9 +142,7 @@ export const EmployeeDetailScreen = ({ route, navigation }) => {
                   </Text>
                   <Text>
                     Hora Salida:
-                    {moment(user.userZone[0].changeTurnDate).format(
-                      "HH: mm a"
-                    )}
+                    {moment(user.userZone[0].changeTurnDate).format("HH: mm a")}
                   </Text>
                 </View>
               ) : (
@@ -182,6 +191,20 @@ const styles = StyleSheet.create({
     borderRadius: 120 / 2,
     backgroundColor: "#fff",
   },
+  openCameraButton: {
+    position: "absolute",
+    bottom: 0,
+    right: -15,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: MainColor,
+    width: 40,
+    height: 40,
+    borderRadius: 40 / 2,
+    borderColor: "#fff",
+    borderWidth: 2,
+    elevation: 10,
+  },
   profileDataContainer: {
     flexDirection: "row",
     //backgroundColor: 'green',
@@ -206,7 +229,7 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: "100",
     color: "black",
-    alignSelf: 'center'
+    alignSelf: "center",
   },
   privilegeBox: {
     backgroundColor: ThirdColor,

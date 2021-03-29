@@ -7,6 +7,7 @@ import jwt from "jsonwebtoken";
 import createError from "http-errors";
 import { Unauthorized } from "http-errors";
 import { $security, $serverPort } from "@config";
+import models from "@models";
 const SECRETKEY = process.env.SECRETKEY || $security().secretKey;
 //Storage
 const storage = multer.diskStorage({
@@ -32,19 +33,42 @@ const uploadImg = multer({
 
 //VERIFY TOKEN MIDDLEWARE
 const middleware = {
-  verifyToken: function(req, res, next) {
-    //console.log("req.headers middleware---", req.headers)
+  verifyToken: async function(req, res, next) {
     if (!req.headers["authorization"])
-      return next(createError(401, "Usuario no Autorizado"));
+      res.json({
+        msg: "token missing or invalid"
+      });
+    //return next(createError(401, "Usuario no Autorizado"));
     const headerToken = req.headers["authorization"];
-    //console.log("CABECERA-----",headerToken)
     const token = headerToken.split(" ")[1];
-    jwt.verify(token, SECRETKEY, (err, payload) => {
-      console.log(payload);
-      if (err) return next(createError(401, err.message));
-      res.payload = payload;
-      next();
-    });
+    const decoded = jwt.verify(token, SECRETKEY)
+      console.log(decoded)
+      //console.log("PAYLOAD DE TOKEN---", payload);
+      try {
+        const user = await models.User.findOne({
+          where: {
+            id: decoded.userId
+          },
+          include: {
+            model: models.UserCompany,
+            as: "UserCompany"
+          }
+        });
+        if (user.dataValues.UserCompany[0].active === false) {
+          //return next(createError(401, 'Cuenta suspendida'))
+          return res.json({
+            msg: "Cuenta suspendida"
+          });
+        } else {
+          req.payload = decoded;
+          next();
+        }
+      } catch (error) {
+        //return next(createError(error, err.message));
+        return res.json({
+          msg: error.message
+        });
+      }
   }
 };
 
@@ -59,24 +83,24 @@ router.post(
 
 router.put("/updateAdmin/:companyId", Controllers.updateAdminId);
 router.post("/login", Controllers.login);
-router.get("/findUser/:id", Controllers.findUser)
+router.get("/findUser/:id", Controllers.findUser);
 router.get("/user/:companyId", Controllers.findUsers);
 router.get("/user/zone/:zoneId", Controllers.findUsersByZone);
 router.get("/findAvailableUsers/:companyId", Controllers.findAvailableUsers);
-router.delete("/deleteUser/:id", Controllers.deleteUser);
+router.put("/user/:id", Controllers.deleteUser);
 router.get("/findCompany/:id", Controllers.findCompany);
 //ZONES
 router.post("/createZone/:id", Controllers.createZone);
 router.get("/findZones/:companyId", Controllers.findZones);
 router.get("/zone/:zoneId", Controllers.findZone);
-router.get("/zoneMaxVisit/:companyId", Controllers.findZoneMaxVisit)
-router.delete("/zone", Controllers.deleteZone);
+router.get("/zoneMaxVisit/:companyId", Controllers.findZoneMaxVisit);
+router.delete("/zone/:id", Controllers.deleteZone);
 //DESTINY
 router.post("/createDestiny/:id", Controllers.createDestiny);
 router.get("/findDestiny/:id", Controllers.findDestinyByZone);
-router.get("/findAllDestiny/:id", Controllers.findAllDestiny)
-router.post("/destinyMaxVisit", Controllers.findDestinyMaxVisit)
-router.delete("/deleteDestiny", Controllers.deleteDestiny);
+router.get("/findAllDestiny/:id", Controllers.findAllDestiny);
+router.post("/destinyMaxVisit", Controllers.findDestinyMaxVisit);
+router.delete("/destiny/:id", Controllers.deleteDestiny);
 //ROUTAS PARA BORRAR
 router.post("/createEmployee", Controllers.createEmployee);
 router.get("/findEmployees", Controllers.findEmployees);
@@ -85,10 +109,10 @@ router.post("/createUserZone", Controllers.createUserZone);
 router.get("/displayPicture", Controllers.displayPicture);
 router.get("/profile", Controllers.getProfile);
 router.put("/profile/:id", uploadImg.single("file"), Controllers.updateProfile);
-router.post("/password/:email", Controllers.recoverPassword)
+router.post("/password/:email", Controllers.recoverPassword);
 
 router.get("/findUserZone/:id", Controllers.findUserZone);
-router.get("/verifyToken", Controllers.verifyExpToken);
+router.get("/verifyLogin", middleware.verifyToken, Controllers.verifyLogin);
 //VISIT ROUTES
 router.post(
   "/visit",
@@ -103,21 +127,31 @@ router.post("/visits", Controllers.findTodayVisits);
 router.get("/findWeekVisits/", Controllers.findWeekVisits);
 router.get("/visits/:userzoneId", Controllers.findTodayVisitsByUser);
 //todas las visitas de hoy por destino
-router.get("/visitsdestiny/:destinyId/:checked?", middleware.verifyToken, Controllers.findTodayVisitsByDestiny);
+router.get(
+  "/visitsdestiny/:destinyId/:checked?",
+  middleware.verifyToken,
+  Controllers.findTodayVisitsByDestiny
+);
 router.delete("/visit/", Controllers.deleteVisit);
 //DEPARTURE ROUTES
-router.post("/departure/:id", middleware.verifyToken, Controllers.createDeparture);
-
+router.post(
+  "/departure/:id",
+  middleware.verifyToken,
+  Controllers.createDeparture
+);
 
 //CITIZEN
-router.get("/citizen/:dni", middleware.verifyToken, Controllers.findCitizen)
-router.post("/citizen", middleware.verifyToken, uploadImg.array('file'), Controllers.createCitizen)
+router.get("/citizen/:dni", middleware.verifyToken, Controllers.findCitizen);
+router.post(
+  "/citizen",
+  middleware.verifyToken,
+  uploadImg.array("file"),
+  Controllers.createCitizen
+);
 //FIND MAX VALUE ROUTES
-router.get("/userCompany/:companyId", Controllers.findMaxVisitUser)
+router.get("/userCompany/:companyId", Controllers.findMaxVisitUser);
 // NUEVAS RUTA AJUSTE SISTEMA
-router.post("/company", 
-uploadImg.array('file'),
- Controllers.createCompany);
+router.post("/company", uploadImg.array("file"), Controllers.createCompany);
 router.post(
   "/supervisor",
   uploadImg.single("file"),

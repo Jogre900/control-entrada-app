@@ -3,19 +3,33 @@ import { View, Text, StyleSheet } from "react-native";
 import { FormContainer } from "./formContainer";
 import Input from "./input.component";
 import { MainButton } from "./mainButton.component";
-import { API_PORT } from "../config/index";
 import { Danger } from "../assets/colors";
 import axios from "axios";
 import Modal from "react-native-modal";
 import { LoadingModal } from "./loadingModal";
-import { deleteInfo } from "../helpers/";
+import { deleteInfo, helpers } from "../helpers/";
 
-export const PrompModal = ({ visible, deleted, onClose, data, url }) => {
+export const PrompModal = ({ visible, deleted, onClose, data, url, suspend }) => {
   const [loading, setLoading] = useState(false);
+
+  const suspendE = async () => {
+    setLoading(true);
+    try {
+      const res = await helpers.suspendEmployee(data)
+      setLoading(false);
+      if(!res.data.error){
+        deleted(true, res.data.msg, res.data.data)
+        onClose();
+      }
+    } catch (error) {
+      setLoading(false);
+      deleted(false, error.message)
+    }
+  }
 
   const deleteHelper = async () => {
     setLoading(true);
-    const res = await deleteInfo(`${API_PORT()}/api/${url}`, data);
+    const res = await deleteInfo(url, data);
     console.log("res de BORRAR---", res)
     if (!res.error) {
       setLoading(false);
@@ -43,7 +57,7 @@ export const PrompModal = ({ visible, deleted, onClose, data, url }) => {
         alignItems: "center",
       }}
     >
-      <FormContainer style={styles.container} title="¿Seguro que desea borra?">
+      <FormContainer style={styles.container} title={!suspend ?"¿Seguro que desea borra?" : "¿Seguro que desea suspender?"}>
         <View style={styles.buttonContainer}>
           <MainButton
             style={[styles.button, styles.buttonLeft]}
@@ -56,9 +70,7 @@ export const PrompModal = ({ visible, deleted, onClose, data, url }) => {
           <MainButton
             style={styles.button}
             title="Si"
-            onPress={() => {
-              deleteHelper();
-            }}
+            onPress={!suspend ? deleteHelper : suspendE}
           />
         </View>
       </FormContainer>

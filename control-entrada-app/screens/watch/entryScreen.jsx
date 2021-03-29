@@ -138,7 +138,8 @@ const EntryScreen = ({ navigation, profile, saveVisit }) => {
       visitData.destinyId = destinyId;
       visitData.userZoneId = userZoneId;
       const res = await helpers.createCitizen(visitData, token);
-      if (res.data.error && res.data.msg === "Usuario ya registrado") {
+      console.log(res.data)
+      if (res.data.msg === "Usuario ya registrado") {
         setLoading(false);
         setStatusModalProps((values) => ({
           ...values,

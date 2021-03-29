@@ -1,4 +1,4 @@
-import React, { useEffect} from "react";
+import React, { useEffect } from "react";
 import {
   View,
   StyleSheet,
@@ -9,39 +9,44 @@ import {
   KeyboardAvoidingView,
   TouchableWithoutFeedback,
   Keyboard,
-
 } from "react-native";
 import { connect, useDispatch } from "react-redux";
 
-import { routes } from '../../assets/routes'
+import { routes } from "../../assets/routes";
 
 //components
 import { MainButton } from "../../components/mainButton.component";
 
 const { width, height } = Dimensions.get("window");
 
-const MainScreen = ({ navigation, saveProfile, saveCompany, saveLogin, route, isToken, token, privilege }) => {
-  const dispatch = useDispatch()
-
-  useEffect(() => {
-    if(route.params?.logOut){
-      setTimeout(() => {
-        dispatch({type: 'CLEAR_STORAGE'})
-      }, 3000);
-    }
-  }, [route.params?.logOut])
-
+const MainScreen = ({
+  navigation,
+  saveProfile,
+  saveCompany,
+  saveLogin,
+  route,
+  isToken,
+  token,
+  privilege,
+}) => {
   return (
     <View style={styles.container}>
-      <ImageBackground source={require("../../assets/images/background.jpg")} style={styles.imageBackground}>
+      <ImageBackground
+        source={require("../../assets/images/background.jpg")}
+        style={styles.imageBackground}
+      >
         <StatusBar hidden={true} />
 
-        <TouchableWithoutFeedback style={styles.backCover} onPress={() => Keyboard.dismiss()}>
+        <TouchableWithoutFeedback
+          style={styles.backCover}
+          onPress={() => Keyboard.dismiss()}
+        >
           <KeyboardAvoidingView style={styles.backCover} behavior="padding">
-            <Image style={styles.logo} source={require("../../assets/images/security-logo.png")} />
+            <Image
+              style={styles.logo}
+              source={require("../../assets/images/security-logo.png")}
+            />
             <View style={styles.buttonBox}>
-
-
               <MainButton
                 title="Ingresar"
                 style={styles.input}
@@ -51,7 +56,9 @@ const MainScreen = ({ navigation, saveProfile, saveCompany, saveLogin, route, is
               />
               <MainButton
                 title="Registrate"
-                style={styles.input}
+                style={[styles.input]}
+                textStyle={{color: '#fff'}}
+                outline
                 onPress={() => {
                   navigation.navigate(routes.REGISTER);
                 }}
@@ -92,7 +99,7 @@ const styles = StyleSheet.create({
     bottom: "25%",
   },
   input: {
-    marginVertical: 2.5,
+    marginVertical: 5,
   },
 });
 
@@ -117,11 +124,11 @@ const mapDispatchToProps = (dispatch) => ({
       payload: company,
     });
   },
-  saveLogin(login){
+  saveLogin(login) {
     dispatch({
-      type: 'SET_LOGIN',
-      payload: login
-    })
-  }
+      type: "SET_LOGIN",
+      payload: login,
+    });
+  },
 });
 export default connect(mapStateToProps, mapDispatchToProps)(MainScreen);

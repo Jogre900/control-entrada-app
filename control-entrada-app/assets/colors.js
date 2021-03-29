@@ -4,6 +4,7 @@ export const ThirdColor = '#ff9e40'
 export const lightColor = '#ffb873'
 export const Success = '#28a745'
 export const Danger = '#dc3545'
+export const Warning = '#ffc107'
 
 //PRUEBA
 const background= '#121315'

@@ -4,28 +4,39 @@ const initialState = {
   available: [],
 };
 
+//SUSPEND EMPLOYEE
+const suspendEmployee = (data, state) => {
+  console.log("PAYLOAD--",data)
+  console.log("STATE--",state.employee)
+  let filterE = state.employee.filter(({ id }) => id !== data.id);
+  console.log("STATE FILTER--",filterE)
+  let newArray = filterE.concat(data);
+  console.log("NUEVO STATE---",newArray)
+  return newArray;
+};
+
 export default (state = initialState, action) => {
   switch (action.type) {
     case "SAVE_EMPLOYEE":
-    //console.log("PAYLOAD---",action.payload)
-    let allEmployees = state.employee.concat(action.payload)
-    //console.log("CONCAT EMPLOY----", allEmployees)
-    let filterEmployee = allEmployees.reduce((acum, emp) => {
-      if(!acum.find(({id}) => id === emp.id)){
-        acum.push(emp)
-      }
-      return acum
-    }, [])
-    //console.log("PAYLOAD SAVED---",filterEmployee) 
-    return {
+      //console.log("PAYLOAD---",action.payload)
+      let allEmployees = state.employee.concat(action.payload);
+      //console.log("CONCAT EMPLOY----", allEmployees)
+      let filterEmployee = allEmployees.reduce((acum, emp) => {
+        if (!acum.find(({ id }) => id === emp.id)) {
+          acum.push(emp);
+        }
+        return acum;
+      }, []);
+      //console.log("PAYLOAD SAVED---",filterEmployee)
+      return {
         ...state,
-        employee: action.payload
+        employee: action.payload,
       };
-      
+
     //ADD NEW EMPLOYEE
     case "ADD_EMPLOYEE":
-    console.log("NEW USER------",action.payload)  
-    return {
+      console.log("NEW USER------", action.payload);
+      return {
         ...state,
         employee: state.employee.concat(action.payload),
       };
@@ -49,11 +60,17 @@ export default (state = initialState, action) => {
         available: state.available.filter(({ id }) => id !== action.payload.id),
         //employee: state.employee.concat(action.payload)
       };
+    case "SUSPEND_EMPLOYEE":
+    console.log("suspendiendo usuario...")  
+    return {
+        ...state,
+        employee: suspendEmployee(action.payload, state),
+      };
     case "CLEAR_STORAGE":
-      console.log("CLEAR_STORAGE----",action.payload)  
+      console.log("CLEAR_STORAGE----", action.payload);
       return {
         employee: [],
-        available: []
+        available: [],
       };
     default:
       return state;

@@ -222,7 +222,7 @@ export const DetailViewScreen = ({ route, navigation }) => {
 
   const goBackHardware = () => {
     //TODO aqui y abajo debes poner segun rol
-    navigation.navigate(privilege === 'Admin' ?  routes.ZONES : routes.ADMIN_HOME);
+    navigation.navigate(routes.ADMIN_HOME);
     return true;
   };
 

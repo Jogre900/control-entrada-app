@@ -33,7 +33,7 @@ const DrawerHeader = ({ navigation, profile, login, company }) => {
                 </Text>
               ) : (
                 <Text style={styles.caption} numberOfLines={1}>
-                  {login ? login.privilege : null} - {profile ? profile.userZone[0].Zona.zone : null}
+                  {login ? login.privilege : null} - {profile.userZone ? profile.userZone[0].Zona.zone : ''}
                 </Text>
               )}
             </View>

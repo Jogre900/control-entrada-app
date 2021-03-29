@@ -45,7 +45,7 @@ const HomeAdminScreen = ({
   const [visits, setVisits] = useState([]);
   const [employee, setEmployee] = useState([]);
   const [hasVisit, setHasVisit] = useState(true);
-  console.log("hasvisit", hasVisit);
+  //console.log(privilege);
 
   //REQUEST ZONE BY ID
   const requestZone = async () => {
@@ -76,10 +76,11 @@ const HomeAdminScreen = ({
   const requestEmployee = async () => {
     let uzArray = [];
     let employee = [];
+    console.log("me ejecute")
     if (company) {
       setLoading(true);
       const res = await fetchAllEmployee(company.id);
-      console.log(res.data)
+      //console.log(res.data)
       if (res.data.data.length > 0) {
         console.log("si hay empleados")
         res.data.data.map((e) => {

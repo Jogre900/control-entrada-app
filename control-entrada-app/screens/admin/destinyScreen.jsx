@@ -18,11 +18,11 @@ import { DestinyCard } from "../../components/destinyCard";
 import { Header } from "../../components/header.component";
 import { CreateDestinyModal } from "../../components/CreateDestinyModal";
 import { StatusModal } from "../../components/statusModal";
-import { Spinner } from "../../components/spinner";
 import { PrompModal } from "../../components/prompModal";
+import { Spinner } from "../../components/spinner";
 import { NotFound } from "../../components/NotFound";
-import { routes } from '../../assets/routes'
-import { BackAction } from '../../helpers/ui/ui'
+import { routes } from "../../assets/routes";
+import { BackAction } from "../../helpers/ui/ui";
 
 let statusModalValues = {
   visible: false,
@@ -95,9 +95,10 @@ const DestinyScreen = ({
     destinys.map(({ id }) => array.push(id));
     setSeletedItem(array);
   };
+  // MOSTRAR TODOS LOS DESTINOS SI
+  // ERES ADMIN O SOLO LOS DE TU ZONA SI ERES SUPERVISOR
   useEffect(() => {
     let filterDestiny = [];
-
     if (privilege === "Admin") {
       filterDestiny = destinos.filter((elem) => elem.zoneId === zoneId);
     } else {
@@ -105,7 +106,6 @@ const DestinyScreen = ({
         (elem) => elem.zoneId === userZone[0].ZoneId
       );
     }
-
     setDestinys(filterDestiny);
   }, [zoneId]);
 
@@ -130,7 +130,10 @@ const DestinyScreen = ({
           selectAction={selectAll}
         />
       ) : (
-        <TopNavigation title="Destinos" leftControl={BackAction(navigation, routes.ADMIN_HOME)} />
+        <TopNavigation
+          title="Destinos"
+          leftControl={BackAction(navigation, routes.ADMIN_HOME)}
+        />
       )}
       {loading && <Spinner />}
       {zonesRedux.length > 0 || zonesRedux ? (
@@ -202,7 +205,7 @@ const DestinyScreen = ({
         onClose={() => setPromp(false)}
         deleted={checkDeleted}
         data={selectItem}
-        url="deleteDestiny"
+        url="destiny"
       />
       <StatusModal
         {...statusModalProps}
