@@ -12,6 +12,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useDispatch } from "react-redux";
 import { storage } from "../../helpers/asyncStorage";
 import { useFocusEffect } from "@react-navigation/native";
+import { useAccountStatus } from '../../helpers/hooks/useAccountStatus'
 
 import { routes } from '../../assets/routes'
 import { LogOutModal } from "../../components/logOutModal";
@@ -28,6 +29,7 @@ const cover = require("../../assets/images/background.jpg");
 const { width, height } = Dimensions.get("window");
 
 export const HomeScreen = ({navigation}) => {
+  const { status, message } = useAccountStatus()
   const [logModal, setLogModal] = useState(false)
   const dispatch = useDispatch();
   const logOut = () => {
@@ -77,6 +79,12 @@ export const HomeScreen = ({navigation}) => {
       };
     }, [])
   );
+
+  useEffect(() => {
+    if(status === false){
+      alert(message)
+    }
+  }, [])
   return (
     <View style={styles.container}>
       <TopNavigation
