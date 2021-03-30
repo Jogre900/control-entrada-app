@@ -33,7 +33,7 @@ export const HomeScreen = ({navigation}) => {
   const { status, message } = useAccountStatus()
   const [logModal, setLogModal] = useState(false)
   const [statusModalProps, setStatusModalProps] = useState({
-    visible: null, message: null, status: null
+    visible: false, message: null, status: null
   });
   const backAction = () => {
     setLogModal(true)
@@ -75,7 +75,9 @@ export const HomeScreen = ({navigation}) => {
   useEffect(() => {
     if(status === false){
       setStatusModalProps(values => ({...values, visible: true, message, status}))
-      navigation.navigate(routes.MAIN)
+      setTimeout(() => {
+        navigation.navigate(routes.MAIN)
+      }, 2500);
     }
   }, [])
   return (

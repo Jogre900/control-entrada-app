@@ -21,7 +21,7 @@ export const useAccountStatus = () => {
 
         useEffect(() => {
             verifiyAccountStatus()
-        }, [])
+        }, )
         return { status, message }
     }
     
