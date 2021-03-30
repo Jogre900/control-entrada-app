@@ -1,6 +1,12 @@
 import React, { useState } from "react";
-import { View, TouchableOpacity, ScrollView, StyleSheet, BackHandler } from "react-native";
-import { useFocusEffect } from '@react-navigation/native'
+import {
+  View,
+  TouchableOpacity,
+  ScrollView,
+  StyleSheet,
+  BackHandler,
+} from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
 import { FormContainer } from "../../components/formContainer";
 import Input from "../../components/input.component";
 import Avatar from "../../components/avatar.component";
@@ -13,8 +19,9 @@ import { LoadingModal } from "../../components/loadingModal";
 import { Ionicons } from "@expo/vector-icons";
 import { MainColor } from "../../assets/colors";
 import { storage } from "../../helpers/asyncStorage";
-import { routes } from '../../assets/routes'
-import { BackAction } from '../../helpers/ui/ui'
+import { routes } from "../../assets/routes";
+import { BackAction } from "../../helpers/ui/ui";
+import { helpers } from "../../helpers";
 import { connect } from "react-redux";
 import axios from "axios";
 
@@ -23,76 +30,64 @@ let formInitialValues = {
   pass: null,
   repPass: null,
   nic: null,
+  address: null,
+  city: null,
   number: null,
   numberTwo: null,
-};
-let fileInitialValues = {
   uri: null,
   fileName: null,
   fileType: null,
+  logouri: null,
+  logofileName: null,
+  logofileType: null,
 };
 let statusModalValues = {
   visible: false,
   message: "",
   status: null,
 };
+let cameraValues = {
+  status: false,
+  profile: null,
+  anotherPic: null,
+  type: null,
+};
 const EditProfileScreen = ({
   profile,
   privilege,
+  company,
   saveLogin,
   saveProfile,
   saveCompany,
   navigation,
 }) => {
   const [formValues, setFormValues] = useState(formInitialValues);
-  const [fileValues, setFileValues] = useState(fileInitialValues);
   const [modalProps, setModalProps] = useState(statusModalValues);
-  const [visible, setVisible] = useState(false);
+  const [cameraProps, setCameraProps] = useState(cameraValues);
   const [loading, setLoading] = useState(false);
 
   const profilePic = (uri, fileName, fileType, caption, changeImg) => {
-    setFileValues((values) => ({ ...values, uri, fileName, fileType }));
+    setFormValues((values) => ({ ...values, uri, fileName, fileType }));
+  };
+  const logoPic = (uri, fileName, fileType, caption, changeImg) => {
+    setFormValues((values) => ({
+      ...values,
+      logouri: uri,
+      logofileName: fileName,
+      logofileType: fileType,
+    }));
   };
 
   const updateProfile = async () => {
     setLoading(true);
-    const { email, pass, repPass, nic, number, numberTwo } = formValues;
-    const { uri, fileName, fileType } = fileValues;
 
     // if (pass !== repPass) {
     //   alert("las contraseña deben ser iguales");
     //   return;
     // }
-    let data = new FormData();
-    if (email) {
-      data.append("email", email);
-    }
-    if (repPass) {
-      data.append("password", repPass);
-    }
-    if (nic) {
-      data.append("nic", nic);
-    }
-    if (number) {
-      data.append("number", number);
-    }
-    if (numberTwo) {
-      data.append("numberTwo", numberTwo);
-    }
-    if (uri) {
-      data.append("file", { uri, name: fileName, type: fileType });
-    }
-    console.log(data);
+
     try {
-      const res = await axios.put(
-        `${API_PORT()}/api/profile/${profile.id}`,
-        data,
-        {
-          headers: {
-            "content-type": "multipart/form-data",
-          },
-        }
-      );
+      const res = await helpers.updateProfile(formValues, profile.id);
       if (!res.data.error) {
         let slogin = {
           token: res.data.token,
@@ -124,8 +119,6 @@ const EditProfileScreen = ({
             select: true,
           });
         });
-        await storage.removeItem("userToken");
-        await storage.setItem("userToken", res.data.token);
         saveLogin(slogin);
         saveProfile(sprofile);
         saveCompany(company);
@@ -147,10 +140,13 @@ const EditProfileScreen = ({
       }));
     }
   };
-  
+
   return (
     <View style={{ flex: 1 }}>
-      <TopNavigation title="Editar" leftControl={BackAction(navigation, routes.PROFILE)} />
+      <TopNavigation
+        title="Editar"
+        leftControl={BackAction(navigation, routes.PROFILE)}
+      />
       <ScrollView>
         <View style={{ alignItems: "center" }}>
           <FormContainer title="Perfil">
@@ -158,27 +154,24 @@ const EditProfileScreen = ({
               <Avatar.Picture
                 size={120}
                 uri={
-                  fileValues.uri ||
+                  formValues.uri ||
                   `${API_PORT()}/public/imgs/${profile.picture}`
                 }
               />
               <TouchableOpacity
                 style={styles.openCameraButton}
                 onPress={() => {
-                  setVisible(true)
+                  setCameraProps((values) => ({
+                    ...values,
+                    status: true,
+                    profile: profilePic,
+                    type: "profile",
+                  }));
                 }}
               >
                 <Avatar.Icon name="ios-camera" size={32} color="#fff" />
               </TouchableOpacity>
             </View>
-            <Input
-              title="Email"
-              icon="ios-mail"
-              shape="flat"
-              onChangeText={(email) =>
-                setFormValues((value) => ({ ...value, email }))
-              }
-            />
             <Input
               title="Nueva Clave"
               icon="ios-eye-off"
@@ -200,9 +193,41 @@ const EditProfileScreen = ({
             />
           </FormContainer>
           {privilege === "Admin" && (
-            <FormContainer title="Empresa">
+            <FormContainer title={company[0].companyName}>
+              <View
+                style={
+                  !company[0].logo && !formValues.logouri 
+                    ? styles.emptyPictureContainer
+                    : styles.pictureContainer
+                }
+              >
+                {company[0].logo || formValues.logouri ? (
+                  <Avatar.Picture
+                    size={120}
+                    uri={
+                      formValues.logouri ||
+                      `${API_PORT()}/public/imgs/${company[0].logo}`
+                    }
+                  />
+                ) : (
+                  <Avatar.Icon size={32} name="md-photos" color="#8e8e8e" />
+                )}
+                <TouchableOpacity
+                  style={styles.openCameraButton}
+                  onPress={() => {
+                    setCameraProps((values) => ({
+                      ...values,
+                      status: true,
+                      anotherPic: logoPic,
+                      type: "logo",
+                    }));
+                  }}
+                >
+                  <Avatar.Icon name="ios-camera" size={32} color="#fff" />
+                </TouchableOpacity>
+              </View>
               <Input
-                title="Rif"
+                title={company[0].nic}
                 icon="ios-card"
                 shape="flat"
                 onChangeText={(nic) =>
@@ -210,7 +235,27 @@ const EditProfileScreen = ({
                 }
               />
               <Input
-                title="Telefono"
+                title={
+                  company[0].address
+                    ? company[0].address
+                    : "Direccion (Opcional)"
+                }
+                icon="ios-pin"
+                onChangeText={(address) =>
+                  setFormValues((values) => ({ ...values, address }))
+                }
+                shape="flat"
+              />
+              <Input
+                title={company[0].city ? company[0].city : "Ciudad (Opcional)"}
+                icon="ios-home"
+                onChangeText={(city) =>
+                  setFormValues((values) => ({ ...values, city }))
+                }
+                shape="flat"
+              />
+              <Input
+                title={company[0].phoneNumber}
                 icon="md-call"
                 shape="flat"
                 onChangeText={(number) =>
@@ -218,7 +263,11 @@ const EditProfileScreen = ({
                 }
               />
               <Input
-                title="Telefono Adicional"
+                title={
+                  company[0].phoneNumberOther
+                    ? company[0].phoneNumberOther
+                    : "Telefono Adicional"
+                }
                 icon="md-call"
                 shape="flat"
                 onChangeText={(numberTwo) =>
@@ -228,10 +277,10 @@ const EditProfileScreen = ({
             </FormContainer>
           )}
           <CameraModal
-            status={visible}
-            onClose={() => setVisible(false)}
-            profile={profilePic}
-            type="profile"
+            {...cameraProps}
+            onClose={() =>
+              setCameraProps((values) => ({ ...values, status: false }))
+            }
           />
           <View
             style={{
@@ -296,6 +345,22 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   pictureContainer: {
+    //height: 120,
+    //width: 120,
+    alignSelf: "center",
+    position: "relative",
+    marginVertical: 10,
+    borderColor: "#fff",
+    borderWidth: 2,
+    elevation: 10,
+    borderRadius: 120 / 2,
+    backgroundColor: "#fff",
+  },
+  emptyPictureContainer: {
+    height: 120,
+    width: 120,
+    justifyContent: "center",
+    alignItems: "center",
     alignSelf: "center",
     position: "relative",
     marginVertical: 10,

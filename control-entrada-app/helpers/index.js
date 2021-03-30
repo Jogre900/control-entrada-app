@@ -3,7 +3,7 @@ import axios from "axios";
 import { API_PORT } from "../config/index";
 import { createCitizen, findCitizendni } from "./citizen";
 import { fetchAllZones,fetchZoneById, zoneMaxVisit, destinyMaxVisit } from './zones'
-import { suspendEmployee, verifyLogin } from './users'
+import { suspendEmployee, verifyLogin, updateProfile } from './users'
 import {
   createVisit,
   findVisitdni,
@@ -31,7 +31,8 @@ export const helpers = {
   zoneMaxVisit,
   destinyMaxVisit,
   suspendEmployee,
-  verifyLogin
+  verifyLogin,
+  updateProfile
 };
 
 //DELETE ANYTHING FROM API
@@ -88,45 +89,7 @@ export async function fetchEmployeeByZone(zoneId) {
   }
 }
 
-//UPDATE PROFILE
-export async function updateProfile(formData, fileData, profileId) {
-  const { email, pass, repPass, nic, number, numberTwo } = formData;
-  const { uri, fileName, fileType } = fileData;
-  let data = new FormData();
 
-  if (email) {
-    data.append("email", email);
-  }
-  if (repPass) {
-    data.append("password", repPass);
-  }
-  if (nic) {
-    data.append("nic", nic);
-  }
-  if (number) {
-    data.append("number", number);
-  }
-  if (numberTwo) {
-    data.append("numberTwo", numberTwo);
-  }
-  if (uri) {
-    data.append("file", { uri, name: fileName, type: fileType });
-  }
-  try {
-    const res = await axios.put(
-      `${API_PORT()}/api/profile/${profileId}`,
-      data,
-      {
-        headers: {
-          "content-type": "multipart/form-data",
-        },
-      }
-    );
-    return res;
-  } catch (error) {
-    return { error };
-  }
-}
 
 //RECOVER PASS
 export async function recoverPass(email, data) {

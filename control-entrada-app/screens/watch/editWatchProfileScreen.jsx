@@ -11,26 +11,30 @@ import { StatusModal } from "../../components/statusModal";
 import { LoadingModal } from "../../components/loadingModal";
 import { Ionicons } from "@expo/vector-icons";
 import { MainColor } from "../../assets/colors";
-import { updateProfile } from "../../helpers";
+import { helpers } from "../../helpers";
 import { storage } from "../../helpers/asyncStorage";
 import { BackAction } from '../../helpers/ui/ui'
 import { routes } from '../../assets/routes'
 import { connect } from "react-redux";
 
 let initialValues = {
-  email: undefined,
   pass: undefined,
   repPass: undefined,
-};
-let fileInitialValues = {
   uri: undefined,
   fileName: undefined,
   fileType: undefined,
 };
+
 let statusModalValues = {
   visible: false,
   message: "",
   status: null,
+};
+let cameraValues = {
+  status: false,
+  profile: null,
+  anotherPic: null,
+  type: null,
 };
 const EditWatchProfileScreen = ({
   profile,
@@ -39,14 +43,13 @@ const EditWatchProfileScreen = ({
   navigation,
 }) => {
   const [formValues, setFormValues] = useState(initialValues);
-  const [fileValues, setFileValues] = useState(fileInitialValues);
   const [modalProps, setModalProps] = useState(statusModalValues);
-  const [visible, setVisible] = useState(false);
+  const [cameraProps, setCameraProps] = useState(cameraValues);
   const [loading, setLoading] = useState(false);
   const [type, setType] = useState("");
 
   const profilePic = (uri, fileName, fileType, caption, changeImg) => {
-    setFileValues((values) => ({ ...values, uri, fileName, fileType }));
+    setFormValues((values) => ({ ...values, uri, fileName, fileType }));
   };
 
   const updateWatchProfile = async () => {
@@ -57,7 +60,7 @@ const EditWatchProfileScreen = ({
     //   return;
     // }
     try {
-      const res = await updateProfile(formValues, fileValues, profile.id);
+      const res = await helpers.updateProfile(formValues, profile.id);
       if (!res.data.error) {
         let slogin = {
           token: res.data.token,
@@ -73,9 +76,6 @@ const EditWatchProfileScreen = ({
           email: res.data.data.email,
           userZone: res.data.data.userZone,
         };
-
-        await storage.removeItem("userToken");
-        await storage.setItem("userToken", res.data.token);
 
         saveLogin(slogin);
         saveProfile(sprofile);
@@ -103,34 +103,29 @@ const EditWatchProfileScreen = ({
       <TopNavigation title="Editar" leftControl={BackAction(navigation)} />
       <ScrollView>
         <View style={{ alignItems: "center" }}>
-          <View style={styles.profileTopContainer}>
-            <View style={styles.pictureContainer}>
+          <FormContainer title="Perfil">
+          <View style={styles.pictureContainer}>
               <Avatar.Picture
                 size={120}
                 uri={
-                  fileValues.uri ||
+                  formValues.uri ||
                   `${API_PORT()}/public/imgs/${profile.picture}`
                 }
               />
               <TouchableOpacity
                 style={styles.openCameraButton}
                 onPress={() => {
-                  setVisible(true), setType("profile");
+                  setCameraProps((values) => ({
+                    ...values,
+                    status: true,
+                    profile: profilePic,
+                    type: "profile",
+                  }));
                 }}
               >
                 <Avatar.Icon name="ios-camera" size={32} color="#fff" />
               </TouchableOpacity>
             </View>
-          </View>
-          <FormContainer title="Perfil">
-            <Input
-              title="Email"
-              icon="ios-mail"
-              shape="flat"
-              onChangeText={(email) =>
-                setFormValues((value) => ({ ...value, email }))
-              }
-            />
             <Input
               title="Nueva Clave"
               icon="ios-eye-off"
@@ -152,10 +147,10 @@ const EditWatchProfileScreen = ({
             />
           </FormContainer>
           <CameraModal
-            status={visible}
-            onClose={() => setVisible(false)}
-            profile={profilePic}
-            type={type}
+            {...cameraProps}
+            onClose={() =>
+              setCameraProps((values) => ({ ...values, status: false }))
+            }
           />
           <View
             style={{

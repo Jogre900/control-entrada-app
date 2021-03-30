@@ -17,7 +17,8 @@ const LoadingScreen = ({ navigation, saveProfile, saveCompany, saveLogin }) => {
             Authorization: `bearer ${token}`,
           },
         });
-        console.log("res de verifi Token---",res)
+
+        console.log("res de verifi Token---",res.data)
         if(res.data.msg === 'Cuenta suspendida'){
           alert(res.data.msg)
           navigation.navigate(routes.MAIN);
@@ -81,6 +82,7 @@ const LoadingScreen = ({ navigation, saveProfile, saveCompany, saveLogin }) => {
         }
       } catch (error) {
         alert(error);
+        navigation.navigate(routes.MAIN);
       }
     } else navigation.navigate(routes.MAIN);
   };

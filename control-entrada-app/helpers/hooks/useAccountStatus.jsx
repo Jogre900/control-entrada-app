@@ -6,7 +6,7 @@ export const useAccountStatus = () => {
     const [status, setStatus] = useState()
         const [message, setMessage] = useState()
     
-        const verifiyAccountStatus = () => {
+        const verifiyAccountStatus = async () => {
             const token = await storage.getItem('userToken')
             try {
                 const res = await helpers.verifyLogin(token)

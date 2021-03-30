@@ -5,9 +5,9 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  BackHandler
+  BackHandler,
 } from "react-native";
-import { useFocusEffect } from '@react-navigation/native'
+import { useFocusEffect } from "@react-navigation/native";
 import { connect } from "react-redux";
 import { Ionicons } from "@expo/vector-icons";
 import { routes } from "../../assets/routes";
@@ -20,28 +20,9 @@ import { FormContainer } from "../../components/formContainer";
 import Avatar from "../../components/avatar.component";
 
 const PerfilScreen = ({ navigation, profile, company }) => {
-  console.log("profile-redux:  ", profile);
   console.log("company-redux:  ", company);
 
-  const [passChange, setPassChange] = React.useState("");
-  const [repeatPass, setRepeatPass] = React.useState("");
-
   const editAction = () => {
-    
-    const goBackHardware = () => {
-      //TODO aqui y abajo debes poner segun rol
-      navigation.navigate(routes.ADMIN_HOME);
-      return true;
-    };
-  
-    useFocusEffect(
-      React.useCallback(() => {
-        BackHandler.addEventListener("hardwareBackPress", goBackHardware);
-        return () => {
-          BackHandler.removeEventListener("hardwareBackPress", goBackHardware);
-        };
-      }, [])
-    );
     return (
       <View>
         <TouchableOpacity
@@ -54,6 +35,21 @@ const PerfilScreen = ({ navigation, profile, company }) => {
       </View>
     );
   };
+
+  const goBackHardware = () => {
+    //TODO aqui y abajo debes poner segun rol
+    navigation.navigate(routes.ADMIN_HOME);
+    return true;
+  };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      BackHandler.addEventListener("hardwareBackPress", goBackHardware);
+      return () => {
+        BackHandler.removeEventListener("hardwareBackPress", goBackHardware);
+      };
+    }, [])
+  );
   return (
     <View style={styles.container}>
       <TopNavigation
@@ -105,7 +101,7 @@ const PerfilScreen = ({ navigation, profile, company }) => {
             </View>
           </View>
           <FormContainer title="Negocio">
-            {company[0].logo ? (
+            {company.length && company[0].logo ? (
               <Avatar.Picture
                 size={60}
                 uri={`${API_PORT()}/public/imgs/${company[0].logo}`}

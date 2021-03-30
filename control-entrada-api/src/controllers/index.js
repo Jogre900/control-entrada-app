@@ -1353,11 +1353,11 @@ password: "123456,
     };
     console.log("UPDATE PROFILE----");
     const { id } = req.params;
-    const { email, password, nic, number, numberTwo } = req.body;
+    const { password, nic, address, city, number, numberTwo, profile, logo } = req.body;
 
     console.log(req.params);
     console.log(req.body);
-    console.log(req.file);
+    console.log(req.files);
     try {
       let user = await models.User.findOne({
         include: [
@@ -1392,8 +1392,11 @@ password: "123456,
       });
       console.log(user.UserCompany[0].privilege);
 
-      if (req.file) {
-        user.Employee.picture = req.file.filename;
+      if (req.files.length > 1 && profile) {
+        user.Employee.picture = req.files[0].filename;
+        await user.Employee.save();
+      }else if(profile){
+        user.Employee.picture = req.files[0].filename;
         await user.Employee.save();
       }
 
@@ -1402,14 +1405,25 @@ password: "123456,
         user.password = hash;
         await user.save();
       }
-      if (email) {
-        user.email = email.toLowerCase();
-        await user.save();
-      }
 
       if (user.UserCompany[0].privilege === "Admin") {
+        if (req.files.length > 1 && logo) {
+          user.UserCompany[0].Company.logo = req.files[1].filename;
+          await user.UserCompany[0].Company.save();
+        }else if(logo){
+          user.UserCompany[0].Company.logo = req.files[0].filename;
+          await user.UserCompany[0].Company.save();
+        }
         if (nic) {
           user.UserCompany[0].Company.nic = nic;
+          await user.UserCompany[0].Company.save();
+        }
+        if (address) {
+          user.UserCompany[0].Company.address = address;
+          await user.UserCompany[0].Company.save();
+        }
+        if (city) {
+          user.UserCompany[0].Company.city = city;
           await user.UserCompany[0].Company.save();
         }
         if (number) {
@@ -1421,11 +1435,10 @@ password: "123456,
           await user.UserCompany[0].Company.save();
         }
       }
-      const token = jwt.sign(user.dataValues, SECRETKEY, { expiresIn: "1d" });
+      
       RESPONSE.error = false;
       RESPONSE.msg = "Datos actualizados!";
       RESPONSE.data = user;
-      RESPONSE.token = token;
       res.status(200).json(RESPONSE);
     } catch (error) {
       console.log(error.message);
@@ -1514,7 +1527,7 @@ password: "123456,
     console.log(token);
     try {
       let decode = jwt.verify(token, SECRETKEY);
-      console.log(decode);
+      console.log("decode--",decode);
       if (decode) {
         if (decode.active === false) {
           console.log(decode);

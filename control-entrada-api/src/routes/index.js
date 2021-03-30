@@ -108,7 +108,7 @@ router.post("/createUserZone", Controllers.createUserZone);
 //router.post("/uploadImage", uploadImg.single('file'), Controllers.uploadImage)
 router.get("/displayPicture", Controllers.displayPicture);
 router.get("/profile", Controllers.getProfile);
-router.put("/profile/:id", uploadImg.single("file"), Controllers.updateProfile);
+router.put("/profile/:id", uploadImg.array("file"), Controllers.updateProfile);
 router.post("/password/:email", Controllers.recoverPassword);
 
 router.get("/findUserZone/:id", Controllers.findUserZone);

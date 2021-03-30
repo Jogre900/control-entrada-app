@@ -89,8 +89,8 @@ export default (state = initialState, action = {}) => {
       case "CLEAR_STORAGE":
       return {
         company: [],
-        profile: [],
-        login: []
+        profile: {},
+        login: {}
       };
     default:
       return state;

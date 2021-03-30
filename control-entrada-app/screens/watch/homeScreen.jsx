@@ -16,6 +16,7 @@ import { useAccountStatus } from '../../helpers/hooks/useAccountStatus'
 
 import { routes } from '../../assets/routes'
 import { LogOutModal } from "../../components/logOutModal";
+import { StatusModal } from '../../components/statusModal'
 
 //components
 import { TopNavigation } from "../../components/TopNavigation.component";
@@ -31,18 +32,9 @@ const { width, height } = Dimensions.get("window");
 export const HomeScreen = ({navigation}) => {
   const { status, message } = useAccountStatus()
   const [logModal, setLogModal] = useState(false)
-  const dispatch = useDispatch();
-  const logOut = () => {
-    return new Promise((resolve, reject) => {
-      resolve(dispatch({ type: "CLEAR_STORAGE" }));
-    });
-  };
-  const deleteToken = async () => {
-    logOut()
-      .then(() => storage.removeItem("userToken"))
-      .then(() => navigation.navigate(routes.MAIN));
-  };
-
+  const [statusModalProps, setStatusModalProps] = useState({
+    visible: null, message: null, status: null
+  });
   const backAction = () => {
     setLogModal(true)
     return true;
@@ -82,7 +74,8 @@ export const HomeScreen = ({navigation}) => {
 
   useEffect(() => {
     if(status === false){
-      alert(message)
+      setStatusModalProps(values => ({...values, visible: true, message, status}))
+      navigation.navigate(routes.MAIN)
     }
   }, [])
   return (
@@ -118,6 +111,12 @@ export const HomeScreen = ({navigation}) => {
         status={logModal}
         navigation={navigation}
         onClose={() => setLogModal(false)}
+      />
+      <StatusModal
+        {...statusModalProps}
+        onClose={() =>
+          setStatusModalProps((values) => ({ ...values, visible: false }))
+        }
       />
     </View>
   );
