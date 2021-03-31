@@ -6,8 +6,56 @@ import { $security, $serverPort } from "@config";
 import options from "dotenv/lib/env-options";
 import moment from "moment";
 import { Op, fn, col, literal } from "sequelize";
+import { Expo } from 'expo-server-sdk';
+import fetch from 'node-fetch'
 
 const SECRETKEY = process.env.SECRETKEY || $security().secretKey;
+
+//PRUEBA DE PUSH N
+let expo = new Expo();
+
+async function sendPushNotification(expoPushToken) {
+  const message = {
+    to: expoPushToken,
+    sound: 'default',
+    title: 'HOLA OMAIRA',
+    body: 'And here is the body!',
+    data: { someData: 'goes here' },
+  };
+
+  await fetch('https://exp.host/--/api/v2/push/send', {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Accept-encoding': 'gzip, deflate',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(message),
+  });
+}
+//---------->
+const sendPush = async (pushToken) => {
+  let messages = []
+  messages.push({
+    to: pushToken,
+    sound: 'default',
+    body: 'This is a test notification',
+    data: { withSome: 'data' },
+  })
+  try {
+    let resPush = await expo.sendPushNotificationsAsync(messages);
+    return console.log("RES DE SENDP--",resPush);
+    // NOTE: If a ticket contains an error code in ticket.details.error, you
+    // must handle it appropriately. The error codes are listed in the Expo
+    // documentation:
+    // https://docs.expo.io/push-notifications/sending-notifications/#individual-errors
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+//FIN PRUEBA DE PUSH N
+
 
 const Controllers = {
   createAdmin: async function(req, res) {
@@ -39,6 +87,33 @@ const Controllers = {
     } catch (error) {
       RESPONSE.msg = error.message;
       res.json(RESPONSE);
+    }
+  },
+  saveDeviceToken: async function(req, res){
+    let RESPONSE = {
+      error: true,
+      msg: "",
+      data: null,
+      token: null
+    };
+    const { id } = req.params
+    const { token } = req.body
+    console.log(req.params, req.body)
+    try {
+      const newToken = await models.Token.create({
+        token: token,
+        userId: id
+      })
+      if(newToken){
+        RESPONSE.error = false
+        RESPONSE.msg = 'Guardado de Token Exitoso!'
+        RESPONSE.data = newToken
+        console.log(RESPONSE)
+        res.json(RESPONSE)
+      }
+    } catch (error) {
+      RESPONSE.msg = error.message
+      res.json(RESPONSE)
     }
   },
   findAdmin: async function(req, res) {
@@ -314,6 +389,9 @@ password: "123456,
           }
         ]
       });
+      //await sendPush('ExponentPushToken[sBb32gExCmzzS2BJZL7bJm]')
+      const push = await sendPushNotification('ExponentPushToken[sBb32gExCmzzS2BJZL7bJm]')
+      console.log("push----",push)
       RESPONSE.error = false;
       RESPONSE.msg = "Busqueda Exitosa!";
       RESPONSE.data = zones;
@@ -1239,7 +1317,6 @@ password: "123456,
         ]
       });
       let tokenInput = {};
-      console.log("user----", user);
       if (user) {
         if (user.dataValues.UserCompany[0].active === false) {
           RESPONSE.msg = "Cuenta Suspendida";
@@ -2414,7 +2491,6 @@ password: "123456,
     };
 
     const { id } = req.body;
-    console.log("body----", req.body);
     try {
       let visits = await models.Visits.findAll({
         //where: {

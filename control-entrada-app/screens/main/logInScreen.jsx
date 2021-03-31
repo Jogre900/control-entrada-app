@@ -9,7 +9,7 @@ import Input from "../../components/input.component";
 import { Ionicons } from "@expo/vector-icons";
 import { MainColor, Danger } from "../../assets/colors";
 import { LoadingModal } from "../../components/loadingModal";
-import { login } from "../../helpers/";
+import { login, helpers } from "../../helpers/";
 import { FormContainer } from "../../components/formContainer";
 import { RecoverPassModal } from "../../components/recoverPassModal";
 import { StatusModal } from "../../components/statusModal";
@@ -45,6 +45,7 @@ const LoginScreen = ({
   saveCompany,
   saveLogin,
   savePrivilege,
+  
 }) => {
   
   const [loginData, setLoginData] = useState(loginInitialValues)
@@ -84,6 +85,10 @@ const LoginScreen = ({
     try {
       const res = await login(prueba.email, prueba.password);
       if (!res.data.error) {
+        const deviceToken = await storage.getItem('deviceToken')
+        console.log("token from local storage-", deviceToken)
+        const resToken = await helpers.saveDeviceToken(deviceToken, res.data.data.id)
+        console.log("res de token api--",resToken.data)
         let slogin = {
           token: res.data.token,
           userId: res.data.data.id,
@@ -302,9 +307,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
 });
-const mapStateToProps = (state) => {
-  return {};
-};
+
+
 
 const mapDispatchToProps = (dispatch) => ({
   saveProfile(profile) {
@@ -333,4 +337,4 @@ const mapDispatchToProps = (dispatch) => ({
   },
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(LoginScreen);
+export default connect(null, mapDispatchToProps)(LoginScreen);

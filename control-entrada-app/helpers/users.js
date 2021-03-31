@@ -11,6 +11,13 @@ export async function verifyLogin(token) {
   return res;
 }
 
+//SAVE DEVICETOKEN
+export async function saveDeviceToken(token, id){
+  console.log("id-",id)
+  const res = axios.post(`${API_PORT()}/api/token/${id}`, {token})
+  return res
+}
+
 //UPDATE PROFILE
 export async function updateProfile(formData, profileId) {
   const {

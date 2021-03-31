@@ -162,5 +162,7 @@ router.post(
   uploadImg.single("file"),
   Controllers.createUserWatchman
 );
+//SAVE DEVICETOKEN
+router.post("/token/:id", Controllers.saveDeviceToken)
 
 module.exports = router;

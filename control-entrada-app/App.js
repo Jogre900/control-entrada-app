@@ -12,11 +12,20 @@ import * as Permissions from "expo-permissions";
 import { MainNavigator } from "./navigation/main.navigator";
 import BottomTabNavigator from "./navigation/BottomTabNavigator";
 import useLinking from "./navigation/useLinking";
-import { Provider } from "react-redux";
+import { storage } from './helpers/asyncStorage'
+import { Provider, useDispatch } from "react-redux";
 import { store, persistor } from "./store";
 //import OneSignalProvider from "./lib/OneSignal";
 
 const Stack = createStackNavigator();
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: true,
+  }),
+});
 
 export default function App(props) {
   const [isLoadingComplete, setLoadingComplete] = React.useState(false);
@@ -27,7 +36,7 @@ export default function App(props) {
 
   // Notification Permisssions
   async function registerForPushNotificationsAsync() {
-    let token;
+    let deviceToken = null
     if (Constants.isDevice) {
       const { status: existingStatus } = await Permissions.getAsync(Permissions.NOTIFICATIONS);
       let finalStatus = existingStatus;
@@ -39,8 +48,9 @@ export default function App(props) {
         alert("Failed to get push token for push notification!");
         return;
       }
-      token = (await Notifications.getDevicePushTokenAsync()).data;
-      //console.log("devicetoken: ", token);
+      deviceToken = (await Notifications.getExpoPushTokenAsync()).data;
+      await storage.setItem('deviceToken', deviceToken)
+      console.log("devicetoken: ", deviceToken);
     } else {
       alert("Must use physical device for Push Notifications");
     }
@@ -54,7 +64,7 @@ export default function App(props) {
       });
     }
 
-    return token;
+    return deviceToken;
   }
 
   // Load any resources or data that we need prior to rendering the app

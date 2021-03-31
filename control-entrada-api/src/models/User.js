@@ -22,6 +22,15 @@ module.exports = (sequelize, DataTypes) => {
         onDelete: "CASCADE",
         onUpdate: "CASCADE"
       });
+      this.hasOne(models.Token, {
+        foreignKey: {
+          name: "userId",
+          field: "user_id"
+        },
+        as: "deviceToken",
+        onDelete: "CASCADE",
+        onUpdate: "CASCADE"
+      });
       this.hasMany(models.UserCompany, {
         foreignKey: {
           name: "userId",

@@ -3,7 +3,7 @@ import axios from "axios";
 import { API_PORT } from "../config/index";
 import { createCitizen, findCitizendni } from "./citizen";
 import { fetchAllZones,fetchZoneById, zoneMaxVisit, destinyMaxVisit } from './zones'
-import { suspendEmployee, verifyLogin, updateProfile } from './users'
+import { suspendEmployee, verifyLogin, updateProfile, saveDeviceToken } from './users'
 import {
   createVisit,
   findVisitdni,
@@ -32,7 +32,8 @@ export const helpers = {
   destinyMaxVisit,
   suspendEmployee,
   verifyLogin,
-  updateProfile
+  updateProfile,
+  saveDeviceToken
 };
 
 //DELETE ANYTHING FROM API

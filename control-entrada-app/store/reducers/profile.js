@@ -30,7 +30,8 @@ const initialState = {
       select: false,
     },
   ],
-  tutorial: false
+  tutorial: false,
+  deviceToken: ''
 };
 
 const companySelect = (state) => {
@@ -39,6 +40,12 @@ const companySelect = (state) => {
 
 export default (state = initialState, action = {}) => {
   switch (action.type) {
+    case "SAVE_TOKEN":
+    console.log("deviceToken",action.payload)  
+    return {
+        ...state,
+        deviceToken: action.payload
+      }
     case actionTypes.SET_LOGIN:
       return {
         ...state,
