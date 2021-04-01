@@ -74,95 +74,90 @@ const middleware = {
 
 const router = Router();
 
-//router.post("/createAdmin", uploadImg.single("file"), Methods.createAdmin);
-router.post(
-  "/createUser/:privilege",
-  uploadImg.single("file"),
-  Controllers.createUser
-);
 
-router.put("/updateAdmin/:companyId", Controllers.updateAdminId);
-router.post("/login", Controllers.login);
-router.get("/findUser/:id", Controllers.findUser);
-router.get("/user/:companyId", Controllers.findUsers);
-router.get("/user/zone/:zoneId", Controllers.findUsersByZone);
-router.get("/findAvailableUsers/:companyId", Controllers.findAvailableUsers);
-router.put("/user/:id", Controllers.deleteUser);
-router.get("/findCompany/:id", Controllers.findCompany);
+router.put("/profile/:id", uploadImg.array("file"), Controllers.login.updateProfile);
+router.post("/password/:email", Controllers.login.recoverPassword);
+router.get("/verifyLogin", middleware.verifyToken, Controllers.login.verifyLogin);
+router.post("/login", Controllers.login.login);
+router.get("/findUser/:id", Controllers.employee.findUser);
+router.get("/user/:companyId", Controllers.employee.findUsers);
+router.get("/user/zone/:zoneId", Controllers.employee.findUsersByZone);
+router.put("/user/:id", Controllers.employee.deleteUser);
+
 //ZONES
-router.post("/createZone/:id", Controllers.createZone);
-router.get("/findZones/:companyId", Controllers.findZones);
-router.get("/zone/:zoneId", Controllers.findZone);
-router.get("/zoneMaxVisit/:companyId", Controllers.findZoneMaxVisit);
-router.delete("/zone/:id", Controllers.deleteZone);
+router.post("/createZone/:id", Controllers.zone.createZone);
+router.get("/findZones/:companyId", Controllers.zone.findZones);
+router.get("/zone/:zoneId", Controllers.zone.findZone);
+router.get("/zoneMaxVisit/:companyId", Controllers.zone.findZoneMaxVisit);
+router.delete("/zone/:id", Controllers.zone.deleteZone);
 //DESTINY
-router.post("/createDestiny/:id", Controllers.createDestiny);
-router.get("/findDestiny/:id", Controllers.findDestinyByZone);
-router.get("/findAllDestiny/:id", Controllers.findAllDestiny);
-router.post("/destinyMaxVisit", Controllers.findDestinyMaxVisit);
-router.delete("/destiny/:id", Controllers.deleteDestiny);
+router.post("/createDestiny/:id", Controllers.destiny.createDestiny);
+router.get("/findDestiny/:id", Controllers.destiny.findDestinyByZone);
+router.get("/findAllDestiny/:id", Controllers.destiny.findAllDestiny);
+router.post("/destinyMaxVisit", Controllers.destiny.findDestinyMaxVisit);
+router.delete("/destiny/:id", Controllers.destiny.deleteDestiny);
 //ROUTAS PARA BORRAR
-router.post("/createEmployee", Controllers.createEmployee);
-router.get("/findEmployees", Controllers.findEmployees);
-router.post("/createUserZone", Controllers.createUserZone);
+// router.post("/createEmployee", Controllers.createEmployee);
+// router.get("/findEmployees", Controllers.findEmployees);
+// router.post("/createUserZone", Controllers.createUserZone);
 //router.post("/uploadImage", uploadImg.single('file'), Controllers.uploadImage)
-router.get("/displayPicture", Controllers.displayPicture);
+// router.get("/displayPicture", Controllers.displayPicture);
+// router.put("/updateAdmin/:companyId", Controllers.updateAdminId);
+// router.get("/findAvailableUsers/:companyId", Controllers.findAvailableUsers);
+// router.get("/findCompany/:id", Controllers.findCompany);
+// router.get("/findUserZone/:id", Controllers.findUserZone);
 router.get("/profile", Controllers.getProfile);
-router.put("/profile/:id", uploadImg.array("file"), Controllers.updateProfile);
-router.post("/password/:email", Controllers.recoverPassword);
 
-router.get("/findUserZone/:id", Controllers.findUserZone);
-router.get("/verifyLogin", middleware.verifyToken, Controllers.verifyLogin);
 //VISIT ROUTES
 router.post(
   "/visit",
   middleware.verifyToken,
   uploadImg.single("file"),
-  Controllers.createVisits
+  Controllers.visits.createVisits
 );
-router.get("/visitId/:id", Controllers.findVisitId);
-router.get("/visit/:dni", Controllers.findVisit);
+router.get("/visitId/:id", Controllers.visits.findVisitId);
+router.get("/visit/:dni", Controllers.visits.findVisit);
 //todas las visitas de hoy por empleados
-router.post("/visits", Controllers.findTodayVisits);
-router.get("/findWeekVisits/", Controllers.findWeekVisits);
-router.get("/visits/:userzoneId", Controllers.findTodayVisitsByUser);
+router.post("/visits", Controllers.visits.findTodayVisits);
+router.get("/findWeekVisits/", Controllers.visits.findWeekVisits);
+router.get("/visits/:userzoneId", Controllers.visits.findTodayVisitsByUser);
 //todas las visitas de hoy por destino
 router.get(
   "/visitsdestiny/:destinyId/:checked?",
   middleware.verifyToken,
-  Controllers.findTodayVisitsByDestiny
+  Controllers.visits.findTodayVisitsByDestiny
 );
-router.delete("/visit/", Controllers.deleteVisit);
+router.delete("/visit/", Controllers.visits.deleteVisit);
 //DEPARTURE ROUTES
 router.post(
   "/departure/:id",
   middleware.verifyToken,
-  Controllers.createDeparture
+  Controllers.visits.createDeparture
 );
 
 //CITIZEN
-router.get("/citizen/:dni", middleware.verifyToken, Controllers.findCitizen);
+router.get("/citizen/:dni", middleware.verifyToken, Controllers.visits.findCitizen);
 router.post(
   "/citizen",
   middleware.verifyToken,
   uploadImg.array("file"),
-  Controllers.createCitizen
+  Controllers.visits.createCitizen
 );
 //FIND MAX VALUE ROUTES
-router.get("/userCompany/:companyId", Controllers.findMaxVisitUser);
+router.get("/userCompany/:companyId", Controllers.visits.findMaxVisitUser);
 // NUEVAS RUTA AJUSTE SISTEMA
 router.post("/company", uploadImg.array("file"), Controllers.createCompany);
 router.post(
   "/supervisor",
   uploadImg.single("file"),
-  Controllers.createUserSupervisor
+  Controllers.employee.createUserSupervisor
 );
 router.post(
   "/watchman",
   uploadImg.single("file"),
-  Controllers.createUserWatchman
+  Controllers.employee.createUserWatchman
 );
 //SAVE DEVICETOKEN
-router.post("/token/:id", Controllers.saveDeviceToken)
+router.post("/token/:id", Controllers.login.saveDeviceToken)
 
 module.exports = router;
