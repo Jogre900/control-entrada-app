@@ -13,7 +13,7 @@ const initialState = {
     lastName: "",
     picture: "",
     email: "",
-    userZone: []
+    userZone: [],
   },
   company: [
     {
@@ -30,23 +30,31 @@ const initialState = {
       select: false,
     },
   ],
-  notificationNotRead : [],
+  notification: [],
+  notificationNotRead: [],
   tutorial: false,
-  deviceToken: ''
+  deviceToken: "",
 };
 
 const companySelect = (state) => {
   return state.company.filter((c) => c.select == true)[0];
 };
 
+//UPDATE NOTIFICATION
+const updateNoti = (newNoti, state) => {
+  let filterNoti = state.today.filter(({ id }) => id !== newNoti.id);
+  let newArray = filterNoti.concat(newNoti);
+  return newArray;
+};
+
 export default (state = initialState, action = {}) => {
   switch (action.type) {
     case "SAVE_TOKEN":
-    console.log("deviceToken",action.payload)  
-    return {
+      console.log("deviceToken", action.payload);
+      return {
         ...state,
-        deviceToken: action.payload
-      }
+        deviceToken: action.payload,
+      };
     case actionTypes.SET_LOGIN:
       return {
         ...state,
@@ -54,9 +62,9 @@ export default (state = initialState, action = {}) => {
         //company: companySelect(state),
       };
     case "SAVE_PROFILE":
-    return {
+      return {
         ...state,
-        profile: action.payload
+        profile: action.payload,
         //companySelect: companySelect(state),
       };
     case "SAVE_COMPANY":
@@ -84,26 +92,39 @@ export default (state = initialState, action = {}) => {
         login: { ...state.login, privilege: action.payload },
         companySelect: companySelect(state),
       };
-      case "SAVE_NOTI_NOT_READ":
-        return {
-          ...state,
-          notificationNotRead: state.notificationNotRead.concat(action.payload)
-        }
-      case "TUTORIAL":
-        return {
-          ...state,
-          tutorial: action.payload
-        }
-        case "TURN_OFF": 
-        return {
-            ...state,
-            tutorial: action.payload
-          }
-      case "CLEAR_STORAGE":
+    case "SAVE_NOTI":
+      return {
+        ...state,
+        notification: action.payload,
+      };
+    case "SAVE_NOTI_NOT_READ":
+      return {
+        ...state,
+        notificationNotRead: action.payload,
+      };
+    case "UPDATE_READ":
+      return {
+        ...state,
+        notificationNotRead: state.notificationNotRead.filter(
+          ({ id }) => id !== action.payload.id
+        ),
+        notification: updateNoti(action.payload, state),
+      };
+    case "TUTORIAL":
+      return {
+        ...state,
+        tutorial: action.payload,
+      };
+    case "TURN_OFF":
+      return {
+        ...state,
+        tutorial: action.payload,
+      };
+    case "CLEAR_STORAGE":
       return {
         company: [],
         profile: {},
-        login: {}
+        login: {},
       };
     default:
       return state;

@@ -41,34 +41,42 @@ const middleware = {
     //return next(createError(401, "Usuario no Autorizado"));
     const headerToken = req.headers["authorization"];
     const token = headerToken.split(" ")[1];
-    const decoded = jwt.verify(token, SECRETKEY)
-      console.log(decoded)
-      //console.log("PAYLOAD DE TOKEN---", payload);
-      try {
-        const user = await models.User.findOne({
-          where: {
-            id: decoded.userId
-          },
-          include: {
-            model: models.UserCompany,
-            as: "UserCompany"
-          }
-        });
-        if (user.dataValues.UserCompany[0].active === false) {
-          //return next(createError(401, 'Cuenta suspendida'))
-          return res.json({
-            msg: "Cuenta suspendida"
+    const decoded = jwt.verify(token, SECRETKEY, async (err, payload) => {
+      //console.log("ERR---",err)
+      if(err){
+        res.json({
+          msg: err.message
+        })
+      }else{
+        try {
+          const user = await models.User.findOne({
+            where: {
+              id: payload.userId
+            },
+            include: {
+              model: models.UserCompany,
+              as: "UserCompany"
+            }
           });
-        } else {
-          req.payload = decoded;
-          next();
+          if (user.dataValues.UserCompany[0].active === false) {
+            return res.json({
+              msg: "Cuenta suspendida"
+            });
+          } else {
+            req.payload = payload;
+            next();
+          }
+        } catch (error) {
+          return res.json({
+            msg: error.message
+          });
         }
-      } catch (error) {
-        //return next(createError(error, err.message));
-        return res.json({
-          msg: error.message
-        });
       }
+      
+    })
+      //console.log("DECODE--",decoded)
+      //console.log("PAYLOAD DE TOKEN---", payload);
+      
   }
 };
 
@@ -84,7 +92,8 @@ router.get("/user/:companyId", Controllers.employee.findUsers);
 router.get("/user/zone/:zoneId", Controllers.employee.findUsersByZone);
 router.put("/user/:id", Controllers.employee.deleteUser);
 //NOTIFICATION
-router.get("/notification/:userId", Controllers.notification.fetchNotificationNotRead)
+router.get("/notification/:userId/:unread?", Controllers.notification.fetchAllNotification)
+router.put("/notification/:id?", Controllers.notification.changeToRead)
 //ZONES
 router.post("/createZone/:id", Controllers.zone.createZone);
 router.get("/findZones/:companyId", Controllers.zone.findZones);

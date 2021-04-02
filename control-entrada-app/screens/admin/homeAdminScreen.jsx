@@ -28,7 +28,7 @@ import {
   helpers,
 } from "../../helpers/";
 
-const DELAY = 1
+const DELAY = 10
 const HomeAdminScreen = ({
   navigation,
   company,
@@ -38,7 +38,9 @@ const HomeAdminScreen = ({
   saveZones,
   saveDestiny,
   profile,
+  login,
   privilege,
+  saveNotification,
   saveNotificationNotRead
 }) => {
   const [visible, setVisible] = useState(false);
@@ -135,14 +137,19 @@ const HomeAdminScreen = ({
     }
   };
 
-  //REQUEST ALL NOTIFICATION NO READ IT
+  //REQUEST ALL NOTIFICATION
   const requestNotification = async () => {
     setLoading(true);
     try {
-      const res = await helpers.fetchNotificationNotRead(profile.id)
+      const res = await helpers.fetchNotification(login.userId)
       if(!res.data.error){
+        console.log("all notif--",res.data.data)
         setLoading(false);
-        saveNotificationNotRead(res.data.data)
+        let array = []
+        saveNotification(res.data.data)
+        array = res.data.data.filter(({read}) => read === false)
+        console.log("notis not read--",array)
+        saveNotificationNotRead(array)
       }
     } catch (error) {
       setLoading(false);
@@ -295,10 +302,17 @@ const HomeAdminScreen = ({
 const mapStateToProps = (state) => ({
   company: state.profile.companySelect,
   profile: state.profile.profile,
+  login: state.profile.login,
   privilege: state.profile.login.privilege,
 });
 
 const mapDispatchToProps = (dispatch) => ({
+  saveNotification(notifications){
+    dispatch({
+      type: 'SAVE_NOTI',
+      payload: notifications
+    })
+  },
   saveNotificationNotRead(notifications){
     dispatch({
       type: 'SAVE_NOTI_NOT_READ',

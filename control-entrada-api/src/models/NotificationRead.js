@@ -2,13 +2,13 @@ import { Model } from "sequelize";
 module.exports = (sequelize, DataTypes) => {
   class NotificationRead extends Model {
     static associate = models => {
-      this.belongsTo(models.User, {
-        foreignKey: {
-          name: "userId",
-          field: "user_id"
-        },
-        as: "user"
-      });
+      // this.belongsTo(models.User, {
+      //   foreignKey: {
+      //     name: "userId",
+      //     field: "user_id"
+      //   },
+      //   as: "user"
+      // });
       NotificationRead.belongsTo(models.Notification, {
         foreignKey: {
           name: "notificationId",

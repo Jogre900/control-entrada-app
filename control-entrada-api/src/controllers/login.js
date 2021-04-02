@@ -50,9 +50,7 @@ const login = {
             },
             include: [
               {
-                model: models.NotificationRead,
-                as: "notificationUsers",
-                include: { model: models.Notification, as: "notification" }
+                model: models.Notification, as: "notificationUsers" 
               },
               {
                 model: models.UserZone,
@@ -136,9 +134,7 @@ const login = {
                 },
                 include: [
                   {
-                    model: models.NotificationRead,
-                    as: "notificationUsers",
-                    include: { model: models.Notification, as: "notification" }
+                    model: models.Notification, as: "notificationUsers"
                   },
                   {
                     model: models.UserZone,

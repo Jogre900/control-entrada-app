@@ -1,12 +1,12 @@
 import React from "react";
-import { TouchableOpacity, View, StyleSheet } from "react-native";
+import { TouchableOpacity, View, Text, StyleSheet } from "react-native";
 
 import { Ionicons } from "@expo/vector-icons";
 import { MainButton } from "../../components/mainButton.component";
 import { routes } from '../../assets/routes'
 import { useSelector } from 'react-redux'
 const size = 28;
-const notificationNotRead = useSelector(state => state.profile.notificationNotRead)
+
 export const DrawerAction = (navigation) => {
   return (
     <View>
@@ -36,6 +36,8 @@ export const BackAction = (navigation, route) => {
 };
 
 export const Notifications = (navigation) => {
+  const notificationNotRead = useSelector(state => state.profile.notificationNotRead)
+  // console.log("noti not length--",notificationNotRead)
   return (
     <View>
       <TouchableOpacity
@@ -65,7 +67,8 @@ const styles = StyleSheet.create({
     height: 30,
     borderRadius: 30/2,
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
+    backgroundColor: '#09f'
   },
   number: {
     fontSize: 14,
