@@ -83,7 +83,8 @@ router.get("/findUser/:id", Controllers.employee.findUser);
 router.get("/user/:companyId", Controllers.employee.findUsers);
 router.get("/user/zone/:zoneId", Controllers.employee.findUsersByZone);
 router.put("/user/:id", Controllers.employee.deleteUser);
-
+//NOTIFICATION
+router.get("/notification/:userId", Controllers.notification.fetchNotificationNotRead)
 //ZONES
 router.post("/createZone/:id", Controllers.zone.createZone);
 router.get("/findZones/:companyId", Controllers.zone.findZones);

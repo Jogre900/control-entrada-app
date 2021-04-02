@@ -11,6 +11,13 @@ module.exports = (sequelize, DataTypes) => {
         onDelete: "CASCADE",
         onUpdate: "CASCADE"
       });
+      this.belongsTo(models.User, {
+        foreignKey: {
+          name: "userId",
+          field: "user_id"
+        },
+        as: "user"
+      });
     };
   }
   Notification.init(
@@ -28,7 +35,21 @@ module.exports = (sequelize, DataTypes) => {
       notification: {
         type: DataTypes.STRING,
         allowNull: false
+      },
+      read: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false
+      },
+      triggerId: {
+        type: DataTypes.UUID,
+        allowNull: true,
+      },
+      targetId:{
+        type: DataTypes.UUID,
+        allowNull: true,
       }
+
     },
     {
       sequelize,

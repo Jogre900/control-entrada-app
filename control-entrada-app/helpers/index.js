@@ -14,6 +14,7 @@ import {
   maxUserVisit,
   fetchVisitDestiny
 } from "./visit";
+import { fetchNotificationNotRead } from './notification'
 
 export const helpers = {
   createCitizen,
@@ -33,7 +34,8 @@ export const helpers = {
   suspendEmployee,
   verifyLogin,
   updateProfile,
-  saveDeviceToken
+  saveDeviceToken,
+  fetchNotificationNotRead
 };
 
 //DELETE ANYTHING FROM API

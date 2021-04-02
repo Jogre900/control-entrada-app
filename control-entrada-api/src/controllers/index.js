@@ -13,6 +13,7 @@ import employee from './employee'
 import zone from './zone'
 import destiny from './destiny'
 import visits from './visits'
+import notification from './notification'
 
 const SECRETKEY = process.env.SECRETKEY || $security().secretKey;
 
@@ -23,6 +24,7 @@ const Controllers = {
   zone,
   destiny,
   visits,
+  notification,
   
   
   createCompany: async function(req, res) {

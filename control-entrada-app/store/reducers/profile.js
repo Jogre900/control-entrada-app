@@ -30,6 +30,7 @@ const initialState = {
       select: false,
     },
   ],
+  notificationNotRead : [],
   tutorial: false,
   deviceToken: ''
 };
@@ -83,6 +84,11 @@ export default (state = initialState, action = {}) => {
         login: { ...state.login, privilege: action.payload },
         companySelect: companySelect(state),
       };
+      case "SAVE_NOTI_NOT_READ":
+        return {
+          ...state,
+          notificationNotRead: state.notificationNotRead.concat(action.payload)
+        }
       case "TUTORIAL":
         return {
           ...state,

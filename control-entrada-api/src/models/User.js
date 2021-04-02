@@ -40,7 +40,7 @@ module.exports = (sequelize, DataTypes) => {
         onDelete: "CASCADE",
         onUpdate: "CASCADE"
       });
-      this.hasMany(models.NotificationRead, {
+      this.hasMany(models.Notification, {
         foreignKey: {
           name: "userId",
           field: "user_id"

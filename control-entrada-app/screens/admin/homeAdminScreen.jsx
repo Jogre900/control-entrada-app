@@ -28,6 +28,7 @@ import {
   helpers,
 } from "../../helpers/";
 
+const DELAY = 1
 const HomeAdminScreen = ({
   navigation,
   company,
@@ -38,6 +39,7 @@ const HomeAdminScreen = ({
   saveDestiny,
   profile,
   privilege,
+  saveNotificationNotRead
 }) => {
   const [visible, setVisible] = useState(false);
   const [selectItem, setSeletedItem] = useState([]);
@@ -133,6 +135,21 @@ const HomeAdminScreen = ({
     }
   };
 
+  //REQUEST ALL NOTIFICATION NO READ IT
+  const requestNotification = async () => {
+    setLoading(true);
+    try {
+      const res = await helpers.fetchNotificationNotRead(profile.id)
+      if(!res.data.error){
+        setLoading(false);
+        saveNotificationNotRead(res.data.data)
+      }
+    } catch (error) {
+      setLoading(false);
+      console.log(error.message)
+    }
+  }
+
   //REQUEST AVAILABLE
   // const findAvailableUsers = async () => {
   //   if (company) {
@@ -207,6 +224,14 @@ const HomeAdminScreen = ({
   // useEffect(() => {
   //   requestVisits();
   // }, [employee]);
+  useEffect(
+    () => {
+      let timer1 = setTimeout(() => requestNotification(), DELAY * 1000);
+      return () => {
+        clearTimeout(timer1);
+      };
+    },
+  )
   useFocusEffect(
     React.useCallback(() => {
       BackHandler.addEventListener("hardwareBackPress", backAction);
@@ -274,6 +299,12 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = (dispatch) => ({
+  saveNotificationNotRead(notifications){
+    dispatch({
+      type: 'SAVE_NOTI_NOT_READ',
+      payload: notifications
+    })
+  },
   saveZones(zones) {
     dispatch({
       type: "setZones",
