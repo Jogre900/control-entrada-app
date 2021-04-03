@@ -28,7 +28,7 @@ import {
   helpers,
 } from "../../helpers/";
 
-const DELAY = 10
+const DELAY = 1;
 const HomeAdminScreen = ({
   navigation,
   company,
@@ -41,7 +41,7 @@ const HomeAdminScreen = ({
   login,
   privilege,
   saveNotification,
-  saveNotificationNotRead
+  saveNotificationNotRead,
 }) => {
   const [visible, setVisible] = useState(false);
   const [selectItem, setSeletedItem] = useState([]);
@@ -80,13 +80,13 @@ const HomeAdminScreen = ({
   const requestEmployee = async () => {
     let uzArray = [];
     let employee = [];
-    console.log("me ejecute")
+    console.log("me ejecute");
     if (company) {
       setLoading(true);
       const res = await fetchAllEmployee(company.id);
       //console.log(res.data)
       if (res.data.data.length > 0) {
-        console.log("si hay empleados")
+        console.log("si hay empleados");
         res.data.data.map((e) => {
           uzArray.push(e.userZone[0]);
         });
@@ -141,21 +141,21 @@ const HomeAdminScreen = ({
   const requestNotification = async () => {
     setLoading(true);
     try {
-      const res = await helpers.fetchNotification(login.userId)
-      if(!res.data.error){
-        console.log("all notif--",res.data.data)
+      const res = await helpers.fetchNotification(login.userId);
+      if (!res.data.error) {
+        console.log("all notif--", res.data.data);
         setLoading(false);
-        let array = []
-        saveNotification(res.data.data)
-        array = res.data.data.filter(({read}) => read === false)
-        console.log("notis not read--",array)
-        saveNotificationNotRead(array)
+        let array = [];
+        saveNotification(res.data.data);
+        array = res.data.data.filter(({ read }) => read === false);
+        console.log("notis not read--", array);
+        saveNotificationNotRead(array);
       }
     } catch (error) {
       setLoading(false);
-      console.log(error.message)
+      console.log(error.message);
     }
-  }
+  };
 
   //REQUEST AVAILABLE
   // const findAvailableUsers = async () => {
@@ -231,14 +231,17 @@ const HomeAdminScreen = ({
   // useEffect(() => {
   //   requestVisits();
   // }, [employee]);
-  useEffect(
-    () => {
-      let timer1 = setTimeout(() => requestNotification(), DELAY * 1000);
-      return () => {
-        clearTimeout(timer1);
-      };
-    },
-  )
+  // useEffect(() => {
+  //   let timer1 = setTimeout(() => requestNotification(), DELAY * 1000);
+  //   return () => {
+  //     clearTimeout(timer1);
+  //   };
+  // }, []);
+  useEffect(() => {
+    if (login) {
+      requestNotification();
+    }
+  }, []);
   useFocusEffect(
     React.useCallback(() => {
       BackHandler.addEventListener("hardwareBackPress", backAction);
@@ -307,17 +310,17 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  saveNotification(notifications){
+  saveNotification(notifications) {
     dispatch({
-      type: 'SAVE_NOTI',
-      payload: notifications
-    })
+      type: "SAVE_NOTI",
+      payload: notifications,
+    });
   },
-  saveNotificationNotRead(notifications){
+  saveNotificationNotRead(notifications) {
     dispatch({
-      type: 'SAVE_NOTI_NOT_READ',
-      payload: notifications
-    })
+      type: "SAVE_NOTI_NOT_READ",
+      payload: notifications,
+    });
   },
   saveZones(zones) {
     dispatch({

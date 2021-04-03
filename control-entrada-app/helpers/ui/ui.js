@@ -37,7 +37,7 @@ export const BackAction = (navigation, route) => {
 
 export const Notifications = (navigation) => {
   const notificationNotRead = useSelector(state => state.profile.notificationNotRead)
-  // console.log("noti not length--",notificationNotRead)
+  console.log("noti not Read length--",notificationNotRead.length)
   return (
     <View>
       <TouchableOpacity
@@ -47,7 +47,7 @@ export const Notifications = (navigation) => {
       >
         <Ionicons name="md-notifications" size={28} color="white" />
         <View style={styles.numberContainer}>
-          <Text style={styles.number}>{notificationNotRead.length && notificationNotRead.length}</Text>
+          <Text style={styles.number}>{notificationNotRead.length > 0 ? notificationNotRead.length : null}</Text>
         </View>
       </TouchableOpacity>
     </View>

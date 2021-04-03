@@ -3,55 +3,12 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { Op, fn, col, literal } from "sequelize";
 import moment from "moment";
-import { Expo } from 'expo-server-sdk';
-import fetch from 'node-fetch'
+import { Expo } from "expo-server-sdk";
+import fetch from "node-fetch";
 import { $security, $serverPort } from "@config";
+import notification from "./notification";
 
 const SECRETKEY = process.env.SECRETKEY || $security().secretKey;
-//PRUEBA DE PUSH N
-const expo = new Expo();
-
-async function sendPushNotification(expoPushToken) {
-  const message = {
-    to: expoPushToken,
-    sound: 'default',
-    title: 'HOLA OMAIRA',
-    body: 'And here is the body!',
-    data: { someData: 'goes here' },
-  };
-
-  await fetch('https://exp.host/--/api/v2/push/send', {
-    method: 'POST',
-    headers: {
-      Accept: 'application/json',
-      'Accept-encoding': 'gzip, deflate',
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(message),
-  });
-}
-//---------->
-const sendPush = async (pushToken) => {
-  let messages = []
-  messages.push({
-    to: pushToken,
-    sound: 'default',
-    body: 'This is a test notification',
-    data: { withSome: 'data' },
-  })
-  try {
-    let resPush = await expo.sendPushNotificationsAsync(messages);
-    return console.log("RES DE SENDP--",resPush);
-    // NOTE: If a ticket contains an error code in ticket.details.error, you
-    // must handle it appropriately. The error codes are listed in the Expo
-    // documentation:
-    // https://docs.expo.io/push-notifications/sending-notifications/#individual-errors
-  } catch (error) {
-    console.error(error);
-  }
-}
-
-//FIN PRUEBA DE PUSH N
 
 const visits = {
   //CREATE VISIT
@@ -149,28 +106,25 @@ const visits = {
         //BUSCAR ADMIN Y SUPERVISOR ZONA
         const admin = await models.UserCompany.findOne({
           where: {
-            [Op.and] : [{privilege: 'Admin'}, {companyId: userCompany.dataValues.companyId}]
+            [Op.and]: [
+              { privilege: "Admin" },
+              { companyId: userCompany.dataValues.companyId }
+            ]
           }
-        })
-        console.log("ADMIN-",admin.dataValues)
-        const adminId = admin.dataValues.userId
+        });
+        console.log("ADMIN-", admin.dataValues);
+        const adminId = admin.dataValues.userId;
 
         //CREAR NOTI
-        const newNoti = await models.Notification.create({
-          notification: 'Nueva Visita Registrada',
-          notificationType: '1',
-          notificationRead: {
-            userId: adminId,
-            read: false
-          }
-        },
-          {
-            include: {
-              model: models.NotificationRead, as: 'notificationRead'
-            }
-          }
-        )
-        console.log("NOTIFICATION--",newNoti.dataValues)
+        const newNoti = await notification.createNotification(
+          adminId,
+          "Segunda Prueba",
+          "Visit",
+          userId,
+          visit.id
+        );
+
+        console.log("NOTIFICATION--", newNoti.dataValues);
         // const superV = await models.User.findAll({
         //   include: [
         //     {model: models.Employee, as: 'Employee'},
@@ -1012,4 +966,4 @@ const visits = {
   }
 };
 
-export default visits
+export default visits;

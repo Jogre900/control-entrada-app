@@ -42,9 +42,13 @@ const companySelect = (state) => {
 
 //UPDATE NOTIFICATION
 const updateNoti = (newNoti, state) => {
-  let filterNoti = state.today.filter(({ id }) => id !== newNoti.id);
-  let newArray = filterNoti.concat(newNoti);
-  return newArray;
+  let prueba = [];
+  //console.log("state noti--", state.notification);
+  prueba = state.notification.map(
+    (obj) => newNoti.find((o) => o.id === obj.id) || obj
+  );
+  //console.log("PRUEBA--", prueba);
+  return prueba;
 };
 
 export default (state = initialState, action = {}) => {
@@ -103,11 +107,15 @@ export default (state = initialState, action = {}) => {
         notificationNotRead: action.payload,
       };
     case "UPDATE_READ":
+      console.log("PAYLOAD NOTI-", action.payload);
+      console.log(state.notificationNotRead)
+      
+      let notReadFilter = state.notificationNotRead.filter(
+        ({ id }) => action.payload.find((elem) => elem.id !== id));
+      console.log(notReadFilter)
       return {
         ...state,
-        notificationNotRead: state.notificationNotRead.filter(
-          ({ id }) => id !== action.payload.id
-        ),
+        notificationNotRead: notReadFilter,
         notification: updateNoti(action.payload, state),
       };
     case "TUTORIAL":
@@ -125,6 +133,8 @@ export default (state = initialState, action = {}) => {
         company: [],
         profile: {},
         login: {},
+        notification: [],
+        notificationNotRead: [],
       };
     default:
       return state;
