@@ -1,31 +1,18 @@
 import * as React from "react";
-import { Platform, StatusBar, StyleSheet, View } from "react-native";
 import { PersistGate } from "redux-persist/integration/react";
 import { SplashScreen } from "expo";
 import * as Font from "expo-font";
 import { Ionicons } from "@expo/vector-icons";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
-import Constants from "expo-constants";
-import * as Notifications from "expo-notifications";
-import * as Permissions from "expo-permissions";
 import { MainNavigator } from "./navigation/main.navigator";
-import BottomTabNavigator from "./navigation/BottomTabNavigator";
 import useLinking from "./navigation/useLinking";
-import { storage } from './helpers/asyncStorage'
-import { Provider, useDispatch } from "react-redux";
+import { Provider } from "react-redux";
 import { store, persistor } from "./store";
+import { PushNotification } from "./config/PushNotification";
 //import OneSignalProvider from "./lib/OneSignal";
 
 const Stack = createStackNavigator();
-
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: true,
-  }),
-});
 
 export default function App(props) {
   const [isLoadingComplete, setLoadingComplete] = React.useState(false);
@@ -33,39 +20,6 @@ export default function App(props) {
   const [tokenDevice, setTokenDevice] = React.useState();
   const containerRef = React.useRef();
   const { getInitialState } = useLinking(containerRef);
-
-  // Notification Permisssions
-  async function registerForPushNotificationsAsync() {
-    let deviceToken = null
-    if (Constants.isDevice) {
-      const { status: existingStatus } = await Permissions.getAsync(Permissions.NOTIFICATIONS);
-      let finalStatus = existingStatus;
-      if (existingStatus !== "granted") {
-        const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
-        finalStatus = status;
-      }
-      if (finalStatus !== "granted") {
-        alert("Failed to get push token for push notification!");
-        return;
-      }
-      deviceToken = (await Notifications.getExpoPushTokenAsync()).data;
-      await storage.setItem('deviceToken', deviceToken)
-      console.log("devicetoken: ", deviceToken);
-    } else {
-      alert("Must use physical device for Push Notifications");
-    }
-
-    if (Platform.OS === "android") {
-      Notifications.setNotificationChannelAsync("default", {
-        name: "default",
-        importance: Notifications.AndroidImportance.MAX,
-        vibrationPattern: [0, 250, 250, 250],
-        lightColor: "#FF231F7C",
-      });
-    }
-
-    return deviceToken;
-  }
 
   // Load any resources or data that we need prior to rendering the app
 
@@ -94,10 +48,6 @@ export default function App(props) {
     loadResourcesAndDataAsync();
   }, []);
 
-  React.useEffect(() => {
-    registerForPushNotificationsAsync().then((token) => setTokenDevice(token));
-  }, []);
-
   if (!isLoadingComplete && !props.skipLoadingScreen) {
     return null;
   } else {
@@ -105,10 +55,11 @@ export default function App(props) {
       <React.Fragment>
         <Provider store={store}>
           <PersistGate loading={null} persistor={persistor}>
+            <PushNotification {...props}/>
             {/* <OneSignalProvider> */}
-              <NavigationContainer>
-                <MainNavigator />
-              </NavigationContainer>
+            <NavigationContainer>
+              <MainNavigator />
+            </NavigationContainer>
             {/* </OneSignalProvider> */}
           </PersistGate>
         </Provider>
@@ -125,10 +76,3 @@ export default function App(props) {
     );
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-  },
-});

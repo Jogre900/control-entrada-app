@@ -82,7 +82,11 @@ const notification = {
           message.to = token.dataValues.token;
           message.sound = "default";
           message.title = "Titulo";
+          message.subtitle = 'sub titulo'
           message.body = notification;
+          message.data = { someData: 'goes here' }
+          message.vibrate = [200, 200, 200],
+          message.launchImageName = 'https://i0.wp.com/paginadelespanol.com/wp-content/uploads/2019/06/Alguien-nadie-algo-nada-todo.png?fit=1080%2C1080&ssl=1'
           messages.push(message);
         });
         console.log("messages Array--", messages);

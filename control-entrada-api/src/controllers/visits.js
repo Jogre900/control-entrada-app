@@ -115,6 +115,45 @@ const visits = {
         console.log("ADMIN-", admin.dataValues);
         const adminId = admin.dataValues.userId;
 
+        //FIND SUPERVISOR
+        //--------------->
+        const userZoneN = await models.UserZone.findOne({
+          where: {
+            id: userZoneId
+          }
+        });
+
+        const alluserZone = await models.UserZone.findAll({
+          where: {
+            ZoneId: userZoneN.dataValues.ZoneId
+          }
+        });
+
+        let usersArrayId = [];
+        alluserZone.map(elem => {
+          usersArrayId.push(elem.dataValues.UserId);
+        });
+
+        const superUsers = await models.User.findAll({
+          where: {
+            id: usersArrayId
+          },
+          include: {
+            model: models.UserCompany,
+            as: "UserCompany",
+            where: {
+              privilege: "Supervisor"
+            }
+          }
+        });
+
+        let supersIdArray = [];
+        superUsers.map(elem => {
+          supersIdArray.push(elem.dataValues.id);
+        });
+        console.log("supers ID Array--", supersIdArray);
+        //-----------<
+
         //CREAR NOTI
         const newNoti = await notification.createNotification(
           adminId,

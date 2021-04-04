@@ -83,7 +83,7 @@ const NotificationScreen = ({ navigation, notifications, updateReadNotification 
         />
       ) : (
         <TopNavigation
-          title="Entradas del Dia"
+          title="Notificaciones"
           leftControl={BackAction(navigation, routes.ADMIN_HOME)}
         />
       )}
