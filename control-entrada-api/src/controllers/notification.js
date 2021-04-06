@@ -8,6 +8,26 @@ import { Expo } from "expo-server-sdk";
 import fetch from "node-fetch";
 const SECRETKEY = process.env.SECRETKEY || $security().secretKey;
 
+
+const notificationType = {
+  //SUSPENDED_EMPLOYEE = 'SUSPENDED_EMPLOYEE', 
+  ENTRY = 'ENTRY',
+  DEPARTURE = 'DEPARTURE',
+  CREATE_ZONE = 'CREATE_ZONE',
+  DELETE_ZONE = 'DELETE_ZONE',
+  CREATE_DESTINY = 'CREATE_DESTINY',
+  DELETE_DESTINY = 'DELETE_DESTINY'
+}
+
+const notificationMessage = {
+  ENTRY = 'ha registrado una nueva entrada.',
+  DEPARTURE = 'ha registrado una nueva salida.',
+  CREATE_ZONE = 'ha creado una nueva zona.',
+  DELETE_ZONE = 'elimino una zona.',
+  CREATE_DESTINY = 'ha creado un nuevo destino.',
+  DELETE_DESTINY = 'elimino un destino.'
+}
+
 //PRUEBA DE PUSH N
 const expo = new Expo();
 
@@ -54,6 +74,25 @@ const sendPush = async messages => {
 //FIN PRUEBA DE PUSH N
 
 const notification = {
+  notificationType = {
+    //SUSPENDED_EMPLOYEE = 'SUSPENDED_EMPLOYEE', 
+    ENTRY = 'ENTRY',
+    DEPARTURE = 'DEPARTURE',
+    CREATE_ZONE = 'CREATE_ZONE',
+    DELETE_ZONE = 'DELETE_ZONE',
+    CREATE_DESTINY = 'CREATE_DESTINY',
+    DELETE_DESTINY = 'DELETE_DESTINY'
+  },
+  
+  notificationMessage = {
+    ENTRY = 'ha registrado una nueva entrada.',
+    DEPARTURE = 'ha registrado una nueva salida.',
+    CREATE_ZONE = 'ha creado una nueva zona.',
+    DELETE_ZONE = 'elimino una zona.',
+    CREATE_DESTINY = 'ha creado un nuevo destino.',
+    DELETE_DESTINY = 'elimino un destino.'
+  },
+  
   //HELPER FOR CREATE NOTI
   createNotification: async function(
     userId,

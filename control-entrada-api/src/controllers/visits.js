@@ -7,6 +7,7 @@ import { Expo } from "expo-server-sdk";
 import fetch from "node-fetch";
 import { $security, $serverPort } from "@config";
 import notification from "./notification";
+import employee from './employee'
 
 const SECRETKEY = process.env.SECRETKEY || $security().secretKey;
 
@@ -103,62 +104,15 @@ const visits = {
         await destinyU.reload();
         await destinyU.save();
 
-        //BUSCAR ADMIN Y SUPERVISOR ZONA
-        const admin = await models.UserCompany.findOne({
-          where: {
-            [Op.and]: [
-              { privilege: "Admin" },
-              { companyId: userCompany.dataValues.companyId }
-            ]
-          }
-        });
-        console.log("ADMIN-", admin.dataValues);
-        const adminId = admin.dataValues.userId;
-
-        //FIND SUPERVISOR
-        //--------------->
-        const userZoneN = await models.UserZone.findOne({
-          where: {
-            id: userZoneId
-          }
-        });
-
-        const alluserZone = await models.UserZone.findAll({
-          where: {
-            ZoneId: userZoneN.dataValues.ZoneId
-          }
-        });
-
-        let usersArrayId = [];
-        alluserZone.map(elem => {
-          usersArrayId.push(elem.dataValues.UserId);
-        });
-
-        const superUsers = await models.User.findAll({
-          where: {
-            id: usersArrayId
-          },
-          include: {
-            model: models.UserCompany,
-            as: "UserCompany",
-            where: {
-              privilege: "Supervisor"
-            }
-          }
-        });
-
-        let supersIdArray = [];
-        superUsers.map(elem => {
-          supersIdArray.push(elem.dataValues.id);
-        });
-        console.log("supers ID Array--", supersIdArray);
-        //-----------<
-
+       
+        //FIND ADMIN
+        const adminId = await employee.findAdmin(userCompany)
+       
         //CREAR NOTI
         const newNoti = await notification.createNotification(
           adminId,
-          "Segunda Prueba",
-          "Visit",
+          notification.notificationMessage.ENTRY,
+          notification.notificationType.ENTRY,
           userId,
           visit.id
         );
@@ -245,7 +199,7 @@ const visits = {
         RESPONSE.data = person;
         res.status(200).json(RESPONSE);
       } else {
-        let visits = await models.Citizen.create(
+        const visits = await models.Citizen.create(
           {
             dni,
             name,
@@ -319,6 +273,19 @@ const visits = {
         await destinyU.increment("visits");
         await destinyU.reload();
         await destinyU.save();
+
+        //FIND ADMIN
+        const adminId = await employee.findAdmin(userCompany)
+        //CREAR NOTI
+        const newNoti = await notification.createNotification(
+          adminId,
+          notification.notificationMessage.ENTRY,
+          notification.notificationType.ENTRY,
+          userId,
+          visits.id
+        );
+
+        console.log("NOTIFICATION--", newNoti.dataValues);
 
         RESPONSE.error = false;
         RESPONSE.msg = "Registro Exitoso";
@@ -551,6 +518,18 @@ const visits = {
             }
           ]
         });
+
+        //FIND ADMIN
+        const adminId = await employee.findAdmin(userCompany)
+        //CREAR NOTI
+        const newNoti = await notification.createNotification(
+          adminId,
+          notification.notificationMessage.DEPARTURE,
+          notification.notificationType.DEPARTURE,
+          userId,
+          visitU.id
+        );
+
         RESPONSE.error = false;
         RESPONSE.msg = "Actualizacion Existosa";
         RESPONSE.data = visitU;

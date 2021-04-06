@@ -14,15 +14,18 @@ import { Header } from "../../components/header.component";
 import { routes } from "../../assets/routes";
 import { BackAction } from "../../helpers/ui/ui";
 import { helpers } from "../../helpers/";
-import { API_PORT } from '../../config'
-import moment from 'moment'
+import { API_PORT } from "../../config";
+import moment from "moment";
 
 import { connect } from "react-redux";
 
-const NotificationScreen = ({ navigation, notifications, updateReadNotification }) => {
+const NotificationScreen = ({
+  navigation,
+  notifications,
+  updateReadNotification,
+}) => {
   //const [notification, setNotification] = useState([]);
   const [selectItem, setSeletedItem] = useState([]);
-
 
   //REQUEST ALL NOTIFICATION
   const requestNotification = async () => {
@@ -39,17 +42,42 @@ const NotificationScreen = ({ navigation, notifications, updateReadNotification 
     }
   };
 
+  //ONPRESSHANDLRES
+  const onPressHandler = (notificationId, notification) => {
+    const { notificationType, targetId } = notification;
+    const route, params;
+
+    switch (notificationType) {
+      case "ENTRY":
+      case "DEPARTURE":
+        route = routes.DETAIL_VIEW;
+        break;
+      case "CREATE_ZONE":
+        route = routes.ZONE_DETAIL;
+        break;
+      case "DELETE_ZONE":
+        route = routes.ZONES;
+      case "CREATE_DESTINY":
+        route = routes.ZONES;
+      case "DELETE_DESTINY":
+        route = routes.ZONES;
+        break;
+      default:
+        break;
+    }
+    changeRead(notificationId).then(() => navigation.navigate(route, targetId));
+  };
   //CHANGE READ STATUS
   const changeRead = async (notificationId) => {
-      try {
-          const res = await helpers.changeReadStatus(notificationId)
-          if(!res.data.error){
-            updateReadNotification(res.data.data)
-          }
-      } catch (error) {
-          console.log(error.message)
+    try {
+      const res = await helpers.changeReadStatus(notificationId);
+      if (!res.data.error) {
+        updateReadNotification(res.data.data);
       }
-  }
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
 
   //ONLONGPRESS
   const onLong = (id) => {
@@ -95,21 +123,23 @@ const NotificationScreen = ({ navigation, notifications, updateReadNotification 
               { backgroundColor: elem.read === true ? "#fff" : "#09f" },
             ]}
             key={elem.id}
-            onPress={() => changeRead(elem.id)}
+            onPress={onPressHandler}
             // onPress={
             //     selectItem.length > 0
             //       ? () => onLong(elem.id)
             //       : () =>
             //           alert("falta accion")
             //   }
-              onLongPress={() => onLong(elem.id)}
-              delayLongPress={200}
+            onLongPress={() => onLong(elem.id)}
+            delayLongPress={200}
           >
-              <Avatar.Picture 
+            <Avatar.Picture
               size={60}
               uri={`${API_PORT()}/public/imgs/${elem.User.Employee.picture}`}
-              />
-              <Text>{elem.User.Employee.name} {elem.User.Employee.lastName}</Text>
+            />
+            <Text>
+              {elem.User.Employee.name} {elem.User.Employee.lastName}
+            </Text>
             <Text>{elem.notification}</Text>
             <Text>{moment(elem.createdAt).fromNow()}</Text>
           </TouchableOpacity>
@@ -123,12 +153,12 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = (dispatch) => ({
-    updateReadNotification(data){
-        dispatch({
-            type: 'UPDATE_READ',
-            payload: data
-        })
-    }
+  updateReadNotification(data) {
+    dispatch({
+      type: "UPDATE_READ",
+      payload: data,
+    });
+  },
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(NotificationScreen);

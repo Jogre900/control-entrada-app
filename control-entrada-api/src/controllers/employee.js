@@ -5,8 +5,68 @@ import { Op, fn, col, literal } from "sequelize";
 import moment from "moment";
 import { $security, $serverPort } from "@config";
 const SECRETKEY = process.env.SECRETKEY || $security().secretKey;
+
+
 const employee = {
-      createUserWatchman: async function(req, res) {
+  //HELPERS
+  //FIND ADMIN
+  findAdmin: async function(userCompany){
+     const admin = await models.UserCompany.findOne({
+      where: {
+        [Op.and]: [
+          { privilege: "Admin" },
+          { companyId: userCompany.dataValues.companyId }
+        ]
+      }
+    });
+    console.log("ADMIN-", admin.dataValues);
+    const adminId = admin.dataValues.userId;
+    return adminId
+  },
+  
+  //FIND ALL SUPERVISOR FROM ONE ZONE
+  findSuper: async function(userZoneId){
+        const userZoneN = await models.UserZone.findOne({
+          where: {
+            id: userZoneId
+          }
+        });
+
+        const alluserZone = await models.UserZone.findAll({
+          where: {
+            ZoneId: userZoneN.dataValues.ZoneId
+          }
+        });
+
+        let usersArrayId = [];
+        alluserZone.map(elem => {
+          usersArrayId.push(elem.dataValues.UserId);
+        });
+
+        const superUsers = await models.User.findAll({
+          where: {
+            id: usersArrayId
+          },
+          include: {
+            model: models.UserCompany,
+            as: "UserCompany",
+            where: {
+              privilege: "Supervisor"
+            }
+          }
+        });
+
+        let supersIdArray = [];
+        superUsers.map(elem => {
+          supersIdArray.push(elem.dataValues.id);
+        });
+        console.log("supers ID Array--", supersIdArray);
+        return supersIdArray
+  },
+  
+  
+  
+  createUserWatchman: async function(req, res) {
         let RESPONSE = {
           error: true,
           msg: "",
