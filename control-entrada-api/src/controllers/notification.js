@@ -8,25 +8,24 @@ import { Expo } from "expo-server-sdk";
 import fetch from "node-fetch";
 const SECRETKEY = process.env.SECRETKEY || $security().secretKey;
 
-
 const notificationType = {
-  //SUSPENDED_EMPLOYEE = 'SUSPENDED_EMPLOYEE', 
-  ENTRY = 'ENTRY',
-  DEPARTURE = 'DEPARTURE',
-  CREATE_ZONE = 'CREATE_ZONE',
-  DELETE_ZONE = 'DELETE_ZONE',
-  CREATE_DESTINY = 'CREATE_DESTINY',
-  DELETE_DESTINY = 'DELETE_DESTINY'
-}
+  //SUSPENDED_EMPLOYEE = 'SUSPENDED_EMPLOYEE',
+  ENTRY: "ENTRY",
+  DEPARTURE: "DEPARTURE",
+  CREATE_ZONE: "CREATE_ZONE",
+  DELETE_ZONE: "DELETE_ZONE",
+  CREATE_DESTINY: "CREATE_DESTINY",
+  DELETE_DESTINY: "DELETE_DESTINY"
+};
 
 const notificationMessage = {
-  ENTRY = 'ha registrado una nueva entrada.',
-  DEPARTURE = 'ha registrado una nueva salida.',
-  CREATE_ZONE = 'ha creado una nueva zona.',
-  DELETE_ZONE = 'elimino una zona.',
-  CREATE_DESTINY = 'ha creado un nuevo destino.',
-  DELETE_DESTINY = 'elimino un destino.'
-}
+  ENTRY: "ha registrado una nueva entrada.",
+  DEPARTURE: "ha registrado una nueva salida.",
+  CREATE_ZONE: "ha creado una nueva zona.",
+  DELETE_ZONE: "elimino una zona.",
+  CREATE_DESTINY: "ha creado un nuevo destino.",
+  DELETE_DESTINY: "elimino un destino."
+};
 
 //PRUEBA DE PUSH N
 const expo = new Expo();
@@ -74,25 +73,25 @@ const sendPush = async messages => {
 //FIN PRUEBA DE PUSH N
 
 const notification = {
-  notificationType = {
-    //SUSPENDED_EMPLOYEE = 'SUSPENDED_EMPLOYEE', 
-    ENTRY = 'ENTRY',
-    DEPARTURE = 'DEPARTURE',
-    CREATE_ZONE = 'CREATE_ZONE',
-    DELETE_ZONE = 'DELETE_ZONE',
-    CREATE_DESTINY = 'CREATE_DESTINY',
-    DELETE_DESTINY = 'DELETE_DESTINY'
+  notificationType: {
+    //SUSPENDED_EMPLOYEE = 'SUSPENDED_EMPLOYEE',
+    ENTRY: "ENTRY",
+    DEPARTURE: "DEPARTURE",
+    CREATE_ZONE: "CREATE_ZONE",
+    DELETE_ZONE: "DELETE_ZONE",
+    CREATE_DESTINY: "CREATE_DESTINY",
+    DELETE_DESTINY: "DELETE_DESTINY"
   },
-  
-  notificationMessage = {
-    ENTRY = 'ha registrado una nueva entrada.',
-    DEPARTURE = 'ha registrado una nueva salida.',
-    CREATE_ZONE = 'ha creado una nueva zona.',
-    DELETE_ZONE = 'elimino una zona.',
-    CREATE_DESTINY = 'ha creado un nuevo destino.',
-    DELETE_DESTINY = 'elimino un destino.'
+
+  notificationMessage: {
+    ENTRY: "ha registrado una nueva entrada.",
+    DEPARTURE: "ha registrado una nueva salida.",
+    CREATE_ZONE: "ha creado una nueva zona.",
+    DELETE_ZONE: "elimino una zona.",
+    CREATE_DESTINY: "ha creado un nuevo destino.",
+    DELETE_DESTINY: "elimino un destino."
   },
-  
+
   //HELPER FOR CREATE NOTI
   createNotification: async function(
     userId,
@@ -121,15 +120,16 @@ const notification = {
           message.to = token.dataValues.token;
           message.sound = "default";
           message.title = "Titulo";
-          message.subtitle = 'sub titulo'
+          message.subtitle = "sub titulo";
           message.body = notification;
-          message.data = { someData: 'goes here' }
-          message.vibrate = [200, 200, 200],
-          message.launchImageName = 'https://i0.wp.com/paginadelespanol.com/wp-content/uploads/2019/06/Alguien-nadie-algo-nada-todo.png?fit=1080%2C1080&ssl=1'
+          message.data = { someData: "goes here" };
+          (message.vibrate = [200, 200, 200]),
+            (message.launchImageName =
+              "https://i0.wp.com/paginadelespanol.com/wp-content/uploads/2019/06/Alguien-nadie-algo-nada-todo.png?fit=1080%2C1080&ssl=1");
           messages.push(message);
         });
         console.log("messages Array--", messages);
-        
+
         const newNoti = await models.Notification.create({
           notification,
           notificationType,
@@ -140,7 +140,7 @@ const notification = {
         });
         if (newNoti) {
           await sendPush(messages);
-          return newNoti
+          return newNoti;
         }
       }
     } catch (error) {
@@ -185,7 +185,7 @@ const notification = {
           RESPONSE.msg = "Busqueda exitosa!";
           RESPONSE.data = noti;
           res.json(RESPONSE);
-          console.log(RESPONSE)
+          console.log(RESPONSE);
         }
       }
     } catch (error) {

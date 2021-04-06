@@ -7,7 +7,7 @@ import { Expo } from "expo-server-sdk";
 import fetch from "node-fetch";
 import { $security, $serverPort } from "@config";
 import notification from "./notification";
-import employee from './employee'
+import employee from "./employee";
 
 const SECRETKEY = process.env.SECRETKEY || $security().secretKey;
 
@@ -104,10 +104,9 @@ const visits = {
         await destinyU.reload();
         await destinyU.save();
 
-       
         //FIND ADMIN
-        const adminId = await employee.findAdmin(userCompany)
-       
+        const adminId = await employee.findAdmin(userCompany);
+
         //CREAR NOTI
         const newNoti = await notification.createNotification(
           adminId,
@@ -275,14 +274,14 @@ const visits = {
         await destinyU.save();
 
         //FIND ADMIN
-        const adminId = await employee.findAdmin(userCompany)
+        const adminId = await employee.findAdmin(userCompany);
         //CREAR NOTI
         const newNoti = await notification.createNotification(
           adminId,
           notification.notificationMessage.ENTRY,
           notification.notificationType.ENTRY,
           userId,
-          visits.id
+          visits.Visitas.id
         );
 
         console.log("NOTIFICATION--", newNoti.dataValues);
@@ -520,7 +519,7 @@ const visits = {
         });
 
         //FIND ADMIN
-        const adminId = await employee.findAdmin(userCompany)
+        const adminId = await employee.findAdmin(userCompany);
         //CREAR NOTI
         const newNoti = await notification.createNotification(
           adminId,

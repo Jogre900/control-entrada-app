@@ -1,13 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  View,
-  StyleSheet,
-  TouchableOpacity,
-  Text,
-  ScrollView,
-  Vibration,
-  BackHandler,
-} from "react-native";
+import { View, StyleSheet, TouchableOpacity, Text, ScrollView, Vibration, BackHandler } from "react-native";
 import Avatar from "../../components/avatar.component";
 import { TopNavigation } from "../../components/TopNavigation.component";
 import { Header } from "../../components/header.component";
@@ -19,11 +11,7 @@ import moment from "moment";
 
 import { connect } from "react-redux";
 
-const NotificationScreen = ({
-  navigation,
-  notifications,
-  updateReadNotification,
-}) => {
+const NotificationScreen = ({ navigation, notifications, updateReadNotification }) => {
   //const [notification, setNotification] = useState([]);
   const [selectItem, setSeletedItem] = useState([]);
 
@@ -43,9 +31,10 @@ const NotificationScreen = ({
   };
 
   //ONPRESSHANDLRES
-  const onPressHandler = (notificationId, notification) => {
-    const { notificationType, targetId } = notification;
-    const route, params;
+  const onPressHandler = (notification) => {
+    console.log("onPressHandler", notification);
+    const { id: notificationId, notificationType, targetId } = notification;
+    let route, params;
 
     switch (notificationType) {
       case "ENTRY":
@@ -101,7 +90,7 @@ const NotificationScreen = ({
   //   }, [])
 
   return (
-    <View styles={styles.container}>
+    <View style={styles.container}>
       {selectItem.length > 0 ? (
         <Header
           value={selectItem.length}
@@ -110,20 +99,14 @@ const NotificationScreen = ({
           selectAction={selectAll}
         />
       ) : (
-        <TopNavigation
-          title="Notificaciones"
-          leftControl={BackAction(navigation, routes.ADMIN_HOME)}
-        />
+        <TopNavigation title="Notificaciones" leftControl={BackAction(navigation, routes.ADMIN_HOME)} />
       )}
-      {notifications.length &&
+      {notifications.length > 0 ? (
         notifications.map((elem) => (
           <TouchableOpacity
-            style={[
-              styles.notificationBox,
-              { backgroundColor: elem.read === true ? "#fff" : "#09f" },
-            ]}
+            style={[styles.notificationBox, { backgroundColor: elem.read === true ? "#fff" : "#09f" }]}
             key={elem.id}
-            onPress={onPressHandler}
+            onPress={() => onPressHandler(elem)}
             // onPress={
             //     selectItem.length > 0
             //       ? () => onLong(elem.id)
@@ -133,17 +116,19 @@ const NotificationScreen = ({
             onLongPress={() => onLong(elem.id)}
             delayLongPress={200}
           >
-            <Avatar.Picture
-              size={60}
-              uri={`${API_PORT()}/public/imgs/${elem.User.Employee.picture}`}
-            />
+            <Avatar.Picture size={60} uri={`${API_PORT()}/public/imgs/${elem.User.Employee.picture}`} />
             <Text>
               {elem.User.Employee.name} {elem.User.Employee.lastName}
             </Text>
             <Text>{elem.notification}</Text>
             <Text>{moment(elem.createdAt).fromNow()}</Text>
           </TouchableOpacity>
-        ))}
+        ))
+      ) : (
+        <View style={{ justifyContent: "center", alignItems: "center", flex: 1 }}>
+          <Text>Estas al día</Text>
+        </View>
+      )}
     </View>
   );
 };
@@ -166,7 +151,6 @@ export default connect(mapStateToProps, mapDispatchToProps)(NotificationScreen);
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 5,
   },
   notificationBox: {
     borderBottomWidth: 0.5,

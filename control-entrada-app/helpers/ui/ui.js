@@ -3,8 +3,8 @@ import { TouchableOpacity, View, Text, StyleSheet } from "react-native";
 
 import { Ionicons } from "@expo/vector-icons";
 import { MainButton } from "../../components/mainButton.component";
-import { routes } from '../../assets/routes'
-import { useSelector } from 'react-redux'
+import { routes } from "../../assets/routes";
+import { useSelector } from "react-redux";
 const size = 28;
 
 export const DrawerAction = (navigation) => {
@@ -26,7 +26,7 @@ export const BackAction = (navigation, route) => {
     <View>
       <TouchableOpacity
         onPress={() => {
-          route ? navigation.navigate(route) : navigation.goBack()
+          route ? navigation.navigate(route) : navigation.goBack();
         }}
       >
         <Ionicons name="ios-arrow-back" size={size} color="#fff" />
@@ -36,8 +36,8 @@ export const BackAction = (navigation, route) => {
 };
 
 export const Notifications = (navigation) => {
-  const notificationNotRead = useSelector(state => state.profile.notificationNotRead)
-  console.log("noti not Read length--",notificationNotRead.length)
+  const notificationNotRead = useSelector((state) => state.profile.notificationNotRead);
+
   return (
     <View>
       <TouchableOpacity
@@ -47,7 +47,7 @@ export const Notifications = (navigation) => {
       >
         <Ionicons name="md-notifications" size={28} color="white" />
         <View style={styles.numberContainer}>
-          <Text style={styles.number}>{notificationNotRead.length > 0 ? notificationNotRead.length : null}</Text>
+          <Text style={styles.number}>{notificationNotRead !== undefined ? notificationNotRead.length : null}</Text>
         </View>
       </TouchableOpacity>
     </View>
@@ -65,14 +65,14 @@ const styles = StyleSheet.create({
   numberContainer: {
     width: 30,
     height: 30,
-    borderRadius: 30/2,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#09f'
+    borderRadius: 30 / 2,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#09f",
   },
   number: {
     fontSize: 14,
-    fontWeight: '600',
-    color: '#fff'
-  }
-})
+    fontWeight: "600",
+    color: "#fff",
+  },
+});

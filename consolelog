@@ -1,0 +1,41 @@
+consolelogCustom
+
+const DEBUG=1;
+//0 no DEBUG
+//1 debug simple
+//2 debug desarrollo
+
+console custom ({
+  type,
+  section,
+  class,
+  function,
+  var,
+  ...show
+}){
+
+if(DEBUG==0) return null;
+
+switch(type)
+{
+case w
+if(DEBUG==1){
+console.wargnin(`${section --class function}`, show)
+}
+if(DEBUG==2){
+console.wargnin(`${section --class function var}`, show)
+}
+case l
+console.log()
+case e
+console.error()
+case i
+console.inf()
+
+}
+
+}
+
+
+
+}

@@ -1,12 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  BackHandler,
-  TouchableOpacity,
-} from "react-native";
+import { View, Text, StyleSheet, ScrollView, BackHandler, TouchableOpacity } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 
 import { MainColor, ThirdColor, Danger } from "../../assets/colors.js";
@@ -41,12 +34,7 @@ let statusModalValues = {
   status: null,
 };
 
-const CreateEmployeScreen = ({
-  navigation,
-  zonesRedux,
-  companyRedux,
-  addEmployee,
-}) => {
+const CreateEmployeScreen = ({ navigation, zonesRedux, companyRedux, addEmployee }) => {
   let employeeValues = {
     name: "",
     lastName: "",
@@ -247,17 +235,18 @@ const CreateEmployeScreen = ({
   //   }, [])
   // );
 
-  useEffect(() => {
-    if (!zonesRedux.length) {
-      setAlertModal((values) => ({
-        ...values,
-        visible: true,
-        message:
-          "Parece que aun no tienes zonas creadas, para registrar personal crea al menos una.",
-        route: routes.EMPLOYEE,
-      }));
-    }
-  }, []);
+  useFocusEffect(
+    React.useCallback(() => {
+      if (zonesRedux && zonesRedux.length == 0) {
+        setAlertModal((values) => ({
+          ...values,
+          visible: true,
+          message: "Parece que aun no tienes zonas creadas, para registrar personal crea al menos una.",
+          route: routes.EMPLOYEE,
+        }));
+      }
+    }, [zonesRedux])
+  );
 
   const goBackHardware = () => {
     //TODO aqui y abajo debes poner segun rol
@@ -276,10 +265,7 @@ const CreateEmployeScreen = ({
 
   return (
     <View style={{ flex: 1 }}>
-      <TopNavigation
-        title="Crear Empleado"
-        leftControl={BackAction(navigation, routes.EMPLOYEE)}
-      />
+      <TopNavigation title="Crear Empleado" leftControl={BackAction(navigation, routes.EMPLOYEE)} />
       <ScrollView contentContainerStyle={styles.container}>
         <View
           style={{
@@ -288,11 +274,7 @@ const CreateEmployeScreen = ({
         >
           <FormContainer title="Datos Personales">
             <View style={styles.pictureContainer}>
-              {employeeData.uri ? (
-                <Avatar.Picture size={120} uri={employeeData.uri} />
-              ) : (
-                <Avatar.Icon size={32} name="md-photos" color="#8e8e8e" />
-              )}
+              {employeeData.uri ? <Avatar.Picture size={120} uri={employeeData.uri} /> : <Avatar.Icon size={32} name="md-photos" color="#8e8e8e" />}
               <TouchableOpacity
                 onPress={() => {
                   setCamera(true);
@@ -310,8 +292,7 @@ const CreateEmployeScreen = ({
               returnKeyType="next"
               shape="flat"
               onChangeText={(name) => {
-                setEmployeeData((values) => ({ ...values, name })),
-                  setCaption("");
+                setEmployeeData((values) => ({ ...values, name })), setCaption("");
               }}
             />
             <Input
@@ -322,8 +303,7 @@ const CreateEmployeScreen = ({
               shape="flat"
               returnKeyType="next"
               onChangeText={(lastName) => {
-                setEmployeeData((values) => ({ ...values, lastName })),
-                  setCaption("");
+                setEmployeeData((values) => ({ ...values, lastName })), setCaption("");
               }}
             />
             <Input
@@ -334,8 +314,7 @@ const CreateEmployeScreen = ({
               shape="flat"
               returnKeyType="next"
               onChangeText={(dni) => {
-                setEmployeeData((values) => ({ ...values, dni })),
-                  setCaption("");
+                setEmployeeData((values) => ({ ...values, dni })), setCaption("");
               }}
             />
             <Input
@@ -346,8 +325,7 @@ const CreateEmployeScreen = ({
               shape="flat"
               returnKeyType="next"
               onChangeText={(email) => {
-                setEmployeeData((values) => ({ ...values, email })),
-                  setCaption("");
+                setEmployeeData((values) => ({ ...values, email })), setCaption("");
               }}
             />
             <View>
@@ -365,30 +343,14 @@ const CreateEmployeScreen = ({
 
           {/* ----ROLL---- */}
           <FormContainer title="Tipo Usuario">
-            <Picker
-              mode="dropdown"
-              selectedValue={privilege}
-              onValueChange={(value) => setPrivilege(value)}
-            >
+            <Picker mode="dropdown" selectedValue={privilege} onValueChange={(value) => setPrivilege(value)}>
               <Picker.Item label={"Supervisor"} value={"Supervisor"} />
               <Picker.Item label={"Vigilante"} value={"Watchman"} />
             </Picker>
             <View>
               <Text>Zonas</Text>
-              <Picker
-                mode="dropdown"
-                selectedValue={zoneId}
-                onValueChange={(value) => setZoneId(value)}
-              >
-                {zonesRedux.length
-                  ? zonesRedux.map((item) => (
-                      <Picker.Item
-                        label={item.zone}
-                        value={item.id}
-                        key={item.id}
-                      />
-                    ))
-                  : null}
+              <Picker mode="dropdown" selectedValue={zoneId} onValueChange={(value) => setZoneId(value)}>
+                {zonesRedux.length ? zonesRedux.map((item) => <Picker.Item label={item.zone} value={item.id} key={item.id} />) : null}
               </Picker>
             </View>
           </FormContainer>
@@ -401,52 +363,21 @@ const CreateEmployeScreen = ({
               }}
             >
               <View style={styles.pickerButtonContainer}>
-                <MainButton
-                  style={styles.pickerButton}
-                  title="Hora Entrada"
-                  onPress={() => showDatepicker()}
-                />
-                <Text style={{ alignSelf: "center" }}>
-                  {entryHolder
-                    ? moment(employeeData.assignationDate).format("D MMM YYYY")
-                    : "----"}
-                </Text>
+                <MainButton style={styles.pickerButton} title="Hora Entrada" onPress={() => showDatepicker()} />
+                <Text style={{ alignSelf: "center" }}>{entryHolder ? moment(employeeData.assignationDate).format("D MMM YYYY") : "----"}</Text>
               </View>
               <View style={styles.pickerButtonContainer}>
-                <MainButton
-                  style={styles.pickerButton}
-                  title="Hora Salida"
-                  onPress={() => showDatepicker2()}
-                />
-                <Text style={{ alignSelf: "center" }}>
-                  {departureHolder
-                    ? moment(employeeData.changeTurnDate).format("D MMM YYYY")
-                    : "----"}
-                </Text>
+                <MainButton style={styles.pickerButton} title="Hora Salida" onPress={() => showDatepicker2()} />
+                <Text style={{ alignSelf: "center" }}>{departureHolder ? moment(employeeData.changeTurnDate).format("D MMM YYYY") : "----"}</Text>
               </View>
             </View>
             {show && (
               <View>
-                <DateTimePicker
-                  testID="dateTimePicker1"
-                  value={employeeData.assignationDate}
-                  mode="time"
-                  is24Hour={true}
-                  display="default"
-                  onChange={onChange}
-                />
+                <DateTimePicker testID="dateTimePicker1" value={employeeData.assignationDate} mode="time" is24Hour={true} display="default" onChange={onChange} />
               </View>
             )}
 
-            {show2 && (
-              <DateTimePicker
-                value={employeeData.changeTurnDate}
-                mode="time"
-                is24Hour={true}
-                display="default"
-                onChange={onChange2}
-              />
-            )}
+            {show2 && <DateTimePicker value={employeeData.changeTurnDate} mode="time" is24Hour={true} display="default" onChange={onChange2} />}
             <View>
               <Text
                 style={{
@@ -474,25 +405,21 @@ const CreateEmployeScreen = ({
           </View>
         </View>
       </ScrollView>
-      <CameraModal
-        status={camera}
-        onClose={() => setCamera(false)}
-        profile={profilePic}
-        type={"profile"}
-      />
+      <CameraModal status={camera} onClose={() => setCamera(false)} profile={profilePic} type={"profile"} />
 
       <LoadingModal visible={visible} message="Guardando..." />
-      <StatusModal
-        {...statusModalProps}
-        onClose={() =>
-          setStatusModalProps((values) => ({ ...values, visible: false }))
-        }
-      />
+      <StatusModal {...statusModalProps} onClose={() => setStatusModalProps((values) => ({ ...values, visible: false }))} />
       <MessageModal
         {...alertModal}
-        onClose={() =>
-          setAlertModal((values) => ({ ...values, visible: false }))
-        }
+        onClose={() => {
+          setAlertModal((values) => ({ ...values, visible: false }));
+          navigation.navigate(routes.EMPLOYEE);
+        }}
+        onPress={() => {
+          setAlertModal((values) => ({ ...values, visible: false }));
+          navigation.navigate(routes.ZONES);
+        }}
+        titleButton="Ir a Zonas"
         navigation={navigation}
       />
     </View>
@@ -512,10 +439,7 @@ const mapDispatchToProps = (dispatch) => ({
     });
   },
 });
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(CreateEmployeScreen);
+export default connect(mapStateToProps, mapDispatchToProps)(CreateEmployeScreen);
 const styles = StyleSheet.create({
   container: {
     // alignContent: "center",
