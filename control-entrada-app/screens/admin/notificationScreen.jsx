@@ -102,7 +102,8 @@ const NotificationScreen = ({ navigation, notifications, updateReadNotification 
         <TopNavigation title="Notificaciones" leftControl={BackAction(navigation, routes.ADMIN_HOME)} />
       )}
       {notifications.length > 0 ? (
-        notifications.map((elem) => (
+        <ScrollView>
+        {notifications.map((elem) => (
           <TouchableOpacity
             style={[styles.notificationBox, { backgroundColor: elem.read === true ? "#fff" : "#09f" }]}
             key={elem.id}
@@ -123,7 +124,8 @@ const NotificationScreen = ({ navigation, notifications, updateReadNotification 
             <Text>{elem.notification}</Text>
             <Text>{moment(elem.createdAt).fromNow()}</Text>
           </TouchableOpacity>
-        ))
+        ))}
+        </ScrollView>
       ) : (
         <View style={{ justifyContent: "center", alignItems: "center", flex: 1 }}>
           <Text>Estas al día</Text>

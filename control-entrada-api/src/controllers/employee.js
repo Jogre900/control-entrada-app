@@ -25,16 +25,16 @@ const employee = {
   },
   
   //FIND ALL SUPERVISOR FROM ONE ZONE
-  findSuper: async function(userZoneId){
-        const userZoneN = await models.UserZone.findOne({
-          where: {
-            id: userZoneId
-          }
-        });
+  findSuper: async function(zoneId){
+        // const userZoneN = await models.UserZone.findOne({
+        //   where: {
+        //     id: userZoneId
+        //   }
+        // });
 
         const alluserZone = await models.UserZone.findAll({
           where: {
-            ZoneId: userZoneN.dataValues.ZoneId
+            ZoneId: zoneId
           }
         });
 

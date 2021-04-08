@@ -191,7 +191,6 @@ const LoginScreen = ({
     }
   };
 const handleChange = (name, value) => {
-  console.log(name, value)
   setprueba((values) => ({...values, [name]: value}))
 }
   return (

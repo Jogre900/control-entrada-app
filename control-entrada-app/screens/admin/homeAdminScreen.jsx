@@ -57,7 +57,7 @@ const HomeAdminScreen = ({
     const res = await helpers.fetchZoneById(profile.userZone[0].ZoneId);
     //console.log("supervisor zone", res);
     setLoading(false);
-    saveZones(res);
+    saveZones(res.data.data);
   };
   //REQUEST ZONES
   const requestZones = async () => {

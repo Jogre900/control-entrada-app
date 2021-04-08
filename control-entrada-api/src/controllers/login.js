@@ -15,7 +15,7 @@ const login = {
     };
     const { id } = req.params;
     const { token } = req.body;
-    console.log(req.params, req.body);
+    console.log("REQ, SAVE DEVICE TOKEN--",req.params, req.body);
     try {
       const newToken = await models.Token.create({
         token: token,
@@ -41,7 +41,7 @@ const login = {
       token: null
     };
     const { email, password } = req.body;
-    console.log(req.body);
+    
     //console.log(email, password)
     try {
       const user = await models.User.findOne({
@@ -119,19 +119,19 @@ const login = {
       data: null,
       token: null
     };
-    console.log("REQ.PAYLOAD----", req.payload);
+    
     const token = req.headers.authorization.split(" ")[1];
     console.log(token);
     try {
       let decode = jwt.verify(token, SECRETKEY);
-      console.log("decode--", decode);
+      
       if (decode) {
         if (decode.active === false) {
-          console.log(decode);
+          
           RESPONSE.msg = "Cuenta Suspendida";
           res.json(RESPONSE);
         } else {
-          console.log(decode.userId);
+          
           const user = await models.User.findOne({
             where: {
               id: decode.userId
@@ -165,7 +165,7 @@ const login = {
               }
             ]
           });
-          console.log(user);
+          
           RESPONSE.error = false;
           RESPONSE.data = user;
           RESPONSE.msg = "token activo";

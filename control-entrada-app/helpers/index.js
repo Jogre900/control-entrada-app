@@ -2,8 +2,21 @@ import { useState } from "react";
 import axios from "axios";
 import { API_PORT } from "../config/index";
 import { createCitizen, findCitizendni } from "./citizen";
-import { fetchAllZones,fetchZoneById, zoneMaxVisit, destinyMaxVisit } from './zones'
-import { suspendEmployee, verifyLogin, updateProfile, saveDeviceToken } from './users'
+import {
+  fetchAllZones,
+  fetchZoneById,
+  zoneMaxVisit,
+  destinyMaxVisit,
+  deleteZone,
+  createZone,
+} from "./zones";
+import { createDestiny, deleteDestiny } from "./destiny";
+import {
+  suspendEmployee,
+  verifyLogin,
+  updateProfile,
+  saveDeviceToken,
+} from "./users";
 import {
   createVisit,
   findVisitdni,
@@ -12,9 +25,9 @@ import {
   createDeparture,
   fetchTodayVisist,
   maxUserVisit,
-  fetchVisitDestiny
+  fetchVisitDestiny,
 } from "./visit";
-import { fetchNotification, changeReadStatus } from './notification'
+import { fetchNotification, changeReadStatus } from "./notification";
 
 export const helpers = {
   createCitizen,
@@ -27,6 +40,8 @@ export const helpers = {
   fetchVisitDestiny,
   createDeparture,
   maxUserVisit,
+  createZone,
+  deleteZone,
   fetchZoneById,
   fetchAllZones,
   zoneMaxVisit,
@@ -36,13 +51,15 @@ export const helpers = {
   updateProfile,
   saveDeviceToken,
   fetchNotification,
-  changeReadStatus
+  changeReadStatus,
+  createDestiny,
+  deleteDestiny,
 };
 
 //DELETE ANYTHING FROM API
 export async function deleteInfo(url, arrayIds) {
   try {
-    const res = await axios.delete(`${API_PORT()}/api/${url}/${arrayIds}`)
+    const res = await axios.delete(`${API_PORT()}/api/${url}/${arrayIds}`);
     return res.data;
   } catch (error) {
     return error.message;
@@ -92,8 +109,6 @@ export async function fetchEmployeeByZone(zoneId) {
     return error.message;
   }
 }
-
-
 
 //RECOVER PASS
 export async function recoverPass(email, data) {
@@ -178,7 +193,10 @@ export async function createCompany(adminData, companyData) {
 export async function login(email, password) {
   // console.log(data);
   try {
-    const res = await axios.post(`${API_PORT()}/api/login`, {email, password});
+    const res = await axios.post(`${API_PORT()}/api/login`, {
+      email,
+      password,
+    });
     // if (!res.data.error) {
     //   console.log("RES DE LOGIN---------", res.data);
 
@@ -313,6 +331,3 @@ export async function createWatchman(employeeData) {
     console.log(error);
   }
 }
-
-
-

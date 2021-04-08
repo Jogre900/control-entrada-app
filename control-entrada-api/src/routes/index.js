@@ -95,17 +95,17 @@ router.put("/user/:id", Controllers.employee.deleteUser);
 router.get("/notification/:userId/:unread?", Controllers.notification.fetchAllNotification)
 router.put("/notification/:id?", Controllers.notification.changeToRead)
 //ZONES
-router.post("/createZone/:id", Controllers.zone.createZone);
+router.post("/zone", middleware.verifyToken, Controllers.zone.createZone);
 router.get("/findZones/:companyId", Controllers.zone.findZones);
 router.get("/zone/:zoneId", Controllers.zone.findZone);
 router.get("/zoneMaxVisit/:companyId", Controllers.zone.findZoneMaxVisit);
 router.delete("/zone/:id", Controllers.zone.deleteZone);
 //DESTINY
-router.post("/createDestiny/:id", Controllers.destiny.createDestiny);
+router.post("/destiny/:id", middleware.verifyToken, Controllers.destiny.createDestiny);
 router.get("/findDestiny/:id", Controllers.destiny.findDestinyByZone);
 router.get("/findAllDestiny/:id", Controllers.destiny.findAllDestiny);
 router.post("/destinyMaxVisit", Controllers.destiny.findDestinyMaxVisit);
-router.delete("/destiny/:id", Controllers.destiny.deleteDestiny);
+router.delete("/destiny/:id", middleware.verifyToken, Controllers.destiny.deleteDestiny);
 //ROUTAS PARA BORRAR
 // router.post("/createEmployee", Controllers.createEmployee);
 // router.get("/findEmployees", Controllers.findEmployees);

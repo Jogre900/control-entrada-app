@@ -15,6 +15,7 @@ const zone = {
       token: null
     };
     const {
+      companyId,
       zone,
       firsEntryTime,
       firsDepartureTime,
@@ -22,13 +23,12 @@ const zone = {
       SecondDepartureTime,
       destiny
     } = req.body;
-    const { id } = req.params;
     console.log(req.body);
     console.log(req.params);
     try {
       let inputZone = {
         zone,
-        companyId: id,
+        companyId,
         visits: 0
       };
 
@@ -100,13 +100,13 @@ const zone = {
         ]
       });
       //await sendPush('ExponentPushToken[sBb32gExCmzzS2BJZL7bJm]')
-      const push = await notification.createNotification(
-        "91e9beaf-f8eb-40bf-8f9d-2486613b6dd3",
-        "mensaje de prueba 3",
-        "tipo prueba 3",
-        "91e9beaf-f8eb-40bf-8f9d-2486613b6dd1"
-      );
-      console.log("push----", push);
+      // const push = await notification.createNotification(
+      //   "91e9beaf-f8eb-40bf-8f9d-2486613b6dd3",
+      //   "mensaje de prueba 3",
+      //   "tipo prueba 3",
+      //   "91e9beaf-f8eb-40bf-8f9d-2486613b6dd1"
+      // );
+      // console.log("push----", push);
       RESPONSE.error = false;
       RESPONSE.msg = "Busqueda Exitosa!";
       RESPONSE.data = zones;

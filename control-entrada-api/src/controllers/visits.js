@@ -59,13 +59,18 @@ const visits = {
       if (visit) {
         //INCREMENT USERCOMPANY
         const user = await models.User.findOne({
-          include: {
+          include: [
+            {
             model: models.UserZone,
             as: "userZone",
             where: {
               id: userZoneId
             }
+          },
+          {
+            model: models.Employee, as: 'Employee'
           }
+        ]
         });
         const userId = user.dataValues.id;
         const userCompany = await models.UserCompany.findOne({
@@ -110,7 +115,7 @@ const visits = {
         //CREAR NOTI
         const newNoti = await notification.createNotification(
           adminId,
-          notification.notificationMessage.ENTRY,
+          `${user.dataValues.Employee.name} ${user.dataValues.Employee.lastName} ${notification.notificationMessage.ENTRY}`,
           notification.notificationType.ENTRY,
           userId,
           visit.id
@@ -194,6 +199,7 @@ const visits = {
           }
         );
         //console.log("visita con dni ya registrado", visit)
+        RESPONSE.error = false
         RESPONSE.msg = "Usuario ya registrado";
         RESPONSE.data = person;
         res.status(200).json(RESPONSE);
@@ -228,13 +234,18 @@ const visits = {
         );
         //INCREMENT USERCOMPANY
         const user = await models.User.findOne({
-          include: {
+          include: [
+            {
             model: models.UserZone,
             as: "userZone",
             where: {
               id: userZoneId
             }
+          },
+          {
+            model: models.Employee, as: 'Employee'
           }
+        ]
         });
         const userId = user.dataValues.id;
         const userCompany = await models.UserCompany.findOne({
@@ -278,7 +289,21 @@ const visits = {
         //CREAR NOTI
         const newNoti = await notification.createNotification(
           adminId,
-          notification.notificationMessage.ENTRY,
+          `${user.dataValues.Employee.name} ${user.dataValues.Employee.lastName} ${notification.notificationMessage.ENTRY}`,
+          notification.notificationType.ENTRY,
+          userId,
+          visits.Visitas.id
+        );
+        //FIND SUPERVISOR
+        const userZoneN = await models.UserZone.findOne({
+          where: {
+            id: userZoneId
+          }
+        });
+        const supersId = await employee.findSuper(userZoneN.dataValues.ZoneId)
+        notification.createNotification(
+          supersId,
+          `${user.dataValues.Employee.name} ${user.dataValues.Employee.lastName} ${notification.notificationMessage.ENTRY}`,
           notification.notificationType.ENTRY,
           userId,
           visits.Visitas.id
@@ -445,35 +470,41 @@ const visits = {
         },
         raw: true
       });
-      console.log(visit.UserZoneId, userZoneId);
+     
       if (visit.UserZoneId !== userZoneId) {
         increment = true;
       }
       let departure = await models.Departure.create({ ...inputs });
 
+      //FIND USER AND USERCOMPANY 
+      const user = await models.User.findOne({
+        include:[ 
+        {
+          model: models.UserZone,
+          as: "userZone",
+          where: {
+            id: userZoneId
+          }
+        },
+        {
+          model: models.Employee, as: 'Employee'
+        }
+      ]
+      });
+      const userId = user.dataValues.id;
+      const userCompany = await models.UserCompany.findOne({
+        where: {
+          userId
+        }
+      });
+      
       if (increment) {
         console.log("hay que incrementar");
-        const user = await models.User.findOne({
-          include: {
-            model: models.UserZone,
-            as: "userZone",
-            where: {
-              id: userZoneId
-            }
-          }
-        });
-        const userId = user.dataValues.id;
-        console.log("userId----", userId);
-        const userCompany = await models.UserCompany.findOne({
-          where: {
-            userId
-          }
-        });
-        console.log(userCompany.dataValues);
+        
         await userCompany.increment("visits");
         await userCompany.reload();
         await userCompany.save();
-        console.log(userCompany.dataValues);
+        
       }
       if (departure) {
         const visitU = await models.Visits.findOne({
@@ -519,15 +550,32 @@ const visits = {
         });
 
         //FIND ADMIN
+        
         const adminId = await employee.findAdmin(userCompany);
         //CREAR NOTI
-        const newNoti = await notification.createNotification(
+        await notification.createNotification(
           adminId,
-          notification.notificationMessage.DEPARTURE,
+          `${user.dataValues.Employee.name} ${user.dataValues.Employee.lastName} ${notification.notificationMessage.DEPARTURE}`,
           notification.notificationType.DEPARTURE,
           userId,
           visitU.id
         );
+
+        //FIND SUPERVISOR
+        const userZoneN = await models.UserZone.findOne({
+          where: {
+            id: userZoneId
+          }
+        });
+        const supersId = await employee.findSuper(userZoneN.dataValues.ZoneId)
+        notification.createNotification(
+          supersId,
+          `${user.dataValues.Employee.name} ${user.dataValues.Employee.lastName} ${notification.notificationMessage.DEPARTURE}`,
+          notification.notificationType.DEPARTURE,
+          userId,
+          visitU.id
+        );
+        
 
         RESPONSE.error = false;
         RESPONSE.msg = "Actualizacion Existosa";
