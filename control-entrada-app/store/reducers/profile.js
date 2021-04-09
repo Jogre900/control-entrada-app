@@ -32,6 +32,7 @@ const initialState = {
   ],
   notification: [],
   notificationNotRead: [],
+  notificationRead: [],
   tutorial: false,
   deviceToken: "",
 };
@@ -41,13 +42,24 @@ const companySelect = (state) => {
 };
 
 //UPDATE NOTIFICATION
-const updateNoti = (newNoti, state) => {
-  let prueba = [];
-  //console.log("state noti--", state.notification);
-  prueba = state.notification.map(
-    (obj) => newNoti.find((o) => o.id === obj.id) || obj
-  );
-  //console.log("PRUEBA--", prueba);
+const updateNoti = (newNoti, state, revert = false) => {
+  console.log("STATE.NOTIFICATION--", state.notification);
+
+  const prueba = state.notification.map((elem) => {
+    newNoti.map(({ id }) => {
+      if (elem.id === id) {
+        elem.read = revert ? false : true;
+      }
+    });
+    return elem;
+  });
+
+  // let prueba = [];
+  // //console.log("state noti--", state.notification);
+  // prueba = state.notification.map(
+  //   (obj) => newNoti.find((o) => o.id === obj.id) || obj
+  // );
+  console.log("PRUEBA--", prueba);
   return prueba;
 };
 
@@ -108,16 +120,23 @@ export default (state = initialState, action = {}) => {
       };
     case "UPDATE_READ":
       console.log("PAYLOAD NOTI-", action.payload);
-      console.log(state.notificationNotRead)
-      
-      let notReadFilter = state.notificationNotRead.filter(
-        ({ id }) => action.payload.find((elem) => elem.id !== id));
-      console.log(notReadFilter)
+
+      let notReadFilter = state.notificationNotRead.filter(({ id }) =>
+        action.payload.find((elem) => elem.id !== id)
+      );
+
       return {
         ...state,
         notificationNotRead: notReadFilter,
         notification: updateNoti(action.payload, state),
+        // notificationRead: state.notificationRead.concat(action.payload)
       };
+      case "REVERT_READ":
+        return {
+          ...state,
+        notificationNotRead: notReadFilter,
+        notification: updateNoti(action.payload, state, true),
+        }
     case "TUTORIAL":
       return {
         ...state,

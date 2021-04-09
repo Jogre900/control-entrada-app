@@ -2,9 +2,9 @@ import axios from "axios";
 import { API_PORT } from "../config/index";
 
 //fetchAllNotification FROM ONE USER
-export const fetchNotification = async (userId, unread = null) => {
+export const fetchNotification = async (userId, unread = false) => {
     console.log(userId)
-    const res = await axios.get(`${API_PORT()}/api/notification/${userId}/${unread}`)
+    const res = await axios.get(`${API_PORT()}/api/notification/${userId}`)
     return res
 }
 

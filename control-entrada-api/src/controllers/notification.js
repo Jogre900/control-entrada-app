@@ -107,12 +107,14 @@ const notification = {
     //   body: notification,
     //   data: { someData: 'goes here' },
     // };
+   console.log("userid in create NOTI--",userId)
     try {
       const deviceToken = await models.Token.findAll({
         where: {
           userId
         }
       });
+      console.log("deviceToken-",deviceToken)
       if (deviceToken) {
         let messages = [];
         deviceToken.map(token => {
@@ -130,14 +132,18 @@ const notification = {
         });
         console.log("messages Array--", messages);
 
-        const newNoti = await models.Notification.create({
-          notification,
-          notificationType,
-          triggerId,
-          targetId,
-          userId,
-          read: false
-        });
+        const inputArray = userId.map((elem) => {
+          let objectValues = {}
+          objectValues.notification = notification
+          objectValues.notificationType = notificationType,
+          objectValues.triggerId = triggerId
+          objectValues.userId = elem
+          objectValues.read = false
+          return objectValues
+        })
+        console.log("inputArray--", inputArray)
+
+        const newNoti = await models.Notification.bulkCreate(inputArray);
         if (newNoti) {
           await sendPush(messages);
           return newNoti;
@@ -166,9 +172,9 @@ const notification = {
       });
       
       if (noti) {
-        let triggerIdArray = []
-        noti.map(({dataValues}) => triggerIdArray.push(dataValues.triggerId))
-        console.log(triggerIdArray)
+      
+        const triggerIdArray = noti.map(({dataValues}) => dataValues.triggerId)
+        
         const userT = await models.User.findAll({
           where: {
             id: triggerIdArray
@@ -177,16 +183,15 @@ const notification = {
             model: models.Employee, as: 'Employee'
           }
         })
-        console.log("TRIGGER USERS--",userT)
-        let newArray = []
-        noti.map(({dataValues}) => {
+        const newArray = noti.map(({dataValues}) => {
           userT.map((elem) => {
             if(dataValues.triggerId === elem.dataValues.id){
               dataValues.nuevaKey = elem.dataValues.Employee
+              return dataValues
             }
           })
         })
-        console.log("NOTI NEW ARRAY--",noti[0].dataValues.nuevaKey)
+        console.log("NOTI NEW ARRAY--",newArray[0])
         if (unread) {
           let unreadArray = [];
           unreadArray = noti.filter(({ read }) => read === false);

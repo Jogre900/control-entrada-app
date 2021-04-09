@@ -21,7 +21,7 @@ const visits = {
       tokn: null
     };
     //console.log("headers---",req.headers)
-    // console.log("BODY--", req.body);
+     console.log("BODY CREATE VISIT--", req.body);
     // console.log("fotos----", req.file);
     const {
       entryDate,
@@ -32,6 +32,7 @@ const visits = {
       destinyId,
       citizenId
     } = req.body;
+    
     let visitInput = {
       entryDate,
       departureDate,
@@ -112,16 +113,28 @@ const visits = {
         //FIND ADMIN
         const adminId = await employee.findAdmin(userCompany);
 
+        //FIND SUPERVISOR
+        const userZoneN = await models.UserZone.findOne({
+          where: {
+            id: userZoneId
+          }
+        });
+        const supersId = await employee.findSuper(userZoneN.dataValues.ZoneId)
+        
+        const allUserIdArray = supersId 
+        allUserIdArray.push(adminId)
+        console.log("allUserIdArray--",allUserIdArray)
+        
         //CREAR NOTI
-        const newNoti = await notification.createNotification(
-          adminId,
+        notification.createNotification(
+          allUserIdArray,
           `${user.dataValues.Employee.name} ${user.dataValues.Employee.lastName} ${notification.notificationMessage.ENTRY}`,
           notification.notificationType.ENTRY,
           userId,
-          visit.id
+          visit.dataValues.id
         );
 
-        console.log("NOTIFICATION--", newNoti.dataValues);
+        
         // const superV = await models.User.findAll({
         //   include: [
         //     {model: models.Employee, as: 'Employee'},
@@ -286,14 +299,14 @@ const visits = {
 
         //FIND ADMIN
         const adminId = await employee.findAdmin(userCompany);
-        //CREAR NOTI
-        const newNoti = await notification.createNotification(
-          adminId,
-          `${user.dataValues.Employee.name} ${user.dataValues.Employee.lastName} ${notification.notificationMessage.ENTRY}`,
-          notification.notificationType.ENTRY,
-          userId,
-          visits.Visitas.id
-        );
+        
+        // const newNoti = await notification.createNotification(
+        //   adminId,
+        //   `${user.dataValues.Employee.name} ${user.dataValues.Employee.lastName} ${notification.notificationMessage.ENTRY}`,
+        //   notification.notificationType.ENTRY,
+        //   userId,
+        //   visits.Visitas.id
+        // );
         //FIND SUPERVISOR
         const userZoneN = await models.UserZone.findOne({
           where: {
@@ -301,15 +314,21 @@ const visits = {
           }
         });
         const supersId = await employee.findSuper(userZoneN.dataValues.ZoneId)
+        
+        const allUserIdArray = supersId 
+        allUserIdArray.push(adminId)
+        console.log("allUserIdArray--",allUserIdArray)
+        
+        //CREAR NOTI
         notification.createNotification(
-          supersId,
+          allUserIdArray,
           `${user.dataValues.Employee.name} ${user.dataValues.Employee.lastName} ${notification.notificationMessage.ENTRY}`,
           notification.notificationType.ENTRY,
           userId,
           visits.Visitas.id
         );
 
-        console.log("NOTIFICATION--", newNoti.dataValues);
+        
 
         RESPONSE.error = false;
         RESPONSE.msg = "Registro Exitoso";

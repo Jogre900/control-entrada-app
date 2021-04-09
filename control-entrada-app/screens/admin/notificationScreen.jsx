@@ -1,5 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { View, StyleSheet, TouchableOpacity, Text, ScrollView, Vibration, BackHandler } from "react-native";
+import {
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  Text,
+  ScrollView,
+  Vibration,
+  BackHandler,
+  FlatList,
+} from "react-native";
 import Avatar from "../../components/avatar.component";
 import { TopNavigation } from "../../components/TopNavigation.component";
 import { Header } from "../../components/header.component";
@@ -11,10 +20,18 @@ import moment from "moment";
 
 import { connect } from "react-redux";
 
-const NotificationScreen = ({ navigation, notifications, updateReadNotification }) => {
+const NotificationScreen = ({
+  navigation,
+  login,
+  saveNotification,
+  notifications,
+  updateReadNotification,
+  revertReadUpdate,
+}) => {
   //const [notification, setNotification] = useState([]);
-  console.log("NOTIFI FROM REDUX--", notifications)
+  //console.log("NOTIFI FROM REDUX--", notifications)
   const [selectItem, setSeletedItem] = useState([]);
+  const [refreshing, setRefreshing] = useState(false);
 
   //REQUEST ALL NOTIFICATION
   const requestNotification = async () => {
@@ -33,7 +50,7 @@ const NotificationScreen = ({ navigation, notifications, updateReadNotification 
 
   //ONPRESSHANDLRES
   const onPressHandler = (notification) => {
-    console.log("onPressHandler", notification);
+    //console.log("onPressHandler", notification);
     const { id: notificationId, notificationType, targetId } = notification;
     let route, params;
 
@@ -55,16 +72,26 @@ const NotificationScreen = ({ navigation, notifications, updateReadNotification 
       default:
         break;
     }
-    changeRead(notificationId).then(() => navigation.navigate(route, targetId));
+    changeRead(notificationId, notification);
+    // .then(() => navigation.navigate(route, targetId));
   };
   //CHANGE READ STATUS
-  const changeRead = async (notificationId) => {
+  const changeRead = async (notificationId, notification) => {
+    const prueba = [];
+    prueba.push(notification);
+    updateReadNotification(prueba);
     try {
       const res = await helpers.changeReadStatus(notificationId);
       if (!res.data.error) {
-        updateReadNotification(res.data.data);
+        alert("exito!");
+        // updateReadNotification(res.data.data);
+      }
+      if (res.data.error) {
+        revertReadUpdate(prueba);
       }
     } catch (error) {
+      alert("Ocurrio un Error!");
+      revertReadUpdate(prueba);
       console.log(error.message);
     }
   };
@@ -90,6 +117,46 @@ const NotificationScreen = ({ navigation, notifications, updateReadNotification 
   //       requestNotification()
   //   }, [])
 
+  const renderItem = ({ item }) => {
+    return (
+      <TouchableOpacity
+        style={[
+          styles.notificationBox,
+          { backgroundColor: item.read === true ? "#fff" : "#09f" },
+        ]}
+        onPress={() => onPressHandler(item)}
+        // onPress={
+        //     selectItem.length > 0
+        //       ? () => onLong(item.id)
+        //       : () =>
+        //           alert("falta accion")
+        //   }
+        onLongPress={() => onLong(item.id)}
+        delayLongPress={200}
+      >
+        <Avatar.Picture
+          size={60}
+          uri={`${API_PORT()}/public/imgs/${item.nuevaKey.picture}`}
+        />
+
+        <Text>{item.notification}</Text>
+        <Text>{moment(item.createdAt).fromNow()}</Text>
+      </TouchableOpacity>
+    );
+  };
+
+  const refresh = async () => {
+    setRefreshing(true);
+    try {
+      const res = await helpers.fetchNotification(login.userId);
+      if (!res.data.error) {
+        saveNotification(res.data.data);
+        setRefreshing(false);
+      }
+    } catch (error) {
+      setRefreshing(false);
+    }
+  };
   return (
     <View style={styles.container}>
       {selectItem.length > 0 ? (
@@ -100,33 +167,46 @@ const NotificationScreen = ({ navigation, notifications, updateReadNotification 
           selectAction={selectAll}
         />
       ) : (
-        <TopNavigation title="Notificaciones" leftControl={BackAction(navigation, routes.ADMIN_HOME)} />
+        <TopNavigation
+          title="Notificaciones"
+          leftControl={BackAction(navigation, routes.ADMIN_HOME)}
+        />
       )}
+      <TouchableOpacity>
+        <Text>Marcar todas como leidas</Text>
+      </TouchableOpacity>
       {notifications.length > 0 ? (
-        <ScrollView>
-        {notifications.map((elem) => (
-          <TouchableOpacity
-            style={[styles.notificationBox, { backgroundColor: elem.read === true ? "#fff" : "#09f" }]}
-            key={elem.id}
-            onPress={() => onPressHandler(elem)}
-            // onPress={
-            //     selectItem.length > 0
-            //       ? () => onLong(elem.id)
-            //       : () =>
-            //           alert("falta accion")
-            //   }
-            onLongPress={() => onLong(elem.id)}
-            delayLongPress={200}
-          >
-            <Avatar.Picture size={60} uri={`${API_PORT()}/public/imgs/${elem.nuevaKey.picture}`} />
-           
-            <Text>{elem.notification}</Text>
-            <Text>{moment(elem.createdAt).fromNow()}</Text>
-          </TouchableOpacity>
-        ))}
-        </ScrollView>
+        <FlatList
+          data={notifications}
+          renderItem={renderItem}
+          keyExtractor={({ id }) => id}
+          onRefresh={refresh}
+          refreshing={refreshing}
+        />
       ) : (
-        <View style={{ justifyContent: "center", alignItems: "center", flex: 1 }}>
+        // notifications.map((elem) => (
+        // <TouchableOpacity
+        //   style={[styles.notificationBox, { backgroundColor: elem.read === true ? "#fff" : "#09f" }]}
+        //   key={elem.id}
+        //   onPress={() => onPressHandler(elem)}
+        //   // onPress={
+        //   //     selectItem.length > 0
+        //   //       ? () => onLong(elem.id)
+        //   //       : () =>
+        //   //           alert("falta accion")
+        //   //   }
+        //   onLongPress={() => onLong(elem.id)}
+        //   delayLongPress={200}
+        // >
+        //   <Avatar.Picture size={60} uri={`${API_PORT()}/public/imgs/${elem.nuevaKey.picture}`} />
+
+        //   <Text>{elem.notification}</Text>
+        //   <Text>{moment(elem.createdAt).fromNow()}</Text>
+        // </TouchableOpacity>
+
+        <View
+          style={{ justifyContent: "center", alignItems: "center", flex: 1 }}
+        >
           <Text>Estas al día</Text>
         </View>
       )}
@@ -136,12 +216,25 @@ const NotificationScreen = ({ navigation, notifications, updateReadNotification 
 
 const mapStateToProps = (state) => ({
   notifications: state.profile.notification,
+  login: state.profile.login,
 });
 
 const mapDispatchToProps = (dispatch) => ({
+  saveNotification(notifications) {
+    dispatch({
+      type: "SAVE_NOTI",
+      payload: notifications,
+    });
+  },
   updateReadNotification(data) {
     dispatch({
       type: "UPDATE_READ",
+      payload: data,
+    });
+  },
+  revertReadUpdate(data) {
+    dispatch({
+      type: "REVERT_READ",
       payload: data,
     });
   },

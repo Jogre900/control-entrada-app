@@ -19,7 +19,6 @@ const employee = {
         ]
       }
     });
-    console.log("ADMIN-", admin.dataValues);
     const adminId = admin.dataValues.userId;
     return adminId
   },
