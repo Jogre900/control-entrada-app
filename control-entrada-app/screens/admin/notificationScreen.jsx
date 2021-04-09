@@ -13,6 +13,7 @@ import { connect } from "react-redux";
 
 const NotificationScreen = ({ navigation, notifications, updateReadNotification }) => {
   //const [notification, setNotification] = useState([]);
+  console.log("NOTIFI FROM REDUX--", notifications)
   const [selectItem, setSeletedItem] = useState([]);
 
   //REQUEST ALL NOTIFICATION
@@ -117,10 +118,8 @@ const NotificationScreen = ({ navigation, notifications, updateReadNotification 
             onLongPress={() => onLong(elem.id)}
             delayLongPress={200}
           >
-            <Avatar.Picture size={60} uri={`${API_PORT()}/public/imgs/${elem.User.Employee.picture}`} />
-            <Text>
-              {elem.User.Employee.name} {elem.User.Employee.lastName}
-            </Text>
+            <Avatar.Picture size={60} uri={`${API_PORT()}/public/imgs/${elem.nuevaKey.picture}`} />
+           
             <Text>{elem.notification}</Text>
             <Text>{moment(elem.createdAt).fromNow()}</Text>
           </TouchableOpacity>

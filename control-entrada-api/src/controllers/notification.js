@@ -156,23 +156,37 @@ const notification = {
       data: null,
       tokn: null
     };
-    console.log("all noti--", req.params);
+    
     const { userId, unread } = req.params;
     try {
       const noti = await models.Notification.findAll({
         where: {
           userId
-        },
-        include: {
-          model: models.User,
-          as: "User",
-          include: {
-            model: models.Employee,
-            as: "Employee"
-          }
         }
       });
+      
       if (noti) {
+        let triggerIdArray = []
+        noti.map(({dataValues}) => triggerIdArray.push(dataValues.triggerId))
+        console.log(triggerIdArray)
+        const userT = await models.User.findAll({
+          where: {
+            id: triggerIdArray
+          },
+          include: {
+            model: models.Employee, as: 'Employee'
+          }
+        })
+        console.log("TRIGGER USERS--",userT)
+        let newArray = []
+        noti.map(({dataValues}) => {
+          userT.map((elem) => {
+            if(dataValues.triggerId === elem.dataValues.id){
+              dataValues.nuevaKey = elem.dataValues.Employee
+            }
+          })
+        })
+        console.log("NOTI NEW ARRAY--",noti[0].dataValues.nuevaKey)
         if (unread) {
           let unreadArray = [];
           unreadArray = noti.filter(({ read }) => read === false);
