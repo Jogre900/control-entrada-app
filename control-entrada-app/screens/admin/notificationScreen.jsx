@@ -50,9 +50,9 @@ const NotificationScreen = ({
 
   //ONPRESSHANDLRES
   const onPressHandler = (notification) => {
-    //console.log("onPressHandler", notification);
     const { id: notificationId, notificationType, targetId } = notification;
     let route, params;
+    console.log("TARGET ID-- ONPRESS NOTI SCREEN--",targetId);
 
     switch (notificationType) {
       case "ENTRY":
@@ -72,7 +72,8 @@ const NotificationScreen = ({
       default:
         break;
     }
-    changeRead(notificationId, notification);
+    navigation.navigate(route, {id: targetId})
+    // changeRead(notificationId, notification);
     // .then(() => navigation.navigate(route, targetId));
   };
   //CHANGE READ STATUS
@@ -118,11 +119,16 @@ const NotificationScreen = ({
   //   }, [])
 
   const renderItem = ({ item }) => {
+    console.log(item)
     return (
       <TouchableOpacity
         style={[
           styles.notificationBox,
-          { backgroundColor: item.read === true ? "#fff" : "#09f" },
+          { 
+            backgroundColor: item.read === true ? "#fff" : "#09f",
+            flexDirection: 'row',
+            alignItems: 'center'
+        },
         ]}
         onPress={() => onPressHandler(item)}
         // onPress={
@@ -134,13 +140,24 @@ const NotificationScreen = ({
         onLongPress={() => onLong(item.id)}
         delayLongPress={200}
       >
+        <View style={{
+          backgroundColor: 'red',
+          flex: 1
+        }}>
+
         <Avatar.Picture
           size={60}
           uri={`${API_PORT()}/public/imgs/${item.nuevaKey.picture}`}
-        />
+          />
+          </View>
+      <View style={{
+        backgroundColor: 'yellow',
+        flex: 3
+      }}>
 
         <Text>{item.notification}</Text>
         <Text>{moment(item.createdAt).fromNow()}</Text>
+      </View>
       </TouchableOpacity>
     );
   };

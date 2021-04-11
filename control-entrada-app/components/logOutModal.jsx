@@ -16,22 +16,22 @@ export const LogOutModal = ({ status, navigation, onClose, userId }) => {
     });
   };
   const deleteToken = async () => {
-    try {
-      const res = await helpers.logOut(userId);
-      if (res) {
-        logOut()
-          .then(() => storage.removeItem("userToken"))
-          .then(() => navigation.navigate(routes.MAIN));
-        onClose();
-      }
-    } catch (error) {
-      console.log(error.message)
-    }
-    //  await helpers.logOut()
-    //   logOut()
-    //     .then(() => storage.removeItem("userToken"))
-    //     .then(() => navigation.navigate(routes.MAIN));
-    //     onClose()
+    logOut()
+    .then(() => storage.removeItem("userToken"))
+    .then(() => navigation.navigate(routes.MAIN));
+  onClose();
+    // try {
+    //   const res = await helpers.logOut(userId);
+    //   if (res) {
+    //     logOut()
+    //       .then(() => storage.removeItem("userToken"))
+    //       .then(() => navigation.navigate(routes.MAIN));
+    //     onClose();
+    //   }
+    // } catch (error) {
+    //   console.log(error.message)
+    // }
+    
   };
 
   return (

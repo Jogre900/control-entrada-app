@@ -12,7 +12,7 @@ import login from './login'
 import employee from './employee'
 import zone from './zone'
 import destiny from './destiny'
-import visits from './visits'
+import visitsControllers from './visits'
 import notification from './notification'
 
 const SECRETKEY = process.env.SECRETKEY || $security().secretKey;
@@ -23,7 +23,7 @@ const Controllers = {
   employee,
   zone,
   destiny,
-  visits,
+  visitsControllers,
   notification,
   
   

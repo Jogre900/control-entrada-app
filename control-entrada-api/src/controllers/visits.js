@@ -11,7 +11,70 @@ import employee from "./employee";
 
 const SECRETKEY = process.env.SECRETKEY || $security().secretKey;
 
-const visits = {
+const visitsControllers = {
+  //HELPERS TO INCREMENTE USERCOMPANY, ZONE AND DESTINY QTY OF ENTRY AND
+  //DEPARTURES
+
+  incrementUserCompany: async function(userZoneId) {
+    //INCREMENT USERCOMPANY
+    const user = await models.User.findOne({
+      include: [
+        {
+          model: models.UserZone,
+          as: "userZone",
+          where: {
+            id: userZoneId
+          }
+        },
+        {
+          model: models.Employee,
+          as: "Employee"
+        }
+      ]
+    });
+    const userId = user.dataValues.id;
+    const userCompany = await models.UserCompany.findOne({
+      where: {
+        userId
+      }
+    });
+    console.log(userCompany.dataValues);
+    await userCompany.increment("visits");
+    await userCompany.reload();
+    await userCompany.save();
+    return { user, userCompany };
+
+    //console.log(userCompanyU)
+  },
+
+  incrementZone: async function(userZoneId) {
+    const zone = await models.Zone.findOne({
+      include: {
+        model: models.UserZone,
+        as: "encargado_zona",
+        where: {
+          id: userZoneId
+        }
+      }
+    });
+    //console.log("ZONE DATAVA---",zone.dataValues);
+
+    await zone.increment("visits");
+    await zone.reload();
+    await zone.save();
+  },
+
+  incrementDestiny: async function(destinyId) {
+    //console.log("DESTINY ID---", destinyId);
+    const destinyU = await models.Destination.findOne({
+      where: { id: destinyId }
+    });
+    //console.log("DESTINY FIND IT--", destinyU.dataValues);
+    await destinyU.increment("visits");
+    await destinyU.reload();
+    await destinyU.save();
+  },
+
   //CREATE VISIT
   createVisits: async function(req, res) {
     let RESPONSE = {
@@ -59,57 +122,16 @@ const visits = {
       );
       if (visit) {
         //INCREMENT USERCOMPANY
-        const user = await models.User.findOne({
-          include: [
-            {
-              model: models.UserZone,
-              as: "userZone",
-              where: {
-                id: userZoneId
-              }
-            },
-            {
-              model: models.Employee,
-              as: "Employee"
-            }
-          ]
-        });
-        const userId = user.dataValues.id;
-        const userCompany = await models.UserCompany.findOne({
-          where: {
-            userId
-          }
-        });
-        console.log(userCompany.dataValues.companyId);
-        await userCompany.increment("visits");
-        await userCompany.reload();
-        await userCompany.save();
-        //console.log(userCompanyU)
+        const {
+          userId,
+          userCompany
+        } = await visitsControllers.incrementUserCompany(userZoneId);
 
         //INCREMENT ZONE
-        const zone = await models.Zone.findOne({
-          include: {
-            model: models.UserZone,
-            as: "encargado_zona",
-            where: {
-              id: userZoneId
-            }
-          }
-        });
-        //console.log("ZONE DATAVA---",zone.dataValues);
+        await visitsControllers.incrementZone(userZoneId);
 
-        await zone.increment("visits");
-        await zone.reload();
-        await zone.save();
         //INCREMENT DESTINY
-        //console.log("DESTINY ID---", destinyId);
-        const destinyU = await models.Destination.findOne({
-          where: { id: destinyId }
-        });
-        //console.log("DESTINY FIND IT--", destinyU.dataValues);
-        await destinyU.increment("visits");
-        await destinyU.reload();
-        await destinyU.save();
+        await visitsControllers.incrementDestiny(destinyId);
 
         //FIND ADMIN
         const adminIdArray = [];
@@ -129,7 +151,7 @@ const visits = {
           //CREAR NOTI
           notification.createNotification(
             allUserIdArray,
-            `${user.dataValues.Employee.name} ${user.dataValues.Employee.lastName} ${notification.notificationMessage.ENTRY}`,
+            notification.notificationMessage.ENTRY,
             notification.notificationType.ENTRY,
             userId,
             visit.dataValues.id
@@ -137,30 +159,14 @@ const visits = {
         } else {
           notification.createNotification(
             adminIdArray,
-            `${user.dataValues.Employee.name} ${user.dataValues.Employee.lastName} ${notification.notificationMessage.ENTRY}`,
+            notification.notificationMessage.ENTRY,
             notification.notificationType.ENTRY,
             userId,
             visit.dataValues.id
           );
         }
         //allUserIdArray.push(adminId)
-        console.log("allUserIdArray--", allUserIdArray);
-
-        // const superV = await models.User.findAll({
-        //   include: [
-        //     {model: models.Employee, as: 'Employee'},
-        //     {model: models.UserZone, as: 'userZone', include: {
-        //       model: models.Zone, as: 'Zona', include: {
-        //         model: models.Destination, as: 'Destino', where: {
-        //           id: destinyId
-        //         }
-        //       }
-        //     }},
-        //     {model: models.UserCompany, as: 'UserCompany', where: {
-        //       privilege: 'Supervisor'
-        //     }}
-        //   ]
-        // })
+        console.log("allUserIdArray--", allUserIdArray);    
 
         RESPONSE.error = false;
         RESPONSE.data = visit;
@@ -201,32 +207,91 @@ const visits = {
         }
       });
       if (person) {
-        let visit = await models.Visits.create(
-          {
-            entryDate,
-            descriptionEntry,
-            departureDate,
-            descriptionDeparture,
-            destinationId: destinyId,
-            UserZoneId: userZoneId,
-            citizenId: person.id,
-            Fotos: {
-              picture: req.files[0].filename,
-              entry: "algo"
+        if (
+          person.dataValues.name !== name ||
+          person.dataValues.lastName !== lastName
+        ) {
+          RESPONSE.msg = "Usuario ya registrado :(";
+          RESPONSE.data = person;
+          res.json(RESPONSE);
+        } else if (
+          person.dataValues.name === name ||
+          person.dataValues.lastName === lastName
+        ) {
+          let visit = await models.Visits.create(
+            {
+              entryDate,
+              descriptionEntry,
+              departureDate,
+              descriptionDeparture,
+              destinationId: destinyId,
+              UserZoneId: userZoneId,
+              citizenId: person.id,
+              Fotos: {
+                picture: req.files[0].filename,
+                entry: "algo"
+              }
+            },
+            {
+              include: {
+                model: models.Picture,
+                as: "Fotos"
+              }
             }
-          },
-          {
-            include: {
-              model: models.Picture,
-              as: "Fotos"
+          );
+          if (visit) {
+            //INCREMENT USERCOMPANY
+            const {user, userCompany} = await visitsControllers.incrementUserCompany(
+              userZoneId
+            );
+
+            //INCREMENT ZONE
+            await visitsControllers.incrementZone(userZoneId);
+
+            //INCREMENT DESTINY
+            await visitsControllers.incrementDestiny(destinyId);
+
+            //FIND ADMIN
+            const adminIdArray = [];
+            const adminId = await employee.findAdmin(userCompany);
+            adminIdArray.push(adminId);
+            //FIND SUPERVISOR
+            const userZoneN = await models.UserZone.findOne({
+              where: {
+                id: userZoneId
+              }
+            });
+            const supersId = await employee.findSuper(
+              userZoneN.dataValues.ZoneId
+            );
+            //CREAR NOTI
+            let allUserIdArray = [];
+            if (supersId.length > 0) {
+              allUserIdArray = adminIdArray.concat(supersId);
+              //CREAR NOTI
+              notification.createNotification(
+                allUserIdArray,
+                notification.notificationMessage.ENTRY,
+                notification.notificationType.ENTRY,
+                user,
+                visit.dataValues.id
+              );
+            } else {
+              notification.createNotification(
+                adminIdArray,
+                notification.notificationMessage.ENTRY,
+                notification.notificationType.ENTRY,
+                user,
+                visit.dataValues.id
+              );
             }
           }
-        );
-        //console.log("visita con dni ya registrado", visit)
-        RESPONSE.error = false;
-        RESPONSE.msg = "Usuario ya registrado";
-        RESPONSE.data = person;
-        res.status(200).json(RESPONSE);
+          //console.log("visita con dni ya registrado", visit)
+          RESPONSE.error = false;
+          RESPONSE.msg = "Entrada Creada! :)";
+          RESPONSE.data = visit;
+          res.status(200).json(RESPONSE);
+        }
       } else {
         const visits = await models.Citizen.create(
           {
@@ -255,61 +320,18 @@ const visits = {
               }
             ]
           }
-        );
+        );  
         //INCREMENT USERCOMPANY
-        const user = await models.User.findOne({
-          include: [
-            {
-              model: models.UserZone,
-              as: "userZone",
-              where: {
-                id: userZoneId
-              }
-            },
-            {
-              model: models.Employee,
-              as: "Employee"
-            }
-          ]
-        });
-        const userId = user.dataValues.id;
-        const userCompany = await models.UserCompany.findOne({
-          where: {
-            userId
-          }
-        });
-        console.log(userCompany.dataValues);
-        await userCompany.increment("visits");
-        await userCompany.reload();
-        await userCompany.save();
-        //console.log(userCompanyU)
+        const {user, userCompany} = await visitsControllers.incrementUserCompany(
+          userZoneId
+        );
 
         //INCREMENT ZONE
-        const zone = await models.Zone.findOne({
-          include: {
-            model: models.UserZone,
-            as: "encargado_zona",
-            where: {
-              id: userZoneId
-            }
-          }
-        });
-        //console.log("ZONE DATAVA---",zone.dataValues);
+          await visitsControllers.incrementZone(userZoneId)
 
-        await zone.increment("visits");
-        await zone.reload();
-        await zone.save();
         //INCREMENT DESTINY
-        console.log("DESTINY ID---", destinyId);
-        const destinyU = await models.Destination.findOne({
-          where: { id: destinyId }
-        });
-        console.log("DESTINY FIND IT--", destinyU.dataValues);
-        await destinyU.increment("visits");
-        await destinyU.reload();
-        await destinyU.save();
+        await visitsControllers.incrementDestiny(destinyId)
 
-        
         //FIND ADMIN
         const adminIdArray = [];
         const adminId = await employee.findAdmin(userCompany);
@@ -323,32 +345,30 @@ const visits = {
         });
         const supersId = await employee.findSuper(userZoneN.dataValues.ZoneId);
 
-        // const allUserIdArray = supersId;
-        // allUserIdArray.push(adminId);
-        // console.log("allUserIdArray--", allUserIdArray);
-
-       //CREAR NOTI
-       const allUserIdArray = [];
-       if (supersId.length > 0) {
-         allUserIdArray = adminIdArray.concat(supersId);
-         notification.createNotification(
-           allUserIdArray,
-           `${user.dataValues.Employee.name} ${user.dataValues.Employee.lastName} ${notification.notificationMessage.ENTRY}`,
-           notification.notificationType.ENTRY,
-           userId,
-           visits.Visitas.id
-         );
-       } else {
-         notification.createNotification(
-           adminIdArray,
-           `${user.dataValues.Employee.name} ${user.dataValues.Employee.lastName} ${notification.notificationMessage.ENTRY}`,
-           notification.notificationType.ENTRY,
-           userId,
-           visits.Visitas.id
-         );
-       }
-       //allUserIdArray.push(adminId)
-       console.log("allUserIdArray--", allUserIdArray);
+        
+        
+        //CREAR NOTI
+        let allUserIdArray = [];
+        if (supersId.length > 0) {
+          allUserIdArray = adminIdArray.concat(supersId);
+          notification.createNotification(
+            allUserIdArray,
+            notification.notificationMessage.ENTRY,
+            notification.notificationType.ENTRY,
+            user,
+            visits.Visitas[0].id
+          );
+        } else {
+          notification.createNotification(
+            adminIdArray,
+            notification.notificationMessage.ENTRY,
+            notification.notificationType.ENTRY,
+            user,
+            visits.Visitas[0].id
+          );
+        }
+        //allUserIdArray.push(adminId)
+        console.log("allUserIdArray--", allUserIdArray);
 
         RESPONSE.error = false;
         RESPONSE.msg = "Registro Exitoso";
@@ -539,7 +559,7 @@ const visits = {
       });
 
       if (increment) {
-        console.log("hay que incrementar");
+        
 
         await userCompany.increment("visits");
         await userCompany.reload();
@@ -605,26 +625,26 @@ const visits = {
         // allUserIdArray.push(adminId);
         // console.log("allUserIdArray--", allUserIdArray);
 
-       //CREAR NOTI
-       const allUserIdArray = [];
-       if (supersId.length > 0) {
-         allUserIdArray = adminIdArray.concat(supersId);
-         notification.createNotification(
-           allUserIdArray,
-           `${user.dataValues.Employee.name} ${user.dataValues.Employee.lastName} ${notification.notificationMessage.DEPARTURE}`,
-           notification.notificationType.DEPARTURE,
-           userId,
-           visitU.id
-         );
-       } else {
-         notification.createNotification(
-           adminIdArray,
-           `${user.dataValues.Employee.name} ${user.dataValues.Employee.lastName} ${notification.notificationMessage.ENTRY}`,
-           notification.notificationType.ENTRY,
-           userId,
-           visitU.id
-         );
-       }
+        //CREAR NOTI
+        let allUserIdArray = [];
+        if (supersId.length > 0) {
+          allUserIdArray = adminIdArray.concat(supersId);
+          notification.createNotification(
+            allUserIdArray,
+            notification.notificationMessage.DEPARTURE,
+            notification.notificationType.DEPARTURE,
+            user,
+            id
+          );
+        } else {
+          notification.createNotification(
+            adminIdArray,
+            notification.notificationMessage.ENTRY,
+            notification.notificationType.ENTRY,
+            user,
+            id
+          );
+        }
 
         RESPONSE.error = false;
         RESPONSE.msg = "Actualizacion Existosa";
@@ -1080,4 +1100,4 @@ const visits = {
   }
 };
 
-export default visits;
+export default visitsControllers;

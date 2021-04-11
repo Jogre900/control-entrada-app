@@ -124,38 +124,38 @@ router.post(
   "/visit",
   middleware.verifyToken,
   uploadImg.single("file"),
-  Controllers.visits.createVisits
+  Controllers.visitsControllers.createVisits
 );
-router.get("/visitId/:id", Controllers.visits.findVisitId);
-router.get("/visit/:dni", Controllers.visits.findVisit);
+router.get("/visitId/:id", Controllers.visitsControllers.findVisitId);
+router.get("/visit/:dni", Controllers.visitsControllers.findVisit);
 //todas las visitas de hoy por empleados
-router.post("/visits", Controllers.visits.findTodayVisits);
-router.get("/findWeekVisits/", Controllers.visits.findWeekVisits);
-router.get("/visits/:userzoneId", Controllers.visits.findTodayVisitsByUser);
+router.post("/visits", Controllers.visitsControllers.findTodayVisits);
+router.get("/findWeekVisits/", Controllers.visitsControllers.findWeekVisits);
+router.get("/visits/:userzoneId", Controllers.visitsControllers.findTodayVisitsByUser);
 //todas las visitas de hoy por destino
 router.get(
   "/visitsdestiny/:destinyId/:checked?",
   middleware.verifyToken,
-  Controllers.visits.findTodayVisitsByDestiny
+  Controllers.visitsControllers.findTodayVisitsByDestiny
 );
-router.delete("/visit/", Controllers.visits.deleteVisit);
+router.delete("/visit/", Controllers.visitsControllers.deleteVisit);
 //DEPARTURE ROUTES
 router.post(
   "/departure/:id",
   middleware.verifyToken,
-  Controllers.visits.createDeparture
+  Controllers.visitsControllers.createDeparture
 );
 
 //CITIZEN
-router.get("/citizen/:dni", middleware.verifyToken, Controllers.visits.findCitizen);
+router.get("/citizen/:dni", middleware.verifyToken, Controllers.visitsControllers.findCitizen);
 router.post(
   "/citizen",
   middleware.verifyToken,
   uploadImg.array("file"),
-  Controllers.visits.createCitizen
+  Controllers.visitsControllers.createCitizen
 );
 //FIND MAX VALUE ROUTES
-router.get("/userCompany/:companyId", Controllers.visits.findMaxVisitUser);
+router.get("/userCompany/:companyId", Controllers.visitsControllers.findMaxVisitUser);
 // NUEVAS RUTA AJUSTE SISTEMA
 router.post("/company", uploadImg.array("file"), Controllers.createCompany);
 router.post(

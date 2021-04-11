@@ -44,6 +44,9 @@ export const Notifications = (navigation) => {
         onPress={() => {
           navigation.navigate(routes.NOTIFICATION);
         }}
+        style={{
+          position: 'relative'
+        }}
       >
         <Ionicons name="md-notifications" size={28} color="white" />
         <View style={styles.numberContainer}>
@@ -63,12 +66,15 @@ export const NavigateAction = (navigation, size, name, route) => {
 
 const styles = StyleSheet.create({
   numberContainer: {
-    width: 30,
-    height: 30,
-    borderRadius: 30 / 2,
+    width: 20,
+    height: 20,
+    borderRadius: 20 / 2,
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#09f",
+    position: 'absolute',
+    top: -8,
+    right: -10
   },
   number: {
     fontSize: 14,

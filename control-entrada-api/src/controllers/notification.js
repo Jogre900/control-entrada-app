@@ -97,17 +97,10 @@ const notification = {
     userId,
     notification,
     notificationType,
-    triggerId,
+    triggerUser,
     targetId = null
   ) {
-    // let message = {
-    //   to: '',
-    //   sound: 'default',
-    //   title: 'HOLA OMAIRA',
-    //   body: notification,
-    //   data: { someData: 'goes here' },
-    // };
-    console.log("userid in create NOTI--", userId);
+    console.log("TRIGGER USER IN CREATE NOTI--",triggerUser.Employee)
     try {
       const deviceToken = await models.Token.findAll({
         where: {
@@ -123,7 +116,7 @@ const notification = {
           message.sound = "default";
           message.title = "Security";
           message.subtitle = "sub titulo";
-          message.body = notification;
+          message.body = `${triggerUser.dataValues.Employee.name} ${triggerUser.dataValues.Employee.lastName} ${notification}`;
           message.data = { someData: "goes here" };
           (message.vibrate = [200, 200, 200]),
             (message.launchImageName =
@@ -136,7 +129,8 @@ const notification = {
           return {
             notification,
             notificationType,
-            triggerId,
+            triggerId: triggerUser.dataValues.id,
+            targetId,
             userId: elem,
             read: false
           };
