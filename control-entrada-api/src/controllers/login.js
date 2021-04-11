@@ -6,43 +6,29 @@ import moment from "moment";
 import { $security, $serverPort } from "@config";
 const SECRETKEY = process.env.SECRETKEY || $security().secretKey;
 const login = {
-  saveDeviceToken: async function(req, res) {
-    let RESPONSE = {
-      error: true,
-      msg: "",
-      data: null,
-      token: null
-    };
-    const { id } = req.params;
-    const { token } = req.body;
-    console.log("REQ, SAVE DEVICE TOKEN--",req.params, req.body);
+  saveDeviceToken: async function(token, userId) {
     try {
       const newToken = await models.Token.create({
-        token: token,
-        userId: id
+        token,
+        userId
       });
       if (newToken) {
-        RESPONSE.error = false;
-        RESPONSE.msg = "Guardado de Token Exitoso!";
-        RESPONSE.data = newToken;
-        console.log(RESPONSE);
-        res.json(RESPONSE);
+        return newToken
       }
     } catch (error) {
-      RESPONSE.msg = error.message;
-      res.json(RESPONSE);
+      return error.message;
     }
   },
-  login: async function(req, res) {
+  logIn: async function(req, res) {
     let RESPONSE = {
       error: true,
       msg: "",
       data: null,
       token: null
     };
-    const { email, password } = req.body;
+    const { email, password, deviceToken } = req.body;
     
-    //console.log(email, password)
+    console.log(req.body)
     try {
       const user = await models.User.findOne({
         where: {
@@ -92,6 +78,7 @@ const login = {
             let token = jwt.sign(tokenInput, SECRETKEY, {
               expiresIn: "1d"
             });
+            await login.saveDeviceToken(deviceToken, user.dataValues.id)
             RESPONSE.error = false;
             RESPONSE.msg = "Inicio Exitoso";
             RESPONSE.data = user;
@@ -110,6 +97,31 @@ const login = {
     } catch (error) {
       RESPONSE.msg = error.message;
       res.json(RESPONSE);
+    }
+  },
+  logOut: async function(req, res){
+    let RESPONSE = {
+      error: true,
+      msg: "",
+      data: null,
+      token: null
+    };
+    const { id } = req.params
+    try {
+      const token = await models.Token.destroy({
+        where: {
+          userId: id
+        }
+      })
+      if(token){
+        RESPONSE.error = false
+        RESPONSE.msg = 'Token del dispositivo Borrado!'
+        RESPONSE.data = token
+        res.json(RESPONSE)
+      }
+    } catch (error) {
+      RESPONSE.msg = error.message
+      res.json(RESPONSE)
     }
   },
   verifyLogin: async function(req, res) {

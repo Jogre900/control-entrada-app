@@ -86,7 +86,8 @@ const router = Router();
 router.put("/profile/:id", uploadImg.array("file"), Controllers.login.updateProfile);
 router.post("/password/:email", Controllers.login.recoverPassword);
 router.get("/verifyLogin", middleware.verifyToken, Controllers.login.verifyLogin);
-router.post("/login", Controllers.login.login);
+router.post("/login", Controllers.login.logIn);
+router.put("/logout/:id", Controllers.login.logOut)
 router.get("/findUser/:id", Controllers.employee.findUser);
 router.get("/user/:companyId", Controllers.employee.findUsers);
 router.get("/user/zone/:zoneId", Controllers.employee.findUsersByZone);

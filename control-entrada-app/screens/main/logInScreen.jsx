@@ -9,7 +9,7 @@ import Input from "../../components/input.component";
 import { Ionicons } from "@expo/vector-icons";
 import { MainColor, Danger } from "../../assets/colors";
 import { LoadingModal } from "../../components/loadingModal";
-import { login, helpers } from "../../helpers/";
+import { helpers } from "../../helpers/";
 import { FormContainer } from "../../components/formContainer";
 import { RecoverPassModal } from "../../components/recoverPassModal";
 import { StatusModal } from "../../components/statusModal";
@@ -83,12 +83,8 @@ const LoginScreen = ({
     // }
     setModalVisible(true);
     try {
-      const res = await login(prueba.email, prueba.password);
+      const res = await helpers.login(prueba.email, prueba.password);
       if (!res.data.error) {
-        const deviceToken = await storage.getItem('deviceToken')
-        console.log("token from local storage-", deviceToken)
-        const resToken = await helpers.saveDeviceToken(deviceToken, res.data.data.id)
-        console.log("res de token api--",resToken.data)
         let slogin = {
           token: res.data.token,
           userId: res.data.data.id,

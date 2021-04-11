@@ -31,6 +31,7 @@ import {
 const DELAY = 1;
 const HomeAdminScreen = ({
   navigation,
+  logOut,
   company,
   saveEmployee,
   saveTodayVisits,
@@ -237,6 +238,13 @@ const HomeAdminScreen = ({
   //     clearTimeout(timer1);
   //   };
   // }, []);
+
+  //LOGOUT HANDLER
+  const logoutHandler = async = (status) => {
+    if(status){
+      helpers.logOut(login.userId).then(() => props.navigation.navigate(routes.MAIN))
+    }
+  }
   useEffect(() => {
     if (login) {
       requestNotification();
@@ -250,8 +258,6 @@ const HomeAdminScreen = ({
       };
     }, [])
   );
-
-  console.log("hasvisit", hasVisit);
 
   return (
     <View style={{ flex: 1 }}>
@@ -295,6 +301,7 @@ const HomeAdminScreen = ({
       <LogOutModal
         status={visible}
         navigation={navigation}
+        userId={login.userId}
         onClose={() => setVisible(false)}
       />
       {!hasVisit && <NotFound message="No hay visitas." />}
@@ -310,6 +317,11 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = (dispatch) => ({
+  logOut(){
+    dispatch({
+      type: 'CLEAR_STORAGE'
+    })
+  },
   saveNotification(notifications) {
     dispatch({
       type: "SAVE_NOTI",

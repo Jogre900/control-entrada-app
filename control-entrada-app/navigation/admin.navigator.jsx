@@ -12,6 +12,7 @@ import { View, StyleSheet } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { Ionicons } from "@expo/vector-icons";
 import { storage } from "../helpers/asyncStorage";
+import { helpers } from '../helpers'
 import DrawerHeader from "./drawerHeader";
 import { routes } from "../assets/routes";
 
@@ -108,15 +109,25 @@ const TUTO = 123;
 const DrawerContent = (props) => {
   const dispatch = useDispatch();
   const privilege = useSelector((state) => state.profile.login.privilege);
+  const userId = useSelector((state) => state.profile.login.userId);
   
   const clearRedux = () => {
     return new Promise((resolve, reject) => {
       resolve(dispatch({ type: "CLEAR_STORAGE" }));
     });
   };
-  const deleteToken = async () => await storage.removeItem("userToken");
-  const logOut = () => {
-    deleteToken().then(clearRedux()).then(() => props.navigation.navigate(routes.MAIN))  
+  
+  const logOut = async () => {
+    try {
+      const res = await helpers.logOut(userId);
+      if (res) {
+        clearRedux()
+          .then(() => storage.removeItem("userToken"))
+          .then(() => props.navigation.navigate(routes.MAIN));
+      }
+    } catch (error) {
+      console.log(error.message)
+    }
   }
   return (
     <View

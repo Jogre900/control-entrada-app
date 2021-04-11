@@ -17,7 +17,7 @@ const destiny = {
     };
     const { name } = req.body;
     const { id } = req.params;
-    console.log("CREATE DESTINY CONTROLLER--",req.params, req.body);
+    console.log("CREATE DESTINY CONTROLLER--", req.params, req.body);
     try {
       const destiny = await models.Destination.create({
         name,
@@ -46,18 +46,25 @@ const destiny = {
 
       if (req.payload.privilege === "Supervisor") {
         //findAdmin
-        console.log("USERCOMPNAY CREATE DESTINY--", user.dataValues.UserCompany)
-        const adminId = await employee.findAdmin(user.dataValues.UserCompany[0]);
+        console.log(
+          "USERCOMPNAY CREATE DESTINY--",
+          user.dataValues.UserCompany
+        );
+        const adminIdArray = [];
+        const adminId = await employee.findAdmin(
+          user.dataValues.UserCompany[0]
+        );
+        adminIdArray.push(adminId);
         notification.createNotification(
-          adminId,
+          adminIdArray,
           `${user.dataValues.Employee.name} ${user.dataValues.Employee.lastName} ${notification.notificationMessage.CREATE_DESTINY}`,
           notification.notificationType.CREATE_DESTINY,
           user.dataValues.id,
           id
         );
-      }else{
+      } else {
         //find all supervisor from the zone
-        const supersId = await employee.findSuper(id)
+        const supersId = await employee.findSuper(id);
         notification.createNotification(
           supersId,
           `${user.dataValues.Employee.name} ${user.dataValues.Employee.lastName} ${notification.notificationMessage.CREATE_DESTINY}`,
@@ -178,7 +185,7 @@ const destiny = {
     };
 
     const { id } = req.params;
-    
+
     let array = [];
     if (id.length > 36) {
       array = id.split(",");
@@ -190,7 +197,8 @@ const destiny = {
           id: array.length ? array : id
         },
         include: {
-          model: models.Zone, as: 'Zona'
+          model: models.Zone,
+          as: "Zona"
         },
         raw: true
       });
@@ -227,30 +235,33 @@ const destiny = {
                   as: "userZone"
                 }
               ]
-            }); 
+            });
             if (req.payload.privilege === "Supervisor") {
               //findAdmin
-              const adminId = await employee.findAdmin(user.dataValues.UserCompany[0]);
+              const adminIdArray = [];
+              const adminId = await employee.findAdmin(
+                user.dataValues.UserCompany[0]
+              );
+              adminIdArray.push(adminId);
               notification.createNotification(
                 adminId,
                 `${user.dataValues.Employee.name} ${user.dataValues.Employee.lastName} ${notification.notificationMessage.DELETE_DESTINY}`,
                 notification.notificationType.DELETE_DESTINY,
-                user.dataValues.id,
-                
+                user.dataValues.id
               );
-            }else{
+            } else {
               //find all supervisor from the zone
-              const supersId = await employee.findSuper(user.dataValues.userZone.ZoneId)
+              const supersId = await employee.findSuper(
+                user.dataValues.userZone.ZoneId
+              );
               notification.createNotification(
                 supersId,
                 `${user.dataValues.Employee.name} ${user.dataValues.Employee.lastName} ${notification.notificationMessage.DELETE_DESTINY}`,
                 notification.notificationType.DELETE_DESTINY,
-                user.dataValues.id,
-                
+                user.dataValues.id
               );
             }
-            
-            
+
             (RESPONSE.error = false), (RESPONSE.msg = "Borrado Exitoso!");
             RESPONSE.data = destiny;
             res.json(RESPONSE);

@@ -9,7 +9,7 @@ import {
   Alert
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useDispatch } from "react-redux";
+import { connect, useDispatch } from "react-redux";
 import { storage } from "../../helpers/asyncStorage";
 import { useFocusEffect } from "@react-navigation/native";
 import { useAccountStatus } from '../../helpers/hooks/useAccountStatus'
@@ -24,12 +24,13 @@ import { MainButton } from "../../components/mainButton.component";
 
 //constants
 import { mainColor } from "../../constants/Colors";
+import { login } from "../../helpers/login";
 
 const cover = require("../../assets/images/background.jpg");
 
 const { width, height } = Dimensions.get("window");
 
-export const HomeScreen = ({navigation}) => {
+const HomeScreen = ({navigation, login}) => {
   const { status, message } = useAccountStatus()
   const [logModal, setLogModal] = useState(false)
   const [statusModalProps, setStatusModalProps] = useState({
@@ -112,6 +113,7 @@ export const HomeScreen = ({navigation}) => {
       <LogOutModal
         status={logModal}
         navigation={navigation}
+        userId={login.userId}
         onClose={() => setLogModal(false)}
       />
       <StatusModal
@@ -123,6 +125,12 @@ export const HomeScreen = ({navigation}) => {
     </View>
   );
 };
+
+const mapStateToProps = (state) => ({
+  login: state.profile.login
+});
+
+export default connect(mapStateToProps, {})(HomeScreen)
 
 const styles = StyleSheet.create({
   container: {
