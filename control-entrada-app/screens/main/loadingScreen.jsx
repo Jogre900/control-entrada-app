@@ -18,14 +18,18 @@ const LoadingScreen = ({ navigation, saveProfile, saveCompany, saveLogin }) => {
           },
         });
 
-        console.log("res de verifi Token---",res.data)
+        console.log("RES---",res.data)
         if(res.data.msg === 'Cuenta suspendida'){
           alert(res.data.msg)
           navigation.navigate(routes.MAIN);
           return;
         }
+        if(res.data.msg === "jwt expired"){
+          navigation.navigate(routes.MAIN);
+          return;
+        }
         //console.log("RES DE TOKEN----", res.data.data.UserCompany[0].privilege)
-        if (res.data.error || res.data.msg === "jwt expired") {
+        if (res.data.error) {
           navigation.navigate(routes.MAIN);
           return;
         }

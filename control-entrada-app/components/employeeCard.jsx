@@ -6,26 +6,37 @@ import { MainColor, ThirdColor, lightColor } from "../assets/colors";
 import moment from "moment";
 
 export const EmployeeCard = ({ data, key, zone, selected }) => {
-  //console.log(data)
+  console.log(data);
   return (
-    <View style={[styles.listEmployeBox, { backgroundColor: selected ? "#ddd" : "#fff" }]} key={key}>
-      <View style={{
-        flexDirection: 'row',
-        //backgroundColor: 'red'
-      }}>
-
-      <Avatar.Picture
-        size={45}
-        uri={`${API_PORT()}/public/imgs/${
-          data.User?.Employee.picture || data.Employee.picture
-        }`}
+    <View
+      style={[
+        styles.listEmployeBox,
+        { backgroundColor: selected ? "#ddd" : "#fff" },
+      ]}
+      key={key}
+    >
+      <View
+        style={{
+          flexDirection: "row",
+          //backgroundColor: 'red'
+        }}
+      >
+        <Avatar.Picture
+          size={45}
+          uri={`${API_PORT()}/public/imgs/${
+            data.User?.Employee.picture || data.Employee.picture
+          }`}
         />
-      {data.UserCompany[0]?.active === false ? (
-        <View style={styles.openCameraButton}>
-                  <Avatar.Icon name="ios-warning" size={16} color="#fff" />
-                </View>
-              ) : null}
-              </View>
+        {data.User?.UserCompany[0].active === false ? (
+          <View style={styles.openCameraButton}>
+            <Avatar.Icon name="ios-warning" size={16} color="#fff" />
+          </View>
+        ) : data.UserCompany[0].active === false ? (
+          <View style={styles.openCameraButton}>
+            <Avatar.Icon name="ios-warning" size={16} color="#fff" />
+          </View>
+        ) : null}
+      </View>
       <View style={styles.listSubItemBox}>
         <View style={{ alignItems: "center" }}>
           <Text style={styles.contentText}>
@@ -78,7 +89,7 @@ const styles = StyleSheet.create({
     height: 20,
     borderRadius: 20 / 2,
     borderColor: "#fff",
-    borderWidth: .5,
+    borderWidth: 0.5,
     elevation: 0,
   },
   listSubItemBox: {

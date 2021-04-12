@@ -32,6 +32,7 @@ const watchPic = require("../../assets/images/male-2.jpg");
 
 export const DetailViewScreen = ({ route, navigation }) => {
   const { id } = route.params;
+  console.log("DETAIL VIEW-- ID FROM PARAMS--",id);
   //console.log(visit);
   //const visitante = visit.Visitante;
 

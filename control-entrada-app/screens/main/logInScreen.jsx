@@ -9,7 +9,7 @@ import Input from "../../components/input.component";
 import { Ionicons } from "@expo/vector-icons";
 import { MainColor, Danger } from "../../assets/colors";
 import { LoadingModal } from "../../components/loadingModal";
-import { login } from "../../helpers/";
+import { helpers } from "../../helpers/";
 import { FormContainer } from "../../components/formContainer";
 import { RecoverPassModal } from "../../components/recoverPassModal";
 import { StatusModal } from "../../components/statusModal";
@@ -45,6 +45,7 @@ const LoginScreen = ({
   saveCompany,
   saveLogin,
   savePrivilege,
+  
 }) => {
   
   const [loginData, setLoginData] = useState(loginInitialValues)
@@ -82,7 +83,7 @@ const LoginScreen = ({
     // }
     setModalVisible(true);
     try {
-      const res = await login(prueba.email, prueba.password);
+      const res = await helpers.login(prueba.email, prueba.password);
       if (!res.data.error) {
         let slogin = {
           token: res.data.token,
@@ -186,7 +187,6 @@ const LoginScreen = ({
     }
   };
 const handleChange = (name, value) => {
-  console.log(name, value)
   setprueba((values) => ({...values, [name]: value}))
 }
   return (
@@ -302,9 +302,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
 });
-const mapStateToProps = (state) => {
-  return {};
-};
+
+
 
 const mapDispatchToProps = (dispatch) => ({
   saveProfile(profile) {
@@ -333,4 +332,4 @@ const mapDispatchToProps = (dispatch) => ({
   },
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(LoginScreen);
+export default connect(null, mapDispatchToProps)(LoginScreen);

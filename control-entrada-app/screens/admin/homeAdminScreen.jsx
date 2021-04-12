@@ -28,8 +28,10 @@ import {
   helpers,
 } from "../../helpers/";
 
+const DELAY = 1;
 const HomeAdminScreen = ({
   navigation,
+  logOut,
   company,
   saveEmployee,
   saveTodayVisits,
@@ -37,7 +39,10 @@ const HomeAdminScreen = ({
   saveZones,
   saveDestiny,
   profile,
+  login,
   privilege,
+  saveNotification,
+  saveNotificationNotRead,
 }) => {
   const [visible, setVisible] = useState(false);
   const [selectItem, setSeletedItem] = useState([]);
@@ -53,7 +58,7 @@ const HomeAdminScreen = ({
     const res = await helpers.fetchZoneById(profile.userZone[0].ZoneId);
     //console.log("supervisor zone", res);
     setLoading(false);
-    saveZones(res);
+    saveZones(res.data.data);
   };
   //REQUEST ZONES
   const requestZones = async () => {
@@ -76,13 +81,13 @@ const HomeAdminScreen = ({
   const requestEmployee = async () => {
     let uzArray = [];
     let employee = [];
-    console.log("me ejecute")
+    console.log("me ejecute");
     if (company) {
       setLoading(true);
       const res = await fetchAllEmployee(company.id);
       //console.log(res.data)
       if (res.data.data.length > 0) {
-        console.log("si hay empleados")
+        console.log("si hay empleados");
         res.data.data.map((e) => {
           uzArray.push(e.userZone[0]);
         });
@@ -130,6 +135,26 @@ const HomeAdminScreen = ({
       }
     } else {
       setHasVisit(false);
+    }
+  };
+
+  //REQUEST ALL NOTIFICATION
+  const requestNotification = async () => {
+    setLoading(true);
+    try {
+      const res = await helpers.fetchNotification(login.userId);
+      if (!res.data.error) {
+        console.log("all notif--", res.data.data);
+        setLoading(false);
+        let array = [];
+        saveNotification(res.data.data);
+        array = res.data.data.filter(({ read }) => read === false);
+        console.log("notis not read--", array);
+        saveNotificationNotRead(array);
+      }
+    } catch (error) {
+      setLoading(false);
+      console.log(error.message);
     }
   };
 
@@ -207,6 +232,24 @@ const HomeAdminScreen = ({
   // useEffect(() => {
   //   requestVisits();
   // }, [employee]);
+  // useEffect(() => {
+  //   let timer1 = setTimeout(() => requestNotification(), DELAY * 1000);
+  //   return () => {
+  //     clearTimeout(timer1);
+  //   };
+  // }, []);
+
+  //LOGOUT HANDLER
+  const logoutHandler = async = (status) => {
+    if(status){
+      helpers.logOut(login.userId).then(() => props.navigation.navigate(routes.MAIN))
+    }
+  }
+  useEffect(() => {
+    if (login) {
+      requestNotification();
+    }
+  }, []);
   useFocusEffect(
     React.useCallback(() => {
       BackHandler.addEventListener("hardwareBackPress", backAction);
@@ -215,8 +258,6 @@ const HomeAdminScreen = ({
       };
     }, [])
   );
-
-  console.log("hasvisit", hasVisit);
 
   return (
     <View style={{ flex: 1 }}>
@@ -260,6 +301,7 @@ const HomeAdminScreen = ({
       <LogOutModal
         status={visible}
         navigation={navigation}
+        userId={login.userId}
         onClose={() => setVisible(false)}
       />
       {!hasVisit && <NotFound message="No hay visitas." />}
@@ -270,10 +312,28 @@ const HomeAdminScreen = ({
 const mapStateToProps = (state) => ({
   company: state.profile.companySelect,
   profile: state.profile.profile,
+  login: state.profile.login,
   privilege: state.profile.login.privilege,
 });
 
 const mapDispatchToProps = (dispatch) => ({
+  logOut(){
+    dispatch({
+      type: 'CLEAR_STORAGE'
+    })
+  },
+  saveNotification(notifications) {
+    dispatch({
+      type: "SAVE_NOTI",
+      payload: notifications,
+    });
+  },
+  saveNotificationNotRead(notifications) {
+    dispatch({
+      type: "SAVE_NOTI_NOT_READ",
+      payload: notifications,
+    });
+  },
   saveZones(zones) {
     dispatch({
       type: "setZones",

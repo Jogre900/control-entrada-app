@@ -17,8 +17,8 @@ export default (state = initialState, action = {}) => {
         destinys: state.destinys.concat(action.payload),
       };
     case "REMOVE_DESTINY":
-      let removed = state.destinys.filter(({id}) => !action.payload.includes(id));
-      //console.log("nueva zona: ", newZone);
+      
+    let removed = state.destinys.filter(({id}) => !action.payload.includes(id));
       return {
         ...state,
         destinys: removed,

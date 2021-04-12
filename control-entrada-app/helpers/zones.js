@@ -1,6 +1,29 @@
 import axios from "axios";
 import { API_PORT } from "../config/index";
+import { storage } from "./asyncStorage";
 
+//CREATE ZONE
+export async function createZone(data){
+  const token = await storage.getItem("userToken");
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+  const res = await axios.post(`${API_PORT()}/api/zone`, data, config)
+  return res
+}
+//DELETE ZONE
+export async function deleteZone(zoneId){
+  const token = await storage.getItem("userToken");
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+  const res = await axios.delete(`${API_PORT()}/api/zone/${zoneId}`, config)
+  return res
+}
 //ZONES BY ID
 export async function fetchZoneById(id) {
     try {

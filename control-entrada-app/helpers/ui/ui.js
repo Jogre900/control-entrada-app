@@ -1,9 +1,10 @@
 import React from "react";
-import { TouchableOpacity, View } from "react-native";
+import { TouchableOpacity, View, Text, StyleSheet } from "react-native";
 
 import { Ionicons } from "@expo/vector-icons";
 import { MainButton } from "../../components/mainButton.component";
-import { routes } from '../../assets/routes'
+import { routes } from "../../assets/routes";
+import { useSelector } from "react-redux";
 const size = 28;
 
 export const DrawerAction = (navigation) => {
@@ -25,7 +26,7 @@ export const BackAction = (navigation, route) => {
     <View>
       <TouchableOpacity
         onPress={() => {
-          route ? navigation.navigate(route) : navigation.goBack()
+          route ? navigation.navigate(route) : navigation.goBack();
         }}
       >
         <Ionicons name="ios-arrow-back" size={size} color="#fff" />
@@ -35,14 +36,26 @@ export const BackAction = (navigation, route) => {
 };
 
 export const Notifications = (navigation) => {
+  const notificationNotRead = useSelector((state) => state.profile.notificationNotRead);
+
   return (
     <View>
       <TouchableOpacity
         onPress={() => {
           navigation.navigate(routes.NOTIFICATION);
         }}
+        style={{
+          position: 'relative'
+        }}
       >
         <Ionicons name="md-notifications" size={28} color="white" />
+       {
+         notificationNotRead !== 'undefined' && notificationNotRead.length >= 1 ?
+         <View style={styles.numberContainer}>
+         <Text style={styles.number}>{notificationNotRead !== undefined ? notificationNotRead.length : null}</Text>
+       </View>
+       : null
+       }
       </TouchableOpacity>
     </View>
   );
@@ -54,3 +67,22 @@ export const NavigateAction = (navigation, size, name, route) => {
     </TouchableOpacity>
   );
 };
+
+const styles = StyleSheet.create({
+  numberContainer: {
+    width: 20,
+    height: 20,
+    borderRadius: 20 / 2,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#09f",
+    position: 'absolute',
+    top: -8,
+    right: -10
+  },
+  number: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#fff",
+  },
+});

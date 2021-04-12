@@ -20,26 +20,26 @@ const timeState = {
   exit: false,
 };
 
-const CreateZoneModal = ({
-  status,
-  onClose,
-  create,
-  addZones,
-  addDestiny,
-  companyRedux,
-}) => {
+const CreateZoneModal = ({ status, onClose, create, addZones, addDestiny, companyRedux }) => {
   const [displayTime, setDisplayTime] = useState(timeState);
   const [caption, setCaption] = useState("");
+  const [captionDestiny, setCaptionDestiny] = useState("");
   const [timeCaption, setTimeCaption] = useState("");
   const [zoneName, setZoneName] = useState("");
   const [entranceTime, setEntranceTime] = useState(new Date());
   const [entry, setEntry] = useState(false);
   const [departureTime, setDepartureTime] = useState(new Date());
-  const [destinyName, setDestinyName] = useState();
+  const [destinyName, setDestinyName] = useState("");
   const [exit, setExit] = useState(false);
   const [show1, setShow1] = useState(false);
   const [show2, setShow2] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  const resetState = () => {
+    setCaption("");
+    setCaptionDestiny("");
+    setTimeCaption("");
+  };
 
   //TIMEPICKER
   const displayTimePicker = () => {
@@ -74,6 +74,7 @@ const CreateZoneModal = ({
     setTimeCaption(""), setExit(true);
   };
   const createZone = async () => {
+    resetState();
     setLoading(true);
     if (zoneName.length === 0) {
       setCaption("Debe ingresar un nombre.");
@@ -85,15 +86,22 @@ const CreateZoneModal = ({
       setLoading(false);
       return;
     }
+    if (destinyName.length === 0) {
+      setCaptionDestiny("Debe ingresar un nombre.");
+      setLoading(false);
+      return;
+    }
+    if (destinyName.length < 4 || destinyName.length > 15) {
+      setCaptionDestiny("Ingrese un nombre entre 4 y 15 caracteres.");
+      setLoading(false);
+      return;
+    }
     if (!entry || !exit) {
       setTimeCaption("Debe seleccionar ambas horas.");
       setLoading(false);
       return;
     }
-    if (
-      moment(entranceTime).format("HH: mm a") >
-      moment(departureTime).format("HH: mm a")
-    ) {
+    if (moment(entranceTime).format("HH: mm a") > moment(departureTime).format("HH: mm a")) {
       setTimeCaption("La hora de entrada no puede ser menor que la de salida");
       setLoading(false);
       return;
@@ -107,20 +115,13 @@ const CreateZoneModal = ({
     let data = {};
     (data.zone = zoneName),
       (data.firsEntryTime = moment(entranceTime).format("HH:mm").toString()),
-      (data.firsDepartureTime = moment(departureTime)
-        .format("HH:mm")
-        .toString()),
+      (data.firsDepartureTime = moment(departureTime).format("HH:mm").toString()),
       (data.destiny = destinyName);
     const res = await createInfo("createZone", companyRedux[0].id, data);
     if (!res.error) {
       addZones(res.data);
-      addDestiny(res.data.Destinos)
-      setCaption(""),
-        setTimeCaption(""),
-        setZoneName(""),
-        setEntry(false),
-        setExit(false),
-        setLoading(false);
+      addDestiny(res.data.Destinos);
+      setCaption(""), setTimeCaption(""), setZoneName(""), setEntry(false), setExit(false), setLoading(false);
       create(true, res.msg);
       onClose();
     } else {
@@ -133,12 +134,7 @@ const CreateZoneModal = ({
     <Modal
       isVisible={status}
       onBackdropPress={() => {
-        setCaption(""),
-          setTimeCaption(""),
-          setZoneName(""),
-          setEntry(false),
-          setExit(false),
-          onClose();
+        setCaption(""), setTimeCaption(""), setZoneName(""), setEntry(false), setExit(false), onClose();
       }}
       useNativeDriver={true}
       animationIn="fadeInUp"
@@ -151,10 +147,7 @@ const CreateZoneModal = ({
         alignItems: "center",
       }}
     >
-      <FormContainer
-        style={{ padding: 20, elevation: 0 }}
-        title="Ingrese los datos de la zona"
-      >
+      <FormContainer style={{ padding: 20, elevation: 0 }} title="Ingrese los datos de la zona">
         <Input
           title="Nombre"
           icon="md-globe"
@@ -179,52 +172,24 @@ const CreateZoneModal = ({
         </View>
         <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
           <View style={styles.pickerButtonContainer}>
-            <MainButton
-              style={styles.pickerButton}
-              title="Entrada"
-              onPress={() => displayTimePicker()}
-            />
+            <MainButton style={styles.pickerButton} title="Entrada" onPress={() => displayTimePicker()} />
             {/* <Ionicons name="ios-timer" size={20} color="green" /> */}
             {/* <Text style={styles.buttonText}>Entrada</Text> */}
             {/* </TouchableOpacity> */}
-            <Text style={styles.timeText}>
-              {entry ? moment(entranceTime).format("HH:mm a") : "----"}
-            </Text>
-            {show1 && (
-              <DateTimePicker
-                value={entranceTime}
-                mode={"time"}
-                is24Hour={false}
-                display="default"
-                onChange={onChange}
-              />
-            )}
+            <Text style={styles.timeText}>{entry ? moment(entranceTime).format("HH:mm a") : "----"}</Text>
+            {show1 && <DateTimePicker value={entranceTime} mode={"time"} is24Hour={false} display="default" onChange={onChange} />}
           </View>
           <View style={styles.pickerButtonContainer}>
-            <MainButton
-              title="Salida"
-              style={styles.pickerButton}
-              onPress={() => displayTimePicker2()}
-            />
+            <MainButton title="Salida" style={styles.pickerButton} onPress={() => displayTimePicker2()} />
             {/* <Text style={styles.buttonText}>Salida</Text> */}
             {/* <Ionicons name="ios-timer" size={20} color="#ccc" /> */}
 
-            <Text style={styles.timeText}>
-              {exit ? moment(departureTime).format("HH:mm a") : "----"}
-            </Text>
-            {show2 && (
-              <DateTimePicker
-                value={departureTime}
-                mode={"time"}
-                is24Hour={false}
-                display="default"
-                onChange={onChange2}
-              />
-            )}
+            <Text style={styles.timeText}>{exit ? moment(departureTime).format("HH:mm a") : "----"}</Text>
+            {show2 && <DateTimePicker value={departureTime} mode={"time"} is24Hour={false} display="default" onChange={onChange2} />}
           </View>
         </View>
         <View>
-          <Text style={styles.labelText}>Agrega al menos 1 destino</Text>
+          <Text style={styles.labelText}>Agregar un destino</Text>
           <Input
             title="Destino"
             shape="flat"
@@ -236,6 +201,17 @@ const CreateZoneModal = ({
             }}
             value={destinyName}
           />
+          <View>
+            <Text
+              style={{
+                color: Danger,
+                fontSize: 15,
+                fontWeight: "600",
+              }}
+            >
+              {captionDestiny}
+            </Text>
+          </View>
         </View>
         <View style={{ marginVertical: 5 }}>
           <Text
@@ -272,12 +248,12 @@ const mapDispatchToProps = (dispatch) => ({
       payload: zones,
     });
   },
-  addDestiny(destiny){
+  addDestiny(destiny) {
     dispatch({
-      type: 'ADD_DESTINY',
-      payload: destiny
-    })
-  }
+      type: "ADD_DESTINY",
+      payload: destiny,
+    });
+  },
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(CreateZoneModal);

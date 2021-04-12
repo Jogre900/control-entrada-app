@@ -47,9 +47,7 @@ const DestinyScreen = ({
   const [promp, setPromp] = useState(false);
   const [loading, setLoading] = useState(false);
   const [selectItem, setSeletedItem] = useState([]);
-  console.log("zoneRedux----", zonesRedux);
-  console.log(zoneId);
-
+  
   //CHEKC CREATE
   const checkCreate = (status, message, data) => {
     setStatusModalProps((values) => ({

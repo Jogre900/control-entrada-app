@@ -5,7 +5,7 @@ import {
 } from "@react-navigation/stack";
 import { routes } from '../assets/routes'
 //screen
-import { HomeScreen } from "../screens/watch/homeScreen";
+import HomeScreen from "../screens/watch/homeScreen";
 import WatchProfileScreen from "../screens/watch/watchProfileScreen.jsx";
 import EntryScreen from "../screens/watch/entryScreen";
 import VisitScreen from "../screens/watch/visitScreen";

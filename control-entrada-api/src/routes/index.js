@@ -41,126 +41,134 @@ const middleware = {
     //return next(createError(401, "Usuario no Autorizado"));
     const headerToken = req.headers["authorization"];
     const token = headerToken.split(" ")[1];
-    const decoded = jwt.verify(token, SECRETKEY)
-      console.log(decoded)
-      //console.log("PAYLOAD DE TOKEN---", payload);
-      try {
-        const user = await models.User.findOne({
-          where: {
-            id: decoded.userId
-          },
-          include: {
-            model: models.UserCompany,
-            as: "UserCompany"
-          }
-        });
-        if (user.dataValues.UserCompany[0].active === false) {
-          //return next(createError(401, 'Cuenta suspendida'))
-          return res.json({
-            msg: "Cuenta suspendida"
+    const decoded = jwt.verify(token, SECRETKEY, async (err, payload) => {
+      //console.log("ERR---",err)
+      if(err){
+        res.json({
+          msg: err.message
+        })
+      }else{
+        try {
+          const user = await models.User.findOne({
+            where: {
+              id: payload.userId
+            },
+            include: {
+              model: models.UserCompany,
+              as: "UserCompany"
+            }
           });
-        } else {
-          req.payload = decoded;
-          next();
+          if (user.dataValues.UserCompany[0].active === false) {
+            return res.json({
+              msg: "Cuenta suspendida"
+            });
+          } else {
+            req.payload = payload;
+            next();
+          }
+        } catch (error) {
+          return res.json({
+            msg: error.message
+          });
         }
-      } catch (error) {
-        //return next(createError(error, err.message));
-        return res.json({
-          msg: error.message
-        });
       }
+      
+    })
+      //console.log("DECODE--",decoded)
+      //console.log("PAYLOAD DE TOKEN---", payload);
+      
   }
 };
 
 const router = Router();
 
-//router.post("/createAdmin", uploadImg.single("file"), Methods.createAdmin);
-router.post(
-  "/createUser/:privilege",
-  uploadImg.single("file"),
-  Controllers.createUser
-);
 
-router.put("/updateAdmin/:companyId", Controllers.updateAdminId);
-router.post("/login", Controllers.login);
-router.get("/findUser/:id", Controllers.findUser);
-router.get("/user/:companyId", Controllers.findUsers);
-router.get("/user/zone/:zoneId", Controllers.findUsersByZone);
-router.get("/findAvailableUsers/:companyId", Controllers.findAvailableUsers);
-router.put("/user/:id", Controllers.deleteUser);
-router.get("/findCompany/:id", Controllers.findCompany);
+router.put("/profile/:id", uploadImg.array("file"), Controllers.login.updateProfile);
+router.post("/password/:email", Controllers.login.recoverPassword);
+router.get("/verifyLogin", middleware.verifyToken, Controllers.login.verifyLogin);
+router.post("/login", Controllers.login.logIn);
+router.put("/logout/:id", Controllers.login.logOut)
+router.get("/findUser/:id", Controllers.employee.findUser);
+router.get("/user/:companyId", Controllers.employee.findUsers);
+router.get("/user/zone/:zoneId", Controllers.employee.findUsersByZone);
+router.put("/user/:id", Controllers.employee.deleteUser);
+//NOTIFICATION
+router.get("/notification/:userId/:unread?", Controllers.notification.fetchAllNotification)
+router.put("/notification/:id?", Controllers.notification.changeToRead)
 //ZONES
-router.post("/createZone/:id", Controllers.createZone);
-router.get("/findZones/:companyId", Controllers.findZones);
-router.get("/zone/:zoneId", Controllers.findZone);
-router.get("/zoneMaxVisit/:companyId", Controllers.findZoneMaxVisit);
-router.delete("/zone/:id", Controllers.deleteZone);
+router.post("/zone", middleware.verifyToken, Controllers.zone.createZone);
+router.get("/findZones/:companyId", Controllers.zone.findZones);
+router.get("/zone/:zoneId", Controllers.zone.findZone);
+router.get("/zoneMaxVisit/:companyId", Controllers.zone.findZoneMaxVisit);
+router.delete("/zone/:id", Controllers.zone.deleteZone);
 //DESTINY
-router.post("/createDestiny/:id", Controllers.createDestiny);
-router.get("/findDestiny/:id", Controllers.findDestinyByZone);
-router.get("/findAllDestiny/:id", Controllers.findAllDestiny);
-router.post("/destinyMaxVisit", Controllers.findDestinyMaxVisit);
-router.delete("/destiny/:id", Controllers.deleteDestiny);
+router.post("/destiny/:id", middleware.verifyToken, Controllers.destiny.createDestiny);
+router.get("/findDestiny/:id", Controllers.destiny.findDestinyByZone);
+router.get("/findAllDestiny/:id", Controllers.destiny.findAllDestiny);
+router.post("/destinyMaxVisit", Controllers.destiny.findDestinyMaxVisit);
+router.delete("/destiny/:id", middleware.verifyToken, Controllers.destiny.deleteDestiny);
 //ROUTAS PARA BORRAR
-router.post("/createEmployee", Controllers.createEmployee);
-router.get("/findEmployees", Controllers.findEmployees);
-router.post("/createUserZone", Controllers.createUserZone);
+// router.post("/createEmployee", Controllers.createEmployee);
+// router.get("/findEmployees", Controllers.findEmployees);
+// router.post("/createUserZone", Controllers.createUserZone);
 //router.post("/uploadImage", uploadImg.single('file'), Controllers.uploadImage)
-router.get("/displayPicture", Controllers.displayPicture);
+// router.get("/displayPicture", Controllers.displayPicture);
+// router.put("/updateAdmin/:companyId", Controllers.updateAdminId);
+// router.get("/findAvailableUsers/:companyId", Controllers.findAvailableUsers);
+// router.get("/findCompany/:id", Controllers.findCompany);
+// router.get("/findUserZone/:id", Controllers.findUserZone);
 router.get("/profile", Controllers.getProfile);
-router.put("/profile/:id", uploadImg.array("file"), Controllers.updateProfile);
-router.post("/password/:email", Controllers.recoverPassword);
 
-router.get("/findUserZone/:id", Controllers.findUserZone);
-router.get("/verifyLogin", middleware.verifyToken, Controllers.verifyLogin);
 //VISIT ROUTES
 router.post(
   "/visit",
   middleware.verifyToken,
   uploadImg.single("file"),
-  Controllers.createVisits
+  Controllers.visitsControllers.createVisits
 );
-router.get("/visitId/:id", Controllers.findVisitId);
-router.get("/visit/:dni", Controllers.findVisit);
+router.get("/visitId/:id", Controllers.visitsControllers.findVisitId);
+router.get("/visit/:dni", Controllers.visitsControllers.findVisit);
 //todas las visitas de hoy por empleados
-router.post("/visits", Controllers.findTodayVisits);
-router.get("/findWeekVisits/", Controllers.findWeekVisits);
-router.get("/visits/:userzoneId", Controllers.findTodayVisitsByUser);
+router.post("/visits", Controllers.visitsControllers.findTodayVisits);
+router.get("/findWeekVisits/", Controllers.visitsControllers.findWeekVisits);
+router.get("/visits/:userzoneId", Controllers.visitsControllers.findTodayVisitsByUser);
 //todas las visitas de hoy por destino
 router.get(
   "/visitsdestiny/:destinyId/:checked?",
   middleware.verifyToken,
-  Controllers.findTodayVisitsByDestiny
+  Controllers.visitsControllers.findTodayVisitsByDestiny
 );
-router.delete("/visit/", Controllers.deleteVisit);
+router.delete("/visit/", Controllers.visitsControllers.deleteVisit);
 //DEPARTURE ROUTES
 router.post(
   "/departure/:id",
   middleware.verifyToken,
-  Controllers.createDeparture
+  Controllers.visitsControllers.createDeparture
 );
 
 //CITIZEN
-router.get("/citizen/:dni", middleware.verifyToken, Controllers.findCitizen);
+router.get("/citizen/:dni", middleware.verifyToken, Controllers.visitsControllers.findCitizen);
 router.post(
   "/citizen",
   middleware.verifyToken,
   uploadImg.array("file"),
-  Controllers.createCitizen
+  Controllers.visitsControllers.createCitizen
 );
 //FIND MAX VALUE ROUTES
-router.get("/userCompany/:companyId", Controllers.findMaxVisitUser);
+router.get("/userCompany/:companyId", Controllers.visitsControllers.findMaxVisitUser);
 // NUEVAS RUTA AJUSTE SISTEMA
 router.post("/company", uploadImg.array("file"), Controllers.createCompany);
 router.post(
   "/supervisor",
   uploadImg.single("file"),
-  Controllers.createUserSupervisor
+  Controllers.employee.createUserSupervisor
 );
 router.post(
   "/watchman",
   uploadImg.single("file"),
-  Controllers.createUserWatchman
+  Controllers.employee.createUserWatchman
 );
+//SAVE DEVICETOKEN
+router.post("/token/:id", Controllers.login.saveDeviceToken)
 
 module.exports = router;

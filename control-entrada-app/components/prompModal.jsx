@@ -9,28 +9,75 @@ import Modal from "react-native-modal";
 import { LoadingModal } from "./loadingModal";
 import { deleteInfo, helpers } from "../helpers/";
 
-export const PrompModal = ({ visible, deleted, onClose, data, url, suspend }) => {
+export const PrompModal = ({
+  visible,
+  deleted,
+  onClose,
+  data,
+  url,
+  suspend,
+}) => {
   const [loading, setLoading] = useState(false);
 
   const suspendE = async () => {
     setLoading(true);
     try {
-      const res = await helpers.suspendEmployee(data)
+      const res = await helpers.suspendEmployee(data);
       setLoading(false);
-      if(!res.data.error){
-        deleted(true, res.data.msg, res.data.data)
+      if (!res.data.error) {
+        deleted(true, res.data.msg, res.data.data);
         onClose();
       }
     } catch (error) {
       setLoading(false);
-      deleted(false, error.message)
+      deleted(false, error.message);
     }
-  }
+  };
 
-  const deleteHelper = async () => {
+  const deleteHelper = async (url) => {
     setLoading(true);
+    switch (url) {
+      case "zone":
+        try {
+          const res = await helpers.deleteZone(data);
+          if (!res.data.error) {
+            setLoading(false);
+            deleted(true, res.data.msg);
+            onClose();
+          } else {
+            setLoading(false);
+            deleted(false, res.data.msg);
+            onClose();
+          }
+        } catch (error) {
+          setLoading(false);
+          deleted(false, error.message);
+          onClose();
+        }
+        break;
+      case "destiny":
+        try {
+          const res = await helpers.deleteDestiny(data);
+          if (!res.data.error) {
+            setLoading(false);
+            deleted(true, res.data.msg);
+            onClose();
+          } else {
+            setLoading(false);
+            deleted(false, res.data.msg);
+            onClose();
+          }
+        } catch (error) {
+          setLoading(false);
+          deleted(false, error.message);
+          onClose();
+        }
+        break;
+      default:
+        break;
+    }
     const res = await deleteInfo(url, data);
-    console.log("res de BORRAR---", res)
+    console.log("res de BORRAR---", res.data);
     if (!res.error) {
       setLoading(false);
       deleted(true, res.msg);
@@ -57,7 +104,12 @@ export const PrompModal = ({ visible, deleted, onClose, data, url, suspend }) =>
         alignItems: "center",
       }}
     >
-      <FormContainer style={styles.container} title={!suspend ?"¿Seguro que desea borra?" : "¿Seguro que desea suspender?"}>
+      <FormContainer
+        style={styles.container}
+        title={
+          !suspend ? "¿Seguro que desea borra?" : "¿Seguro que desea suspender?"
+        }
+      >
         <View style={styles.buttonContainer}>
           <MainButton
             style={[styles.button, styles.buttonLeft]}
@@ -70,7 +122,7 @@ export const PrompModal = ({ visible, deleted, onClose, data, url, suspend }) =>
           <MainButton
             style={styles.button}
             title="Si"
-            onPress={!suspend ? deleteHelper : suspendE}
+            onPress={!suspend ? () => deleteHelper(url) : suspendE}
           />
         </View>
       </FormContainer>

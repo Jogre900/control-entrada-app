@@ -1,9 +1,24 @@
 import { useState } from "react";
 import axios from "axios";
 import { API_PORT } from "../config/index";
+import { storage } from './asyncStorage'
+import { login, logOut } from './login'
 import { createCitizen, findCitizendni } from "./citizen";
-import { fetchAllZones,fetchZoneById, zoneMaxVisit, destinyMaxVisit } from './zones'
-import { suspendEmployee, verifyLogin, updateProfile } from './users'
+import {
+  fetchAllZones,
+  fetchZoneById,
+  zoneMaxVisit,
+  destinyMaxVisit,
+  deleteZone,
+  createZone,
+} from "./zones";
+import { createDestiny, deleteDestiny } from "./destiny";
+import {
+  suspendEmployee,
+  verifyLogin,
+  updateProfile,
+  saveDeviceToken,
+} from "./users";
 import {
   createVisit,
   findVisitdni,
@@ -12,10 +27,13 @@ import {
   createDeparture,
   fetchTodayVisist,
   maxUserVisit,
-  fetchVisitDestiny
+  fetchVisitDestiny,
 } from "./visit";
+import { fetchNotification, changeReadStatus } from "./notification";
 
 export const helpers = {
+  login,
+  logOut,
   createCitizen,
   findCitizendni,
   createVisit,
@@ -26,19 +44,26 @@ export const helpers = {
   fetchVisitDestiny,
   createDeparture,
   maxUserVisit,
+  createZone,
+  deleteZone,
   fetchZoneById,
   fetchAllZones,
   zoneMaxVisit,
   destinyMaxVisit,
   suspendEmployee,
   verifyLogin,
-  updateProfile
+  updateProfile,
+  saveDeviceToken,
+  fetchNotification,
+  changeReadStatus,
+  createDestiny,
+  deleteDestiny,
 };
 
 //DELETE ANYTHING FROM API
 export async function deleteInfo(url, arrayIds) {
   try {
-    const res = await axios.delete(`${API_PORT()}/api/${url}/${arrayIds}`)
+    const res = await axios.delete(`${API_PORT()}/api/${url}/${arrayIds}`);
     return res.data;
   } catch (error) {
     return error.message;
@@ -88,8 +113,6 @@ export async function fetchEmployeeByZone(zoneId) {
     return error.message;
   }
 }
-
-
 
 //RECOVER PASS
 export async function recoverPass(email, data) {
@@ -170,60 +193,7 @@ export async function createCompany(adminData, companyData) {
   }
 }
 
-//LOGIN
-export async function login(email, password) {
-  // console.log(data);
-  try {
-    const res = await axios.post(`${API_PORT()}/api/login`, {email, password});
-    // if (!res.data.error) {
-    //   console.log("RES DE LOGIN---------", res.data);
 
-    //   let slogin = {
-    //     token: res.data.token,
-    //     userId: res.data.data.id,
-    //   };
-
-    //   let sprofile = {
-    //     id: res.data.data.Employee.id,
-    //     dni: res.data.data.Employee.dni,
-    //     name: res.data.data.Employee.name,
-    //     lastName: res.data.data.Employee.lastName,
-    //     picture: res.data.data.Employee.picture,
-    //     email: res.data.data.email,
-    //   };
-    //   if (res.data.data.userZone.length > 0) {
-    //     sprofile.userZone = res.data.data.userZone;
-    //   }
-    //   let company = [];
-    //   res.data.data.UserCompany.map((comp) => {
-    //     company.push({
-    //       id: comp.Company.id,
-    //       companyName: comp.Company.companyName,
-    //       businessName: comp.Company.businessName,
-    //       nic: comp.Company.nic,
-    //       city: comp.Company.city,
-    //       address: comp.Company.address,
-    //       phoneNumber: comp.Company.phoneNumber,
-    //       phoneNumberOther: comp.Company.phoneNumberOther,
-    //       logo: comp.Company.logo,
-    //       privilege: comp.privilege,
-    //       select: true,
-    //     });
-    //   });
-    //   let privilege = res.data.data.UserCompany[0].privilege;
-    //   let token = res.data.token
-    //   // await storage.removeItem("userToken", res.data.token);
-    //   // await storage.setItem("userToken", res.data.token);
-    //   return { slogin, sprofile, company, privilege, token };
-    // } else {
-    //   return res;
-    // }
-    console.log("LOGIN----", res.data);
-    return res;
-  } catch (error) {
-    return error;
-  }
-}
 //CREATE SUPERVISOR
 export async function createSupervisor(employeeData) {
   const {
@@ -309,6 +279,3 @@ export async function createWatchman(employeeData) {
     console.log(error);
   }
 }
-
-
-

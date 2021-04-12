@@ -8,6 +8,7 @@ import { Danger } from "../assets/colors";
 import axios from "axios";
 import Modal from "react-native-modal";
 import { LoadingModal } from "./loadingModal";
+import { helpers } from '../helpers'
 
 export const CreateDestinyModal = ({ status, create, onClose, zoneId }) => {
   const [destinyName, setDestinyName] = useState("");
@@ -32,16 +33,18 @@ export const CreateDestinyModal = ({ status, create, onClose, zoneId }) => {
     setLoading(true);
     // create(false);
     try {
-      let res = await axios.post(`${API_PORT()}/api/createDestiny/${zoneId}`, {
-        name: destinyName,
-      });
-      console.log(res.data)
+      let res = await helpers.createDestiny(destinyName, zoneId)
+      console.log("RES CREATE DESTINY--",res.data)
       if (!res.data.error) {
         setDestinyName("");
         setCaption("");
         setLoading(false);
         onClose();
         create(true, res.data.msg, res.data.data);
+      }else{
+        setLoading(false);
+        onClose();
+        create(false, res.data.msg);
       }
     } catch (error) {
       setLoading(false);

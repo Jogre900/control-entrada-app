@@ -1,17 +1,11 @@
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  Dimensions,
-  StyleSheet,
-} from "react-native";
+import { View, Text, TouchableOpacity, Dimensions, StyleSheet } from "react-native";
 import Modal from "react-native-modal";
 import { Ionicons } from "@expo/vector-icons";
 import { MainButton } from "./mainButton.component";
-import { MainColor, ThirdColor } from '../assets/colors'
+import { MainColor, ThirdColor } from "../assets/colors";
 
-export const MessageModal = ({ visible, status, onClose, navigation , route, message }) => {
+export const MessageModal = ({ visible, status, onClose, onPress, navigation, route, message, titleButton = "Cerrar" }) => {
   console.log(route);
 
   return (
@@ -25,16 +19,18 @@ export const MessageModal = ({ visible, status, onClose, navigation , route, mes
       onBackdropPress={onClose}
       animationOut="fadeOutDown"
       animationOutTiming={500}
-      style={{
-        //justifyContent: "flex-end",
-        //marginHorizontal: 0,
-      }}
+      style={
+        {
+          //justifyContent: "flex-end",
+          //marginHorizontal: 0,
+        }
+      }
       children={
         <View style={styles.container}>
           <Ionicons name="ios-warning" size={120} color={ThirdColor} />
           <Text style={styles.loadingText}>{message}</Text>
           <View style={styles.buttonContainer}>
-            <MainButton title="Cerrar" onPress={() => { onClose(), navigation.navigate(route)}} />
+            <MainButton title={titleButton} onPress={onPress} />
           </View>
         </View>
       }

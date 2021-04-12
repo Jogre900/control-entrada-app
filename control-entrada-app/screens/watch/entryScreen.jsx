@@ -109,37 +109,56 @@ const EntryScreen = ({ navigation, profile, saveVisit }) => {
     }
     const token = await storage.getItem("userToken");
     //CREAR VISITA DE USUARIO YA REGISTRADO
-    if (changeImg) {
-      shortVisitData.destinyId = destinyId;
-      shortVisitData.userZoneId = userZoneId;
-      //console.log(shortVisitData);
-      const res = await helpers.createVisit(shortVisitData, token);
-      console.log("RES FROM CREATE VISIT SHORT--", res.data);
-      if (!res.data.error) {
-        setLoading(false);
-        saveVisit(res.data.data);
-        setStatusModalProps((values) => ({
-          ...values,
-          visible: true,
-          status: true,
-          message: res.data.msg,
-        }));
-      } else {
-        setLoading(false);
-        setStatusModalProps((values) => ({
-          ...values,
-          visible: true,
-          status: false,
-          message: res.data.msg,
-        }));
-      }
-    } else {
+    // if (changeImg) {
+    //   shortVisitData.destinyId = destinyId;
+    //   shortVisitData.userZoneId = userZoneId;
+    //   //console.log(shortVisitData);
+    //   const res = await helpers.createVisit(shortVisitData, token);
+    //   console.log("RES FROM CREATE VISIT SHORT--", res.data);
+    //   if (!res.data.error) {
+    //     setLoading(false);
+    //     saveVisit(res.data.data);
+    //     setStatusModalProps((values) => ({
+    //       ...values,
+    //       visible: true,
+    //       status: true,
+    //       message: res.data.msg,
+    //     }));
+    //   } else {
+    //     setLoading(false);
+    //     setStatusModalProps((values) => ({
+    //       ...values,
+    //       visible: true,
+    //       status: false,
+    //       message: res.data.msg,
+    //     }));
+    //   }
+    //} else {
       //CREAR VISITA DE USUARIO NUEVO CON TODOS LOS DATOS
       visitData.destinyId = destinyId;
       visitData.userZoneId = userZoneId;
       const res = await helpers.createCitizen(visitData, token);
       console.log(res.data)
-      if (res.data.msg === "Usuario ya registrado") {
+      if (!res.data.error) {
+        setLoading(false);
+        setStatusModalProps((values) => ({
+          ...values,
+          visible: true,
+          status: true,
+          message: res.data.msg,
+        }));
+        // let citizen = res.data.data;
+        // setVisitData((values) => ({
+        //   ...values,
+        //   name: citizen.name,
+        //   lastName: citizen.lastName,
+        //   profileUri: citizen.picture,
+        // }));
+        // setShortVisitData((values) => ({ ...values, citizenId: citizen.id }));
+        // setChangeImg(true);
+        // setEditable(false);
+        // return;
+      }else{
         setLoading(false);
         setStatusModalProps((values) => ({
           ...values,
@@ -147,28 +166,18 @@ const EntryScreen = ({ navigation, profile, saveVisit }) => {
           status: false,
           message: res.data.msg,
         }));
-        let citizen = res.data.data;
-        setVisitData((values) => ({
-          ...values,
-          name: citizen.name,
-          lastName: citizen.lastName,
-          profileUri: citizen.picture,
-        }));
-        setShortVisitData((values) => ({ ...values, citizenId: citizen.id }));
-        setChangeImg(true);
-        setEditable(false);
-        return;
-      } else if (!res.data.error) {
-        setLoading(false);
-        saveVisit(res.data.data);
-        setStatusModalProps((values) => ({
-          ...values,
-          visible: true,
-          status: true,
-          message: res.data.msg,
-        }));
-      }
-    }
+      } 
+      // else if (!res.data.error) {
+      //   setLoading(false);
+      //   saveVisit(res.data.data);
+      //   setStatusModalProps((values) => ({
+      //     ...values,
+      //     visible: true,
+      //     status: true,
+      //     message: res.data.msg,
+      //   }));
+      // }
+    //}
   };
   //CHECK DNI
   const checkDni = async () => {

@@ -2,12 +2,13 @@ import React, { useState } from "react";
 import { View, StyleSheet } from "react-native";
 import { FormContainer } from "./formContainer";
 import { MainButton } from "./mainButton.component";
-import { routes } from '../assets/routes'
-import { storage } from '../helpers/asyncStorage'
-import { useDispatch } from 'react-redux'
+import { routes } from "../assets/routes";
+import { storage } from "../helpers/asyncStorage";
+import { helpers } from "../helpers";
+import { useDispatch } from "react-redux";
 import Modal from "react-native-modal";
 
-export const LogOutModal = ({ status, navigation, onClose }) => {
+export const LogOutModal = ({ status, navigation, onClose, userId }) => {
   const dispatch = useDispatch();
   const logOut = () => {
     return new Promise((resolve, reject) => {
@@ -15,14 +16,24 @@ export const LogOutModal = ({ status, navigation, onClose }) => {
     });
   };
   const deleteToken = async () => {
-   
     logOut()
-      .then(() => storage.removeItem("userToken"))
-      .then(() => navigation.navigate(routes.MAIN));
-      onClose()
+    .then(() => storage.removeItem("userToken"))
+    .then(() => navigation.navigate(routes.MAIN));
+  onClose();
+    // try {
+    //   const res = await helpers.logOut(userId);
+    //   if (res) {
+    //     logOut()
+    //       .then(() => storage.removeItem("userToken"))
+    //       .then(() => navigation.navigate(routes.MAIN));
+    //     onClose();
+    //   }
+    // } catch (error) {
+    //   console.log(error.message)
+    // }
+    
   };
 
-  
   return (
     <Modal
       isVisible={status}
@@ -49,11 +60,7 @@ export const LogOutModal = ({ status, navigation, onClose }) => {
             outline
             onPress={onClose}
           />
-          <MainButton
-            style={styles.button}
-            title="Si"
-            onPress={deleteToken}
-          />
+          <MainButton style={styles.button} title="Si" onPress={deleteToken} />
         </View>
       </FormContainer>
     </Modal>

@@ -18,6 +18,7 @@
     },
     "android": {
       "package": "com.yourcompany.controlsecurity",
+      "useNextNotificationsApi": true,
       "versionCode": 1
     },
     "updates": {
