@@ -10,12 +10,14 @@ import {
   FlatList,
 } from "react-native";
 import Avatar from "../../components/avatar.component";
+import { MainButton } from "../../components/mainButton.component";
 import { TopNavigation } from "../../components/TopNavigation.component";
 import { Header } from "../../components/header.component";
 import { routes } from "../../assets/routes";
 import { BackAction } from "../../helpers/ui/ui";
 import { helpers } from "../../helpers/";
 import { API_PORT } from "../../config";
+import { NotificationCard } from '../../components/notificationCard'
 import moment from "moment";
 
 import { connect } from "react-redux";
@@ -25,6 +27,7 @@ const NotificationScreen = ({
   login,
   saveNotification,
   notifications,
+  notificationNotRead,
   updateReadNotification,
   revertReadUpdate,
 }) => {
@@ -51,8 +54,8 @@ const NotificationScreen = ({
   //ONPRESSHANDLRES
   const onPressHandler = (notification) => {
     const { id: notificationId, notificationType, targetId } = notification;
-    let route, params;
-    console.log("TARGET ID-- ONPRESS NOTI SCREEN--",targetId);
+    let route
+    console.log("TARGET ID-- ONPRESS NOTI SCREEN--", targetId);
 
     switch (notificationType) {
       case "ENTRY":
@@ -72,28 +75,68 @@ const NotificationScreen = ({
       default:
         break;
     }
-    navigation.navigate(route, {id: targetId})
-    // changeRead(notificationId, notification);
-    // .then(() => navigation.navigate(route, targetId));
+    //navigation.navigate(route, { id: targetId });
+    navigation.navigate(route, { id: targetId });
+    changeRead(notificationId, notification);
   };
   //CHANGE READ STATUS
   const changeRead = async (notificationId, notification) => {
+    if(notification.read === true){
+      return
+    }else{
+      //<--- introducimos el obj notification en un array para redux
     const prueba = [];
     prueba.push(notification);
     updateReadNotification(prueba);
+    //----->
     try {
       const res = await helpers.changeReadStatus(notificationId);
       if (!res.data.error) {
         alert("exito!");
-        // updateReadNotification(res.data.data);
+        
       }
       if (res.data.error) {
+        alert("Oh no! algo salio mal :(");
         revertReadUpdate(prueba);
       }
     } catch (error) {
       alert("Ocurrio un Error!");
       revertReadUpdate(prueba);
       console.log(error.message);
+    }
+    }
+  };
+
+  const changeReadAll = async (notificationArray) => {
+    if (notifications.length <= 0) {
+      return;
+    } else if(notificationNotRead.length === 0){
+      return
+    }else{
+      //<---- redux recive un array con el obj notificationes ---->
+      updateReadNotification(notificationArray);
+      //<---- extraemos los id de las notificaciones para mandarlos al endpoint
+      let idArray = [];
+      notificationArray.map(({ id }) => idArray.push(id));
+      //----->
+      try {
+        const res = await helpers.changeReadStatus(idArray);
+        if (!res.data.error) {
+          alert("exito!");
+        }
+        if (res.data.error) {
+          //<--- en caso de error revertimos el optimist update --->
+          alert("Oh no! algo salio mal :(");
+          console.log(res.data);
+          revertReadUpdate(notificationArray);
+
+        }
+      } catch (error) {
+        //<--- en caso de error revertimos el optimist update --->
+        alert("Ocurrio un Error!");
+        revertReadUpdate(notificationArray);
+        console.log(error.message);
+      }
     }
   };
 
@@ -118,49 +161,7 @@ const NotificationScreen = ({
   //       requestNotification()
   //   }, [])
 
-  const renderItem = ({ item }) => {
-    console.log(item)
-    return (
-      <TouchableOpacity
-        style={[
-          styles.notificationBox,
-          { 
-            backgroundColor: item.read === true ? "#fff" : "#09f",
-            flexDirection: 'row',
-            alignItems: 'center'
-        },
-        ]}
-        onPress={() => onPressHandler(item)}
-        // onPress={
-        //     selectItem.length > 0
-        //       ? () => onLong(item.id)
-        //       : () =>
-        //           alert("falta accion")
-        //   }
-        onLongPress={() => onLong(item.id)}
-        delayLongPress={200}
-      >
-        <View style={{
-          backgroundColor: 'red',
-          flex: 1
-        }}>
-
-        <Avatar.Picture
-          size={60}
-          uri={`${API_PORT()}/public/imgs/${item.nuevaKey.picture}`}
-          />
-          </View>
-      <View style={{
-        backgroundColor: 'yellow',
-        flex: 3
-      }}>
-
-        <Text>{item.notification}</Text>
-        <Text>{moment(item.createdAt).fromNow()}</Text>
-      </View>
-      </TouchableOpacity>
-    );
-  };
+  
 
   const refresh = async () => {
     setRefreshing(true);
@@ -189,38 +190,22 @@ const NotificationScreen = ({
           leftControl={BackAction(navigation, routes.ADMIN_HOME)}
         />
       )}
-      <TouchableOpacity>
-        <Text>Marcar todas como leidas</Text>
-      </TouchableOpacity>
+      <MainButton
+        onPress={() => changeReadAll(notifications)}
+        title="Marcar todo como leído"
+        outline
+        style={{marginVertical:5}}
+      />
+
       {notifications.length > 0 ? (
         <FlatList
           data={notifications}
-          renderItem={renderItem}
+          renderItem={({item}) => <NotificationCard onPress={onPressHandler} item={item}/>}
           keyExtractor={({ id }) => id}
           onRefresh={refresh}
           refreshing={refreshing}
         />
       ) : (
-        // notifications.map((elem) => (
-        // <TouchableOpacity
-        //   style={[styles.notificationBox, { backgroundColor: elem.read === true ? "#fff" : "#09f" }]}
-        //   key={elem.id}
-        //   onPress={() => onPressHandler(elem)}
-        //   // onPress={
-        //   //     selectItem.length > 0
-        //   //       ? () => onLong(elem.id)
-        //   //       : () =>
-        //   //           alert("falta accion")
-        //   //   }
-        //   onLongPress={() => onLong(elem.id)}
-        //   delayLongPress={200}
-        // >
-        //   <Avatar.Picture size={60} uri={`${API_PORT()}/public/imgs/${elem.nuevaKey.picture}`} />
-
-        //   <Text>{elem.notification}</Text>
-        //   <Text>{moment(elem.createdAt).fromNow()}</Text>
-        // </TouchableOpacity>
-
         <View
           style={{ justifyContent: "center", alignItems: "center", flex: 1 }}
         >
@@ -233,6 +218,7 @@ const NotificationScreen = ({
 
 const mapStateToProps = (state) => ({
   notifications: state.profile.notification,
+  notificationNotRead: state.profile.notificationNotRead,
   login: state.profile.login,
 });
 
@@ -262,17 +248,5 @@ export default connect(mapStateToProps, mapDispatchToProps)(NotificationScreen);
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  notificationBox: {
-    borderBottomWidth: 0.5,
-    borderColor: "grey",
-    paddingVertical: 5,
-  },
-  notificationTitle: {
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  notificationSub: {
-    fontSize: 16,
-  },
+  }
 });

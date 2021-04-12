@@ -49,9 +49,13 @@ export const Notifications = (navigation) => {
         }}
       >
         <Ionicons name="md-notifications" size={28} color="white" />
-        <View style={styles.numberContainer}>
-          <Text style={styles.number}>{notificationNotRead !== undefined ? notificationNotRead.length : null}</Text>
-        </View>
+       {
+         notificationNotRead !== 'undefined' && notificationNotRead.length >= 1 ?
+         <View style={styles.numberContainer}>
+         <Text style={styles.number}>{notificationNotRead !== undefined ? notificationNotRead.length : null}</Text>
+       </View>
+       : null
+       }
       </TouchableOpacity>
     </View>
   );

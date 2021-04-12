@@ -43,23 +43,19 @@ const companySelect = (state) => {
 
 //UPDATE NOTIFICATION
 const updateNoti = (newNoti, state, revert = false) => {
-  console.log("STATE.NOTIFICATION--", state.notification);
-
+  //   console.log("STATE.NOTIFICATION--", state.notification);
+  // console.log("REVER VALUE--",revert)
+  // console.log("PAYLOAD--",newNoti)
   const prueba = state.notification.map((elem) => {
     newNoti.map(({ id }) => {
       if (elem.id === id) {
-        elem.read = revert ? false : true;
+        elem.read = revert === true ? false : true;
       }
     });
     return elem;
   });
 
-  // let prueba = [];
-  // //console.log("state noti--", state.notification);
-  // prueba = state.notification.map(
-  //   (obj) => newNoti.find((o) => o.id === obj.id) || obj
-  // );
-  console.log("PRUEBA--", prueba);
+  //console.log("PRUEBA--", prueba);
   return prueba;
 };
 
@@ -119,24 +115,28 @@ export default (state = initialState, action = {}) => {
         notificationNotRead: action.payload,
       };
     case "UPDATE_READ":
-      console.log("PAYLOAD NOTI-", action.payload);
+      //console.log("PAYLOAD NOTI-", action.payload);
 
       let notReadFilter = state.notificationNotRead.filter(({ id }) =>
         action.payload.find((elem) => elem.id !== id)
       );
+      console.log("NOTREADFILTER ARRAY--",notReadFilter)
 
       return {
         ...state,
-        notificationNotRead: notReadFilter,
+        notificationNotRead: action.payload.length > 1 ? [] : notReadFilter,
         notification: updateNoti(action.payload, state),
         // notificationRead: state.notificationRead.concat(action.payload)
       };
-      case "REVERT_READ":
-        return {
-          ...state,
-        notificationNotRead: notReadFilter,
+    case "REVERT_READ":
+      return {
+        ...state,
+        notificationNotRead:
+          action.payload.length > 1
+            ? action.payload
+            : state.notificationNotRead.concat(action.payload),
         notification: updateNoti(action.payload, state, true),
-        }
+      };
     case "TUTORIAL":
       return {
         ...state,

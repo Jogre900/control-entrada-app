@@ -216,15 +216,17 @@ const notification = {
       data: null,
       tokn: null
     };
+    console.log("PARAMS CHANGE READ CONTROLE--",req.params)
     const { id } = req.params;
     let arrayIds = [];
     if (id.length > 36) {
       arrayIds = id.split(",");
     }
+    console.log("ARRAY ID FROM SPLIT CONTROLLER--", arrayIds)
     try {
       const noti = await models.Notification.findAll({
         where: {
-          id: arrayIds.length ? arrayIds.length : id
+          id: arrayIds.length > 0 ? arrayIds : id
         },
         include: {
           model: models.User,
