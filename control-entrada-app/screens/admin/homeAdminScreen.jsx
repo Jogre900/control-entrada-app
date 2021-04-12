@@ -199,7 +199,7 @@ const HomeAdminScreen = ({
     }
     Vibration.vibrate(100), setSeletedItem(selectItem.concat(id));
   };
-
+  
   const clearList = () => setSeletedItem([]);
 
   const selectAll = () => {
