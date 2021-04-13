@@ -27,6 +27,7 @@ const Input = (props, ref) => {
     secureTextEntry,
     autoCorrect,
     onSubmitEditing,
+    onEndEditing,
     caption,
     editable,
     onChange
@@ -110,6 +111,7 @@ const Input = (props, ref) => {
             editable={editable}
             value={value}
             onSubmitEditing={onSubmitEditing}
+            onEndEditing={onEndEditing}
             ref={refInput}
           />
         </View>
