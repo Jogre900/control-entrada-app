@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { FormContainer } from "../formContainer";
-import { MainColor, Success } from "../../assets/colors";
+import { MainColor, Success, Danger } from "../../assets/colors";
 import Avatar from "../avatar.component";
 import Input from "../input.component";
 import { CameraModal } from "../cameraModal";
@@ -39,8 +39,12 @@ export const AdminForm = ({ handleChange, value, caption }) => {
   return (
     <>
       <FormContainer title="Datos Personales">
+      <View>
+            <Text style={styles.captionText}>{caption.profilePic}</Text>
+          </View>
         <View style={styles.pictureContainer}>
-          {value.uri ? (
+          
+          {value && value.uri ? (
             <Avatar.Picture size={120} uri={value.uri} />
           ) : (
             <Avatar.Icon size={32} name="md-photos" color="#8e8e8e" />
@@ -60,7 +64,7 @@ export const AdminForm = ({ handleChange, value, caption }) => {
           onChangeText={(name) => handleChange("name", name)}
           value={value.name}
           {...inputProps}
-          // caption={caption.name}
+          caption={caption.name}
         />
         <Input
           title="Apellido"
@@ -68,14 +72,14 @@ export const AdminForm = ({ handleChange, value, caption }) => {
           onChangeText={(lastName) => handleChange("lastName", lastName)}
           value={value.lastName}
           {...inputProps}
-          // caption={caption.lastName}
+          caption={caption.lastName}
         />
         <Input
-          title="DNI"
+          title="DNI (ejemplo: J-123456)"
           icon="ios-card"
           onChangeText={(dni) => handleChange("dni", dni)}
           value={value.dni}
-          // caption={caption.dni}
+          caption={caption.dni}
           {...inputProps}
         />
         <Input
@@ -83,7 +87,7 @@ export const AdminForm = ({ handleChange, value, caption }) => {
           icon="ios-mail"
           onChangeText={(email) => handleChange("email", email)}
           value={value.email}
-          // caption={caption.email}
+          caption={caption.email}
           {...inputProps}
         />
         <Input
@@ -91,22 +95,19 @@ export const AdminForm = ({ handleChange, value, caption }) => {
           title="Contraseña"
           onChangeText={(password) => handleChange("password", password)}
           value={value.password}
-          // caption={caption.password}
+          caption={caption.password}
           secureTextEntry
           {...inputProps}
         />
         <Input
           //style={{ borderColor: passEqual && Success }}
           title="Repetir Contraseña"
-          onChangeText={(repPass) => handleChange("repPass", repPass)}
-          value={value.repPass}
-          // caption={caption.repPass}
+          onChangeText={(repeatPass) => handleChange("repeatPass", repeatPass)}
+          value={value.repeatPass}
+          caption={caption.repeatPass}
           secureTextEntry
           {...inputProps}
         />
-        <View>
-          <Text style={styles.caption}>{caption}</Text>
-        </View>
       </FormContainer>
       <FormContainer title="Datos de la empresa">
         <Input
@@ -116,7 +117,7 @@ export const AdminForm = ({ handleChange, value, caption }) => {
             handleChange("companyName", companyName)
           }
           {...inputProps}
-          //caption={registerCaption.companyName}
+          caption={caption.companyName}
         />
         <Input
           title="Razon social"
@@ -125,14 +126,14 @@ export const AdminForm = ({ handleChange, value, caption }) => {
             handleChange("businessName", businessName)
           }
           {...inputProps}
-          //   caption={registerCaption.businessName}
+          caption={caption.businessName}
         />
         <Input
           title="nic"
           icon="ios-card"
           onChangeText={(nic) => handleChange("nic", nic)}
           {...inputProps}
-          //   caption={registerCaption.nic}
+          caption={caption.nic}
         />
         <Input
           title="Direccion (Opcional)"
@@ -155,7 +156,7 @@ export const AdminForm = ({ handleChange, value, caption }) => {
             handleChange("phoneNumber", phoneNumber)
           }
           {...inputProps}
-          //   caption={registerCaption.phoneNumber}
+          caption={caption.phoneNumber}
         />
         <Input
           title="Telefono adicional (Opcional)"
@@ -237,11 +238,10 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#8e8e8e'
   },
-  caption: {
-    fontSize: 16,
-    fontWeight: "500",
-    color: "red",
-    letterSpacing: 0.5,
-    marginLeft: 5,
+  captionText: {
+    color: Danger,
+    //alignSelf: "center",
+    fontSize: 14,
+    fontWeight: '600'
   },
 });

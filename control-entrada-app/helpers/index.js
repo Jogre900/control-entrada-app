@@ -128,7 +128,7 @@ export async function recoverPass(email, data) {
   }
 }
 //CREATE COMPANY AND ADMIN
-export async function createCompany(adminData, companyData) {
+export async function createCompany(adminData) {
   const {
     name,
     lastName,
@@ -138,8 +138,6 @@ export async function createCompany(adminData, companyData) {
     uri,
     fileName,
     fileType,
-  } = adminData;
-  const {
     uriLogo,
     fileNameLogo,
     fileTypeLogo,
@@ -150,7 +148,7 @@ export async function createCompany(adminData, companyData) {
     city,
     phoneNumber,
     phoneNumberOther,
-  } = companyData;
+  } = adminData;
 
   let data = new FormData();
   data.append("name", name);
@@ -181,16 +179,13 @@ export async function createCompany(adminData, companyData) {
     });
   }
 
-  try {
+  
     const res = await axios.post(`${API_PORT()}/api/company`, data, {
       headers: {
         "content-type": "multipart/form-data",
       },
     });
     return res;
-  } catch (error) {
-    return error.message;
-  }
 }
 
 
