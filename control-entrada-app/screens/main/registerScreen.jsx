@@ -12,10 +12,9 @@ import { TopNavigation } from "../../components/TopNavigation.component";
 import { MainButton } from "../../components/mainButton.component";
 import { MainColor } from "../../assets/colors";
 import * as ImagePicker from "expo-image-picker";
-// import * as ImagePicker from 'react-native-image-picker'
 import { Ionicons } from "@expo/vector-icons";
 import { storage } from "../../helpers/asyncStorage";
-import { createCompany, login } from "../../helpers";
+import { createCompany, helpers } from "../../helpers";
 import { StatusModal } from "../../components/statusModal";
 import { LoadingModal } from "../../components/loadingModal";
 import { AdminForm } from '../../components/forms/adminForm'
@@ -43,19 +42,6 @@ let statusModalValues = {
 let loadingModalValues = {
   visible: false,
   message: null,
-};
-
-let captionInitialValues = {
-  name: null,
-  lastName: null,
-  email: null,
-  dni: null,
-  password: null,
-  repPass: null,
-  companyName: null,
-  businessName: null,
-  nic: null,
-  phoneNumber: null,
 };
 
 const RegisterScreen = ({
@@ -90,49 +76,10 @@ const RegisterScreen = ({
   //   }));
   // };
 
-const adminHandleChange = (name, value) => {
-    setAdminData(values => ({...values, [name]: value}))
+const handleChange = (name, value) => {
+  setAdminData(values => ({...values, [name]: value}))
 }
 
-const companyHandleChange = (name, value) => {
-  setCompanyData(values => ({...values, [name]: value}))
-}
-  const validateForm = (data) => {
-    const nameError = validateName(data.name);
-    const lastNameError = validateLastName(data.lastName);
-    const emailError = validateEmail(data.email);
-    const dniError = validateDni(data.dni);
-    const passError = validatePass(data.password);
-    const repPassError = validateRepPass(data.repPass);
-    const companyError = validateCompany(data.companyName);
-    const businessError = validateBusiness(data.businessName);
-    const phoneError = validatePhone(data.phoneNumber);
-    if (
-      nameError ||
-      lastNameError ||
-      emailError ||
-      dniError ||
-      passError ||
-      repPassError ||
-      companyError ||
-      businessError ||
-      phoneError
-    ) {
-      setRegisterCaption((values) => ({
-        ...values,
-        name: nameError,
-        lastName: lastNameError,
-        email: emailError,
-        password: passError,
-        repPass: repPassError,
-        dni: dniError,
-        companyName: companyError,
-        businessName: businessError,
-        phoneError: phoneError,
-      }));
-      return true;
-    }
-  };
 
   //CREATE USER
   const createAdmin = async () => {
@@ -153,7 +100,7 @@ const companyHandleChange = (name, value) => {
       }));
       //console.log(dataComp.email, dataComp.repPass)
       setLoadingModal({ visible: true, message: "Iniciando Sesión..." });
-      const resLogin = await login(adminData.email, adminData.repPass);
+      const resLogin = await helpers.login(adminData.email, adminData.repPass);
 
       
       if (!resLogin.data.error) {
@@ -251,14 +198,14 @@ const companyHandleChange = (name, value) => {
       <ScrollView>
         <View style={{ alignItems: "center" }}>
           <AdminForm
-            handleChange={adminHandleChange}
+            handleChange={handleChange}
             value={adminData}
             //caption={registerCaption}
           />
-          <CompanyForm
+          {/* <CompanyForm
             handleChange={companyHandleChange}
             value={companyData}
-          />
+          /> */}
           <View
             style={{ width: "90%", flexDirection: "row", alignItems: "center" }}
           >

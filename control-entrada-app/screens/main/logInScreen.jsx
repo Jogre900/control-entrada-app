@@ -17,7 +17,6 @@ import { validateEmail, validatePass } from '../../helpers/forms'
 import { storage } from "../../helpers/asyncStorage";
 import { routes } from '../../assets/routes'
 import { BackAction } from '../../helpers/ui/ui'
-import { database } from "firebase";
 
 let passModalValues = {
   visible: false,
