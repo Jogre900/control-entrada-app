@@ -19,6 +19,7 @@ import Avatar from "../../components/avatar.component";
 import { CameraModal } from "../../components/cameraModal";
 import { MessageModal } from "../../components/messageModal";
 import { createSupervisor, createWatchman } from "../../helpers";
+import { validateName, validateLastName, validateEmail, validateDni } from '../../helpers/forms'
 import { routes } from "../../assets/routes";
 import { BackAction } from "../../helpers/ui/ui";
 import { connect } from "react-redux";
@@ -43,21 +44,25 @@ const CreateEmployeScreen = ({ navigation, zonesRedux, companyRedux, addEmployee
     password: "",
     assignationDate: new Date(),
     changeTurnDate: new Date(),
-    uri: null,
-    fileName: null,
-    fileType: null,
-    //zoneId: zonesRedux.length ? zonesRedux[0].id : null,
+    uri: "",
+    fileName: "",
+    fileType: "",
     companyId: companyRedux[0].id,
   };
   const zones = zonesRedux;
-  console.log("zones from redux--", zonesRedux);
+  
   const [alertModal, setAlertModal] = useState(alertModalValues);
   const [statusModalProps, setStatusModalProps] = useState(statusModalValues);
   const [employeeData, setEmployeeData] = useState(employeeValues);
   const [privilege, setPrivilege] = useState("Supervisor");
   const [zoneId, setZoneId] = useState(zonesRedux.length && zones[0].id);
 
-  const [caption, setCaption] = useState("");
+  const [caption, setCaption] = useState({
+    name: "",
+    lastName: "",
+    dni: "",
+    email: ""
+  });
   const [timeCaption, setTimeCaption] = useState("");
   const [imageCaption, setImageCaption] = useState("");
   const [entryHolder, setEntryHolder] = useState(false);
@@ -108,49 +113,26 @@ const CreateEmployeScreen = ({ navigation, zonesRedux, companyRedux, addEmployee
     //imageCaption = caption,
   };
 
+  const handlerChange = (name, value) => {
+    setEmployeeData(values => ({...values, [name]: value}))
+  }
+
   //CREATE EMPLOYEE
   const createEmploye = async () => {
-    console.log(employeeData);
-    setVisible(true);
-    // if (
-    //   employeeData.name.length === 0 ||
-    //   employeeData.lastName.length === 0 ||
-    //   employeeData.dni.length === 0 ||
-    //   employeeData.email.length === 0
-    // ) {
-    //   setCaption("Debe llenar todos los campos");
-    //   setVisible(false);
-    //   return;
-    // }
-    // if (employeeData.uri.length === 0) {
-    //   setImageCaption("Debe agregar una foto");
-    //   setVisible(false);
-    //   return;
-    // }
-    // if (!entryHolder || !departureHolder) {
-    //   setTimeCaption("Debe seleccionar ambas horas.");
-    //   setVisible(false);
-    //   return;
-    // }
-    // if (
-    //   moment(employeeData.assignationDate).format("D MMM YYYY") >
-    //   moment(employeeData.changeTurnDate).format("D MMM YYYY")
-    // ) {
-    //   setTimeCaption(
-    //     "La fecha de inicio no puede ser mayor que la de culminacion"
-    //   );
-    //   setVisible(false);
-    //   return;
-    // }
+    
+    let validate = {
+      name: validateName(employeeData.name),
+      lastName : validateLastName(employeeData.lastName),
+      dni: validateDni(employeeData.dni),
+      email: validateEmail(employeeData.email)
+    }
+    setCaption(validate)
+    if(caption.name || caption.lastName || caption.dni || caption.email){
+      return
+    }
 
-    // if (
-    //   moment(employeeData.assignationDate).format("D MMM YYYY") ===
-    //   moment(employeeData.changeTurnDate).format("D MMM YYYY")
-    // ) {
-    //   setTimeCaption("La fecha de inicio y culminacion deben ser distintas");
-    //   setVisible(false);
-    //   return;
-    // }
+    setVisible(true);
+    
     console.log("zoneId on CREATE SCREEN--", zones[0].id);
 
     employeeData.privilege = privilege;
@@ -292,8 +274,9 @@ const CreateEmployeScreen = ({ navigation, zonesRedux, companyRedux, addEmployee
               returnKeyType="next"
               shape="flat"
               onChangeText={(name) => {
-                setEmployeeData((values) => ({ ...values, name })), setCaption("");
+                handlerChange("name", name);
               }}
+              caption={caption.name}
             />
             <Input
               style={{ borderColor: "black", marginBottom: 10 }}
@@ -303,8 +286,9 @@ const CreateEmployeScreen = ({ navigation, zonesRedux, companyRedux, addEmployee
               shape="flat"
               returnKeyType="next"
               onChangeText={(lastName) => {
-                setEmployeeData((values) => ({ ...values, lastName })), setCaption("");
+                handlerChange("lastName", lastName);
               }}
+              caption={caption.lastName}
             />
             <Input
               style={{ borderColor: "black", marginBottom: 10 }}
@@ -314,8 +298,9 @@ const CreateEmployeScreen = ({ navigation, zonesRedux, companyRedux, addEmployee
               shape="flat"
               returnKeyType="next"
               onChangeText={(dni) => {
-                setEmployeeData((values) => ({ ...values, dni })), setCaption("");
+                handlerChange("dni", dni)
               }}
+              caption={caption.dni}
             />
             <Input
               style={{ borderColor: "black", marginBottom: 10 }}
@@ -325,20 +310,10 @@ const CreateEmployeScreen = ({ navigation, zonesRedux, companyRedux, addEmployee
               shape="flat"
               returnKeyType="next"
               onChangeText={(email) => {
-                setEmployeeData((values) => ({ ...values, email })), setCaption("");
+                handlerChange("email", email)
               }}
+              caption={caption.email}
             />
-            <View>
-              <Text
-                style={{
-                  color: Danger,
-                  fontSize: 15,
-                  fontWeight: "600",
-                }}
-              >
-                {caption}
-              </Text>
-            </View>
           </FormContainer>
 
           {/* ----ROLL---- */}
