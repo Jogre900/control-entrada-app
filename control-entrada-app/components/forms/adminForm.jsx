@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { FormContainer } from "../formContainer";
@@ -13,7 +13,7 @@ const inputProps = {
 };
 
 export const AdminForm = ({ handleChange, value, caption }) => {
-  
+  const [passEqual, setPassEqual] = useState(false);
   const [camera, setCamera] = useState({
     visible: false,
     type: "",
@@ -36,6 +36,14 @@ export const AdminForm = ({ handleChange, value, caption }) => {
     handleChange("fileNameLogo", fileName);
     handleChange("fileTypeLogo", fileType);
   };
+
+  useEffect(() => {
+    if (value.password.length && value.repeatPass.length) {
+      if (value.password === value.repeatPass) {
+        setPassEqual(true);
+      } else setPassEqual(false);
+    }else setPassEqual(false);
+  }, [value.password, value.repeatPass]);
   return (
     <>
       <FormContainer title="Datos Personales">
@@ -91,7 +99,7 @@ export const AdminForm = ({ handleChange, value, caption }) => {
           {...inputProps}
         />
         <Input
-          //style={{ borderColor: passEqual && Success }}
+          style={{borderColor: passEqual ? Success : '#8e8e8e'}}
           title="Contraseña"
           onChangeText={(password) => handleChange("password", password)}
           value={value.password}
@@ -100,7 +108,7 @@ export const AdminForm = ({ handleChange, value, caption }) => {
           {...inputProps}
         />
         <Input
-          //style={{ borderColor: passEqual && Success }}
+          style={{borderColor: passEqual ? Success : '#8e8e8e'}}
           title="Repetir Contraseña"
           onChangeText={(repeatPass) => handleChange("repeatPass", repeatPass)}
           value={value.repeatPass}

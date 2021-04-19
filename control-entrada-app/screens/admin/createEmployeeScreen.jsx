@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, ScrollView, BackHandler, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  BackHandler,
+  TouchableOpacity,
+} from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 
 import { MainColor, ThirdColor, Danger } from "../../assets/colors.js";
@@ -19,7 +26,12 @@ import Avatar from "../../components/avatar.component";
 import { CameraModal } from "../../components/cameraModal";
 import { MessageModal } from "../../components/messageModal";
 import { createSupervisor, createWatchman } from "../../helpers";
-import { validateName, validateLastName, validateEmail, validateDni } from '../../helpers/forms'
+import {
+  validateName,
+  validateLastName,
+  validateEmail,
+  validateDni,
+} from "../../helpers/forms";
 import { routes } from "../../assets/routes";
 import { BackAction } from "../../helpers/ui/ui";
 import { connect } from "react-redux";
@@ -35,7 +47,12 @@ let statusModalValues = {
   status: null,
 };
 
-const CreateEmployeScreen = ({ navigation, zonesRedux, companyRedux, addEmployee }) => {
+const CreateEmployeScreen = ({
+  navigation,
+  zonesRedux,
+  companyRedux,
+  addEmployee,
+}) => {
   let employeeValues = {
     name: "",
     lastName: "",
@@ -50,7 +67,7 @@ const CreateEmployeScreen = ({ navigation, zonesRedux, companyRedux, addEmployee
     companyId: companyRedux[0].id,
   };
   const zones = zonesRedux;
-  
+
   const [alertModal, setAlertModal] = useState(alertModalValues);
   const [statusModalProps, setStatusModalProps] = useState(statusModalValues);
   const [employeeData, setEmployeeData] = useState(employeeValues);
@@ -61,7 +78,7 @@ const CreateEmployeScreen = ({ navigation, zonesRedux, companyRedux, addEmployee
     name: "",
     lastName: "",
     dni: "",
-    email: ""
+    email: "",
   });
   const [timeCaption, setTimeCaption] = useState("");
   const [imageCaption, setImageCaption] = useState("");
@@ -114,91 +131,90 @@ const CreateEmployeScreen = ({ navigation, zonesRedux, companyRedux, addEmployee
   };
 
   const handlerChange = (name, value) => {
-    setEmployeeData(values => ({...values, [name]: value}))
-  }
+    setEmployeeData((values) => ({ ...values, [name]: value }));
+  };
 
   //CREATE EMPLOYEE
   const createEmploye = async () => {
-    
     let validate = {
       name: validateName(employeeData.name),
-      lastName : validateLastName(employeeData.lastName),
+      lastName: validateLastName(employeeData.lastName),
       dni: validateDni(employeeData.dni),
-      email: validateEmail(employeeData.email)
-    }
-    setCaption(validate)
-    if(caption.name || caption.lastName || caption.dni || caption.email){
-      return
+      email: validateEmail(employeeData.email),
+      profilePic: employeeData.uri ? "" : "Debe agregar una foto de perfil.",
+    };
+    setCaption(validate);
+    if (caption.name || caption.lastName || caption.dni || caption.email) {
+      return;
     }
 
-    setVisible(true);
-    
     console.log("zoneId on CREATE SCREEN--", zones[0].id);
 
     employeeData.privilege = privilege;
     employeeData.zoneId = zoneId;
     console.log(employeeData);
-    try {
-      if (privilege === "Supervisor") {
-        const res = await createSupervisor(employeeData);
-        console.log("CREATE EMPLOYEE----", res.data);
-        if (!res.data.error) {
-          console.log(res.data.data);
-          addEmployee(res.data.data);
-          setVisible(false);
-          setStatusModalProps((values) => ({
-            ...values,
-            visible: true,
-            status: true,
-            message: res.data.msg,
-          }));
-          //setCreate(true);
-          //setSaving(false);
-        } else {
-          setVisible(false);
-          setStatusModalProps((values) => ({
-            ...values,
-            visible: true,
-            status: false,
-            message: res.data.msg,
-          }));
-        }
-      } else {
-        const res = await createWatchman(employeeData);
-        if (!res.data.error) {
-          console.log(res.data.data);
-          addEmployee(res.data.data);
+    // try {
+    //   setVisible(true);
+    //   if (privilege === "Supervisor") {
+    //     const res = await createSupervisor(employeeData);
+    //     console.log("CREATE EMPLOYEE----", res.data);
+    //     if (!res.data.error) {
+    //       console.log(res.data.data);
+    //       addEmployee(res.data.data);
+    //       setVisible(false);
+    //       setStatusModalProps((values) => ({
+    //         ...values,
+    //         visible: true,
+    //         status: true,
+    //         message: res.data.msg,
+    //       }));
+    //       //setCreate(true);
+    //       //setSaving(false);
+    //     } else {
+    //       setVisible(false);
+    //       setStatusModalProps((values) => ({
+    //         ...values,
+    //         visible: true,
+    //         status: false,
+    //         message: res.data.msg,
+    //       }));
+    //     }
+    //   } else {
+    //     const res = await createWatchman(employeeData);
+    //     if (!res.data.error) {
+    //       console.log(res.data.data);
+    //       addEmployee(res.data.data);
 
-          setVisible(false);
-          setStatusModalProps((values) => ({
-            ...values,
-            visible: true,
-            status: true,
-            message: res.data.msg,
-          }));
+    //       setVisible(false);
+    //       setStatusModalProps((values) => ({
+    //         ...values,
+    //         visible: true,
+    //         status: true,
+    //         message: res.data.msg,
+    //       }));
 
-          setEntryHolder(false);
-          setDepartureHolder(false);
-          //setSaving(false);
-        } else {
-          setVisible(false);
-          setStatusModalProps((values) => ({
-            ...values,
-            visible: true,
-            status: false,
-            message: res.data.msg,
-          }));
-        }
-      }
-    } catch (error) {
-      setVisible(false);
-      setStatusModalProps((values) => ({
-        ...values,
-        visible: true,
-        status: false,
-        message: error,
-      }));
-    }
+    //       setEntryHolder(false);
+    //       setDepartureHolder(false);
+    //       //setSaving(false);
+    //     } else {
+    //       setVisible(false);
+    //       setStatusModalProps((values) => ({
+    //         ...values,
+    //         visible: true,
+    //         status: false,
+    //         message: res.data.msg,
+    //       }));
+    //     }
+    //   }
+    // } catch (error) {
+    //   setVisible(false);
+    //   setStatusModalProps((values) => ({
+    //     ...values,
+    //     visible: true,
+    //     status: false,
+    //     message: error,
+    //   }));
+    // }
   };
 
   // useFocusEffect(
@@ -223,7 +239,8 @@ const CreateEmployeScreen = ({ navigation, zonesRedux, companyRedux, addEmployee
         setAlertModal((values) => ({
           ...values,
           visible: true,
-          message: "Parece que aun no tienes zonas creadas, para registrar personal crea al menos una.",
+          message:
+            "Parece que aun no tienes zonas creadas, para registrar personal crea al menos una.",
           route: routes.EMPLOYEE,
         }));
       }
@@ -247,7 +264,10 @@ const CreateEmployeScreen = ({ navigation, zonesRedux, companyRedux, addEmployee
 
   return (
     <View style={{ flex: 1 }}>
-      <TopNavigation title="Crear Empleado" leftControl={BackAction(navigation, routes.EMPLOYEE)} />
+      <TopNavigation
+        title="Crear Empleado"
+        leftControl={BackAction(navigation, routes.EMPLOYEE)}
+      />
       <ScrollView contentContainerStyle={styles.container}>
         <View
           style={{
@@ -255,8 +275,18 @@ const CreateEmployeScreen = ({ navigation, zonesRedux, companyRedux, addEmployee
           }}
         >
           <FormContainer title="Datos Personales">
+            {caption.profilePic !== "" && (
+              <View>
+                <Text style={styles.captionText}>{caption.profilePic}</Text>
+              </View>
+            )}
+
             <View style={styles.pictureContainer}>
-              {employeeData.uri ? <Avatar.Picture size={120} uri={employeeData.uri} /> : <Avatar.Icon size={32} name="md-photos" color="#8e8e8e" />}
+              {employeeData.uri ? (
+                <Avatar.Picture size={120} uri={employeeData.uri} />
+              ) : (
+                <Avatar.Icon size={32} name="md-photos" color="#8e8e8e" />
+              )}
               <TouchableOpacity
                 onPress={() => {
                   setCamera(true);
@@ -298,7 +328,7 @@ const CreateEmployeScreen = ({ navigation, zonesRedux, companyRedux, addEmployee
               shape="flat"
               returnKeyType="next"
               onChangeText={(dni) => {
-                handlerChange("dni", dni)
+                handlerChange("dni", dni);
               }}
               caption={caption.dni}
             />
@@ -310,7 +340,7 @@ const CreateEmployeScreen = ({ navigation, zonesRedux, companyRedux, addEmployee
               shape="flat"
               returnKeyType="next"
               onChangeText={(email) => {
-                handlerChange("email", email)
+                handlerChange("email", email);
               }}
               caption={caption.email}
             />
@@ -318,14 +348,30 @@ const CreateEmployeScreen = ({ navigation, zonesRedux, companyRedux, addEmployee
 
           {/* ----ROLL---- */}
           <FormContainer title="Tipo Usuario">
-            <Picker mode="dropdown" selectedValue={privilege} onValueChange={(value) => setPrivilege(value)}>
+            <Picker
+              mode="dropdown"
+              selectedValue={privilege}
+              onValueChange={(value) => setPrivilege(value)}
+            >
               <Picker.Item label={"Supervisor"} value={"Supervisor"} />
               <Picker.Item label={"Vigilante"} value={"Watchman"} />
             </Picker>
             <View>
               <Text>Zonas</Text>
-              <Picker mode="dropdown" selectedValue={zoneId} onValueChange={(value) => setZoneId(value)}>
-                {zonesRedux.length ? zonesRedux.map((item) => <Picker.Item label={item.zone} value={item.id} key={item.id} />) : null}
+              <Picker
+                mode="dropdown"
+                selectedValue={zoneId}
+                onValueChange={(value) => setZoneId(value)}
+              >
+                {zonesRedux.length
+                  ? zonesRedux.map((item) => (
+                      <Picker.Item
+                        label={item.zone}
+                        value={item.id}
+                        key={item.id}
+                      />
+                    ))
+                  : null}
               </Picker>
             </View>
           </FormContainer>
@@ -338,21 +384,52 @@ const CreateEmployeScreen = ({ navigation, zonesRedux, companyRedux, addEmployee
               }}
             >
               <View style={styles.pickerButtonContainer}>
-                <MainButton style={styles.pickerButton} title="Hora Entrada" onPress={() => showDatepicker()} />
-                <Text style={{ alignSelf: "center" }}>{entryHolder ? moment(employeeData.assignationDate).format("D MMM YYYY") : "----"}</Text>
+                <MainButton
+                  style={styles.pickerButton}
+                  title="Hora Entrada"
+                  onPress={() => showDatepicker()}
+                />
+                <Text style={{ alignSelf: "center" }}>
+                  {entryHolder
+                    ? moment(employeeData.assignationDate).format("D MMM YYYY")
+                    : "----"}
+                </Text>
               </View>
               <View style={styles.pickerButtonContainer}>
-                <MainButton style={styles.pickerButton} title="Hora Salida" onPress={() => showDatepicker2()} />
-                <Text style={{ alignSelf: "center" }}>{departureHolder ? moment(employeeData.changeTurnDate).format("D MMM YYYY") : "----"}</Text>
+                <MainButton
+                  style={styles.pickerButton}
+                  title="Hora Salida"
+                  onPress={() => showDatepicker2()}
+                />
+                <Text style={{ alignSelf: "center" }}>
+                  {departureHolder
+                    ? moment(employeeData.changeTurnDate).format("D MMM YYYY")
+                    : "----"}
+                </Text>
               </View>
             </View>
             {show && (
               <View>
-                <DateTimePicker testID="dateTimePicker1" value={employeeData.assignationDate} mode="time" is24Hour={true} display="default" onChange={onChange} />
+                <DateTimePicker
+                  testID="dateTimePicker1"
+                  value={employeeData.assignationDate}
+                  mode="time"
+                  is24Hour={true}
+                  display="default"
+                  onChange={onChange}
+                />
               </View>
             )}
 
-            {show2 && <DateTimePicker value={employeeData.changeTurnDate} mode="time" is24Hour={true} display="default" onChange={onChange2} />}
+            {show2 && (
+              <DateTimePicker
+                value={employeeData.changeTurnDate}
+                mode="time"
+                is24Hour={true}
+                display="default"
+                onChange={onChange2}
+              />
+            )}
             <View>
               <Text
                 style={{
@@ -380,10 +457,20 @@ const CreateEmployeScreen = ({ navigation, zonesRedux, companyRedux, addEmployee
           </View>
         </View>
       </ScrollView>
-      <CameraModal status={camera} onClose={() => setCamera(false)} profile={profilePic} type={"profile"} />
+      <CameraModal
+        status={camera}
+        onClose={() => setCamera(false)}
+        profile={profilePic}
+        type={"profile"}
+      />
 
       <LoadingModal visible={visible} message="Guardando..." />
-      <StatusModal {...statusModalProps} onClose={() => setStatusModalProps((values) => ({ ...values, visible: false }))} />
+      <StatusModal
+        {...statusModalProps}
+        onClose={() =>
+          setStatusModalProps((values) => ({ ...values, visible: false }))
+        }
+      />
       <MessageModal
         {...alertModal}
         onClose={() => {
@@ -414,7 +501,10 @@ const mapDispatchToProps = (dispatch) => ({
     });
   },
 });
-export default connect(mapStateToProps, mapDispatchToProps)(CreateEmployeScreen);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(CreateEmployeScreen);
 const styles = StyleSheet.create({
   container: {
     // alignContent: "center",
@@ -484,5 +574,11 @@ const styles = StyleSheet.create({
     backgroundColor: ThirdColor,
     borderColor: ThirdColor,
     marginVertical: 5,
+  },
+  captionText: {
+    color: Danger,
+    //alignSelf: "center",
+    fontSize: 14,
+    fontWeight: "600",
   },
 });
